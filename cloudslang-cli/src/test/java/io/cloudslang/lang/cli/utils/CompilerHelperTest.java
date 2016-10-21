@@ -176,8 +176,10 @@ public class CompilerHelperTest {
     public void testCompileMixedSlangFiles() throws Exception {
         final URI flowFilePath = getClass().getResource("/flow.sl").toURI();
         final URI folderPath = getClass().getResource("/mixed_sl_files/").toURI();
-        final URI dependency1 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_flow.sl").toURI();
-        final URI dependency2 = getClass().getResource("/mixed_sl_files/configuration/properties/executables/test_op.sl").toURI();
+        final URI dependency1 = getClass()
+                .getResource("/mixed_sl_files/configuration/properties/executables/test_flow.sl").toURI();
+        final URI dependency2 = getClass()
+                .getResource("/mixed_sl_files/configuration/properties/executables/test_op.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(
@@ -194,9 +196,12 @@ public class CompilerHelperTest {
     // flowprop.sl is not recognized as properties file
     @Test
     public void testCompileDependencyPropPartOfFileName() throws Exception {
-        final URI flowFilePath = getClass().getResource("/flow.sl").toURI();
-        final URI folderPath = getClass().getResource("/executables/dir2/").toURI();
-        final URI flow2FilePath = getClass().getResource("/executables/dir2/flowprop.sl").toURI();
+        final URI flowFilePath = getClass()
+                .getResource("/flow.sl").toURI();
+        final URI folderPath = getClass()
+                .getResource("/executables/dir2/").toURI();
+        final URI flow2FilePath = getClass()
+                .getResource("/executables/dir2/flowprop.sl").toURI();
         compilerHelper.compile(flowFilePath.getPath(), Lists.newArrayList(folderPath.getPath()));
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(
@@ -233,7 +238,8 @@ public class CompilerHelperTest {
 
     @Test
     public void testLoadSystemProperties() throws Exception {
-        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("user.sys", "props.host", "localhost"),
+        final Set<SystemProperty> systemProperties =
+                newHashSet(new SystemProperty("user.sys", "props.host", "localhost"),
                 new SystemProperty("user.sys", "props.port", "22"),
                 new SystemProperty("user.sys", "props.alla", "balla"));
         final URI systemPropertyUri = getClass().getResource("/properties/system_properties.prop.sl").toURI();
@@ -249,15 +255,19 @@ public class CompilerHelperTest {
     public void testLoadSystemPropertiesInvalidExtension() throws Exception {
         final URI props1 = getClass().getResource("/properties/duplicate/props1.prop.sl").toURI();
         final URI props2 = getClass().getResource("/properties/duplicate/props2.prop.sl").toURI();
-        Set<SystemProperty> systemProperties1 = newHashSet(new SystemProperty("user.sys", "props.host", "localhost"));
-        Set<SystemProperty> systemProperties2 = newHashSet(new SystemProperty("user.SYS", "props.host", "localhost"));
+        Set<SystemProperty> systemProperties1 =
+                newHashSet(new SystemProperty("user.sys", "props.host", "localhost"));
+        Set<SystemProperty> systemProperties2 =
+                newHashSet(new SystemProperty("user.SYS", "props.host", "localhost"));
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props1)))).thenReturn(systemProperties1);
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props2)))).thenReturn(systemProperties2);
 
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage(containsIgnoreCase("user.SYS.props.host"));
-        expectedException.expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
-        expectedException.expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
+        expectedException
+                .expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
+        expectedException
+                .expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
 
         compilerHelper.loadSystemProperties(Lists.newArrayList(props1.getPath(), props2.getPath()));
     }
@@ -275,8 +285,10 @@ public class CompilerHelperTest {
 
         Set<SlangSource> capturedSources = new HashSet<>(sourceCaptor.getAllValues());
         Set<SlangSource> expectedSources = newHashSet(
-                SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/ubuntu.prop.sl").toURI()),
-                SlangSource.fromFile(getClass().getResource("/mixed_sl_files/configuration/properties/properties/windows.prop.sl").toURI())
+                SlangSource.fromFile(getClass()
+                        .getResource("/mixed_sl_files/configuration/properties/properties/ubuntu.prop.sl").toURI()),
+                SlangSource.fromFile(getClass()
+                        .getResource("/mixed_sl_files/configuration/properties/properties/windows.prop.sl").toURI())
         );
         Assert.assertEquals(expectedSources, capturedSources);
 
@@ -291,7 +303,8 @@ public class CompilerHelperTest {
         expected.put("username", ValueFactory.create("myusername", false));
         expected.put("password", ValueFactory.create("mypassword", true));
         final URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
-        Map<String, ? extends Serializable> result = compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
+        Map<String, ? extends Serializable> result =
+                compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
         Assert.assertNotNull(result);
         Assert.assertEquals(expected, result);
     }

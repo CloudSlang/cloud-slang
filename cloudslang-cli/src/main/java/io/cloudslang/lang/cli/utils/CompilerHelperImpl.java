@@ -98,7 +98,8 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     private void handleException(File file, Exception e) {
         logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
-        throw new RuntimeException("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage(), e);
+        throw new RuntimeException("Failed compilation for file : " + file.getName() +
+                " ,Exception is : " + e.getMessage(), e);
     }
 
     @Override
@@ -113,7 +114,8 @@ public class CompilerHelperImpl implements CompilerHelper {
                     result.setFile(file);
                     results.add(result);
                 } catch (Exception e) {
-                    logger.error("Failed compilation for file : " + file.getName() + " ,Exception is : " + e.getMessage());
+                    logger.error("Failed compilation for file : " + file.getName() +
+                            " ,Exception is : " + e.getMessage());
                 }
             }
         } finally {
@@ -175,7 +177,8 @@ public class CompilerHelperImpl implements CompilerHelper {
     @Override
     public Map<String, Value> loadInputsFromFile(List<String> inputFiles) {
         String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
-        return loadMapsFromFiles(convertToFiles(inputFiles), Extension.getYamlFileExtensionValues(), inputsRelativePath);
+        return loadMapsFromFiles(convertToFiles(inputFiles),
+                Extension.getYamlFileExtensionValues(), inputsRelativePath);
     }
 
     private Map<String, Value> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
@@ -199,11 +202,13 @@ public class CompilerHelperImpl implements CompilerHelper {
                             (Map<String, ? extends Serializable>) yaml.load(inputsFileContent);
                     if (MapUtils.isNotEmpty(inputFileYamlContent)) {
                         emptyContent = false;
-                        result.putAll(slangSourceService.convertInputFromMap(inputFileYamlContent, inputFile.getName()));
+                        result.putAll(slangSourceService
+                                .convertInputFromMap(inputFileYamlContent, inputFile.getName()));
                     }
                 }
                 if (emptyContent) {
-                    throw new RuntimeException("Inputs file: " + inputFile + " is empty or does not contain valid YAML content.");
+                    throw new RuntimeException("Inputs file: " + inputFile +
+                            " is empty or does not contain valid YAML content.");
                 }
             } catch (RuntimeException ex) {
                 logger.error("Error loading file: " + inputFile + ". Nested exception is: " + ex.getMessage(), ex);
@@ -251,7 +256,8 @@ public class CompilerHelperImpl implements CompilerHelper {
                 if (SetUtils.containsIgnoreCaseBasedOnFqn(entry.getValue(), propertyFromFile)) {
                     throw new RuntimeException(
                             DUPLICATE_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX + propertyFromFile.getFullyQualifiedName() +
-                                    "' in the following files: " + entry.getKey().getPath() + ", " + sourceFile.getPath()
+                                    "' in the following files: " +
+                                    entry.getKey().getPath() + ", " + sourceFile.getPath()
 
                     );
                 }
@@ -284,8 +290,10 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     // e.g. exclude .prop.sl from .sl set
     private Collection<File> listSlangFiles(File directory, boolean recursive) {
-        Validate.isTrue(directory.isDirectory(), "Parameter '" + directory.getPath() + INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
+        Validate.isTrue(directory.isDirectory(), "Parameter '" + directory.getPath() +
+                INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory,
+                Extension.getSlangFileExtensionValues(), recursive);
         Collection<File> result = new ArrayList<>();
         for (File file : dependenciesFiles) {
             if (Extension.SL.equals(Extension.findExtension(file.getName()))) {

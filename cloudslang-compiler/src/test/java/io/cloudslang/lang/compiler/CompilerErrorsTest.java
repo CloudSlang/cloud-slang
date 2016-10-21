@@ -588,8 +588,10 @@ public class CompilerErrorsTest {
         dependencies.add(SlangSource.fromFile(operation3Uri));
 
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot compile flow 'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
-                "Step 'explicit_alias' has input 'balla' with the same name as the one of the outputs of 'user.ops.test_op'.");
+        exception.expectMessage("Cannot compile flow " +
+                "'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
+                "Step 'explicit_alias' has input 'balla' with the same name " +
+                "as the one of the outputs of 'user.ops.test_op'.");
         compiler.compile(SlangSource.fromFile(flowUri), dependencies);
     }
 

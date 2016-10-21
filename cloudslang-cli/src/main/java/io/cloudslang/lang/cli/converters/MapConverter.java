@@ -46,7 +46,8 @@ public class MapConverter implements Converter<Map<String, String>> {
                 keyValue[1] = keyValue[1].replace(ESCAPE_EXPRESSION, ",");
                 map.put(keyValue[0], keyValue[1]);
             } else {
-                throw new RuntimeException("Input should be in a key=value comma separated format, e.g. key1=val1,key2=val2 etc.");
+                throw new RuntimeException("Input should be in a key=value " +
+                        "comma separated format, e.g. key1=val1,key2=val2 etc.");
             }
         }
 
@@ -54,7 +55,8 @@ public class MapConverter implements Converter<Map<String, String>> {
     }
 
     @Override
-    public boolean getAllPossibleValues(List<Completion> completions, Class<?> targetType, String existingData, String optionContext, MethodTarget target) {
+    public boolean getAllPossibleValues(List<Completion> completions, Class<?> targetType,
+                                        String existingData, String optionContext, MethodTarget target) {
         return true;
     }
 }

@@ -41,8 +41,11 @@ public class SyncTriggerEventListenerTest {
     public static final String RETURN_RESULT = "returnResult";
     public static final String ERROR_MESSAGE = "errorMessage";
     public static final String RESULT = "result";
-    public static final String LONG_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability result that is too long will be abbreviated so that it does not affect CLI readability";
-    public static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated so that it does not affect CLI readability result tha...";
+    public static final String LONG_RESULT = "result that is too long will be abbreviated so that it does not " +
+            "affect CLI readability result that is too long will be abbreviated so that " +
+            "it does not affect CLI readability";
+    public static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated " +
+            "so that it does not affect CLI readability result tha...";
 
     LanguageEventData data;
     Map<String, Serializable> outputs;

@@ -9,15 +9,9 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.SystemPropertyModellingResult;
 import io.cloudslang.lang.entities.SystemProperty;
-
-import java.net.URI;
-import java.util.Collections;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +20,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertTrue;
@@ -194,7 +192,8 @@ public class LoadSystemPropertiesTest {
 
     @Test
     public void testDuplicateIgnoringCaseComplexKey() throws Exception {
-        final URI propertiesUri = getClass().getResource("/properties/a/b/duplicate_ignoring_case_complex_key.prop.sl").toURI();
+        final URI propertiesUri = getClass()
+                .getResource("/properties/a/b/duplicate_ignoring_case_complex_key.prop.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage(SlangCompilerImpl.ERROR_LOADING_PROPERTIES_FILE_MESSAGE);
         exception.expectMessage(SlangCompilerImpl.DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX);

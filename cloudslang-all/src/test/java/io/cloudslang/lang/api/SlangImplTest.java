@@ -63,7 +63,8 @@ import static org.mockito.Matchers.eq;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SlangImplTest {
 
-    static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(), new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
+    static final CompilationArtifact emptyCompilationArtifact = new CompilationArtifact(new ExecutionPlan(),
+            new HashMap<String, ExecutionPlan>(), new ArrayList<Input>(), new HashSet<String>());
     private static final int ALL_EVENTS_SIZE = 24;
 
     @Autowired
@@ -103,7 +104,8 @@ public class SlangImplTest {
     @Test
     public void testCompile() throws IOException {
         SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
+        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
+                .thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, new HashSet<SlangSource>());
         Assert.assertNotNull(compilationArtifact);
         Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>());
@@ -122,7 +124,8 @@ public class SlangImplTest {
     @Test
     public void testCompileWithNullDependencies() throws IOException {
         SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
+        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
+                .thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, null);
         Assert.assertNotNull(compilationArtifact);
         Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>());
@@ -135,7 +138,8 @@ public class SlangImplTest {
         tempDependencyFile.deleteOnExit();
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(tempDependencyFile));
-        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
+        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
+                .thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, dependencies);
         Assert.assertNotNull(compilationArtifact);
         Set<SlangSource> dependencyFiles = new HashSet<>();
@@ -190,10 +194,15 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
         Mockito.when(mockSlang.compile(tempFile, new HashSet<SlangSource>())).thenReturn(emptyCompilationArtifact);
-        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class),
+                anySetOf(SlangSource.class), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class)))
+                .thenCallRealMethod();
+        Long id = mockSlang
+                .compileAndRun(tempFile, new HashSet<SlangSource>(),
+                        new HashMap<String, Value>(), new HashSet<SystemProperty>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).run(emptyCompilationArtifact, new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        Mockito.verify(mockSlang).run(emptyCompilationArtifact,
+                new HashMap<String, Value>(), new HashSet<SystemProperty>());
     }
 
     @Test
@@ -201,10 +210,15 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
 
-        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
-        Long id = mockSlang.compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class),
+                anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
+        Long id = mockSlang
+                .compileAndRun(tempFile, new HashSet<SlangSource>(),
+                        new HashMap<String, Value>(), new HashSet<SystemProperty>());
         Assert.assertNotNull(id);
-        Mockito.verify(mockSlang).compileAndRun(tempFile, new HashSet<SlangSource>(), new HashMap<String, Value>(), new HashSet<SystemProperty>());
+        Mockito.verify(mockSlang)
+                .compileAndRun(tempFile, new HashSet<SlangSource>(),
+                        new HashMap<String, Value>(), new HashSet<SystemProperty>());
     }
 
     // tests for subscribeOnEvents() method
@@ -272,7 +286,8 @@ public class SlangImplTest {
         @Bean
         public SlangCompiler compiler() {
             SlangCompiler compiler = Mockito.mock(SlangCompiler.class);
-            Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenReturn(emptyCompilationArtifact);
+            Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
+                    .thenReturn(emptyCompilationArtifact);
             return compiler;
         }
 

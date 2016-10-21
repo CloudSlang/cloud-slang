@@ -47,7 +47,8 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
 
     private StepData buildStepData(List<LanguageEventData> data) {
         List<LanguageEventData> stepEvents = selectByStepType(data, LanguageEventData.StepType.STEP);
-        List<LanguageEventData> executableEvents = selectByStepType(data, LanguageEventData.StepType.getExecutableTypes());
+        List<LanguageEventData> executableEvents =
+                selectByStepType(data, LanguageEventData.StepType.getExecutableTypes());
 
         LanguageEventData inputsEvent;
         LanguageEventData outputsEvent;
@@ -77,7 +78,8 @@ public class RunDataAggregatorListener extends AbstractAggregatorListener {
         return new StepData(path, stepName, inputs, outputs, executableName, result);
     }
 
-    private List<LanguageEventData> selectByStepType(List<LanguageEventData> data, LanguageEventData.StepType... stepTypes) {
+    private List<LanguageEventData> selectByStepType(List<LanguageEventData> data,
+                                                     LanguageEventData.StepType... stepTypes) {
         List<LanguageEventData> result = new ArrayList<>();
         for (LanguageEventData element : data) {
             boolean match = false;

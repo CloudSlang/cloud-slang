@@ -254,7 +254,8 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testFunctionsAndSpDependencies() throws Exception {
-        @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMapWithFunctions).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Input> inputs = inputTransformer.transform(inputsMapWithFunctions).getTransformedData();
 
         // prepare parameters
         Set<ScriptFunction> setGet = Sets.newHashSet(ScriptFunction.GET);

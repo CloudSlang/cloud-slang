@@ -35,6 +35,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
@@ -54,10 +55,10 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         URI operation33 = getClass().getResource("/yaml/versioning/javaOneAnother33.sl").toURI();
 
         Set<SlangSource> dependencies = Sets.newHashSet(
-                SlangSource.fromFile(operation11), SlangSource.fromFile(operation12), SlangSource.fromFile(operation13),
-                SlangSource.fromFile(operation21), SlangSource.fromFile(operation22), SlangSource.fromFile(operation23),
-                SlangSource.fromFile(operation31), SlangSource.fromFile(operation32), SlangSource.fromFile(operation33));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
+                fromFile(operation11), fromFile(operation12), fromFile(operation13),
+                fromFile(operation21), fromFile(operation22), fromFile(operation23),
+                fromFile(operation31), fromFile(operation32), fromFile(operation33));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(flow), dependencies);
 
         ScoreEvent event = trigger(compilationArtifact, new HashMap<String, Value>(), new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
@@ -133,7 +134,7 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
     @Test
     public void testMultOfSumOpWithParameters() throws Exception {
         URI operationSum3 = getClass().getResource("/yaml/versioning/math/javaMulOfSum.sl").toURI();
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(operationSum3), null);
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(operationSum3), null);
 
         HashMap<String, Value> userInputs = new HashMap<>();
         userInputs.put("var1", ValueFactory.create("4"));
@@ -149,7 +150,7 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
     @Test
     public void testSumOfMulOpWithParameters() throws Exception {
         URI operationSum3 = getClass().getResource("/yaml/versioning/math/javaSumOfMul.sl").toURI();
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(operationSum3), null);
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(operationSum3), null);
 
         HashMap<String, Value> userInputs = new HashMap<>();
         userInputs.put("var1", ValueFactory.create("3"));
@@ -164,12 +165,15 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
 
     @Test
     public void testFlowWithGlobalSession() throws Exception {
-        URI resource = getClass().getResource("/yaml/versioning/testglobals/flow_using_global_session_dependencies.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/versioning/testglobals/set_global_session_object_dependencies.sl").toURI();
-        URI operation2 = getClass().getResource("/yaml/versioning/testglobals/get_global_session_object_dependencies.sl").toURI();
+        URI resource = getClass()
+                .getResource("/yaml/versioning/testglobals/flow_using_global_session_dependencies.sl").toURI();
+        URI operation1 = getClass()
+                .getResource("/yaml/versioning/testglobals/set_global_session_object_dependencies.sl").toURI();
+        URI operation2 = getClass()
+                .getResource("/yaml/versioning/testglobals/get_global_session_object_dependencies.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Set<SlangSource> path = Sets.newHashSet(fromFile(operation1), fromFile(operation2));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("object_value", ValueFactory.create("SessionValue"));
@@ -182,7 +186,7 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
 
     private void testOperation(String operationPath, String expectedResultValue) throws URISyntaxException {
         URI operationSum3 = getClass().getResource(operationPath).toURI();
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(operationSum3), null);
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(operationSum3), null);
 
         ScoreEvent event = trigger(compilationArtifact, new HashMap<String, Value>(), new HashSet<SystemProperty>());
         assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
@@ -196,8 +200,8 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
         URI flow = getClass().getResource("/yaml/versioning/java_flow_with_loop.sl").toURI();
         URI pyDependencyMulOp = getClass().getResource("/yaml/versioning/javaMulOfSum.sl").toURI();
 
-        Set<SlangSource> dependencies = Sets.newHashSet(SlangSource.fromFile(pyDependencyMulOp));
-        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), dependencies);
+        Set<SlangSource> dependencies = Sets.newHashSet(fromFile(pyDependencyMulOp));
+        final CompilationArtifact compilationArtifact = slang.compile(fromFile(flow), dependencies);
 
         for (int iteration = 0; iteration < 20; iteration++) {
             String addedValue = String.valueOf(iteration);

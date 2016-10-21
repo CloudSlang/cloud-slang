@@ -630,7 +630,8 @@ public class PreCompilerErrorsTest {
         List<RuntimeException> errors = result.getErrors();
         assertTrue(errors.size() == 2);
 
-        assertContains(errors, 0, "Failed to compile step: print_message1. The step/result name: CUSTOM of navigation: FAILURE -> CUSTOM is missing");
+        assertContains(errors, 0, "Failed to compile step: print_message1. " +
+                "The step/result name: CUSTOM of navigation: FAILURE -> CUSTOM is missing");
         assertContains(errors, 1, "The following results are not wired: [UNREACHABLE_RESULT].");
     }
 
@@ -677,7 +678,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Failed to compile step: Step1. The step/result name: non_existing_step of navigation: " +
+        exception.expectMessage("Failed to compile step: Step1. " +
+                "The step/result name: non_existing_step of navigation: " +
                 "SUCCESS -> non_existing_step is missing");
         throw result.getErrors().get(0);
     }
@@ -690,7 +692,8 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'Step1' syntax is illegal.");
-        exception.expectMessage("Navigation rule should be a Map. Actual type is java.util.ArrayList: [SUCCESS, SUCCESS]");
+        exception.expectMessage("Navigation rule should be a Map. " +
+                "Actual type is java.util.ArrayList: [SUCCESS, SUCCESS]");
         throw result.getErrors().get(0);
     }
 
@@ -709,7 +712,8 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowWithUnreachableTasksOneReachableFromUnreachableTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_unreachable_task.sl").toURI();
+        URI resource = getClass()
+                .getResource("/corrupted/unreachable_tasks_one_reachable_from_unreachable_task.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -737,7 +741,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Failed to compile step: jedi_training_1. The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing");
+        exception.expectMessage("Failed to compile step: jedi_training_1. " +
+                "The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing");
         throw result.getErrors().get(0);
     }
 

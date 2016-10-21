@@ -28,6 +28,9 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static io.cloudslang.lang.compiler.SlangSource.fromFile;
+
 /**
  * Date: 3/25/2015
  *
@@ -45,9 +48,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     public void testFlowWithParallelLoop() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/parallel_loop/simple_parallel_loop.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        Set<SlangSource> path = newHashSet(fromFile(operation1));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(fromFile(resource), path);
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -57,9 +60,10 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     public void testFlowWithSensitiveInputParallelLoop() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/parallel_loop/sensitive_input_parallel_loop.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        Set<SlangSource> path = newHashSet(fromFile(operation1));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path, getSystemProperties());
+        RuntimeInformation runtimeInformation =
+                triggerWithData(fromFile(resource), path, getSystemProperties());
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -73,9 +77,10 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     public void testFlowWithSensitiveOutputParallelLoop() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/parallel_loop/sensitive_output_parallel_loop.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        Set<SlangSource> path = newHashSet(fromFile(operation1));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path, getSystemProperties());
+        RuntimeInformation runtimeInformation =
+                triggerWithData(fromFile(resource), path, getSystemProperties());
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -89,10 +94,10 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     public void testFlowWithParallelLoopPublish() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_publish.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        Set<SlangSource> path = newHashSet(fromFile(operation1));
 
         RuntimeInformation runtimeInformation = triggerWithData(
-                SlangSource.fromFile(resource),
+                fromFile(resource),
                 path,
                 getSystemProperties()
         );
@@ -109,10 +114,10 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     public void testFlowBranchResults() throws Exception {
         URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_branch_result.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        Set<SlangSource> path = newHashSet(fromFile(operation1));
 
         RuntimeInformation runtimeInformation = triggerWithData(
-                SlangSource.fromFile(resource),
+                fromFile(resource),
                 path,
                 getSystemProperties()
         );
@@ -130,12 +135,14 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowBranchResultsOutputCollision() throws Exception {
-        URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_branch_result_output_collision.sl").toURI();
-        URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch_with_result_output_collision.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        URI resource = getClass()
+                .getResource("/yaml/loops/parallel_loop/parallel_loop_branch_result_output_collision.sl").toURI();
+        URI operation1 = getClass()
+                .getResource("/yaml/loops/parallel_loop/print_branch_with_result_output_collision.sl").toURI();
+        Set<SlangSource> path = newHashSet(fromFile(operation1));
 
         RuntimeInformation runtimeInformation = triggerWithData(
-                SlangSource.fromFile(resource),
+                fromFile(resource),
                 path,
                 getSystemProperties()
         );
@@ -157,9 +164,9 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/loops/parallel_loop/print_list.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
+        Set<SlangSource> path = newHashSet(fromFile(operation1), fromFile(operation2));
 
-        RuntimeInformation runtimeInformation = triggerWithData(SlangSource.fromFile(resource), path);
+        RuntimeInformation runtimeInformation = triggerWithData(fromFile(resource), path);
 
         List<StepData> branchesData = extractParallelLoopData(runtimeInformation);
         Assert.assertEquals("incorrect number of branches", 3, branchesData.size());
@@ -173,10 +180,10 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/loops/parallel_loop/print_list.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
+        Set<SlangSource> path = newHashSet(fromFile(operation1), fromFile(operation2));
 
         RuntimeInformation runtimeInformation = triggerWithData(
-                SlangSource.fromFile(resource),
+                fromFile(resource),
                 path,
                 getSystemProperties()
         );
@@ -193,24 +200,27 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
     @Test
     public void testFlowContextInPublishSectionNotReachable() throws Exception {
-        final URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_publish_flow_context.sl").toURI();
-        final URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
-        final Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
+        final URI resource = getClass()
+                .getResource("/yaml/loops/parallel_loop/parallel_loop_publish_flow_context.sl").toURI();
+        final URI operation1 = getClass()
+                .getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
+        final Set<SlangSource> path = newHashSet(fromFile(operation1));
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("flow_var");
         exception.expectMessage("not defined");
 
-        triggerWithData(SlangSource.fromFile(resource), path);
+        triggerWithData(fromFile(resource), path);
     }
 
     @Test
     public void testFlowWithInlineMapLoops() throws Exception {
-        final URI resource = getClass().getResource("/yaml/loops/parallel_loop/parallel_loop_with_inline_map.sl").toURI();
+        final URI resource = getClass()
+                .getResource("/yaml/loops/parallel_loop/parallel_loop_with_inline_map.sl").toURI();
         final URI operation1 = getClass().getResource("/yaml/loops/parallel_loop/print_branch_map.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1));
-        final CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Set<SlangSource> path = newHashSet(fromFile(operation1));
+        final CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, getSystemProperties());
@@ -221,7 +231,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     }
 
     private Set<SystemProperty> getSystemProperties() {
-        return Sets.newHashSet(new SystemProperty("loop", "parallel.prop1", "publish_value"));
+        return newHashSet(new SystemProperty("loop", "parallel.prop1", "publish_value"));
     }
 
     private RuntimeInformation triggerWithData(

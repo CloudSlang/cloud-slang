@@ -62,7 +62,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
 
     @Override
     public synchronized void onEvent(ScoreEvent scoreEvent) throws InterruptedException {
-        @SuppressWarnings("unchecked") Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> data = (Map<String, Serializable>) scoreEvent.getData();
         switch (scoreEvent.getEventType()) {
             case EventConstants.SCORE_FINISHED_EVENT:
                 flowFinished.set(true);
@@ -135,7 +136,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                 Map.Entry<String, Serializable> output = iterator.next();
 
                 if (output.getValue() != null && !(StringUtils.isEmpty(output.getValue().toString()))) {
-                    extractedOutputs.put(output.getKey(), StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
+                    extractedOutputs.put(output.getKey(),
+                            StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
                 }
             }
             return extractedOutputs;
@@ -151,7 +153,8 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                 "Flow: " + flowName + FINISHED_WITH_RESULT + flowResult);
     }
 
-    private void printForOperationOrFlow(Map<String, Serializable> data, Ansi.Color color, String operationMessage, String flowMessage) {
+    private void printForOperationOrFlow(Map<String, Serializable> data, Ansi.Color color,
+                                         String operationMessage, String flowMessage) {
         if (LanguageEventData.StepType.OPERATION.equals(data.get(LanguageEventData.STEP_TYPE))) {
             printWithColor(color, operationMessage);
         } else {

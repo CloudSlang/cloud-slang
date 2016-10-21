@@ -43,7 +43,8 @@ public class DecisionsTest extends SystemsTestsParent {
     @Test
     public void testValues1() throws Exception {
         CompilationArtifact compilationArtifact = getCompilationArtifact("/yaml/decisions/decision_1.sl");
-        Map<String, StepData> executionData = triggerWithData(compilationArtifact, getUserInputs(), emptyProperties).getSteps();
+        Map<String, StepData> executionData =
+                triggerWithData(compilationArtifact, getUserInputs(), emptyProperties).getSteps();
         StepData decisionData = executionData.get(EXEC_START_PATH);
 
         verifyInputs1(decisionData);
@@ -54,7 +55,8 @@ public class DecisionsTest extends SystemsTestsParent {
     @Test
     public void testValues2() throws Exception {
         CompilationArtifact compilationArtifact = getCompilationArtifact("/yaml/decisions/decision_2.sl");
-        Map<String, StepData> executionData = triggerWithData(compilationArtifact, getUserInputs(), emptyProperties).getSteps();
+        Map<String, StepData> executionData =
+                triggerWithData(compilationArtifact, getUserInputs(), emptyProperties).getSteps();
         StepData decisionData = executionData.get(EXEC_START_PATH);
 
         verifyInputs2(decisionData);
@@ -65,7 +67,8 @@ public class DecisionsTest extends SystemsTestsParent {
     @Test
     public void testValuesSystemProperties() throws Exception {
         CompilationArtifact compilationArtifact = getCompilationArtifact("/yaml/decisions/decision_3_sp.sl");
-        Map<String, StepData> executionData = triggerWithData(compilationArtifact, getUserInputs(), getSystemProperties()).getSteps();
+        Map<String, StepData> executionData =
+                triggerWithData(compilationArtifact, getUserInputs(), getSystemProperties()).getSteps();
         StepData decisionData = executionData.get(EXEC_START_PATH);
 
         verifyInputs1(decisionData);
@@ -83,7 +86,8 @@ public class DecisionsTest extends SystemsTestsParent {
                                 "/yaml/noop.sl"
                         )
                 );
-        Map<String, StepData> executionData = triggerWithData(compilationArtifact, getUserInputs(), emptyProperties).getSteps();
+        Map<String, StepData> executionData =
+                triggerWithData(compilationArtifact, getUserInputs(), emptyProperties).getSteps();
         StepData decisionData = executionData.get(EXEC_START_PATH);
 
         verifyOutputs1(decisionData);
@@ -94,7 +98,9 @@ public class DecisionsTest extends SystemsTestsParent {
         return getCompilationArtifactWithDependencies(path, emptySet);
     }
 
-    private CompilationArtifact getCompilationArtifactWithDependencies(String flowPath, Set<String> dependencyPaths) throws URISyntaxException {
+    private CompilationArtifact getCompilationArtifactWithDependencies(String flowPath,
+                                                                       Set<String> dependencyPaths)
+            throws URISyntaxException {
         URI flow = getClass().getResource(flowPath).toURI();
         Set<SlangSource> dependencies = new HashSet<>();
         for (String dependencyPath : dependencyPaths) {

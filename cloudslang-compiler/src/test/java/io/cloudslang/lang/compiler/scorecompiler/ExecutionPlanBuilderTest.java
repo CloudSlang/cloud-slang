@@ -90,7 +90,8 @@ public class ExecutionPlanBuilderTest {
         return createSimpleCompiledStep(stepName, isParallelLoop, navigationStrings);
     }
 
-    private Step createSimpleCompiledStep(String stepName, boolean isParallelLoop, List<Map<String, String>> navigationStrings) {
+    private Step createSimpleCompiledStep(String stepName, boolean isParallelLoop,
+                                          List<Map<String, String>> navigationStrings) {
         Map<String, Serializable> preStepActionData = new HashMap<>();
 
         if (isParallelLoop) {
@@ -121,8 +122,12 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preExecActionData = executable.getPreExecActionData();
         String execName = executable.getName();
         List<Input> inputs = executable.getInputs();
-        when(stepFactory.createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName), eq(ExecutableType.FLOW))).thenReturn(new ExecutionStep(1L));
-        when(stepFactory.createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName), eq(ExecutableType.OPERATION))).thenReturn(new ExecutionStep(1L));
+        when(stepFactory
+                .createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName),
+                        eq(ExecutableType.FLOW))).thenReturn(new ExecutionStep(1L));
+        when(stepFactory
+                .createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName),
+                        eq(ExecutableType.OPERATION))).thenReturn(new ExecutionStep(1L));
     }
 
     private void mockEndStep(Long stepId, Executable executable, ExecutableType executableType) {
@@ -130,7 +135,9 @@ public class ExecutionPlanBuilderTest {
         List<Output> outputs = executable.getOutputs();
         List<Result> results = executable.getResults();
         String execName = executable.getName();
-        when(stepFactory.createEndStep(eq(stepId), same(postExecActionData), same(outputs), same(results), same(execName), same(executableType))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory
+                .createEndStep(eq(stepId), same(postExecActionData), same(outputs), same(results),
+                        same(execName), same(executableType))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockFinishStep(Long stepId, Step step) {
@@ -140,7 +147,10 @@ public class ExecutionPlanBuilderTest {
     private void mockFinishStep(Long stepId, Step step, boolean isParallelLoop) {
         Map<String, Serializable> postStepActionData = step.getPostStepActionData();
         String stepName = step.getName();
-        when(stepFactory.createFinishStepStep(eq(stepId), eq(postStepActionData), anyMapOf(String.class, ResultNavigation.class), eq(stepName), eq(isParallelLoop))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory
+                .createFinishStepStep(eq(stepId), eq(postStepActionData),
+                        anyMapOf(String.class, ResultNavigation.class), eq(stepName),
+                        eq(isParallelLoop))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockFinishParallelLoopStep(Long stepId, Step step) {
@@ -151,20 +161,26 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preStepActionData = step.getPreStepActionData();
         String refId = step.getRefId();
         String name = step.getName();
-        when(stepFactory.createBeginStepStep(eq(stepId), anyListOf(Argument.class), eq(preStepActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory
+                .createBeginStepStep(eq(stepId), anyListOf(Argument.class),
+                        eq(preStepActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepId, Long branchBeginStepId, Step step, Flow flow) {
         Map<String, Serializable> preStepActionData = step.getPreStepActionData();
         String refId = flow.getId();
         String name = step.getName();
-        when(stepFactory.createAddBranchesStep(eq(stepId), eq(nextStepId), eq(branchBeginStepId), eq(preStepActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createAddBranchesStep(eq(stepId), eq(nextStepId),
+                eq(branchBeginStepId), eq(preStepActionData), eq(refId), eq(name)))
+                .thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockJoinBranchesStep(Long stepId, Step step) {
         Map<String, Serializable> postStepActionData = step.getPostStepActionData();
         String stepName = step.getName();
-        when(stepFactory.createJoinBranchesStep(eq(stepId), eq(postStepActionData), anyMapOf(String.class, ResultNavigation.class), eq(stepName))).thenReturn(new ExecutionStep(stepId));
+        when(stepFactory.createJoinBranchesStep(eq(stepId), eq(postStepActionData),
+                anyMapOf(String.class, ResultNavigation.class), eq(stepName)))
+                .thenReturn(new ExecutionStep(stepId));
     }
 
     @Test
@@ -180,7 +196,8 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = new ArrayList<>();
 
         Operation compiledOperation =
-                new Operation(preOpActionData, postOpActionData, action, opNamespace, operationName, inputs, outputs, results, null, systemPropertyDependencies);
+                new Operation(preOpActionData, postOpActionData, action, opNamespace,
+                        operationName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledOperation);
         when(stepFactory.createActionStep(eq(2L), same(actionData))).thenReturn(new ExecutionStep(2L));
@@ -209,7 +226,8 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = defaultFlowResults();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
+                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -238,7 +256,8 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = defaultFlowResults();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
+                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -255,9 +274,15 @@ public class ExecutionPlanBuilderTest {
                 eq(step.getPreStepActionData()),
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
-        verify(stepFactory).createBeginStepStep(eq(3L), anyListOf(Argument.class), eq(step.getPreStepActionData()), eq(step.getRefId()), eq(step.getName()));
-        verify(stepFactory).createFinishStepStep(eq(4L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isParallelLoop()));
-        verify(stepFactory).createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()), anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
+        verify(stepFactory)
+                .createBeginStepStep(eq(3L), anyListOf(Argument.class),
+                        eq(step.getPreStepActionData()), eq(step.getRefId()), eq(step.getName()));
+        verify(stepFactory)
+                .createFinishStepStep(eq(4L), eq(step.getPostStepActionData()),
+                        anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isParallelLoop()));
+        verify(stepFactory)
+                .createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()),
+                        anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 
         assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
@@ -292,7 +317,8 @@ public class ExecutionPlanBuilderTest {
 
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
+                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -322,7 +348,8 @@ public class ExecutionPlanBuilderTest {
         List<Result> results = new ArrayList<>();
 
         Flow compiledFlow =
-                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace, flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
+                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);

@@ -48,7 +48,8 @@ public class LangTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> getConnectionFromNonSerializableSession(@Param("connection") GlobalSessionObject<NonSerializableObject> connection) {
+    public Map<String, String> getConnectionFromNonSerializableSession(
+            @Param("connection") GlobalSessionObject<NonSerializableObject> connection) {
         SessionResource<NonSerializableObject> sessionName = connection.getResource();
         Map<String, String> returnMap = new HashMap<>();
         String value = null;
@@ -60,7 +61,8 @@ public class LangTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> setConnectionOnNonSerializableSession(@Param("connection") GlobalSessionObject<NonSerializableObject> connection,
+    public Map<String, String> setConnectionOnNonSerializableSession(
+            @Param("connection") GlobalSessionObject<NonSerializableObject> connection,
                                                                      @Param("value") String value) {
         connection.getResource();
         Map<String, String> returnMap = new HashMap<>();

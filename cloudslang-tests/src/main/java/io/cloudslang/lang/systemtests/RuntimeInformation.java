@@ -22,7 +22,8 @@ public class RuntimeInformation {
     private final Map<String, List<StepData>> branchesByPath;
     private final Map<String, StepData> parallelSteps;
 
-    public RuntimeInformation(Map<String, StepData> steps, Map<String, List<StepData>> branchesByPath, Map<String, StepData> parallelSteps) {
+    public RuntimeInformation(Map<String, StepData> steps, Map<String, List<StepData>> branchesByPath,
+                              Map<String, StepData> parallelSteps) {
         this.steps = steps;
         this.branchesByPath = branchesByPath;
         this.parallelSteps = parallelSteps;

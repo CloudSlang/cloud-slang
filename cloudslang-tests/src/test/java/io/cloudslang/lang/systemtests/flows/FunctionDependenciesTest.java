@@ -31,6 +31,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Bonczidai Levente
  * @since 11/6/2015
@@ -47,7 +49,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
 
-        Assert.assertEquals(
+        assertEquals(
                 "system property dependencies not as expected",
                 prepareSystemPropertiesForDependencyTest(),
                 compilationArtifact.getSystemProperties()
@@ -80,7 +82,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         verifyFlowOutputs(flowData);
 
         // verify 'get' function worked in result expressions
-        Assert.assertEquals("Function evaluation problem in result expression", "FUNCTIONS_KEY_EXISTS", flowData.getResult());
+        assertEquals("Function evaluation problem in result expression",
+                "FUNCTIONS_KEY_EXISTS", flowData.getResult());
     }
 
     @Test
@@ -98,7 +101,8 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         StepData flowData = executionData.get(EXEC_START_PATH);
 
         // verify 'get' function worked in result expressions
-        Assert.assertEquals("Get function problem in result expression", "GET_FUNCTION_DEFAULT_VALUE", flowData.getResult());
+        assertEquals("Get function problem in result expression",
+                "GET_FUNCTION_DEFAULT_VALUE", flowData.getResult());
     }
 
     private void verifyStepArguments(StepData stepData) {
@@ -122,7 +126,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedArguments.put("input_16", null);
         expectedArguments.put("input_17", "default_str");
         Map<String, Serializable> actualArguments = stepData.getInputs();
-        Assert.assertEquals("step arguments not as expected", expectedArguments, actualArguments);
+        assertEquals("step arguments not as expected", expectedArguments, actualArguments);
     }
 
     private void verifyFlowInputs(StepData flowData) {
@@ -153,14 +157,14 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedFlowInputs.put("input_16", null);
         expectedFlowInputs.put("input_17", "default_str");
         Map<String, Serializable> actualFlowInputs = flowData.getInputs();
-        Assert.assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
+        assertEquals("flow input values not as expected", expectedFlowInputs, actualFlowInputs);
     }
 
     private void verifyFlowOutputs(StepData flowData) {
         Map<String, Serializable> expectedFlowOutputs = new LinkedHashMap<>();
         expectedFlowOutputs.put("value_propagate", "flowInput_stepArg_opInput_opOutput_stepPublish_flowOutput_");
         Map<String, Serializable> actualFlowOutputs = flowData.getOutputs();
-        Assert.assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
+        assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
     }
 
     private void verifyStepPublishValues(StepData stepData) {
@@ -186,7 +190,7 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         expectedPublishValues.put("output_15", "default_str");
         expectedPublishValues.put("value_propagate", "flowInput_stepArg_opInput_opOutput_stepPublish_");
         Map<String, Serializable> actualPublishValues = stepData.getOutputs();
-        Assert.assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
+        assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 
     private Set<SystemProperty> prepareSystemProperties() {

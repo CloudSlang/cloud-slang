@@ -40,7 +40,8 @@ public class SlangSourceTest {
     private static final String content = "file_content";
     private static final Extension extension = Extension.SL;
     private static final String nameWithoutExtension = "file_name";
-    private static final String name = nameWithoutExtension + FilenameUtils.EXTENSION_SEPARATOR_STR + extension.getValue();
+    private static final String name = nameWithoutExtension +
+            FilenameUtils.EXTENSION_SEPARATOR_STR + extension.getValue();
 
     private void assertSourceEquals(String nameSuffix, Extension expectedExtension) throws IOException {
         String name = nameWithoutExtension + nameSuffix;
@@ -70,37 +71,44 @@ public class SlangSourceTest {
 
     @Test
     public void testFromFileYamlSlExtension() throws Exception {
-        assertSourceEquals(nameWithoutExtension + "." + Extension.YAML.getValue() + "." + Extension.SL.getValue(), Extension.SL);
+        assertSourceEquals(nameWithoutExtension + "." + Extension.YAML.getValue() + "." +
+                Extension.SL.getValue(), Extension.SL);
     }
 
     @Test
     public void testFromFileYamlYmlExtension() throws Exception {
-        assertSourceEquals(nameWithoutExtension + "." + Extension.YAML.getValue() + "." + Extension.YML.getValue(), Extension.YML);
+        assertSourceEquals(nameWithoutExtension + "." + Extension.YAML.getValue() + "." +
+                Extension.YML.getValue(), Extension.YML);
     }
 
     @Test
     public void testFromFileYmlSlExtension() throws Exception {
-        assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." + Extension.SL.getValue(), Extension.SL);
+        assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." +
+                Extension.SL.getValue(), Extension.SL);
     }
 
     @Test
     public void testFromFileYmlSlYamlExtension() throws Exception {
-        assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." + Extension.SL_YAML.getValue(), Extension.SL_YAML);
+        assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." +
+                Extension.SL_YAML.getValue(), Extension.SL_YAML);
     }
 
     @Test
     public void testFromFileYmlSlYmlExtension() throws Exception {
-        assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." + Extension.SL_YML.getValue(), Extension.SL_YML);
+        assertSourceEquals(nameWithoutExtension + "." + Extension.YML.getValue() + "." +
+                Extension.SL_YML.getValue(), Extension.SL_YML);
     }
 
     @Test
     public void testFromFileSlPropSlExtension() throws Exception {
-        assertSourceEquals(nameWithoutExtension + "." + Extension.SL.getValue() + "." + Extension.PROP_SL.getValue(), Extension.PROP_SL);
+        assertSourceEquals(nameWithoutExtension + "." + Extension.SL.getValue() + "." +
+                Extension.PROP_SL.getValue(), Extension.PROP_SL);
     }
 
     @Test
     public void testFromFilePropSlSlExtension() throws Exception {
-        assertSourceEquals(nameWithoutExtension + "." + Extension.PROP_SL.getValue() + "." + Extension.SL.getValue(), Extension.SL);
+        assertSourceEquals(nameWithoutExtension + "." + Extension.PROP_SL.getValue() + "." +
+                Extension.SL.getValue(), Extension.SL);
     }
 
     @Test
@@ -193,7 +201,8 @@ public class SlangSourceTest {
 
     @Test
     public void testFromFileOverrideEncoding() throws Exception {
-        // In this scenario, the source file is encoded using a single-byte Western European encoding (instead of UTF-8)
+        // In this scenario, the source file is encoded using a single-byte Western European encoding
+        // (instead of UTF-8)
         final String sourceString = "André Citroën";
         final String filename = name + "_fr";
         File file = folder.newFile(filename);
@@ -228,7 +237,8 @@ public class SlangSourceTest {
 
     @Test
     public void testFromBytesOverrideEncoding() throws Exception {
-        // In this scenario, the source file is encoded using a single-byte Western European encoding (instead of UTF-8)
+        // In this scenario, the source file is encoded using a single-byte Western European encoding
+        // (instead of UTF-8)
         final String sourceString = "André Citroën";
         final byte[] sourceFile = sourceString.getBytes("ISO-8859-1");
 
