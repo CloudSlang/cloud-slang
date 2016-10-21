@@ -33,7 +33,6 @@ import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 @Component
 public class StaticValidatorImpl implements StaticValidator {
 
-    // TODO correct this regex
     private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z_0-9-.]+$");
 
     @Override
