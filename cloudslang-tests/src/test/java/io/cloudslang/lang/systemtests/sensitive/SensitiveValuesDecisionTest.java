@@ -30,7 +30,8 @@ public class SensitiveValuesDecisionTest extends ValueSyntaxParent {
     public void testValues() throws Exception {
         // compile
         URI resource = getClass().getResource("/yaml/sensitive/sensitive_values_decision.sl").toURI();
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
+        CompilationArtifact compilationArtifact = slang
+                .compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
 
         // trigger
         Map<String, StepData> steps = prepareAndRun(compilationArtifact);

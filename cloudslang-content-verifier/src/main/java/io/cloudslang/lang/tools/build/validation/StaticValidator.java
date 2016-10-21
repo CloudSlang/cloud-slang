@@ -18,5 +18,8 @@ import java.io.File;
  * Created by bancl on 8/30/2016.
  */
 public interface StaticValidator {
-    void validateSlangFile(File slangFile, Executable executable, Metadata sourceMetadata, boolean shouldValidateDescription);
+    void validateSlangFile(File slangFile,
+                           Executable executable,
+                           Metadata sourceMetadata,
+                           boolean shouldValidateDescription);
 }

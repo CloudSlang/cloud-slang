@@ -29,8 +29,10 @@ public class SlangTestCaseRunnable implements Runnable {
     private final SlangTestRunner slangTestRunService;
     private final MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener;
 
-    public SlangTestCaseRunnable(SlangTestCase testCase, Map<String, CompilationArtifact> compiledFlows, String projectPath, SlangTestRunner slangTestRunService,
-                                 TestCaseEventDispatchService testCaseEventDispatchService, MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
+    public SlangTestCaseRunnable(SlangTestCase testCase, Map<String, CompilationArtifact> compiledFlows,
+                                 String projectPath, SlangTestRunner slangTestRunService,
+                                 TestCaseEventDispatchService testCaseEventDispatchService,
+                                 MultiTriggerTestCaseEventListener multiTriggerTestCaseEventListener) {
         this.testCase = testCase;
         this.compiledFlows = compiledFlows;
         this.projectPath = projectPath;
@@ -45,10 +47,12 @@ public class SlangTestCaseRunnable implements Runnable {
             testCaseEventDispatchService.notifyListeners(new BeginSlangTestCaseEvent(testCase));
 
             CompilationArtifact compiledTestFlow = slangTestRunService.getCompiledTestFlow(compiledFlows, testCase);
-            slangTestRunService.runTestCaseParallel(testCase, compiledTestFlow, projectPath, multiTriggerTestCaseEventListener);
+            slangTestRunService
+                    .runTestCaseParallel(testCase, compiledTestFlow, projectPath, multiTriggerTestCaseEventListener);
             testCaseEventDispatchService.notifyListeners(new PassedSlangTestCaseEvent(testCase));
         } catch (RuntimeException failureException) {
-            testCaseEventDispatchService.notifyListeners(new FailedSlangTestCaseEvent(testCase, failureException.getMessage(), failureException));
+            testCaseEventDispatchService.notifyListeners(
+                    new FailedSlangTestCaseEvent(testCase, failureException.getMessage(), failureException));
         }
     }
 }

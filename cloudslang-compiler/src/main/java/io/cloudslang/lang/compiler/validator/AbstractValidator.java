@@ -64,7 +64,8 @@ public abstract class AbstractValidator {
         validateChars(variableNamePatternMatcher, input);
     }
 
-    protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams, List<Output> outputs, String errorMessage) {
+    protected void validateListsHaveMutuallyExclusiveNames(List<? extends InOutParam> inOutParams,
+                                                           List<Output> outputs, String errorMessage) {
         for (InOutParam inOutParam : CollectionUtils.emptyIfNull(inOutParams)) {
             for (Output output : CollectionUtils.emptyIfNull(outputs)) {
                 if (StringUtils.equalsIgnoreCase(inOutParam.getName(), output.getName())) {

@@ -28,7 +28,8 @@ public class CompilationArtifact {
     private final List<Input> inputs;
     private final Set<String> systemProperties;
 
-    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs, Set<String> systemProperties) {
+    public CompilationArtifact(ExecutionPlan executionPlan, Map<String, ExecutionPlan> dependencies, List<Input> inputs,
+                               Set<String> systemProperties) {
         this.executionPlan = executionPlan;
         this.dependencies = dependencies;
         this.inputs = inputs;

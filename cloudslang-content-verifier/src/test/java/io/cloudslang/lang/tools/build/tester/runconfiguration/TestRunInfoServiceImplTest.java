@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.beust.jcommander.internal.Lists.newArrayList;
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -94,43 +95,55 @@ public class TestRunInfoServiceImplTest {
     @Test
     public void testGetRunModeForTestCaseEmptySuites() {
         SlangTestCase testCase = mock(SlangTestCase.class);
-        RunMultipleTestSuiteConflictResolutionStrategy multipleTestSuiteConflictResolutionStrategy = mock(RunMultipleTestSuiteConflictResolutionStrategy.class);
-        SequentialRunTestSuiteResolutionStrategy sequentialResolutionStrategy = mock(SequentialRunTestSuiteResolutionStrategy.class);
+        RunMultipleTestSuiteConflictResolutionStrategy multipleTestSuiteConflictResolutionStrategy =
+                mock(RunMultipleTestSuiteConflictResolutionStrategy.class);
+        SequentialRunTestSuiteResolutionStrategy sequentialResolutionStrategy =
+                mock(SequentialRunTestSuiteResolutionStrategy.class);
 
         doReturn(newArrayList()).when(testCase).getTestSuites();
         doCallRealMethod().when(sequentialResolutionStrategy).getDefaultWhenUnspecified();
 
         // Tested call
-        TestCaseRunMode runModeForTestCaseResult = testRunInfoService.getRunModeForTestCase(testCase, multipleTestSuiteConflictResolutionStrategy, sequentialResolutionStrategy);
-        Assert.assertEquals(TestCaseRunMode.SEQUENTIAL, runModeForTestCaseResult);
+        TestCaseRunMode runModeForTestCaseResult = testRunInfoService.getRunModeForTestCase(testCase,
+                multipleTestSuiteConflictResolutionStrategy, sequentialResolutionStrategy);
+        assertEquals(TestCaseRunMode.SEQUENTIAL, runModeForTestCaseResult);
         verify(sequentialResolutionStrategy).getDefaultWhenUnspecified();
-        verify(multipleTestSuiteConflictResolutionStrategy, never()).resolve(any(TestCaseRunMode.class), any(TestCaseRunMode.class));
+        verify(multipleTestSuiteConflictResolutionStrategy, never()).resolve(any(TestCaseRunMode.class),
+                any(TestCaseRunMode.class));
     }
 
     @Test
     public void testGetRunModeForTestCaseSomeSuites() {
         SlangTestCase testCase = mock(SlangTestCase.class);
-        RunMultipleTestSuiteConflictResolutionStrategy multipleTestSuiteConflictResolutionStrategy = mock(RunMultipleTestSuiteConflictResolutionStrategy.class);
-        SequentialRunTestSuiteResolutionStrategy sequentialResolutionStrategy = mock(SequentialRunTestSuiteResolutionStrategy.class);
+        RunMultipleTestSuiteConflictResolutionStrategy multipleTestSuiteConflictResolutionStrategy =
+                mock(RunMultipleTestSuiteConflictResolutionStrategy.class);
+        SequentialRunTestSuiteResolutionStrategy sequentialResolutionStrategy =
+                mock(SequentialRunTestSuiteResolutionStrategy.class);
 
         doReturn(newArrayList("aaa", "bbb", "ccc")).when(testCase).getTestSuites();
         doCallRealMethod().when(sequentialResolutionStrategy).getDefaultWhenUnspecified();
         doCallRealMethod()
                 .doCallRealMethod()
-                .doCallRealMethod().when(multipleTestSuiteConflictResolutionStrategy).resolve(any(TestCaseRunMode.class), any(TestCaseRunMode.class));
+                .doCallRealMethod().when(multipleTestSuiteConflictResolutionStrategy)
+                .resolve(any(TestCaseRunMode.class), any(TestCaseRunMode.class));
         doReturn(TestCaseRunMode.SEQUENTIAL)
                 .doReturn(TestCaseRunMode.PARALLEL)
                 .doReturn(TestCaseRunMode.SEQUENTIAL).when(runModeMap).get(anyString());
 
         // Tested call
-        TestCaseRunMode runModeForTestCaseResult = testRunInfoService.getRunModeForTestCase(testCase, multipleTestSuiteConflictResolutionStrategy, sequentialResolutionStrategy);
+        TestCaseRunMode runModeForTestCaseResult = testRunInfoService
+                .getRunModeForTestCase(testCase, multipleTestSuiteConflictResolutionStrategy,
+                        sequentialResolutionStrategy);
 
-        Assert.assertEquals(TestCaseRunMode.SEQUENTIAL, runModeForTestCaseResult);
+        assertEquals(TestCaseRunMode.SEQUENTIAL, runModeForTestCaseResult);
         verify(sequentialResolutionStrategy, never()).getDefaultWhenUnspecified();
 
-        verify(multipleTestSuiteConflictResolutionStrategy).resolve(eq((TestCaseRunMode) null), eq(TestCaseRunMode.SEQUENTIAL));
-        verify(multipleTestSuiteConflictResolutionStrategy).resolve(eq(TestCaseRunMode.SEQUENTIAL), eq(TestCaseRunMode.PARALLEL));
-        verify(multipleTestSuiteConflictResolutionStrategy).resolve(eq(TestCaseRunMode.SEQUENTIAL), eq(TestCaseRunMode.SEQUENTIAL));
+        verify(multipleTestSuiteConflictResolutionStrategy)
+                .resolve(eq((TestCaseRunMode) null), eq(TestCaseRunMode.SEQUENTIAL));
+        verify(multipleTestSuiteConflictResolutionStrategy)
+                .resolve(eq(TestCaseRunMode.SEQUENTIAL), eq(TestCaseRunMode.PARALLEL));
+        verify(multipleTestSuiteConflictResolutionStrategy)
+                .resolve(eq(TestCaseRunMode.SEQUENTIAL), eq(TestCaseRunMode.SEQUENTIAL));
         verifyNoMoreInteractions(multipleTestSuiteConflictResolutionStrategy);
     }
 

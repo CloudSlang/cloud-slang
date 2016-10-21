@@ -96,7 +96,8 @@ public abstract class SystemsTestsParent {
         System.out.println("m2.conf path [" + m2ConfPath + "]");
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, m2ConfPath);
 
-        String provideralAlreadyConfigured = System.setProperty("python.executor.engine", PythonExecutionCachedEngine.class.getSimpleName());
+        String provideralAlreadyConfigured = System.setProperty("python.executor.engine",
+                PythonExecutionCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
     }
 
@@ -112,11 +113,13 @@ public abstract class SystemsTestsParent {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
+    protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Value> userInputs,
+                                 Set<SystemProperty> systemProperties) {
         return triggerFlows.runSync(compilationArtifact, userInputs, systemProperties);
     }
 
-    public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
+    public RuntimeInformation triggerWithData(CompilationArtifact compilationArtifact,
+                                              Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
         return triggerFlows.runWithData(compilationArtifact, userInputs, systemProperties);
     }
 
@@ -133,12 +136,14 @@ public abstract class SystemsTestsParent {
             List<String> errorsInSensitivity = new ArrayList<>();
             for (Map.Entry<String, Serializable> entry : params.entrySet()) {
                 String name = entry.getKey();
-                boolean sensitive = entry.getValue() != null && entry.getValue().equals(SensitiveValue.SENSITIVE_VALUE_MASK);
+                boolean sensitive = entry.getValue() != null &&
+                        entry.getValue().equals(SensitiveValue.SENSITIVE_VALUE_MASK);
                 if (!(name.contains("sensitive") && sensitive || !name.contains("sensitive") && !sensitive)) {
                     errorsInSensitivity.add(name);
                 }
                 boolean success = true;
-                String errorMessage = "\nSensitivity not set properly for: " + Arrays.toString(errorsInSensitivity.toArray(new String[errorsInSensitivity.size()]));
+                String errorMessage = "\nSensitivity not set properly for: " +
+                        Arrays.toString(errorsInSensitivity.toArray(new String[errorsInSensitivity.size()]));
                 if (errorsInSensitivity.size() > 0) {
                     System.out.println(errorMessage);
                     success = false;

@@ -22,6 +22,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.stereotype.Component;
 
+import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -36,10 +37,11 @@ public class SimpleOperationTest extends SystemsTestsParent {
     public void testEqualsOperation() throws Exception {
 
         URI resource = getClass().getResource("/yaml/check_equals.sl").toURI();
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), new HashSet<SlangSource>());
 
         Map<String, Value> userInputs = new HashMap<>();
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps =
+                triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         StepData data = steps.get(EXEC_START_PATH);
         assertEquals(data.getOutputs().get("return_result"), "Parsing successful.");
@@ -50,10 +52,11 @@ public class SimpleOperationTest extends SystemsTestsParent {
     public void testSortListOperation() throws Exception {
 
         URI resource = getClass().getResource("/yaml/check_sort_list.sl").toURI();
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), new HashSet<SlangSource>());
 
         Map<String, Value> userInputs = new HashMap<>();
-        Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> steps =
+                triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
 
         StepData data = steps.get(EXEC_START_PATH);
         String outputs = (String) data.getOutputs().get("result");

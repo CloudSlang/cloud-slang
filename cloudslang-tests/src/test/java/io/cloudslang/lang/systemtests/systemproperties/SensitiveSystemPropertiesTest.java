@@ -108,7 +108,8 @@ public class SensitiveSystemPropertiesTest extends ValueSyntaxParent {
 
     @Test
     public void testKeyNotStringd() throws Exception {
-        final URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive_value_not_serializable.prop.sl").toURI();
+        final URI propertiesFileUri = getClass()
+                .getResource("/yaml/properties/a/b/sensitive_value_not_serializable.prop.sl").toURI();
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Artifact {flow.var3_sensitive} has invalid value {java.lang.Object");

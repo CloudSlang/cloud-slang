@@ -47,7 +47,8 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
     }
 
     @Override
-    void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry, List<RuntimeException> errors) {
+    void handleOutputProperties(List<Output> transformedData,
+                                Map.Entry<String, ?> entry, List<RuntimeException> errors) {
         //noinspection unchecked
         addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry), errors);
     }
@@ -69,7 +70,8 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
     private void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
         for (String key : props.keySet()) {
             if (!KNOWN_KEYS.contains(key)) {
-                throw new RuntimeException("Key: " + key + " in output: " + entry.getKey() + " is not a known property");
+                throw new RuntimeException("Key: " + key + " in output: " +
+                        entry.getKey() + " is not a known property");
             }
         }
     }

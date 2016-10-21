@@ -24,7 +24,13 @@ import java.util.Set;
 public interface ScoreServices {
     void subscribe(ScoreEventListener eventHandler, Set<String> eventTypes);
 
-    Long trigger(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties);
+    Long trigger(CompilationArtifact compilationArtifact,
+                 Map<String, Value> inputs,
+                 Set<SystemProperty> systemProperties);
 
-    Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties, boolean quiet, boolean debug);
+    Long triggerSync(CompilationArtifact compilationArtifact,
+                     Map<String, Value> inputs,
+                     Set<SystemProperty> systemProperties,
+                     boolean quiet,
+                     boolean debug);
 }

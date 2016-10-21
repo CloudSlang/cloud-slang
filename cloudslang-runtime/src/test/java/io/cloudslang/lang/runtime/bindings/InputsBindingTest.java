@@ -448,7 +448,8 @@ public class InputsBindingTest {
         Assert.assertEquals("orig context should not change", 1, context.size());
     }
 
-    private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context, Set<SystemProperty> systemProperties) {
+    private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context,
+                                          Set<SystemProperty> systemProperties) {
         return inputsBinding.bindInputs(inputs, context, systemProperties);
     }
 

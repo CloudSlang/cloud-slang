@@ -129,7 +129,8 @@ public class ScoreServicesImplTest {
                     public void run() {
                         try {
                             Thread.sleep(DEFAULT_THREAD_SLEEP_TIME);
-                            ScoreEvent scoreFinishedEvent = new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
+                            ScoreEvent scoreFinishedEvent =
+                                    new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
                             scoreEventListener.onEvent(scoreFinishedEvent);
                         } catch (InterruptedException ignore) {
                         }
@@ -141,7 +142,8 @@ public class ScoreServicesImplTest {
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
         // invoke method
-        final long executionId = scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
+        final long executionId = scoreServicesImpl
+                .triggerSync(compilationArtifact, inputs, systemProperties, false, false);
 
         // verify constraints
         ArgumentCaptor<ScoreEventListener> scoreEventListenerArg = ArgumentCaptor.forClass(ScoreEventListener.class);
@@ -177,7 +179,8 @@ public class ScoreServicesImplTest {
                             ScoreEvent slangExecutionExceptionEvent = new ScoreEvent(
                                     ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
                                     (Serializable) slangExecutionExceptionEventData);
-                            ScoreEvent scoreFinishedEvent = new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
+                            ScoreEvent scoreFinishedEvent =
+                                    new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
 
                             scoreEventListener.onEvent(slangExecutionExceptionEvent);
                             scoreEventListener.onEvent(scoreFinishedEvent);
@@ -214,11 +217,14 @@ public class ScoreServicesImplTest {
                             Thread.sleep(DEFAULT_THREAD_SLEEP_TIME);
 
                             Map<String, Serializable> slangExecutionExceptionEventData = new HashMap<>();
-                            slangExecutionExceptionEventData.put(LanguageEventData.EXCEPTION, "This value can also be supplied using a system property");
+                            slangExecutionExceptionEventData
+                                    .put(LanguageEventData.EXCEPTION,
+                                            "This value can also be supplied using a system property");
                             ScoreEvent slangExecutionExceptionEvent = new ScoreEvent(
                                     ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
                                     (Serializable) slangExecutionExceptionEventData);
-                            ScoreEvent scoreFinishedEvent = new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
+                            ScoreEvent scoreFinishedEvent =
+                                    new ScoreEvent(EventConstants.SCORE_FINISHED_EVENT, new HashMap<>());
 
                             scoreEventListener.onEvent(slangExecutionExceptionEvent);
                             scoreEventListener.onEvent(scoreFinishedEvent);

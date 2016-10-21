@@ -178,7 +178,8 @@ public class DuplicateParamsErrorsTest {
 
     @Test
     public void testStepDuplicatePublishValueIgnoreCase() throws Exception {
-        URI resource = getClass().getResource("/corrupted/duplicate/duplicate_step_publish_value_ignore_case.sl").toURI();
+        URI resource = getClass()
+                .getResource("/corrupted/duplicate/duplicate_step_publish_value_ignore_case.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);

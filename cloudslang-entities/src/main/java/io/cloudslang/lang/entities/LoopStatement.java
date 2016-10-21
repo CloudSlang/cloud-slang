@@ -27,7 +27,9 @@ public abstract class LoopStatement implements Serializable {
     private Set<ScriptFunction> functionDependencies;
     private Set<String> systemPropertyDependencies;
 
-    public LoopStatement(String expression, Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
+    public LoopStatement(String expression, Set<ScriptFunction> functionDependencies,
+                         Set<String> systemPropertyDependencies) {
+
         Validate.notBlank(expression, "loop expression cannot be empty");
 
         this.expression = expression;

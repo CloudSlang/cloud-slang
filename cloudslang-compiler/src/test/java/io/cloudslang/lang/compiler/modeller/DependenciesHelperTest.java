@@ -68,7 +68,8 @@ public class DependenciesHelperTest {
         Executable executable = mock(Executable.class);
         when(executable.getType()).thenReturn(SlangTextualKeys.OPERATION_TYPE);
 
-        Set<String> result = dependenciesHelper.fetchDependencies(executable, Collections.<String, Executable>emptyMap());
+        Set<String> result = dependenciesHelper.fetchDependencies(executable,
+                Collections.<String, Executable>emptyMap());
 
         assertEquals(Collections.emptySet(), result);
     }

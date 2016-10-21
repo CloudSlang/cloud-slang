@@ -52,10 +52,12 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                 if (parameterName != null) {
                     String paramClassName = parameterTypes[index - 1].getCanonicalName();
                     if (paramClassName.equals(GLOBAL_SESSION_OBJECT_CLASS_NAME)) {
-                        handleSessionContextArgument(nonSerializableExecutionData, GLOBAL_SESSION_OBJECT_CLASS_NAME, args, parameterName,
+                        handleSessionContextArgument(nonSerializableExecutionData,
+                                GLOBAL_SESSION_OBJECT_CLASS_NAME, args, parameterName,
                                 annotation.getClass().getClassLoader());
                     } else if (paramClassName.equals(SERIALIZABLE_SESSION_OBJECT)) {
-                        handleSessionContextArgument(serializableSessionData, SERIALIZABLE_SESSION_OBJECT, args, parameterName,
+                        handleSessionContextArgument(serializableSessionData, SERIALIZABLE_SESSION_OBJECT,
+                                args, parameterName,
                                 annotation.getClass().getClassLoader());
                     } else {
                         Serializable value = currentContext.get(parameterName);
@@ -92,13 +94,15 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             try {
                 return (String) annotationType.getMethod("value", new Class[0]).invoke(annotation, new Object[0]);
             } catch (Exception e) {
-                throw new RuntimeException("Failed to get value from " + Param.class.getCanonicalName() + " annotation", e);
+                throw new RuntimeException("Failed to get value from " + Param.class.getCanonicalName() +
+                        " annotation", e);
             }
         }
         return null;
     }
 
-    private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args, String parameterName, ClassLoader classLoader) {
+    private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args,
+                                              String parameterName, ClassLoader classLoader) {
         Object sessionContextObject = sessionData.get(parameterName);
         if (sessionContextObject == null) {
             try {

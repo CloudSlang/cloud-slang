@@ -49,7 +49,8 @@ public class PreCompilerErrorsTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error transforming source: no_op_flow_file.sl to a Slang model." +
-                " Source no_op_flow_file.sl has no content associated with flow/operation/decision/properties property."
+                " Source no_op_flow_file.sl has no content associated with " +
+                "flow/operation/decision/properties property."
         );
         compiler.preCompileSource(SlangSource.fromFile(resource));
     }
@@ -91,7 +92,8 @@ public class PreCompilerErrorsTest {
     public void testOperationWithNullFileName() throws Exception {
         URI resource = getClass().getResource("/corrupted/wrong_name_operation.sl").toURI();
 
-        ExecutableModellingResult result = compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getContent(), null));
+        ExecutableModellingResult result =
+                compiler.preCompileSource(new SlangSource(SlangSource.fromFile(resource).getContent(), null));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("should be declared in a file named \"test_op\" " +
@@ -173,7 +175,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Inputs and outputs names should be different for \"io.cloudslang.base.json.same_input_and_output_name\". " +
+        exception.expectMessage("Inputs and outputs names should be different for " +
+                "\"io.cloudslang.base.json.same_input_and_output_name\". " +
                 "Please rename input/output \"json_path\"");
         throw result.getErrors().get(0);
     }
@@ -627,7 +630,8 @@ public class PreCompilerErrorsTest {
         List<RuntimeException> errors = result.getErrors();
         assertTrue(errors.size() == 2);
 
-        assertContains(errors, 0, "Failed to compile step: print_message1. The step/result name: CUSTOM of navigation: FAILURE -> CUSTOM is missing");
+        assertContains(errors, 0, "Failed to compile step: print_message1. " +
+                "The step/result name: CUSTOM of navigation: FAILURE -> CUSTOM is missing");
         assertContains(errors, 1, "The following results are not wired: [UNREACHABLE_RESULT].");
     }
 
@@ -674,7 +678,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Failed to compile step: Step1. The step/result name: non_existing_step of navigation: " +
+        exception.expectMessage("Failed to compile step: Step1. " +
+                "The step/result name: non_existing_step of navigation: " +
                 "SUCCESS -> non_existing_step is missing");
         throw result.getErrors().get(0);
     }
@@ -687,7 +692,8 @@ public class PreCompilerErrorsTest {
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'Step1' syntax is illegal.");
-        exception.expectMessage("Navigation rule should be a Map. Actual type is java.util.ArrayList: [SUCCESS, SUCCESS]");
+        exception.expectMessage("Navigation rule should be a Map. " +
+                "Actual type is java.util.ArrayList: [SUCCESS, SUCCESS]");
         throw result.getErrors().get(0);
     }
 
@@ -706,7 +712,8 @@ public class PreCompilerErrorsTest {
 
     @Test
     public void testFlowWithUnreachableTasksOneReachableFromUnreachableTask() throws Exception {
-        URI resource = getClass().getResource("/corrupted/unreachable_tasks_one_reachable_from_unreachable_task.sl").toURI();
+        URI resource = getClass()
+                .getResource("/corrupted/unreachable_tasks_one_reachable_from_unreachable_task.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
@@ -734,7 +741,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Failed to compile step: jedi_training_1. The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing");
+        exception.expectMessage("Failed to compile step: jedi_training_1. " +
+                "The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing");
         throw result.getErrors().get(0);
     }
 

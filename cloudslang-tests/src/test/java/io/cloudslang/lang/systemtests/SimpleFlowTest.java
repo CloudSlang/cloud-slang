@@ -34,6 +34,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static io.cloudslang.lang.compiler.SlangSource.fromFile;
+import static org.apache.commons.io.FileUtils.readFileToString;
+
 /**
  * Date: 11/14/2014
  *
@@ -101,8 +104,8 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/set_global_session_object.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/get_global_session_object.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Set<SlangSource> path = Sets.newHashSet(fromFile(operation1), fromFile(operation2));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("object_value", ValueFactory.create("SessionValue"));
@@ -110,25 +113,28 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
-    private void compileAndRunSimpleFlow(Map<String, Value> inputs, Set<SystemProperty> systemProperties) throws Exception {
+    private void compileAndRunSimpleFlow(Map<String, Value> inputs,
+                                         Set<SystemProperty> systemProperties) throws Exception {
         URI flow = getClass().getResource("/yaml/simple_flow.yaml").toURI();
         URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
-        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
+        Set<SlangSource> path = Sets.newHashSet(fromFile(operations1), fromFile(operations2));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(flow), path);
+        Assert.assertEquals("the system properties size is not as expected",
+                2, compilationArtifact.getSystemProperties().size());
         ScoreEvent event = trigger(compilationArtifact, inputs, systemProperties);
         Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
     }
 
-    private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, Value> inputs, Set<SystemProperty> systemProperties) throws Exception {
+    private void compileAndRunSimpleFlowOneLinerSyntax(Map<String, Value> inputs,
+                                                       Set<SystemProperty> systemProperties) throws Exception {
         URI flow = getClass().getResource("/yaml/simple_flow_one_liner.yaml").toURI();
         URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operations1), SlangSource.fromFile(operations2));
+        Set<SlangSource> path = Sets.newHashSet(fromFile(operations1), fromFile(operations2));
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step arguments");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(flow), path);
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(flow), path);
         trigger(compilationArtifact, inputs, systemProperties);
     }
 
@@ -137,13 +143,13 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_with_missing_navigation_from_op_result.sl").toURI();
         URI operations = getClass().getResource("/yaml/print_custom_result_op.sl").toURI();
 
-        SlangSource operationsSource = SlangSource.fromFile(operations);
+        SlangSource operationsSource = fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Step1");
         exception.expectMessage("CUSTOM");
         exception.expectMessage("navigation");
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
         trigger(compilationArtifact, new HashMap<String, Value>(), null);
     }
 
@@ -151,14 +157,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
     public void testFlowWithRequiredInputUtf8() throws Exception {
         URI resource = getClass().getResource("/yaml/flow_with_required_input.sl").toURI();
         URI operations = getClass().getResource("/yaml/print.sl").toURI();
-        String inputValue = FileUtils.readFileToString(new File(getClass().getResource("/inputs/utf8_input.txt").getFile()),
+        String inputValue = readFileToString(new File(getClass().getResource("/inputs/utf8_input.txt").getFile()),
                 StandardCharsets.UTF_8);
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("input", ValueFactory.create(inputValue));
 
-        SlangSource operationsSource = SlangSource.fromFile(operations);
+        SlangSource operationsSource = fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         Serializable stepsData = trigger(compilationArtifact, inputs, SYS_PROPS).getData();
         Map<String, Serializable> outputs = ((LanguageEventData) stepsData).getOutputs();
@@ -171,8 +177,8 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/string_equals.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/test_op.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Set<SlangSource> path = Sets.newHashSet(fromFile(operation1), fromFile(operation2));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("first", ValueFactory.create("value"));
@@ -193,8 +199,8 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/flow_with_extensions_tag.sl").toURI();
         URI operation = getClass().getResource("/yaml/noop.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Set<SlangSource> path = Sets.newHashSet(fromFile(operation));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         triggerWithData(compilationArtifact, userInputs, EMPTY_SET);
@@ -206,8 +212,8 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operation1 = getClass().getResource("/yaml/get_value.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/check_equal_types.sl").toURI();
 
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation1), SlangSource.fromFile(operation2));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+        Set<SlangSource> path = Sets.newHashSet(fromFile(operation1), fromFile(operation2));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         Map<String, Value> userInputs = new HashMap<>();
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, EMPTY_SET).getSteps();

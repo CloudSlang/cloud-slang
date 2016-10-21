@@ -25,11 +25,18 @@ import java.util.Map;
  */
 public interface PreCompileValidator {
 
-    String validateExecutableRawData(ParsedSlang parsedSlang, Map<String, Object> executableRawData, List<RuntimeException> errors);
+    String validateExecutableRawData(ParsedSlang parsedSlang,
+                                     Map<String, Object> executableRawData,
+                                     List<RuntimeException> errors);
 
-    List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang, Object workflowRawData, String executableName, List<RuntimeException> errors);
+    List<Map<String, Map<String, Object>>> validateWorkflowRawData(ParsedSlang parsedSlang,
+                                                                   Object workflowRawData,
+                                                                   String executableName,
+                                                                   List<RuntimeException> errors);
 
-    ExecutableModellingResult validateResult(ParsedSlang parsedSlang, String executableName, ExecutableModellingResult result);
+    ExecutableModellingResult validateResult(ParsedSlang parsedSlang,
+                                             String executableName,
+                                             ExecutableModellingResult result);
 
     List<RuntimeException> checkKeyWords(
             String dataLogicalName,
@@ -44,7 +51,9 @@ public interface PreCompileValidator {
             String execName,
             List<RuntimeException> errors);
 
-    void validateDecisionResultsSection(Map<String, Object> executableRawData, String artifact, List<RuntimeException> errors);
+    void validateDecisionResultsSection(Map<String, Object> executableRawData,
+                                        String artifact,
+                                        List<RuntimeException> errors);
 
     List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
 

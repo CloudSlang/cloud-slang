@@ -79,7 +79,8 @@ public class SlangImpl implements Slang {
             return compiler.compileSource(source, dependencySources);
         } catch (Exception e) {
             logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
-            throw new RuntimeException("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage(), e);
+            throw new RuntimeException("Failed compilation for source : " + source.getName() +
+                    " ,Exception is : " + e.getMessage(), e);
         }
     }
 
@@ -106,13 +107,15 @@ public class SlangImpl implements Slang {
         try {
             return metadataExtractor.extractMetadata(source);
         } catch (Exception e) {
-            logger.error("Failed metadata extraction for source : " + source.getName() + " ,Exception is : " + e.getMessage());
+            logger.error("Failed metadata extraction for source : " + source.getName() + " ,Exception is : " +
+                    e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Long run(CompilationArtifact compilationArtifact, Map<String, Value> runInputs, Set<SystemProperty> systemProperties) {
+    public Long run(CompilationArtifact compilationArtifact, Map<String, Value> runInputs,
+                    Set<SystemProperty> systemProperties) {
         Validate.notNull(compilationArtifact, "Compilation artifact can not be null");
         if (runInputs == null) {
             runInputs = new HashMap<>();
@@ -123,7 +126,8 @@ public class SlangImpl implements Slang {
         executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
 
         executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) runInputs);
-        TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan()).setDependencies(compilationArtifact.getDependencies())
+        TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan())
+                .setDependencies(compilationArtifact.getDependencies())
                 .setContext(executionContext);
         return score.trigger(triggeringProperties);
     }

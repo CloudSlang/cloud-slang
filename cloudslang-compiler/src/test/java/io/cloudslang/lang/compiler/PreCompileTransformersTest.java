@@ -62,7 +62,8 @@ public class PreCompileTransformersTest {
         Assert.assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'operation_input_private_no_default' syntax is illegal.");
-        exception.expectMessage("Input: 'input_private_no_default' is private and required but no default value was specified");
+        exception.expectMessage("Input: 'input_private_no_default' is private " +
+                "and required but no default value was specified");
         throw errors.get(0);
     }
 
@@ -129,7 +130,8 @@ public class PreCompileTransformersTest {
 
     @Test
     public void testInputDefaultInteger() throws Exception {
-        URL resource = getClass().getResource("/corrupted/transformers/check_weather_optional_input_default_integer.sl");
+        URL resource = getClass()
+                .getResource("/corrupted/transformers/check_weather_optional_input_default_integer.sl");
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
 
         List<RuntimeException> errors = result.getErrors();

@@ -37,6 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.python.google.common.collect.Lists.newArrayList;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParallelLoopBindingTest {
@@ -60,7 +61,8 @@ public class ParallelLoopBindingTest {
     @Test
     public void passingNullParallelLoopStatementThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        parallelLoopBinding.bindParallelLoopList(null, new Context(new HashMap<String, Value>()), EMPTY_SET, "nodeName");
+        parallelLoopBinding
+                .bindParallelLoopList(null, new Context(new HashMap<String, Value>()), EMPTY_SET, "nodeName");
     }
 
     @Test
@@ -72,7 +74,8 @@ public class ParallelLoopBindingTest {
     @Test
     public void passingNullNodeNameThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
-        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(new HashMap<String, Value>()), EMPTY_SET, null);
+        parallelLoopBinding.bindParallelLoopList(
+                createBasicSyncLoopStatement(), new Context(new HashMap<String, Value>()), EMPTY_SET, null);
     }
 
     @Test
@@ -81,11 +84,13 @@ public class ParallelLoopBindingTest {
         variables.put("key1", ValueFactory.create("value1"));
         variables.put("key2", ValueFactory.create("value2"));
         final Context context = new Context(variables);
-        List<Value> expectedList = Lists.newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
+        List<Value> expectedList = newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenReturn(ValueFactory.create((Serializable) expectedList));
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
+                .thenReturn(ValueFactory.create((Serializable) expectedList));
 
-        List<Value> actualList = parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
+        List<Value> actualList = parallelLoopBinding
+                .bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
 
         verify(scriptEvaluator).evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET));
         assertEquals("returned parallel loop list not as expected", expectedList, actualList);
@@ -98,7 +103,8 @@ public class ParallelLoopBindingTest {
         variables.put("key2", ValueFactory.create("value2"));
         final Context context = new Context(variables);
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenReturn(ValueFactory.create(Lists.newArrayList()));
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
+                .thenReturn(ValueFactory.create(newArrayList()));
 
         exception.expectMessage("expression is empty");
         exception.expect(RuntimeException.class);
@@ -110,12 +116,14 @@ public class ParallelLoopBindingTest {
     public void testExceptionIsPropagated() throws Exception {
         Map<String, Value> variables = new HashMap<>();
 
-        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET))).thenThrow(new RuntimeException("evaluation exception"));
+        when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
+                .thenThrow(new RuntimeException("evaluation exception"));
         exception.expectMessage("evaluation exception");
         exception.expectMessage("nodeName");
         exception.expect(RuntimeException.class);
 
-        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
+        parallelLoopBinding
+                .bindParallelLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
     }
 
     private ListLoopStatement createBasicSyncLoopStatement() {

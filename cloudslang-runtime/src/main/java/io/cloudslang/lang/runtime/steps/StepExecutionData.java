@@ -85,7 +85,8 @@ public class StepExecutionData extends AbstractExecutionData {
 
             //loops
             if (loopStatementExist(loop)) {
-                LoopCondition loopCondition = loopsBinding.getOrCreateLoopCondition(loop, flowContext, runEnv.getSystemProperties(), nodeName);
+                LoopCondition loopCondition = loopsBinding
+                        .getOrCreateLoopCondition(loop, flowContext, runEnv.getSystemProperties(), nodeName);
                 if (loopCondition == null || !loopCondition.hasMore()) {
                     runEnv.putNextStepPosition(nextStepId);
                     runEnv.getStack().pushContext(flowContext);
@@ -119,7 +120,8 @@ public class StepExecutionData extends AbstractExecutionData {
                     nodeName
             );
 
-            Map<String, Value> boundInputs = argumentsBinding.bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
+            Map<String, Value> boundInputs = argumentsBinding
+                    .bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 
             sendEndBindingArgumentsEvent(
@@ -135,13 +137,16 @@ public class StepExecutionData extends AbstractExecutionData {
 
             // request the score engine to switch to the execution plan of the given ref
             //CHECKSTYLE:OFF
-            requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices, RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
+            requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices,
+                    RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
             //CHECKSTYLE:ON
 
-            // set the start step of the given ref as the next step to execute (in the new running execution plan that will be set)
+            // set the start step of the given ref as the next step to execute
+            // (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
         } catch (RuntimeException e) {
-            logger.error("There was an error running the beginStep execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            logger.error("There was an error running the beginStep execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
     }
@@ -153,7 +158,8 @@ public class StepExecutionData extends AbstractExecutionData {
     @SuppressWarnings("unused")
     public void endStep(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                         @Param(ScoreLangConstants.STEP_PUBLISH_KEY) List<Output> stepPublishValues,
-                        @Param(ScoreLangConstants.STEP_NAVIGATION_KEY) Map<String, ResultNavigation> stepNavigationValues,
+                        @Param(ScoreLangConstants.STEP_NAVIGATION_KEY)
+                                    Map<String, ResultNavigation> stepNavigationValues,
                         @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                         @Param(ScoreLangConstants.PREVIOUS_STEP_ID_KEY) Long previousStepId,
                         @Param(ScoreLangConstants.BREAK_LOOP_KEY) List<String> breakOn,
@@ -204,19 +210,24 @@ public class StepExecutionData extends AbstractExecutionData {
                 }
             }
 
-            // if this is an endStep method from a branch then next execution step position should ne null (end the flow)
-            // and result should be the one from the executable (navigation is handled in join branches step)
+            // if this is an endStep method from a branch then next execution step position should ne null
+            // (end the flow) and result should be the one from the executable
+            // (navigation is handled in join branches step)
             Long nextPosition = null;
             String executableResult = executableReturnValues.getResult();
             String presetResult = executableResult;
 
             if (!parallelLoop) {
                 // set the position of the next step - for the use of the navigation
-                // find in the navigation values the correct next step position, according to the operation result, and set it
+                // find in the navigation values the correct next step position, according to the operation result,
+                // and set it
                 ResultNavigation navigation = stepNavigationValues.get(executableResult);
                 if (navigation == null) {
-                    // should always have the executable response mapped to a navigation by the step, if not, it is an error
-                    throw new RuntimeException("Step: " + nodeName + " has no matching navigation for the executable result: " + executableReturnValues.getResult());
+                    // should always have the executable response mapped to a navigation by the step,
+                    // if not, it is an error
+                    throw new RuntimeException("Step: " + nodeName +
+                            " has no matching navigation for the executable result: " +
+                            executableReturnValues.getResult());
                 }
 
                 nextPosition = navigation.getNextStepId();
@@ -228,14 +239,16 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
             HashMap<String, Value> outputs = new HashMap<>(flowVariables);
 
-            ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : executableResult);
+            ReturnValues returnValues = new ReturnValues(outputs,
+                    presetResult != null ? presetResult : executableResult);
             runEnv.putReturnValues(returnValues);
             throwEventOutputEnd(runEnv, executionRuntimeServices, nodeName, publishValues, nextPosition, returnValues);
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
-            logger.error("There was an error running the endStep execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            logger.error("There was an error running the endStep execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
         }
     }
@@ -270,7 +283,8 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     private void saveStepInputsResultContext(Context context, Map<String, Value> stepInputsResultContext) {
-        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT, ValueFactory.create((Serializable) stepInputsResultContext));
+        context.putLanguageVariable(ScoreLangConstants.STEP_INPUTS_RESULT_CONTEXT,
+                ValueFactory.create((Serializable) stepInputsResultContext));
     }
 
     private Map<String, Value> removeStepInputsResultContext(Context context) {

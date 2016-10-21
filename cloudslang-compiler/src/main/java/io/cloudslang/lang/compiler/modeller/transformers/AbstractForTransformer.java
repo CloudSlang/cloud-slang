@@ -59,7 +59,8 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
                 // case: value in variable_name
                 varName = matcherSimpleFor.group(2);
                 collectionExpression = matcherSimpleFor.group(4);
-                loopStatement = createLoopStatement(varName, collectionExpression, dependencyAccumulator, isParallelLoop);
+                loopStatement = createLoopStatement(varName, collectionExpression,
+                        dependencyAccumulator, isParallelLoop);
             } else {
                 String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
                 collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD).trim();
@@ -71,11 +72,13 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
                     // case: key, value
                     String keyName = matcherKeyValueFor.group(2);
                     String valueName = matcherKeyValueFor.group(6);
-                    loopStatement = createMapForLoopStatement(keyName, valueName, collectionExpression, dependencyAccumulator);
+                    loopStatement = createMapForLoopStatement(keyName, valueName,
+                            collectionExpression, dependencyAccumulator);
                 } else {
                     // case: value in expression_other_than_variable_name
                     varName = beforeInKeyword.trim();
-                    loopStatement = createLoopStatement(varName, collectionExpression, dependencyAccumulator, isParallelLoop);
+                    loopStatement = createLoopStatement(varName, collectionExpression,
+                            dependencyAccumulator, isParallelLoop);
                 }
             }
         } catch (RuntimeException rex) {
@@ -85,7 +88,8 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
         return new BasicTransformModellingResult<>(loopStatement, errors);
     }
 
-    private LoopStatement createMapForLoopStatement(String keyName, String valueName, String collectionExpression, Accumulator dependencyAccumulator) {
+    private LoopStatement createMapForLoopStatement(String keyName, String valueName,
+                                                    String collectionExpression, Accumulator dependencyAccumulator) {
         executableValidator.validateLoopStatementVariable(keyName);
         executableValidator.validateLoopStatementVariable(valueName);
         return new MapLoopStatement(
@@ -96,7 +100,8 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
                 dependencyAccumulator.getSystemPropertyDependencies());
     }
 
-    private LoopStatement createLoopStatement(String varName, String collectionExpression, Accumulator dependencyAccumulator, boolean isParallelLoop) {
+    private LoopStatement createLoopStatement(String varName, String collectionExpression,
+                                              Accumulator dependencyAccumulator, boolean isParallelLoop) {
         executableValidator.validateLoopStatementVariable(varName);
         return new ListLoopStatement(varName, collectionExpression,
                     dependencyAccumulator.getFunctionDependencies(),

@@ -51,7 +51,8 @@ public class LoopsBinding extends AbstractBinding {
 
         Value loopConditionValue = flowContext.getLanguageVariable(LOOP_CONDITION_KEY);
         if (loopConditionValue == null) {
-            LoopCondition loopCondition = createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
+            LoopCondition loopCondition =
+                    createForLoopCondition(forLoopStatement, flowContext, systemProperties, nodeName);
             flowContext.putLanguageVariable(LOOP_CONDITION_KEY, ValueFactory.create(loopCondition));
         }
         return (LoopCondition) flowContext.getLanguageVariable(LOOP_CONDITION_KEY).get();
@@ -67,13 +68,15 @@ public class LoopsBinding extends AbstractBinding {
         logger.debug("name: " + varName + ", value: " + varValue);
     }
 
-    public void incrementMapForLoop(String keyName, String valueName, Context flowContext, ForLoopCondition forLoopCondition) {
+    public void incrementMapForLoop(String keyName, String valueName, Context flowContext,
+                                    ForLoopCondition forLoopCondition) {
         Validate.notNull(keyName, "loop key name cannot be null");
         Validate.notNull(keyName, "loop value name cannot be null");
         Validate.notNull(flowContext, "flow context cannot be null");
         Validate.notNull(forLoopCondition, "for condition cannot be null");
 
-        @SuppressWarnings("unchecked") Map.Entry<Value, Value> entry = (Map.Entry<Value, Value>) forLoopCondition.next().get();
+        @SuppressWarnings("unchecked") Map.Entry<Value, Value> entry =
+                (Map.Entry<Value, Value>) forLoopCondition.next().get();
         Value keyFromIteration = entry.getKey();
         Value valueFromIteration = entry.getValue();
 
@@ -95,19 +98,22 @@ public class LoopsBinding extends AbstractBinding {
             evalResult = scriptEvaluator.evalExpr(collectionExpression, variables, systemProperties,
                     forLoopStatement.getFunctionDependencies());
         } catch (Throwable t) {
-            throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: " + t.getMessage(), t);
+            throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" +
+                    nodeName + "',\n\tError is: " + t.getMessage(), t);
         }
 
         evalResult = getEvalResultForMap(evalResult, forLoopStatement, collectionExpression);
 
         ForLoopCondition forLoopCondition = createForLoopCondition(evalResult);
         if (forLoopCondition == null) {
-            throw new RuntimeException("collection expression: '" + collectionExpression + "' in the 'for' loop " +
+            throw new RuntimeException("collection expression: '" + collectionExpression +
+                    "' in the 'for' loop " +
                     "in step: '" + nodeName + "' " +
                     "doesn't return an iterable, other types are not supported");
         }
         if (!forLoopCondition.hasMore()) {
-            throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "',\n\tError is: expression is empty");
+            throw new RuntimeException(FOR_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName +
+                    "',\n\tError is: expression is empty");
         }
         return forLoopCondition;
     }

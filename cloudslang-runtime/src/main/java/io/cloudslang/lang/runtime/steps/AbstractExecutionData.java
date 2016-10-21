@@ -141,7 +141,8 @@ public abstract class AbstractExecutionData {
         runtimeServices.addEvent(type, eventData);
     }
 
-    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext, Map<String, Value> callArguments) {
+    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext,
+                                                            Map<String, Value> callArguments) {
         ContextStack contextStack = runEnvironment.getStack();
         contextStack.pushContext(currentContext);
         runEnvironment.putCallArguments(callArguments);

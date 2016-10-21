@@ -85,16 +85,23 @@ public class SlangBuildMain {
 
     private static final Logger log = Logger.getLogger(SlangBuildMain.class);
     private static final int MAX_THREADS_TEST_RUNNER = 32;
-    private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key are not scheduled for run.";
+    private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key " +
+            "are not scheduled for run.";
 
-    private static final String MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING = "Test suites '%s' have unspecified mapping. They will run in '%s' mode.";
+    private static final String MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING = "Test suites '%s' have " +
+            "unspecified mapping. They will run in '%s' mode.";
     private static final String PROPERTIES_FILE_EXTENSION = "properties";
 
-    private static final String DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE = "Did not detect run configuration properties file at path '%s'. " +
-            "Check that the path you are using is an absolute path. Check that the path separator is '\\\\' for Windows, or '/' for Linux.";
+    private static final String DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE = "Did not detect run " +
+            "configuration properties file at path '%s'. " +
+            "Check that the path you are using is an absolute path. " +
+            "Check that the path separator is '\\\\' for Windows, or '/' for Linux.";
     private static final String NEW_LINE = System.lineSeparator();
-    private static final String MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION = "The '%s' suites are configured for both parallel and sequential execution. Each test suite must have only one execution mode (parallel or sequential).";
-    private static final String MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE = "Error loading smart mode configuration file:";
+    private static final String MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION = "The '%s' suites are configured for " +
+            "both parallel and sequential execution." +
+            " Each test suite must have only one execution mode (parallel or sequential).";
+    private static final String MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE = "Error loading smart " +
+            "mode configuration file:";
 
     // This class is a used in the interaction with the run configuration property file
     static class RunConfigurationProperties {
@@ -165,17 +172,24 @@ public class SlangBuildMain {
         List<String> testSuitesSequential = new ArrayList<>();
         BulkRunMode bulkRunMode = runTestsInParallel ? ALL_PARALLEL : ALL_SEQUENTIAL;
 
-        TestCaseRunMode unspecifiedTestSuiteRunMode = runTestsInParallel ? TestCaseRunMode.PARALLEL : TestCaseRunMode.SEQUENTIAL;
-        if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS) && equalsIgnoreCase(PROPERTIES_FILE_EXTENSION, FilenameUtils.getExtension(runConfigPath))) {
+        TestCaseRunMode unspecifiedTestSuiteRunMode = runTestsInParallel ?
+                TestCaseRunMode.PARALLEL : TestCaseRunMode.SEQUENTIAL;
+        if (get(runConfigPath).isAbsolute() && isRegularFile(get(runConfigPath), NOFOLLOW_LINKS) &&
+                equalsIgnoreCase(PROPERTIES_FILE_EXTENSION, FilenameUtils.getExtension(runConfigPath))) {
             Properties runConfigurationProperties = ArgumentProcessorUtils.getPropertiesFromFile(runConfigPath);
-            shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData, runConfigurationProperties);
-            threadCount = getIntFromPropertiesWithDefaultAndRange(TEST_PARALLEL_THREAD_COUNT, Runtime.getRuntime().availableProcessors(), runConfigurationProperties, 1, MAX_THREADS_TEST_RUNNER + 1);
+            shouldPrintCoverageData = getBooleanFromPropertiesWithDefault(TEST_COVERAGE, shouldPrintCoverageData,
+                    runConfigurationProperties);
+            threadCount = getIntFromPropertiesWithDefaultAndRange(TEST_PARALLEL_THREAD_COUNT,
+                    Runtime.getRuntime().availableProcessors(),
+                    runConfigurationProperties, 1, MAX_THREADS_TEST_RUNNER + 1);
             testSuites = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_TO_RUN);
             testSuitesParallel = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_PARALLEL);
             testSuitesSequential = getTestSuitesForKey(runConfigurationProperties, TEST_SUITES_SEQUENTIAL);
             addErrorIfSameTestSuiteIsInBothParallelOrSequential(testSuitesParallel, testSuitesSequential);
-            unspecifiedTestSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED, unspecifiedTestSuiteRunMode, runConfigurationProperties);
-            addWarningsForMisconfiguredTestSuites(unspecifiedTestSuiteRunMode, testSuites, testSuitesSequential, testSuitesParallel);
+            unspecifiedTestSuiteRunMode = getEnumInstanceFromPropertiesWithDefault(TEST_SUITES_RUN_UNSPECIFIED,
+                    unspecifiedTestSuiteRunMode, runConfigurationProperties);
+            addWarningsForMisconfiguredTestSuites(unspecifiedTestSuiteRunMode, testSuites,
+                    testSuitesSequential, testSuitesParallel);
             bulkRunMode = POSSIBLY_MIXED;
         } else { // Warn when file is misconfigured, relative path, file does not exist or is not a properties file
             log.info(format(DID_NOT_DETECT_RUN_CONFIGURATION_PROPERTIES_FILE, runConfigPath));
@@ -183,7 +197,8 @@ public class SlangBuildMain {
 
         String testCaseReportLocation = getProperty(TEST_CASE_REPORT_LOCATION);
         if (StringUtils.isBlank(testCaseReportLocation)) {
-            log.info("Test case report location property [" + TEST_CASE_REPORT_LOCATION + "] is not defined. Report will be skipped.");
+            log.info("Test case report location property [" + TEST_CASE_REPORT_LOCATION +
+                    "] is not defined. Report will be skipped.");
         }
 
         // Setting thread count for visibility in ParallelTestCaseExecutorService
@@ -194,9 +209,12 @@ public class SlangBuildMain {
         log.info("Content root is at: " + contentPath);
         log.info("Test root is at: " + testsPath);
         log.info("Active test suites are: " + getListForPrint(testSuites));
-        log.info("Parallel run mode is configured for test suites: " + getListForPrint(testSuitesParallel));
-        log.info("Sequential run mode is configured for test suites: " + getListForPrint(testSuitesSequential));
-        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() + "' is configured for test suites: " +
+        log.info("Parallel run mode is configured for test suites: " +
+                getListForPrint(testSuitesParallel));
+        log.info("Sequential run mode is configured for test suites: " +
+                getListForPrint(testSuitesSequential));
+        log.info("Default run mode '" + unspecifiedTestSuiteRunMode.name().toLowerCase() +
+                "' is configured for test suites: " +
                 getListForPrint(getDefaultRunModeTestSuites(testSuites, testSuitesParallel, testSuitesSequential)));
 
         log.info("Bulk run mode for tests: " + getBulkModeForPrint(bulkRunMode));
@@ -204,7 +222,8 @@ public class SlangBuildMain {
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Validate description: " + valueOf(shouldValidateDescription));
         log.info("Thread count: " + threadCount);
-        log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ? valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
+        log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ?
+                valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
 
         log.info(NEW_LINE + "Loading...");
 
@@ -216,14 +235,16 @@ public class SlangBuildMain {
 
         try {
 
-            updateTestSuiteMappings(context.getBean(TestRunInfoService.class), testSuitesParallel, testSuitesSequential, testSuites, unspecifiedTestSuiteRunMode);
+            updateTestSuiteMappings(context.getBean(TestRunInfoService.class), testSuitesParallel,
+                    testSuitesSequential, testSuites, unspecifiedTestSuiteRunMode);
 
             registerEventHandlers(slang);
 
             List<RuntimeException> exceptions = new ArrayList<>();
 
             SlangBuildResults buildResults =
-                    slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites, shouldValidateDescription, bulkRunMode, buildMode, changedFiles);
+                    slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites,
+                            shouldValidateDescription, bulkRunMode, buildMode, changedFiles);
             exceptions.addAll(buildResults.getCompilationExceptions());
             if (exceptions.size() > 0) {
                 logErrors(exceptions, projectPath, loggingService);
@@ -268,18 +289,22 @@ public class SlangBuildMain {
     private static Set<String> readChangedFilesFromSource(String filePath) throws IOException {
         String normalizedPath = FilenameUtils.normalize(filePath);
         if (!get(normalizedPath).isAbsolute()) {
-            throw new RuntimeException(MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE + " Path[" + normalizedPath + "] is not an absolute path.");
+            throw new RuntimeException(MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE +
+                    " Path[" + normalizedPath + "] is not an absolute path.");
         }
         if (!isRegularFile(get(normalizedPath), NOFOLLOW_LINKS)) {
-            throw new RuntimeException(MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE + " Path[" + normalizedPath + "] does not lead to a regular file.");
+            throw new RuntimeException(MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE +
+                    " Path[" + normalizedPath + "] does not lead to a regular file.");
         }
         return ArgumentProcessorUtils.loadChangedItems(normalizedPath);
     }
 
-    private static void addErrorIfSameTestSuiteIsInBothParallelOrSequential(List<String> testSuitesParallel, List<String> testSuitesSequential) {
+    private static void addErrorIfSameTestSuiteIsInBothParallelOrSequential(List<String> testSuitesParallel,
+                                                                            List<String> testSuitesSequential) {
         final List<String> intersection = ListUtils.intersection(testSuitesParallel, testSuitesSequential);
         if (!intersection.isEmpty()) {
-            final String message = String.format(MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION, getListForPrint(intersection));
+            final String message = String.format(MESSAGE_BOTH_PARALLEL_AND_SEQUENTIAL_EXECUTION,
+                    getListForPrint(intersection));
             log.error(message);
             throw new IllegalStateException();
         }
@@ -301,11 +326,15 @@ public class SlangBuildMain {
      * @param activeSuites                the suite names that are active
      * @param unspecifiedTestSuiteRunMode the default run mode for suites that don't explicitly mention a run mode.
      */
-    private static void updateTestSuiteMappings(final TestRunInfoService testRunInfoService, final List<String> parallelSuites,
-                                                final List<String> sequentialSuites, final List<String> activeSuites, final TestCaseRunMode unspecifiedTestSuiteRunMode) {
+    private static void updateTestSuiteMappings(final TestRunInfoService testRunInfoService,
+                                                final List<String> parallelSuites,
+                                                final List<String> sequentialSuites, final List<String> activeSuites,
+                                                final TestCaseRunMode unspecifiedTestSuiteRunMode) {
         testRunInfoService.setRunModeForTestSuites(parallelSuites, TestCaseRunMode.PARALLEL);
         testRunInfoService.setRunModeForTestSuites(sequentialSuites, TestCaseRunMode.SEQUENTIAL);
-        testRunInfoService.setRunModeForTestSuites(getDefaultRunModeTestSuites(activeSuites, parallelSuites, sequentialSuites), unspecifiedTestSuiteRunMode);
+        testRunInfoService.setRunModeForTestSuites(
+                getDefaultRunModeTestSuites(activeSuites, parallelSuites, sequentialSuites),
+                unspecifiedTestSuiteRunMode);
     }
 
     /**
@@ -314,7 +343,9 @@ public class SlangBuildMain {
      * @param sequentialSuites the suite names to be executed in sequential manner
      * @return
      */
-    private static List<String> getDefaultRunModeTestSuites(final List<String> activeSuites, final List<String> parallelSuites, final List<String> sequentialSuites) {
+    private static List<String> getDefaultRunModeTestSuites(final List<String> activeSuites,
+                                                            final List<String> parallelSuites,
+                                                            final List<String> sequentialSuites) {
         return removeAll(new ArrayList<>(activeSuites), union(parallelSuites, sequentialSuites));
     }
 
@@ -324,11 +355,14 @@ public class SlangBuildMain {
      * @param sequentialSuites            the suite names to be executed in sequential manner
      * @param parallelSuites              the suite names to be executed in parallel
      */
-    private static void addWarningsForMisconfiguredTestSuites(final TestCaseRunMode unspecifiedTestSuiteRunMode, final List<String> activeSuites, final List<String> sequentialSuites,
+    private static void addWarningsForMisconfiguredTestSuites(final TestCaseRunMode unspecifiedTestSuiteRunMode,
+                                                              final List<String> activeSuites,
+                                                              final List<String> sequentialSuites,
                                                               final List<String> parallelSuites) {
         addWarningForSubsetOfRules(activeSuites, sequentialSuites, TEST_SUITES_SEQUENTIAL);
         addWarningForSubsetOfRules(activeSuites, parallelSuites, TEST_SUITES_PARALLEL);
-        addInformativeNoteForUnspecifiedRules(unspecifiedTestSuiteRunMode, activeSuites, sequentialSuites, parallelSuites);
+        addInformativeNoteForUnspecifiedRules(unspecifiedTestSuiteRunMode, activeSuites,
+                sequentialSuites, parallelSuites);
     }
 
     /**
@@ -339,25 +373,30 @@ public class SlangBuildMain {
      * @param sequentialSuites            the suite names to be executed in sequential manner
      * @param parallelSuites              the suite names to be executed in parallel
      */
-    private static void addInformativeNoteForUnspecifiedRules(final TestCaseRunMode unspecifiedTestSuiteRunMode, final List<String> activeSuites, final List<String> sequentialSuites,
+    private static void addInformativeNoteForUnspecifiedRules(final TestCaseRunMode unspecifiedTestSuiteRunMode,
+                                                              final List<String> activeSuites,
+                                                              final List<String> sequentialSuites,
                                                               final List<String> parallelSuites) {
         List<String> union = union(sequentialSuites, parallelSuites);
         if (!union.containsAll(activeSuites)) {
             List<String> copy = new ArrayList<>(activeSuites);
             copy.removeAll(union);
 
-            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING, getListForPrint(copy), unspecifiedTestSuiteRunMode.name()));
+            log.info(format(MESSAGE_TEST_SUITES_WITH_UNSPECIFIED_MAPPING,
+                    getListForPrint(copy), unspecifiedTestSuiteRunMode.name()));
         }
     }
 
     /**
-     * Displays a warning message for test suites that have rules defined for sequential or parallel execution but are not in active test suites.
+     * Displays a warning message for test suites that have rules defined for sequential or parallel execution
+     *    but are not in active test suites.
      *
      * @param testSuites          suite names contained in 'container' suites
      * @param testSuitesContained suite names contained in 'contained' suites
      * @param key                 run configuration property key
      */
-    private static void addWarningForSubsetOfRules(List<String> testSuites, List<String> testSuitesContained, String key) {
+    private static void addWarningForSubsetOfRules(List<String> testSuites, List<String> testSuitesContained,
+                                                   String key) {
         List<String> intersectWithContained = ListUtils.intersection(testSuites, testSuitesContained);
         if (intersectWithContained.size() != testSuitesContained.size()) {
             List<String> notScheduledForRun = new ArrayList<>(testSuitesContained);
@@ -378,7 +417,8 @@ public class SlangBuildMain {
         return ArgumentProcessorUtils.parseTestSuitesToList(valueList);
     }
 
-    private static void logErrors(List<RuntimeException> exceptions, String projectPath, final LoggingService loggingService) {
+    private static void logErrors(List<RuntimeException> exceptions, String projectPath,
+                                  final LoggingService loggingService) {
         logErrorsPrefix(loggingService);
         for (RuntimeException runtimeException : exceptions) {
             loggingService.logEvent(Level.ERROR, "Exception: " + runtimeException.getMessage());
@@ -452,7 +492,9 @@ public class SlangBuildMain {
             return 1;
         } else {
             int defaultThreadCount = Runtime.getRuntime().availableProcessors();
-            String threadCountErrorMessage = format("Thread count is misconfigured. The thread count value must be a positive integer less than or equal to %d. Using %d threads.", MAX_THREADS_TEST_RUNNER, defaultThreadCount);
+            String threadCountErrorMessage = format("Thread count is misconfigured. The thread count value must be a " +
+                    "positive integer less than or equal to %d. Using %d threads.",
+                    MAX_THREADS_TEST_RUNNER, defaultThreadCount);
             try {
                 String stringThreadCount = appArgs.getThreadCount();
                 if (stringThreadCount != null) {
@@ -470,7 +512,9 @@ public class SlangBuildMain {
         }
     }
 
-    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults, IRunTestResults runTestsResults, final LoggingService loggingService) {
+    private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults,
+                                                 IRunTestResults runTestsResults,
+                                                 final LoggingService loggingService) {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
         loggingService.logEvent(Level.INFO, "BUILD SUCCESS");
@@ -481,7 +525,8 @@ public class SlangBuildMain {
         loggingService.logEvent(Level.INFO, "");
     }
 
-    private static void printNumberOfPassedAndSkippedTests(IRunTestResults runTestsResults, final LoggingService loggingService) {
+    private static void printNumberOfPassedAndSkippedTests(IRunTestResults runTestsResults,
+                                                           final LoggingService loggingService) {
         loggingService.logEvent(Level.INFO, runTestsResults.getPassedTests().size() + " test cases passed");
         Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
         if (skippedTests.size() > 0) {
@@ -492,7 +537,8 @@ public class SlangBuildMain {
     private static void printPassedTests(IRunTestResults runTestsResults, final LoggingService loggingService) {
         if (runTestsResults.getPassedTests().size() > 0) {
             loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-            loggingService.logEvent(Level.INFO, "Following " + runTestsResults.getPassedTests().size() + " test cases passed:");
+            loggingService.logEvent(Level.INFO, "Following " + runTestsResults.getPassedTests().size() +
+                    " test cases passed:");
             for (Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
                 String testCaseReference = SlangTestCase.generateTestCaseReference(passedTest.getValue().getTestCase());
                 loggingService.logEvent(Level.INFO, "- " + testCaseReference.replaceAll("\n", "\n\t"));
@@ -500,13 +546,15 @@ public class SlangBuildMain {
         }
     }
 
-    private static void printBuildFailureSummary(String projectPath, IRunTestResults runTestsResults, final LoggingService loggingService) {
+    private static void printBuildFailureSummary(String projectPath, IRunTestResults runTestsResults,
+                                                 final LoggingService loggingService) {
         printNumberOfPassedAndSkippedTests(runTestsResults, loggingService);
         final Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         logErrorsPrefix(loggingService);
         loggingService.logEvent(Level.ERROR, "BUILD FAILURE");
         loggingService.logEvent(Level.ERROR, "------------------------------------------------------------");
-        loggingService.logEvent(Level.ERROR, "CloudSlang build for repository: \"" + projectPath + "\" failed due to failed tests.");
+        loggingService.logEvent(Level.ERROR, "CloudSlang build for repository: \"" + projectPath +
+                "\" failed due to failed tests.");
         loggingService.logEvent(Level.ERROR, "Following " + failedTests.size() + " tests failed:");
         for (Map.Entry<String, TestRun> failedTest : failedTests.entrySet()) {
             String failureMessage = failedTest.getValue().getMessage();
@@ -515,7 +563,8 @@ public class SlangBuildMain {
         loggingService.logEvent(Level.ERROR, "");
     }
 
-    private static void printSkippedTestsSummary(Map<String, TestRun> skippedTests, final LoggingService loggingService) {
+    private static void printSkippedTestsSummary(Map<String, TestRun> skippedTests,
+                                                 final LoggingService loggingService) {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
         loggingService.logEvent(Level.INFO, "Following " + skippedTests.size() + " tests were skipped:");
@@ -535,7 +584,8 @@ public class SlangBuildMain {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
         loggingService.logEvent(Level.INFO, ((int) coveragePercentage) + "% of the content has tests");
-        loggingService.logEvent(Level.INFO, "Out of " + totalNumberOfExecutables + " executables, " + coveredExecutablesSize + " executables have tests");
+        loggingService.logEvent(Level.INFO, "Out of " + totalNumberOfExecutables + " executables, " +
+                coveredExecutablesSize + " executables have tests");
     }
 
     private static void printCoveredExecutables(Set<String> coveredExecutables, final LoggingService loggingService) {
@@ -547,10 +597,12 @@ public class SlangBuildMain {
         }
     }
 
-    private static void printUncoveredExecutables(Set<String> uncoveredExecutables, final LoggingService loggingService) {
+    private static void printUncoveredExecutables(Set<String> uncoveredExecutables,
+                                                  final LoggingService loggingService) {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "Following " + uncoveredExecutables.size() + " executables do not have tests:");
+        loggingService.logEvent(Level.INFO, "Following " + uncoveredExecutables.size() +
+                " executables do not have tests:");
         for (String executable : uncoveredExecutables) {
             loggingService.logEvent(Level.INFO, "- " + executable);
         }

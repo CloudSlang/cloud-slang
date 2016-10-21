@@ -32,6 +32,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -98,8 +100,9 @@ public class CompileDependenciesTest {
         path.add(SlangSource.fromFile(importedOperation2));
 
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
-        Assert.assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
-        Assert.assertThat(compilationArtifact.getDependencies(), not(Matchers.<String, ExecutionPlan>hasKey("slang.sample.flows.SimpleFlow")));
+        assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
+        assertThat(compilationArtifact.getDependencies(),
+                not(Matchers.<String, ExecutionPlan>hasKey("slang.sample.flows.SimpleFlow")));
     }
 
     @Test
@@ -124,10 +127,11 @@ public class CompileDependenciesTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
-        Assert.assertEquals("different number of dependencies than expected", 2, compilationArtifact.getDependencies().size());
+        assertEquals("different number of dependencies than expected", 2,
+                compilationArtifact.getDependencies().size());
         ExecutionStep secondStepStartExecutionStep = executionPlan.getStep(4L);
         String refId = (String) secondStepStartExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
-        Assert.assertEquals("refId is not as expected", "user.flows.circular.child_flow", refId);
+        assertEquals("refId is not as expected", "user.flows.circular.child_flow", refId);
     }
 
     @Test
@@ -141,7 +145,7 @@ public class CompileDependenciesTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
-        Assert.assertEquals("different number of dependencies than expected", 2, compilationArtifact.getDependencies().size());
+        assertEquals("different number of dependencies than expected", 2, compilationArtifact.getDependencies().size());
     }
 
     @Test
@@ -155,7 +159,7 @@ public class CompileDependenciesTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull(executionPlan);
-        Assert.assertEquals(3, compilationArtifact.getDependencies().size());
+        assertEquals(3, compilationArtifact.getDependencies().size());
     }
 
     @Test

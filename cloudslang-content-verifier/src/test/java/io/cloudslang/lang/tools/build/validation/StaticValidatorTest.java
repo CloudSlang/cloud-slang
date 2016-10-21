@@ -63,7 +63,8 @@ public class StaticValidatorTest {
         metadata.setInputs(inputMap);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: Input 'input3' is missing description.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
+                "Input 'input3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true);
     }
@@ -87,9 +88,12 @@ public class StaticValidatorTest {
 
     @Test
     public void missingDescriptionForOutput() throws URISyntaxException {
-        List<Output> outputList = Lists.newArrayList(new Output("output1", ValueFactory.create("value1"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
-                new Output("output2", ValueFactory.create("value2"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
-                new Output("output3", ValueFactory.create("value3"), Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()));
+        List<Output> outputList = Lists.newArrayList(new Output("output1", ValueFactory.create("value1"),
+                        Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
+                new Output("output2", ValueFactory.create("value2"),
+                        Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
+                new Output("output3", ValueFactory.create("value3"),
+                        Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()));
         final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, outputList, null,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
@@ -99,7 +103,8 @@ public class StaticValidatorTest {
         metadata.setOutputs(outputMap);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: Output 'output3' is missing description.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
+                "Output 'output3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true);
     }
@@ -118,7 +123,8 @@ public class StaticValidatorTest {
         metadata.setResults(inputMap);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: Result 'result3' is missing description.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
+                "Result 'result3' is missing description.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true);
     }
@@ -133,7 +139,8 @@ public class StaticValidatorTest {
         Metadata metadata = new Metadata();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: Results are missing description entirely.");
+        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
+                "Results are missing description entirely.");
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true);
     }

@@ -60,7 +60,8 @@ public class SlangContentVerifier {
 
     public CompilationResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
-        Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" + directoryPath + "\' does not lead to a directory");
+        Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" +
+                directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
         Collection<File> slangFiles = listSlangFiles(new File(directoryPath), true);
         loggingService.logEvent(Level.INFO, "Start compiling all slang files under: " + directoryPath);
@@ -70,16 +71,19 @@ public class SlangContentVerifier {
         for (File slangFile: slangFiles) {
             Executable sourceModel = null;
             try {
-                Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() + "\' must lead to a file");
+                Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() +
+                        "\' must lead to a file");
                 SlangSource slangSource = SlangSource.fromFile(slangFile);
                 sourceModel = slangCompiler.preCompile(slangSource);
                 Metadata sourceMetadata = metadataExtractor.extractMetadata(slangSource);
                 if (sourceModel != null) {
-                    staticValidator.validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
+                    staticValidator
+                            .validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
                     slangModels.put(getUniqueName(sourceModel), sourceModel);
                 }
             } catch (Exception e) {
-                String errorMessage = "Failed to extract metadata for file: \'" + slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+                String errorMessage = "Failed to extract metadata for file: \'" +
+                        slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
                 loggingService.logEvent(Level.ERROR, errorMessage);
                 exceptions.add(new RuntimeException(errorMessage, e));
                 if (e instanceof MetadataMissingException && sourceModel != null) {
@@ -89,7 +93,8 @@ public class SlangContentVerifier {
         }
         if (slangFiles.size() != slangModels.size()) {
             exceptions.add(new RuntimeException("Some Slang files were not pre-compiled.\nFound: " + slangFiles.size() +
-                    " executable files in path: \'" + directoryPath + "\' But managed to create slang models for only: " + slangModels.size()));
+                    " executable files in path: \'" + directoryPath +
+                    "\' But managed to create slang models for only: " + slangModels.size()));
         }
         CompilationResult compilationResult = new CompilationResult();
         compilationResult.addExceptions(exceptions);
@@ -108,14 +113,17 @@ public class SlangContentVerifier {
                     CompilationModellingResult result = scoreCompiler.compile(slangModel, dependenciesModels);
                     compiledSource = result.getCompilationArtifact();
                     if (compiledSource != null) {
-                        loggingService.logEvent(Level.INFO, "Compiled: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\' successfully");
+                        loggingService.logEvent(Level.INFO, "Compiled: \'" + slangModel.getNamespace() + "." +
+                                slangModel.getName() + "\' successfully");
                         compiledArtifacts.put(getUniqueName(slangModel), compiledSource);
                     } else {
-                        loggingService.logEvent(Level.ERROR, "Failed to compile source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'");
+                        loggingService.logEvent(Level.ERROR, "Failed to compile source: \'" +
+                                slangModel.getNamespace() + "." + slangModel.getName() + "\'");
                     }
                 }
             } catch (Exception e) {
-                String errorMessage = "Failed compiling Slang source: \'" + slangModel.getNamespace() + "." + slangModel.getName() + "\'.\n" + e.getMessage();
+                String errorMessage = "Failed compiling Slang source: \'" + slangModel.getNamespace() + "." +
+                        slangModel.getName() + "\'.\n" + e.getMessage();
                 loggingService.logEvent(Level.ERROR, errorMessage);
                 throw new RuntimeException(errorMessage, e);
             }
@@ -123,7 +131,8 @@ public class SlangContentVerifier {
         return compiledArtifacts;
     }
 
-    private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels, Executable slangModel) {
+    private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels,
+                                                            Executable slangModel) {
         Set<Executable> dependenciesModels = new HashSet<>();
         for (String dependencyName : slangModel.getExecutableDependencies()) {
             Executable dependency = slangModels.get(dependencyName);
@@ -143,7 +152,8 @@ public class SlangContentVerifier {
 
     // e.g. exclude .prop.sl from .sl set
     private Collection<File> listSlangFiles(File directory, boolean recursive) {
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory, Extension.getSlangFileExtensionValues(), recursive);
+        Collection<File> dependenciesFiles = FileUtils.listFiles(directory,
+                Extension.getSlangFileExtensionValues(), recursive);
         Collection<File> result = new ArrayList<>();
         for (File file : dependenciesFiles) {
             if (Extension.SL.equals(Extension.findExtension(file.getName()))) {

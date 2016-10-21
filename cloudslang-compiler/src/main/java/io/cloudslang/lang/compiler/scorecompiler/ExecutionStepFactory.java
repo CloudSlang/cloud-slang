@@ -43,7 +43,8 @@ public class ExecutionStepFactory {
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
 
 
-    public ExecutionStep createBeginStepStep(Long index, List<Argument> stepInputs, Map<String, Serializable> preStepData, String refId, String stepName) {
+    public ExecutionStep createBeginStepStep(Long index, List<Argument> stepInputs,
+                                             Map<String, Serializable> preStepData, String refId, String stepName) {
         Validate.notNull(preStepData, "preStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.STEP_INPUTS_KEY, (Serializable) stepInputs);
@@ -56,7 +57,8 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
-                                              Map<String, ResultNavigation> navigationValues, String stepName, boolean parallelLoop) {
+                                              Map<String, ResultNavigation> navigationValues,
+                                              String stepName, boolean parallelLoop) {
         Validate.notNull(postStepData, "postStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
 
@@ -95,9 +97,11 @@ public class ExecutionStepFactory {
         ActionType actionType;
 
         @SuppressWarnings("unchecked")
-        Map<String, String> javaActionData = (Map<String, String>) actionRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
+        Map<String, String> javaActionData =
+                (Map<String, String>) actionRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> pythonActionData = (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        Map<String, Serializable> pythonActionData =
+                (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
         boolean pythonActionFound = MapUtils.isNotEmpty(pythonActionData);
 
@@ -118,7 +122,8 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
-                                       List<Output> outputs, List<Result> results, String executableName, ExecutableType executableType) {
+                                       List<Output> outputs, List<Result> results,
+                                       String executableName, ExecutableType executableType) {
         Validate.notNull(postExecutableData, "postExecutableData is null");
         Validate.notNull(outputs, "Executable outputs are null");
         Validate.notNull(results, "Executable results are null");
@@ -131,15 +136,19 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, OPERATION_STEPS_CLASS, "finishExecutable", actionData);
     }
 
-    public ExecutionStep createAddBranchesStep(Long currentStepId, Long nextStepId, Long branchBeginStepId, Map<String, Serializable> preStepData, String refId, String stepName) {
+    public ExecutionStep createAddBranchesStep(Long currentStepId, Long nextStepId,
+                                               Long branchBeginStepId, Map<String, Serializable> preStepData,
+                                               String refId, String stepName) {
         Validate.notNull(preStepData, "preStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, nextStepId);
         actionData.put(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY, branchBeginStepId);
-        actionData.put(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY, preStepData.get(SlangTextualKeys.PARALLEL_LOOP_KEY));
-        ExecutionStep executionStep = createGeneralStep(currentStepId, PARALLEL_LOOP_STEPS_CLASS, "addBranches", actionData);
+        actionData.put(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY,
+                preStepData.get(SlangTextualKeys.PARALLEL_LOOP_KEY));
+        ExecutionStep executionStep =
+                createGeneralStep(currentStepId, PARALLEL_LOOP_STEPS_CLASS, "addBranches", actionData);
         executionStep.setSplitStep(true);
         return executionStep;
     }

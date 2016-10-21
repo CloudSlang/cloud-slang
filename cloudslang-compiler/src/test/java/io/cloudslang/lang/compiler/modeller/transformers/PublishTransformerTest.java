@@ -76,13 +76,15 @@ public class PublishTransformerTest extends TransformersTestParent {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Assert.assertFalse(publishValues.isEmpty());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testNoValue() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Output publish = publishValues.get(0);
         Assert.assertEquals("weather", publish.getName());
         Assert.assertEquals("${weather}", publish.getValue().get());
@@ -90,7 +92,8 @@ public class PublishTransformerTest extends TransformersTestParent {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testExpressionValue() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Output publish = publishValues.get(1);
         Assert.assertEquals("temp", publish.getName());
         Assert.assertEquals("${temperature}", publish.getValue().get());
@@ -98,7 +101,8 @@ public class PublishTransformerTest extends TransformersTestParent {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testStringValue() throws Exception {
-        @SuppressWarnings("unchecked") List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
+        @SuppressWarnings("unchecked")
+        List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
         Output publish = publishValues.get(2);
         Assert.assertEquals("publish_str", publish.getName());
         Assert.assertEquals("publish_str_value", publish.getValue().get());

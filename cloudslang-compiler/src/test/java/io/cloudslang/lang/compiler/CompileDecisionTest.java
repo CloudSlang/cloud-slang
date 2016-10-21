@@ -43,6 +43,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static io.cloudslang.lang.compiler.SlangSource.fromFile;
+
 /**
  * @author Bonczidai Levente
  * @since 7/7/2016
@@ -51,7 +54,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CompileDecisionTest {
-    private static final HashSet<ScriptFunction> SP_SCRIPT_FUNCTIONS_SET = Sets.newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
+    private static final HashSet<ScriptFunction> SP_SCRIPT_FUNCTIONS_SET =
+            newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -73,12 +77,12 @@ public class CompileDecisionTest {
     );
     private List<Input> inputs3 = Lists.newArrayList(
             new Input.InputBuilder("x", "${get_sp('user.sys.prop1')}")
-                    .withSystemPropertyDependencies(Sets.newHashSet("user.sys.prop1"))
+                    .withSystemPropertyDependencies(newHashSet("user.sys.prop1"))
                     .withFunctionDependencies(SP_SCRIPT_FUNCTIONS_SET)
                     .build(),
             new Input.InputBuilder("y", "${get_sp('user.sys.prop2')}")
                     .withRequired(false)
-                    .withSystemPropertyDependencies(Sets.newHashSet("user.sys.prop2"))
+                    .withSystemPropertyDependencies(newHashSet("user.sys.prop2"))
                     .withFunctionDependencies(SP_SCRIPT_FUNCTIONS_SET)
                     .build()
     );
@@ -90,10 +94,10 @@ public class CompileDecisionTest {
                     "sum",
                     ValueFactory.create("${get_sp('user.sys.prop3')}"),
                     SP_SCRIPT_FUNCTIONS_SET,
-                    Sets.newHashSet("user.sys.prop3")
+                    newHashSet("user.sys.prop3")
             )
     );
-    private Set<String> spSet1 = Sets.newHashSet(
+    private Set<String> spSet1 = newHashSet(
             "user.sys.prop1",
             "user.sys.prop2",
             "user.sys.prop3",
@@ -109,7 +113,7 @@ public class CompileDecisionTest {
                     "EQUAL",
                     ValueFactory.create("${x == get_sp('user.sys.prop4')}"),
                     SP_SCRIPT_FUNCTIONS_SET,
-                    Sets.newHashSet("user.sys.prop4")
+                    newHashSet("user.sys.prop4")
             ),
             new Result("LESS_THAN", ValueFactory.create("${x < y}")),
             new Result("GREATER_THAN", null)
@@ -119,7 +123,7 @@ public class CompileDecisionTest {
     public void testDecision1PreCompile() throws Exception {
         URL decision = getClass().getResource("/decision/decision_1.sl");
 
-        Executable executable = compiler.preCompile(SlangSource.fromFile(decision.toURI()));
+        Executable executable = compiler.preCompile(fromFile(decision.toURI()));
 
         Assert.assertNotNull(executable);
         Assert.assertTrue(executable instanceof Decision);
@@ -141,7 +145,7 @@ public class CompileDecisionTest {
     public void testDecision1() throws Exception {
         URL decision = getClass().getResource("/decision/decision_1.sl");
 
-        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
+        CompilationArtifact compilationArtifact = compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
 
         validateCompilationArtifact(compilationArtifact, inputs1, outputs1, results1, emptySetSystemProperties);
     }
@@ -150,7 +154,7 @@ public class CompileDecisionTest {
     public void testDecision2() throws Exception {
         URL decision = getClass().getResource("/decision/decision_2.sl");
 
-        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
+        CompilationArtifact compilationArtifact = compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
 
         validateCompilationArtifact(compilationArtifact, inputs2, emptyListOutputs, results1, emptySetSystemProperties);
     }
@@ -159,7 +163,7 @@ public class CompileDecisionTest {
     public void testDecisionSystemPropertyDependencies() throws Exception {
         URL decision = getClass().getResource("/decision/decision_3_sp.sl");
 
-        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
+        CompilationArtifact compilationArtifact = compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
 
         validateCompilationArtifact(compilationArtifact, inputs3, outputs2, results2, spSet1);
     }
@@ -173,7 +177,7 @@ public class CompileDecisionTest {
                 "Artifact {decision_4_py_action_key} has unrecognized tag {wrong_key}." +
                         " Please take a look at the supported features per versions link"
         );
-        compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
+        compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
     }
 
     @Test
@@ -185,7 +189,7 @@ public class CompileDecisionTest {
                 "Artifact {decision_4_py_action_key} has unrecognized tag {python_action}." +
                         " Please take a look at the supported features per versions link"
         );
-        compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
+        compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
     }
 
     @Test
@@ -197,7 +201,7 @@ public class CompileDecisionTest {
                 "Artifact {decision_wo_results} syntax is invalid:" +
                         " 'results' section cannot be empty for executable type 'decision'"
         );
-        compiler.compile(SlangSource.fromFile(decision.toURI()), emptySetSlangSource);
+        compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
     }
 
     private void validateCompilationArtifact(

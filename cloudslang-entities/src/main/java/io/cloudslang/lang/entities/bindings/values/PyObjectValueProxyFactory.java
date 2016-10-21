@@ -46,11 +46,13 @@ public class PyObjectValueProxyFactory {
         PyObject pyObject = Py.java2py(content);
         try {
             PyObjectValueProxyClass proxyClass = getProxyClass(pyObject);
-            PyObjectValue pyObjectValue = (PyObjectValue) proxyClass.getConstructor().newInstance(proxyClass.getParams());
+            PyObjectValue pyObjectValue = (PyObjectValue) proxyClass.getConstructor()
+                    .newInstance(proxyClass.getParams());
             ((Proxy) pyObjectValue).setHandler(new PyObjectValueMethodHandler(content, sensitive, pyObject));
             return pyObjectValue;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create a proxy to new instance for PyObjectValue and " + pyObject.getClass().getSimpleName(), e);
+            throw new RuntimeException("Failed to create a proxy to new instance for PyObjectValue and " +
+                    pyObject.getClass().getSimpleName(), e);
         }
     }
 
@@ -135,7 +137,8 @@ public class PyObjectValueProxyFactory {
                 Method valueMethod = value.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
                 return valueMethod.invoke(value, args);
             } else if (PyObject.class.isAssignableFrom(thisMethod.getDeclaringClass())) {
-                Method pyObjectMethod = pyObject.getClass().getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
+                Method pyObjectMethod = pyObject.getClass()
+                        .getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
                 if (!thisMethod.getName().equals("toString")) {
                     accessed = true;
                 }
@@ -149,7 +152,8 @@ public class PyObjectValueProxyFactory {
             Object[] pyObjectArgs = new Object[args.length];
             for (int index = 0; index < args.length; index++) {
                 if (args[index] instanceof PyObjectValue) {
-                    PyObjectValueMethodHandler handler = (PyObjectValueMethodHandler) ((ProxyObject) args[index]).getHandler();
+                    PyObjectValueMethodHandler handler = (PyObjectValueMethodHandler) ((ProxyObject) args[index])
+                            .getHandler();
                     handler.accessed = true;
                     pyObjectArgs[index] = handler.pyObject;
                 } else {

@@ -43,6 +43,7 @@ import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
 
 @Component
@@ -85,8 +86,10 @@ public class DependenciesHelper {
      * @param availableDependencies the executables to match from
      * @return a map of a the executables that were successfully matched
      */
-    public Map<String, Executable> matchReferences(Executable executable, Collection<Executable> availableDependencies) {
-        Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE), "Executable: \'" + executable.getId() + "\' is not a flow, therefore it has no references");
+    public Map<String, Executable> matchReferences(Executable executable,
+                                                   Collection<Executable> availableDependencies) {
+        Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE),
+                "Executable: \'" + executable.getId() + "\' is not a flow, therefore it has no references");
         Map<String, Executable> resolvedDependencies = new HashMap<>();
         return fetchFlowReferences(executable, availableDependencies, resolvedDependencies);
     }
@@ -97,7 +100,8 @@ public class DependenciesHelper {
         for (String refId : executable.getExecutableDependencies()) {
             //if it is already in the references we do nothing
             if (resolvedDependencies.get(refId) == null) {
-                Executable matchingRef = Lambda.selectFirst(availableDependencies, having(on(Executable.class).getId(), equalTo(refId)));
+                Executable matchingRef = selectFirst(availableDependencies,
+                        having(on(Executable.class).getId(), equalTo(refId)));
                 if (matchingRef == null) {
                     throw new RuntimeException("Reference: \'" + refId + "\' in executable: \'" +
                             executable.getName() + "\', wasn't found in path");
@@ -107,7 +111,8 @@ public class DependenciesHelper {
                 resolvedDependencies.put(matchingRef.getId(), matchingRef);
                 if (matchingRef.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
                     //if it is a flow  we recursively
-                    resolvedDependencies.putAll(fetchFlowReferences(matchingRef, availableDependencies, resolvedDependencies));
+                    resolvedDependencies
+                            .putAll(fetchFlowReferences(matchingRef, availableDependencies, resolvedDependencies));
                 }
             }
         }
@@ -208,7 +213,8 @@ public class DependenciesHelper {
                         Output itemAsOutput = (Output) itemAsObject;
                         result.addAll(itemAsOutput.getSystemPropertyDependencies());
                     } else {
-                        throw new RuntimeException("For step: " + stepName + " - Incorrect type for post step data items.");
+                        throw new RuntimeException("For step: " + stepName +
+                                " - Incorrect type for post step data items.");
                     }
                 }
             } else {

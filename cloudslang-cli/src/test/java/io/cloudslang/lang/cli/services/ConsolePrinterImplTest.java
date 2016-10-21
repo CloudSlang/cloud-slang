@@ -11,7 +11,6 @@ package io.cloudslang.lang.cli.services;
 
 import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.fusesource.jansi.Ansi;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,6 +28,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -119,8 +119,8 @@ public class ConsolePrinterImplTest {
             }
         }).when(singleThreadExecutor).submit(Mockito.any(Runnable.class));
 
-        consolePrinter.printWithColor(Ansi.Color.GREEN, "firstMessage");
-        Future lastFuture = consolePrinter.printWithColor(Ansi.Color.GREEN, "secondMessage");
+        consolePrinter.printWithColor(GREEN, "firstMessage");
+        Future lastFuture = consolePrinter.printWithColor(GREEN, "secondMessage");
 
         assertEquals("secondMessage", lastFuture.get());
 
@@ -129,7 +129,7 @@ public class ConsolePrinterImplTest {
         assertTrue(runnableList.get(0) instanceof ConsolePrinterImpl.ConsolePrinterRunnable);
         assertTrue(runnableList.get(1) instanceof ConsolePrinterImpl.ConsolePrinterRunnable);
 
-        assertEquals(new ConsolePrinterImpl.ConsolePrinterRunnable(Ansi.Color.GREEN, "firstMessage"), runnableList.get(0));
-        assertEquals(new ConsolePrinterImpl.ConsolePrinterRunnable(Ansi.Color.GREEN, "secondMessage"), runnableList.get(1));
+        assertEquals(new ConsolePrinterImpl.ConsolePrinterRunnable(GREEN, "firstMessage"), runnableList.get(0));
+        assertEquals(new ConsolePrinterImpl.ConsolePrinterRunnable(GREEN, "secondMessage"), runnableList.get(1));
     }
 }

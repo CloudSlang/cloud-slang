@@ -25,17 +25,20 @@ public class BuildModeConfig {
     private final Set<String> changedFiles;
     private final Map<String, Executable> allTestedFlowModels;
 
-    private BuildModeConfig(SlangBuildMain.BuildMode buildMode, Set<String> changedFiles, Map<String, Executable> allTestedFlowModels) {
+    private BuildModeConfig(SlangBuildMain.BuildMode buildMode, Set<String> changedFiles,
+                            Map<String, Executable> allTestedFlowModels) {
         this.buildMode = buildMode;
         this.changedFiles = changedFiles;
         this.allTestedFlowModels = allTestedFlowModels;
     }
 
     public static BuildModeConfig createBasicBuildModeConfig() {
-        return new BuildModeConfig(SlangBuildMain.BuildMode.BASIC, new HashSet<String>(), new HashMap<String, Executable>());
+        return new BuildModeConfig(SlangBuildMain.BuildMode.BASIC, new HashSet<String>(),
+                new HashMap<String, Executable>());
     }
 
-    public static BuildModeConfig createChangedBuildModeConfig(Set<String> changedFiles, Map<String, Executable> allTestedFlowModels) {
+    public static BuildModeConfig createChangedBuildModeConfig(Set<String> changedFiles,
+                                                               Map<String, Executable> allTestedFlowModels) {
         return new BuildModeConfig(SlangBuildMain.BuildMode.CHANGED, changedFiles, allTestedFlowModels);
     }
 

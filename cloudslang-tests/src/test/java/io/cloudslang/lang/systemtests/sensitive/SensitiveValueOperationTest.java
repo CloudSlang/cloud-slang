@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import static io.cloudslang.lang.compiler.SlangSource.fromFile;
+
 /**
  * Sensitive value test
  * <p>
@@ -31,7 +33,7 @@ public class SensitiveValueOperationTest extends ValueSyntaxParent {
     public void testValues() throws Exception {
         // compile
         URI resource = getClass().getResource("/yaml/sensitive/sensitive_values_op.sl").toURI();
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), new HashSet<SlangSource>());
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), new HashSet<SlangSource>());
 
         // trigger
         Map<String, StepData> steps = prepareAndRun(compilationArtifact);

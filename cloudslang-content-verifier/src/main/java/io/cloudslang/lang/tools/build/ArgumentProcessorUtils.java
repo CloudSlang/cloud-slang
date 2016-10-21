@@ -56,18 +56,22 @@ public class ArgumentProcessorUtils {
      * Returns a property value as boolean value, with a default in case of null.
      *
      * @param propertyKey the key inside the properties entries.
-     * @param defaultBooleanValue the default boolean value to use in case it is not present inside the properties entries.
+     * @param defaultBooleanValue the default boolean value to use in case it is not present
+     *     inside the properties entries.
      * @param properties the properties entries.
      * @return
      */
-    public static boolean getBooleanFromPropertiesWithDefault(String propertyKey, boolean defaultBooleanValue, Properties properties) {
+    public static boolean getBooleanFromPropertiesWithDefault(String propertyKey,
+                                                              boolean defaultBooleanValue, Properties properties) {
         validateArguments(propertyKey, properties);
         String valueBoolean = properties.getProperty(propertyKey);
-        return (equalsIgnoreCase(valueBoolean, TRUE.toString()) || equalsIgnoreCase(valueBoolean, FALSE.toString())) ? parseBoolean(valueBoolean) : defaultBooleanValue;
+        return (equalsIgnoreCase(valueBoolean, TRUE.toString()) || equalsIgnoreCase(valueBoolean, FALSE.toString())) ?
+                parseBoolean(valueBoolean) : defaultBooleanValue;
     }
 
     /**
-     * Returns a property value as an integer value, with a default in case the range contract is not respected or in case of null.
+     * Returns a property value as an integer value, with a default in case the range contract is not respected or
+     *     in case of null.
      *
      * @param propertyKey the key inside the properties entries.
      * @param defaultIntValue the default integer value to use in case it is not present inside the properties entries.
@@ -76,7 +80,9 @@ public class ArgumentProcessorUtils {
      * @param upperLimit the upper limit for the integer value against which the comparison is done using < sign.
      * @return
      */
-    public static int getIntFromPropertiesWithDefaultAndRange(String propertyKey, int defaultIntValue, Properties properties, Integer lowerLimit, Integer upperLimit) {
+    public static int getIntFromPropertiesWithDefaultAndRange(String propertyKey, int defaultIntValue,
+                                                              Properties properties, Integer lowerLimit,
+                                                              Integer upperLimit) {
         validateArguments(propertyKey, properties);
         try {
             int value = parseInt(properties.getProperty(propertyKey, valueOf(defaultIntValue)));
@@ -96,7 +102,8 @@ public class ArgumentProcessorUtils {
      * @param <T> generic type T of the enum.
      * @return
      */
-    public static <T extends Enum<T>> T getEnumInstanceFromPropertiesWithDefault(String propertyKey, T defaultValue, Properties properties) {
+    public static <T extends Enum<T>> T getEnumInstanceFromPropertiesWithDefault(String propertyKey, T defaultValue,
+                                                                                 Properties properties) {
         validateArguments(propertyKey, properties);
         try {
             String propertyValue = properties.getProperty(propertyKey);
@@ -127,7 +134,8 @@ public class ArgumentProcessorUtils {
      * @return the test suite names as a java.util.List of String type.
      */
     public static List<String> parseTestSuitesToList(final String suitesString) {
-        return isNotEmpty(suitesString) ? parseTestSuitesToList(asList(suitesString.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
+        return isNotEmpty(suitesString) ?
+                parseTestSuitesToList(asList(suitesString.split(SUITE_LIST_SEPARATOR))) : new ArrayList<String>();
     }
 
     static List<String> parseTestSuitesToList(List<String> testSuitesArg) {
@@ -142,13 +150,17 @@ public class ArgumentProcessorUtils {
                 continue;
             }
 
-            if (!startsWithIgnoreCase(testSuite, NOT_TS) && !equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) { // every normal test suite except default
+            if (!startsWithIgnoreCase(testSuite, NOT_TS) &&
+                    !equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {
+                // every normal test suite except default
                 if (!isSuitePresent(testSuites, testSuite)) {
                     testSuites.add(testSuite);
                 }
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {   // default test suite
+            } else if (!containsNotDefaultTestSuite &&
+                    equalsIgnoreCase(testSuite, SlangBuildMain.DEFAULT_TESTS)) {   // default test suite
                 containsDefaultTestSuite = true;
-            } else if (!containsNotDefaultTestSuite && equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // !default test suite
+            } else if (!containsNotDefaultTestSuite &&
+                    equalsIgnoreCase(testSuite, notDefaultTestSuite)) { // !default test suite
                 containsNotDefaultTestSuite = true;
             }
         }
@@ -194,7 +206,8 @@ public class ArgumentProcessorUtils {
      * @return A string joining the test suite names using io.cloudslang.lang.tools.build.SlangBuildMain#LIST_JOINER
      */
     public static String getListForPrint(final List<String> stringList, final String emptyMessage) {
-        return CollectionUtils.isEmpty(stringList) ? ((emptyMessage == null) ? EMPTY : emptyMessage) : join(stringList, LIST_JOINER);
+        return CollectionUtils.isEmpty(stringList) ?
+                ((emptyMessage == null) ? EMPTY : emptyMessage) : join(stringList, LIST_JOINER);
     }
 
     /**

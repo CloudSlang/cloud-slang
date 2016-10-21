@@ -111,7 +111,8 @@ public class ExpressionUtilsTest {
 
     @Test
     public void testExtractSystemPropertiesMixed() throws Exception {
-        Assert.assertEquals(props2, extractSystemProperties("get(get_sp('a.b.c.key'), get_sp('d.e.f.key', default_expression))"));
+        Assert.assertEquals(props2,
+                extractSystemProperties("get(get_sp('a.b.c.key'), get_sp('d.e.f.key', default_expression))"));
     }
 
     @Test
@@ -151,7 +152,8 @@ public class ExpressionUtilsTest {
 
     @Test
     public void testExtractSystemPropertiesMixedDoubleQuote() throws Exception {
-        Assert.assertEquals(props2, extractSystemProperties("get(get_sp(\"a.b.c.key\"), get_sp(\"d.e.f.key\", default_expression))"));
+        Assert.assertEquals(props2,
+                extractSystemProperties("get(get_sp(\"a.b.c.key\"), get_sp(\"d.e.f.key\", default_expression))"));
     }
 
     @Test

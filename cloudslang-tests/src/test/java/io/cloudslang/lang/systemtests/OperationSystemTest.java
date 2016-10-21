@@ -86,7 +86,8 @@ public class OperationSystemTest extends SystemsTestsParent {
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("host", ValueFactory.create("localhost"));
         userInputs.put("port", ValueFactory.create("8080"));
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> stepsData =
+                triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
         Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url"));
@@ -101,7 +102,8 @@ public class OperationSystemTest extends SystemsTestsParent {
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("host", ValueFactory.create("localhost"));
         userInputs.put("port", ValueFactory.create("8080"));
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> stepsData =
+                triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
         Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url"));
@@ -118,7 +120,8 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("string", ValueFactory.create("please print it"));
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> stepsData =
+                triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
         Assert.assertEquals("120", execStepData.getOutputs().get("dur"));
@@ -130,7 +133,8 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
 
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> stepsData =
+                triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals("True", execStepData.getOutputs().get("condition_1"));
         Assert.assertEquals("False", execStepData.getOutputs().get("condition_2"));
@@ -145,7 +149,8 @@ public class OperationSystemTest extends SystemsTestsParent {
 
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
 
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> stepsData =
+                triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Assert.assertEquals("True", execStepData.getOutputs().get("condition_1"));
         Assert.assertEquals("False", execStepData.getOutputs().get("condition_2"));
@@ -159,7 +164,8 @@ public class OperationSystemTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/op_python_pyclass.sl").toURI();
 
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
-        Map<String, StepData> stepsData = triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
+        Map<String, StepData> stepsData =
+                triggerWithData(compilationArtifact, null, new HashSet<SystemProperty>()).getSteps();
 
         StepData execStepData = stepsData.get(EXEC_START_PATH);
         Map<String, Serializable> expectedOutputs = new HashMap<>();

@@ -50,10 +50,12 @@ public class SlangModellerImpl implements SlangModeller {
                             parseModellingResult
                     );
                 default:
-                    throw new RuntimeException("Source: " + parsedSlang.getName() + " is not of flow, operations or decision type");
+                    throw new RuntimeException("Source: " + parsedSlang.getName() +
+                            " is not of flow, operations or decision type");
             }
         } catch (Throwable ex) {
-            throw new RuntimeException("Error transforming source: " + parsedSlang.getName() + " to a Slang model. " + ex.getMessage(), ex);
+            throw new RuntimeException("Error transforming source: " + parsedSlang.getName() +
+                    " to a Slang model. " + ex.getMessage(), ex);
         }
     }
 
