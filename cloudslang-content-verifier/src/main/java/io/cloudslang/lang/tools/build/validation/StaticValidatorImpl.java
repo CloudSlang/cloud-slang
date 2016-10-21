@@ -34,7 +34,7 @@ import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 public class StaticValidatorImpl implements StaticValidator {
 
     // TODO correct this regex
-    private static final Pattern PATTERN = Pattern.compile("^[\\w-\\.]+$");
+    private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z_0-9-.]+$");
 
     @Override
     public void validateSlangFile(File slangFile, Executable executable, Metadata metadata,
