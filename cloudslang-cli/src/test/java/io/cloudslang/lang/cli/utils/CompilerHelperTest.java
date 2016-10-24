@@ -83,7 +83,7 @@ public class CompilerHelperTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void testFilePathWrong() throws Exception {
         compilerHelper.compile(null, null);
     }
