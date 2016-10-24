@@ -20,10 +20,6 @@ import org.springframework.shell.Bootstrap;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-/**
- * User: bancl
- * Date: 6/30/2016
- */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SlangBootstrap.class, Bootstrap.class})
 public class SlangBootstrapTest {

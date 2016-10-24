@@ -27,9 +27,6 @@ import java.util.concurrent.TimeoutException;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.fusesource.jansi.Ansi.ansi;
 
-/**
- * Created by bancl on 10/17/2016.
- */
 @Service
 public class ConsolePrinterImpl implements ConsolePrinter, DisposableBean {
 

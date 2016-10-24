@@ -9,15 +9,11 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * User: bancl
- * Date: 3/1/2016
- */
+import java.util.Arrays;
+
 public enum Extension {
     SL("sl"),
     SL_YAML("sl.yaml"),

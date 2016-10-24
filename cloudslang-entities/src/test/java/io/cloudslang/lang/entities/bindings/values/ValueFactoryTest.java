@@ -19,10 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- * User: bancl
- * Date: 6/24/2016
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ValueFactoryTest.Config.class)
 public class ValueFactoryTest {

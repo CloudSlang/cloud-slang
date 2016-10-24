@@ -9,16 +9,13 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by bancl on 10/10/2016.
- */
 public class CachedPrecompileService {
 
     private Cache<String, ExecutableModellingResult> cache;

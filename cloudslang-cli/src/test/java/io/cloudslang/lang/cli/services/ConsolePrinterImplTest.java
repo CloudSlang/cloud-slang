@@ -38,9 +38,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by bancl on 10/18/2016.
- */
 @RunWith(MockitoJUnitRunner.class)
 public class ConsolePrinterImplTest {
 

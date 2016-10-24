@@ -12,7 +12,9 @@ package io.cloudslang.lang.cli.utils;
 import com.google.common.collect.Lists;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.cli.services.ConsolePrinter;
+import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
+import io.cloudslang.lang.commons.services.impl.SlangCompilationServiceImpl;
 import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
@@ -53,7 +55,6 @@ import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -229,7 +230,7 @@ public class CompilerHelperTest {
 
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("xxx");
-        expectedException.expectMessage(CompilerHelperImpl.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
+        expectedException.expectMessage(SlangCompilationService.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
 
         compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath));
     }
@@ -240,7 +241,7 @@ public class CompilerHelperTest {
 
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("flow.sl");
-        expectedException.expectMessage(CompilerHelperImpl.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
+        expectedException.expectMessage(SlangCompilationService.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
 
         compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath));
     }
@@ -393,6 +394,11 @@ public class CompilerHelperTest {
         @Bean
         public ConsolePrinter consolePrinter() {
             return mock(ConsolePrinter.class);
+        }
+
+        @Bean
+        public SlangCompilationService slangCompilationService() {
+            return new SlangCompilationServiceImpl();
         }
 
     }

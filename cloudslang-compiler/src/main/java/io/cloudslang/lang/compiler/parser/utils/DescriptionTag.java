@@ -14,10 +14,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-/**
- * User: bancl
- * Date: 1/27/2016
- */
 public enum DescriptionTag {
     DESCRIPTION("@description"),
     PREREQUISITES("@prerequisites"),

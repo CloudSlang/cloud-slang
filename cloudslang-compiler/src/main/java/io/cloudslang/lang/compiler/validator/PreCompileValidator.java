@@ -15,14 +15,11 @@ import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Result;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: bancl
- * Date: 6/17/2016
- */
 public interface PreCompileValidator {
 
     String validateExecutableRawData(ParsedSlang parsedSlang,

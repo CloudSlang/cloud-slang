@@ -24,7 +24,6 @@ import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by bancl on 8/31/2016.
- */
 public class StaticValidatorTest {
 
     private static final Set<String> SYSTEM_PROPERTY_DEPENDENCIES = Collections.emptySet();

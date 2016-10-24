@@ -22,6 +22,11 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ArgumentUtils;
 import io.cloudslang.lang.entities.utils.InputUtils;
 import io.cloudslang.lang.entities.utils.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.python.google.common.collect.Lists;
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,15 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.python.google.common.collect.Lists;
-import org.springframework.stereotype.Component;
 
-/**
- * User: bancl
- * Date: 5/12/2016
- */
 @Component
 public class CompileValidatorImpl extends AbstractValidator implements CompileValidator {
 

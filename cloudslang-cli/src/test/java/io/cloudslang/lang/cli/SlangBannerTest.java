@@ -14,10 +14,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * User: bancl
- * Date: 7/4/2016
- */
 public class SlangBannerTest {
     public static final String CLOUDSLANG = "CloudSlang";
     private SlangBanner slangBanner;

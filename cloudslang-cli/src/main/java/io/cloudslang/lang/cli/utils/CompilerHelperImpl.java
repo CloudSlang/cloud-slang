@@ -11,7 +11,8 @@ package io.cloudslang.lang.cli.utils;
 
 import ch.lambdaj.function.convert.Converter;
 import io.cloudslang.lang.api.Slang;
-import io.cloudslang.lang.cli.services.ConsolePrinter;
+import io.cloudslang.lang.commons.services.api.CompilationHelper;
+import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
@@ -23,11 +24,10 @@ import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
@@ -52,7 +52,6 @@ import static ch.lambdaj.Lambda.convert;
 @Component
 public class CompilerHelperImpl implements CompilerHelper {
 
-    public static final String INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX = "' is not a directory";
     private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
     private static final String SP_DIR = "properties";
     private static final String INPUT_DIR = "inputs";
@@ -69,11 +68,14 @@ public class CompilerHelperImpl implements CompilerHelper {
     private SlangSourceService slangSourceService;
 
     @Autowired
-    private ConsolePrinter consolePrinter;
+    private AutowireCapableBeanFactory autowireCapableBeanFactory;
+
+    @Autowired
+    private SlangCompilationService slangCompilationService;
 
     @Override
     public CompilationArtifact compile(String filePath, List<String> dependencies) {
-        File file = getFile(filePath);
+        File file = slangCompilationService.getFile(filePath);
 
         try {
             return slang.compile(SlangSource.fromFile(file), getDependencySources(dependencies, file));
@@ -87,7 +89,7 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     @Override
     public CompilationModellingResult compileSource(String filePath, List<String> dependencies) {
-        File file = getFile(filePath);
+        File file = slangCompilationService.getFile(filePath);
         Set<SlangSource> dependencySources = getDependencySources(dependencies, file);
         return compileSource(file, dependencySources);
     }
@@ -111,51 +113,28 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     @Override
     public List<CompilationModellingResult> compileFolders(List<String> foldersPaths) {
-        List<CompilationModellingResult> results = new ArrayList<>();
-        try {
-            Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
-            for (SlangSource dependencySource : dependencySources) {
-                File file = getFile(dependencySource.getFilePath());
-                consolePrinter.printWithColor(Ansi.Color.GREEN, "Compiling " + file.getName());
-                try {
-                    CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
-                    result.setFile(file);
-                    results.add(result);
-                } catch (Exception e) {
-                    logger.error("Failed compilation for file : " + file.getName() +
-                            " ,Exception is : " + e.getMessage());
-                }
-            }
-        } finally {
-            slang.compileCleanUp();
-            consolePrinter.waitForAllPrintTasksToFinish();
-        }
-        return results;
+        CompilationHelper compilationHelper = new ConsoleOpCompilationHelper();
+        autowireCapableBeanFactory.autowireBean(compilationHelper);
+        return slangCompilationService.compileFoldersTemp(foldersPaths, compilationHelper);
     }
 
-    private File getFile(String filePath) {
-        Validate.notNull(filePath, "File path can not be null");
-        File file = new File(filePath);
-        Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
-        Extension.validateSlangFileExtension(file.getName());
-        return file;
+    @Override
+    public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
+        String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
+        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles),
+                Extension.getPropertiesFileExtensionValues(), propertiesRelativePath);
+    }
+
+    @Override
+    public Map<String, Value> loadInputsFromFile(List<String> inputFiles) {
+        String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
+        return loadMapsFromFiles(convertToFiles(inputFiles),
+                Extension.getYamlFileExtensionValues(), inputsRelativePath);
     }
 
     private Set<SlangSource> getDependencySources(List<String> dependencies, File file) {
         dependencies = getDependenciesIfEmpty(dependencies, file);
-        return getSourcesFromFolders(dependencies);
-    }
-
-    private Set<SlangSource> getSourcesFromFolders(List<String> dependencies) {
-        Set<SlangSource> dependencySources = new HashSet<>();
-        for (String dependency : dependencies) {
-            Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);
-            for (File dependencyCandidate : dependenciesFiles) {
-                SlangSource source = SlangSource.fromFile(dependencyCandidate);
-                dependencySources.add(source);
-            }
-        }
-        return dependencySources;
+        return slangCompilationService.getSourcesFromFolders(dependencies);
     }
 
     private List<String> getDependenciesIfEmpty(List<String> dependencies, File file) {
@@ -174,20 +153,6 @@ public class CompilerHelperImpl implements CompilerHelper {
             }
         }
         return dependencies;
-    }
-
-    @Override
-    public Set<SystemProperty> loadSystemProperties(List<String> systemPropertyFiles) {
-        String propertiesRelativePath = CONFIG_DIR + File.separator + SP_DIR;
-        return loadPropertiesFromFiles(convertToFiles(systemPropertyFiles),
-                Extension.getPropertiesFileExtensionValues(), propertiesRelativePath);
-    }
-
-    @Override
-    public Map<String, Value> loadInputsFromFile(List<String> inputFiles) {
-        String inputsRelativePath = CONFIG_DIR + File.separator + INPUT_DIR;
-        return loadMapsFromFiles(convertToFiles(inputFiles),
-                Extension.getYamlFileExtensionValues(), inputsRelativePath);
     }
 
     private Map<String, Value> loadMapsFromFiles(List<File> files, String[] extensions, String directory) {
@@ -295,21 +260,6 @@ public class CompilerHelperImpl implements CompilerHelper {
                 return new File(from);
             }
         });
-    }
-
-    // e.g. exclude .prop.sl from .sl set
-    private Collection<File> listSlangFiles(File directory, boolean recursive) {
-        Validate.isTrue(directory.isDirectory(), "Parameter '" + directory.getPath() +
-                INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory,
-                Extension.getSlangFileExtensionValues(), recursive);
-        Collection<File> result = new ArrayList<>();
-        for (File file : dependenciesFiles) {
-            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
-                result.add(file);
-            }
-        }
-        return result;
     }
 
 }

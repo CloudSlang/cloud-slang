@@ -7,19 +7,22 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.entities;
+package io.cloudslang.lang.commons.services.impl;
 
-public enum SlangSystemPropertyConstant {
-    CSLANG_ENCODING("cslang.encoding"),
-    LOG4J_CONFIGURATION("log4j.configuration");
+import io.cloudslang.lang.commons.services.api.CompilationHelper;
+import org.fusesource.jansi.Ansi;
 
-    private final String value;
+import java.util.concurrent.Future;
 
-    SlangSystemPropertyConstant(String value) {
-        this.value = value;
+public class NoOpCompilationHelper implements CompilationHelper {
+    @Override
+    public void finish() {
+        // Do nothing
     }
 
-    public String getValue() {
-        return value;
+    @Override
+    public Future<?> repeat(Ansi.Color color, String message) {
+        // Do nothing
+        return null;
     }
 }
