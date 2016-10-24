@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import io.cloudslang.utils.ValidationUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -252,11 +253,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
     @Override
     public void validateStringValue(String name, Serializable value, InOutTransformer transformer) {
-        if (value != null && !(value instanceof String)) {
-            throw new RuntimeException(StringUtils.capitalize(getMessagePart(
-                    transformer.getTransformedObjectsClass())) +
-                    ": '" + name + "' should have a String value.");
-        }
+        String prefix = StringUtils.capitalize(getMessagePart(transformer.getTransformedObjectsClass())) + ": '" + name;
+        ValidationUtils.validateStringValue(prefix, value);
     }
 
     @Override
