@@ -70,7 +70,8 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input5", ValueFactory.create("value5"));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Error binding input: 'input1' should have a String value, but got value '11' of type Integer.");
+        exception.expectMessage("Error binding input: 'input1' should have a String value, but got value '11' " +
+                "of type Integer.");
 
         URL resource = getClass().getResource("/yaml/test_op_2.sl");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);

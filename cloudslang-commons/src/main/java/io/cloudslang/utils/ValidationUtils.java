@@ -15,7 +15,8 @@ public class ValidationUtils {
 
     public static void validateStringValue(String errorMessagePrefix, Serializable value) {
         if (value != null && !(value instanceof String)) {
-            throw new RuntimeException(errorMessagePrefix + "' should have a String value, but got value '" + value + "' of type " + value.getClass().getSimpleName() + ".");
+            throw new RuntimeException(errorMessagePrefix + "' should have a String value, but got value '" + value +
+                    "' of type " + value.getClass().getSimpleName() + ".");
         }
     }
 }
