@@ -27,7 +27,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
@@ -68,7 +67,7 @@ public class CompilerHelperImpl implements CompilerHelper {
     private SlangSourceService slangSourceService;
 
     @Autowired
-    private AutowireCapableBeanFactory autowireCapableBeanFactory;
+    private CompilationHelper compilationHelper;
 
     @Autowired
     private SlangCompilationService slangCompilationService;
@@ -113,9 +112,7 @@ public class CompilerHelperImpl implements CompilerHelper {
 
     @Override
     public List<CompilationModellingResult> compileFolders(List<String> foldersPaths) {
-        CompilationHelper compilationHelper = new ConsoleOpCompilationHelper();
-        autowireCapableBeanFactory.autowireBean(compilationHelper);
-        return slangCompilationService.compileFoldersTemp(foldersPaths, compilationHelper);
+        return slangCompilationService.compileFolders(foldersPaths, compilationHelper);
     }
 
     @Override

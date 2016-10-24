@@ -118,8 +118,8 @@ public class ScoreServicesImplTest {
         );
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
-         * After a specific amount of time a finish event needs to be sent
-         * to the ScoreEventListener.onEvent() method in order to finish the execution
+         * After a specific amount of time a onCompilationFinish event needs to be sent
+         * to the ScoreEventListener.onEvent() method in order to onCompilationFinish the execution
          * of the triggerSync method.
          */
         doAnswer(new Answer<Object>() {
@@ -162,7 +162,7 @@ public class ScoreServicesImplTest {
         final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c"));
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
-         * After a specific amount of time a erroneous event followed by a finish event
+         * After a specific amount of time a erroneous event followed by a onCompilationFinish event
          * need to be sent to the ScoreEventListener.onEvent() method in order to
          * test the error case of the triggerSync method.
          */

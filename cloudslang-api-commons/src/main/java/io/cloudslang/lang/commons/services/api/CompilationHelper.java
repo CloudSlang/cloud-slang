@@ -14,7 +14,7 @@ import org.fusesource.jansi.Ansi;
 import java.util.concurrent.Future;
 
 public interface CompilationHelper {
-    void finish();
+    void onCompilationFinish();
 
-    Future<?> repeat(Ansi.Color color, String message);
+    Future<?> onEveryFile(Ansi.Color color, String message);
 }

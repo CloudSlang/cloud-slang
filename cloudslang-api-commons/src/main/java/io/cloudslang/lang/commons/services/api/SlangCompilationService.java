@@ -19,7 +19,8 @@ import java.util.Set;
 public interface SlangCompilationService {
     String INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX = "' is not a directory";
 
-    List<CompilationModellingResult> compileFoldersTemp(List<String> foldersPaths, CompilationHelper compilationHelper);
+    List<CompilationModellingResult> compileFolders(final List<String> foldersPaths,
+                                                    final CompilationHelper compilationHelper);
 
     File getFile(String filePath);
 

@@ -16,12 +16,12 @@ import java.util.concurrent.Future;
 
 public class NoOpCompilationHelper implements CompilationHelper {
     @Override
-    public void finish() {
+    public void onCompilationFinish() {
         // Do nothing
     }
 
     @Override
-    public Future<?> repeat(Ansi.Color color, String message) {
+    public Future<?> onEveryFile(Ansi.Color color, String message) {
         // Do nothing
         return null;
     }

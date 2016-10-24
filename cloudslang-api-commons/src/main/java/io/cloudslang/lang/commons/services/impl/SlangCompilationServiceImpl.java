@@ -38,14 +38,14 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
     private Slang slang;
 
     @Override
-    public List<CompilationModellingResult> compileFoldersTemp(List<String> foldersPaths,
-                                                               CompilationHelper compilationHelper) {
+    public List<CompilationModellingResult> compileFolders(final List<String> foldersPaths,
+                                                           final CompilationHelper compilationHelper) {
         List<CompilationModellingResult> results = new ArrayList<>();
         try {
             Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
             for (SlangSource dependencySource : dependencySources) {
                 File file = getFile(dependencySource.getFilePath());
-                compilationHelper.repeat(Ansi.Color.GREEN, "Compiling " + file.getName());
+                compilationHelper.onEveryFile(Ansi.Color.GREEN, "Compiling " + file.getName());
                 try {
                     CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
                     result.setFile(file);
@@ -56,14 +56,14 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
                 }
             }
         } finally {
+            compilationHelper.onCompilationFinish();
             slang.compileCleanUp();
-            compilationHelper.finish();
         }
         return results;
     }
 
     @Override
-    public File getFile(String filePath) {
+    public File getFile(final String filePath) {
         Validate.notNull(filePath, "File path can not be null");
         File file = new File(filePath);
         Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
@@ -72,7 +72,7 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
     }
 
     @Override
-    public Set<SlangSource> getSourcesFromFolders(List<String> dependencies) {
+    public Set<SlangSource> getSourcesFromFolders(final List<String> dependencies) {
         Set<SlangSource> dependencySources = new HashSet<>();
         for (String dependency : dependencies) {
             Collection<File> dependenciesFiles = listSlangFiles(new File(dependency), true);

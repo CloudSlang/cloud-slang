@@ -12,6 +12,7 @@ package io.cloudslang.lang.cli.utils;
 import com.google.common.collect.Lists;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.cli.services.ConsolePrinter;
+import io.cloudslang.lang.commons.services.api.CompilationHelper;
 import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.commons.services.impl.SlangCompilationServiceImpl;
@@ -394,6 +395,11 @@ public class CompilerHelperTest {
         @Bean
         public ConsolePrinter consolePrinter() {
             return mock(ConsolePrinter.class);
+        }
+
+        @Bean
+        public CompilationHelper compilationHelper() {
+            return new ConsoleOpCompilationHelper();
         }
 
         @Bean

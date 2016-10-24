@@ -13,21 +13,23 @@ import io.cloudslang.lang.cli.services.ConsolePrinter;
 import io.cloudslang.lang.commons.services.api.CompilationHelper;
 import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Future;
 
+@Component
 public class ConsoleOpCompilationHelper implements CompilationHelper {
 
     @Autowired
     private ConsolePrinter consolePrinter;
 
     @Override
-    public void finish() {
+    public void onCompilationFinish() {
         consolePrinter.waitForAllPrintTasksToFinish();
     }
 
     @Override
-    public Future<?> repeat(Ansi.Color color, String message) {
+    public Future<?> onEveryFile(Ansi.Color color, String message) {
         return consolePrinter.printWithColor(Ansi.Color.GREEN, message);
     }
 }
