@@ -13,9 +13,7 @@ import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import org.apache.commons.lang3.tuple.Pair;
-import org.python.core.PyObject;
-
+import io.cloudslang.utils.ValidationUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,12 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.tuple.Pair;
+import org.python.core.PyObject;
 
 public class AbstractBinding {
 
     protected void validateStringValue(String errorMessagePrefix, Value value) {
-        if (value != null && value.get() != null && !(value.get() instanceof String)) {
-            throw new RuntimeException(errorMessagePrefix + "' should have a String value.");
+        if (value != null) {
+            ValidationUtils.validateStringValue(errorMessagePrefix, value.get());
         }
     }
 

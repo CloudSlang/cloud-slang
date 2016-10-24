@@ -27,6 +27,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.cloudslang.lang</groupId>
+            <artifactId>cloudslang-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-spi</artifactId>
             <version>${project.version}</version>
