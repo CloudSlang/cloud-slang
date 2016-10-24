@@ -626,7 +626,6 @@
                         </dependency>
                     </dependencies>
                 </plugin>
-
             </plugins>
         </pluginManagement>
         <plugins>
@@ -713,6 +712,30 @@
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>owasp-check-vulnerabilities</id>
+            <build>
+                <plugins>
+                    <!--Check vulnerabilities in third party libraries-->
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>1.4.3</version>
+                        <executions>
+                            <execution>
+                                <id>scan-vulnerabilities-in-used-third-parties</id>
+                                <configuration>
+                                    <failOnError>true</failOnError>
+                                </configuration>
+                                <goals>
+                                    <goal>check</goal>
                                 </goals>
                             </execution>
                         </executions>
