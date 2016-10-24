@@ -16,7 +16,7 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
