@@ -38,7 +38,8 @@ public class ThreadSafeRunTestResultsTest {
     public void testFailedTestCaseOnEvent() {
         String nameFailed = "nameFailed";
         SlangTestCase testCase = new SlangTestCase(nameFailed, null, null, null, null, null, null, null, null);
-        FailedSlangTestCaseEvent failedSlangTestCaseEvent = new FailedSlangTestCaseEvent(testCase, "message", new RuntimeException("ex"));
+        FailedSlangTestCaseEvent failedSlangTestCaseEvent =
+                new FailedSlangTestCaseEvent(testCase, "message", new RuntimeException("ex"));
 
         threadSafeTestResults.onEvent(failedSlangTestCaseEvent);
 
@@ -46,7 +47,8 @@ public class ThreadSafeRunTestResultsTest {
         assertEquals(0, threadSafeTestResults.getPassedTests().size());
         assertEquals(0, threadSafeTestResults.getSkippedTests().size());
         Assert.assertTrue(threadSafeTestResults.getFailedTests().keySet().contains(nameFailed));
-        assertEquals(new TestRun(testCase, failedSlangTestCaseEvent.getFailureReason()), threadSafeTestResults.getFailedTests().values().iterator().next());
+        assertEquals(new TestRun(testCase, failedSlangTestCaseEvent.getFailureReason()),
+                threadSafeTestResults.getFailedTests().values().iterator().next());
     }
 
     @Test
@@ -79,7 +81,8 @@ public class ThreadSafeRunTestResultsTest {
         TestRun expectedTestRun =
                 new TestRun(
                         testCase,
-                        "Skipping test: " + SlangTestCase.generateTestCaseReference(testCase) + " because it is not in active test suites"
+                        "Skipping test: " + SlangTestCase.generateTestCaseReference(testCase) +
+                                " because it is not in active test suites"
                 );
         TestRun actualTestRun = threadSafeTestResults.getSkippedTests().values().iterator().next();
         assertEquals(expectedTestRun, actualTestRun);

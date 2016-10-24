@@ -26,6 +26,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+
 /*
  * Created by orius123 on 05/11/14.
  */
@@ -52,9 +54,10 @@ public class CompileFlowWithMultipleStepsTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
-        Assert.assertEquals("execution plan name is different than expected", "flow_with_multiple_steps", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
+        assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
+        assertEquals("execution plan name is different than expected",
+                "flow_with_multiple_steps", executionPlan.getName());
+        assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
     }
 
     @Test
@@ -63,12 +66,13 @@ public class CompileFlowWithMultipleStepsTest {
         Executable flow = compiler.preCompile(SlangSource.fromFile(flowUri));
 
         Assert.assertNotNull("Pre-Compiled meta-data is null", flow);
-        Assert.assertEquals("Flow name is wrong", "flow_with_multiple_steps", flow.getName());
-        Assert.assertEquals("Flow namespace is wrong", "user.ops", flow.getNamespace());
-        Assert.assertEquals("There is a different number of flow inputs than expected", 0, flow.getInputs().size());
-        Assert.assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
-        Assert.assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
-        Assert.assertEquals("There is a different number of flow dependencies than expected", 3, flow.getExecutableDependencies().size());
+        assertEquals("Flow name is wrong", "flow_with_multiple_steps", flow.getName());
+        assertEquals("Flow namespace is wrong", "user.ops", flow.getNamespace());
+        assertEquals("There is a different number of flow inputs than expected", 0, flow.getInputs().size());
+        assertEquals("There is a different number of flow outputs than expected", 0, flow.getOutputs().size());
+        assertEquals("There is a different number of flow results than expected", 2, flow.getResults().size());
+        assertEquals("There is a different number of flow dependencies than expected",
+                3, flow.getExecutableDependencies().size());
     }
 
 }

@@ -79,7 +79,8 @@ public enum Extension {
 
     public static void validatePropertiesFileExtension(String fileName) {
         Extension fileExtension = Extension.findExtension(fileName);
-        validateFileExtension(fileName, fileExtension, getPropertiesFileExtensions(), getPropertiesFileExtensionValues());
+        validateFileExtension(fileName, fileExtension,
+                getPropertiesFileExtensions(), getPropertiesFileExtensionValues());
     }
 
     private static void validateFileExtension(String fileName, Extension fileExtension,
@@ -109,8 +110,9 @@ public enum Extension {
         Extension foundExtension = null;
         if (fileName != null) {
             for (Extension extension : values()) {
-                if (fileName.endsWith("." + extension.getValue()) &&
-                        (foundExtension == null || extension.getValue().length() > foundExtension.getValue().length())) {
+                final String extensionValue = extension.getValue();
+                if (fileName.endsWith("." + extensionValue) &&
+                        (foundExtension == null || extensionValue.length() > foundExtension.getValue().length())) {
                     foundExtension = extension;
                 }
             }

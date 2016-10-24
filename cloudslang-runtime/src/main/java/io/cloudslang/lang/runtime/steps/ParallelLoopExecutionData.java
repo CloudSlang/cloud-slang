@@ -81,7 +81,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         try {
             Context flowContext = runEnv.getStack().popContext();
 
-            List<Value> splitData = parallelLoopBinding.bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
+            List<Value> splitData = parallelLoopBinding
+                    .bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
 
             fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_SPLIT_BRANCHES,
                     "parallel loop expression bound", runEnv.getExecutionPath().getCurrentPath(),
@@ -131,7 +132,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Value>());
         } catch (RuntimeException e) {
-            logger.error("There was an error running the add branches execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            logger.error("There was an error running the add branches execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
 
@@ -140,7 +142,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
     public void joinBranches(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                              @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                              @Param(ScoreLangConstants.STEP_PUBLISH_KEY) List<Output> stepPublishValues,
-                             @Param(ScoreLangConstants.STEP_NAVIGATION_KEY) Map<String, ResultNavigation> stepNavigationValues,
+                             @Param(ScoreLangConstants.STEP_NAVIGATION_KEY)
+                                     Map<String, ResultNavigation> stepNavigationValues,
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
             runEnv.getExecutionPath().up();
@@ -163,12 +166,14 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             String parallelLoopResult = getParallelLoopResult(branchesContext);
 
-            handleNavigationAndReturnValues(runEnv, executionRuntimeServices, stepNavigationValues, nodeName, publishValues, parallelLoopResult);
+            handleNavigationAndReturnValues(runEnv, executionRuntimeServices,
+                    stepNavigationValues, nodeName, publishValues, parallelLoopResult);
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
         } catch (RuntimeException e) {
-            logger.error("There was an error running the joinBranches execution step of: \'" + nodeName + "\'. Error is: " + e.getMessage());
+            logger.error("There was an error running the joinBranches execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': \n" + e.getMessage(), e);
         }
     }
@@ -181,11 +186,13 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             Map<String, Value> publishValues,
             String parallelLoopResult) {
         // set the position of the next step - for the use of the navigation
-        // find in the navigation values the correct next step position, according to the parallel loop result, and set it
+        // find in the navigation values the correct next step position, according to the parallel loop result,
+        // and set it
         ResultNavigation navigation = stepNavigationValues.get(parallelLoopResult);
         if (navigation == null) {
             // should always have the executable response mapped to a navigation by the step, if not, it is an error
-            throw new RuntimeException("Step: " + nodeName + " has no matching navigation for the parallel loop result: " + parallelLoopResult);
+            throw new RuntimeException("Step: " + nodeName +
+                    " has no matching navigation for the parallel loop result: " + parallelLoopResult);
         }
         Long nextStepPosition = navigation.getNextStepId();
         String presetResult = navigation.getPresetResult();

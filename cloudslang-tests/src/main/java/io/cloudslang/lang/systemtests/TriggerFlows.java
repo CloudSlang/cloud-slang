@@ -41,7 +41,8 @@ public class TriggerFlows {
 
     private static final HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
 
-    private static final HashSet<String> PARALLEL_LOOP_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
+    private static final HashSet<String> PARALLEL_LOOP_EVENTS =
+            Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
 
     @Autowired
     private Slang slang;
@@ -80,7 +81,8 @@ public class TriggerFlows {
         }
     }
 
-    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact, Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
+    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact,
+                                          Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
         RunDataAggregatorListener runDataAggregatorListener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(runDataAggregatorListener, STEP_EVENTS);
 

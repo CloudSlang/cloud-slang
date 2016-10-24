@@ -63,7 +63,8 @@ public class SlangCli implements CommandMarker {
     private static final String CURRENTLY = "You are CURRENTLY running CloudSlang version: ";
     private static final String RUN_HELP = "triggers a CloudSlang flow";
     private static final String FILE_HELP = "Path to filename. e.g. run --f c:/.../your_flow.sl";
-    private static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, by default it will take flow file dir. " +
+    private static final String CLASSPATH_HELP = "Classpath, a directory comma separated list to flow dependencies, " +
+            "by default it will take flow file dir. " +
             "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25 --cp c:/.../yaml";
     private static final String INPUTS_HELP = "inputs in a key=value comma separated list. " +
             "e.g. run --f c:/.../your_flow.sl --i input1=root,input2=25";
@@ -100,12 +101,17 @@ public class SlangCli implements CommandMarker {
     @CliCommand(value = "run", help = RUN_HELP)
     public String run(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = FILE_HELP) final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath,
-            @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP) final Map<String, ? extends Serializable> inputs,
-            @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP) final List<String> inputFiles,
-            @CliOption(key = {"v", "verbose"}, mandatory = false, help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet",
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP)
+            final List<String> classPath,
+            @CliOption(key = {"i", "inputs"}, mandatory = false, help = INPUTS_HELP)
+            final Map<String, ? extends Serializable> inputs,
+            @CliOption(key = {"if", "input-file"}, mandatory = false, help = INPUT_FILE_HELP)
+            final List<String> inputFiles,
+            @CliOption(key = {"v", "verbose"}, mandatory = false,
+                    help = "default, quiet, debug(print each step outputs). e.g. run --f c:/.../your_flow.sl --v quiet",
                     specifiedDefaultValue = "debug", unspecifiedDefaultValue = "default") final String verbose,
-            @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP) final List<String> systemPropertyFiles) {
+            @CliOption(key = {"spf", "system-property-file"}, mandatory = false, help = SYSTEM_PROPERTY_FILE_HELP)
+            final List<String> systemPropertyFiles) {
 
         if (invalidVerboseInput(verbose)) {
             throw new IllegalArgumentException("Verbose argument is invalid.");
@@ -144,9 +150,11 @@ public class SlangCli implements CommandMarker {
 
     @CliCommand(value = "compile", help = "Display compile errors for an executable")
     public String compileSource(
-            @CliOption(key = {"", "d", "directory"}, mandatory = false, help = FILE_HELP) final List<String> directories,
+            @CliOption(key = {"", "d", "directory"}, mandatory = false, help = FILE_HELP)
+            final List<String> directories,
             @CliOption(key = {"", "f", "file"}, mandatory = false, help = FILE_HELP) final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP)
+            final List<String> classPath
     ) {
         if (directories != null) {
             List<CompilationModellingResult> results = compilerHelper.compileFolders(directories);
@@ -188,14 +196,16 @@ public class SlangCli implements CommandMarker {
 
     @CliCommand(value = "inspect", help = "Display metadata about an executable")
     public String inspectExecutable(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final File executableFile
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP)
+            final File executableFile
     ) {
         return metadataHelper.extractMetadata(executableFile);
     }
 
     @CliCommand(value = "list", help = "List system properties from a properties file")
     public String listSystemProperties(
-            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP) final String propertiesFile) {
+            @CliOption(key = {"", "f", "file"}, mandatory = true, help = PATH_TO_FILENAME_HELP)
+            final String propertiesFile) {
         Set<SystemProperty> systemProperties = compilerHelper.loadSystemProperties(Lists.newArrayList(propertiesFile));
         return prettyPrintSystemProperties(systemProperties);
     }
@@ -227,7 +237,8 @@ public class SlangCli implements CommandMarker {
     @CliCommand(value = "inputs", help = INPUTS_COMMAND_HELP)
     public List<String> getFlowInputs(
             @CliOption(key = {"", "f", "file"}, mandatory = true, help = FILE_HELP) final File file,
-            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP) final List<String> classPath) {
+            @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP)
+            final List<String> classPath) {
         CompilationArtifact compilationArtifact = compilerHelper.compile(file.getAbsolutePath(), classPath);
         List<Input> inputs = compilationArtifact.getInputs();
         List<String> inputsResult = new ArrayList<>();

@@ -99,7 +99,8 @@ public class TestCaseEventDispatchServiceTest {
         localTestCaseEventDispatchService.registerListener(listenerIncrement);
         localTestCaseEventDispatchService.registerListener(listenerIncrementTwice);
 
-        localTestCaseEventDispatchService.notifyListeners(new SlangTestCaseEvent(new SlangTestCase("name", null, null, null, null, null, null, null, null)));
+        localTestCaseEventDispatchService.notifyListeners(new SlangTestCaseEvent(
+                new SlangTestCase("name", null, null, null, null, null, null, null, null)));
 
         while (mutableBoolean.isFalse()) {
             Thread.sleep(50);

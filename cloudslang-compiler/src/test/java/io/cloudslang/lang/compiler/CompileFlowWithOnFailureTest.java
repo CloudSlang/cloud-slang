@@ -33,6 +33,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /*
@@ -59,21 +61,22 @@ public class CompileFlowWithOnFailureTest {
 
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
-        Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 8, executionPlan.getSteps().size());
-        Assert.assertEquals("execution plan name is different than expected", "flow_with_on_failure", executionPlan.getName());
-        Assert.assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
-        Assert.assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
+        assertNotNull("execution plan is null", executionPlan);
+        assertEquals("there is a different number of steps than expected", 8, executionPlan.getSteps().size());
+        assertEquals("execution plan name is different than expected", "flow_with_on_failure", executionPlan.getName());
+        assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
+        assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
 
         long firstOnFailureStep = 6L;
         long endFlowStep = 0L;
 
         ExecutionStep firstStep = executionPlan.getStep(3L);
-        Assert.assertEquals("first step didn't navigate to on failure", firstOnFailureStep, getFailureNavigationStepId(firstStep));
+        assertEquals("first step didn't navigate to on failure",
+                firstOnFailureStep, getFailureNavigationStepId(firstStep));
         ExecutionStep secondStep = executionPlan.getStep(5L);
-        Assert.assertEquals(endFlowStep, getFailureNavigationStepId(secondStep));
+        assertEquals(endFlowStep, getFailureNavigationStepId(secondStep));
         ExecutionStep firstOnFailStep = executionPlan.getStep(7L);
-        Assert.assertEquals(endFlowStep, getFailureNavigationStepId(firstOnFailStep));
+        assertEquals(endFlowStep, getFailureNavigationStepId(firstOnFailStep));
     }
 
     @Test

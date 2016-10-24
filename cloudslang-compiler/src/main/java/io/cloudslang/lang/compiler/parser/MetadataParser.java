@@ -117,11 +117,13 @@ public class MetadataParser {
         StringTokenizer stringTokenizer = new StringTokenizer(lineWithoutTag);
         if ((DescriptionTag.isUniqueTagType(tag) && stringTokenizer.countTokens() == 1) ||
                 stringTokenizer.countTokens() > 1) {
-            throw new RuntimeException("Line \"" + line + "\" does not contain colon the tag name and the description of the tag.");
+            throw new RuntimeException("Line \"" + line +
+                    "\" does not contain colon the tag name and the description of the tag.");
         }
     }
 
-    private void putValueInMapAndResetBuilder(Map<String, String> map, String key, StrBuilder valueStringBuilder, String line) {
+    private void putValueInMapAndResetBuilder(Map<String, String> map,
+                                              String key, StrBuilder valueStringBuilder, String line) {
         if (line == null || DescriptionTag.stringContainsTag(line)) {
             String value = valueStringBuilder.trim().build();
             if (StringUtils.equals(key, value)) {

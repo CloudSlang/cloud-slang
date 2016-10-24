@@ -82,8 +82,8 @@ public class InputsBinding extends AbstractBinding {
         targetContext.put(inputName, value);
     }
 
-    private Value resolveValue(Input input, Map<String, ? extends Value> context, Map<String, ? extends Value> targetContext,
-                               Set<SystemProperty> systemProperties) {
+    private Value resolveValue(Input input, Map<String, ? extends Value> context,
+                               Map<String, ? extends Value> targetContext, Set<SystemProperty> systemProperties) {
         Value value = null;
 
         //we do not want to change original context map
@@ -91,7 +91,8 @@ public class InputsBinding extends AbstractBinding {
 
         String inputName = input.getName();
         Value valueFromContext = context.get(inputName);
-        boolean sensitive = input.getValue() != null && input.getValue().isSensitive() || valueFromContext != null && valueFromContext.isSensitive();
+        boolean sensitive = input.getValue() != null && input.getValue().isSensitive() ||
+                valueFromContext != null && valueFromContext.isSensitive();
         if (!input.isPrivateInput()) {
             value = ValueFactory.create(valueFromContext, sensitive);
         }
@@ -105,9 +106,11 @@ public class InputsBinding extends AbstractBinding {
                 }
                 //so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
-                value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties, input.getFunctionDependencies());
+                value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
+                        input.getFunctionDependencies());
                 value = ValueFactory.create(value, sensitive);
-            } else if ((value == null && rawValue != null) || (containsEmptyStringOrNull(value) && doesNotContainNull(rawValue))) {
+            } else if ((value == null && rawValue != null) ||
+                    (containsEmptyStringOrNull(value) && doesNotContainNull(rawValue))) {
                 value = rawValue;
             }
         }

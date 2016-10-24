@@ -28,9 +28,12 @@ public class LoggingSlangTestCaseEventListener implements ISlangTestCaseEventLis
     public synchronized void onEvent(SlangTestCaseEvent event) {
         SlangTestCase slangTestCase = event.getSlangTestCase();
         if (event instanceof BeginSlangTestCaseEvent) {
-            loggingService.logEvent(Level.INFO, "Running test: " + SlangTestCase.generateTestCaseReference(slangTestCase) + " - " + slangTestCase.getDescription());
+            loggingService.logEvent(Level.INFO, "Running test: " +
+                    SlangTestCase.generateTestCaseReference(slangTestCase) + " - " + slangTestCase.getDescription());
         } else if (event instanceof SkippedSlangTestCaseEvent) {
-            loggingService.logEvent(Level.INFO, "Skipping test: " + SlangTestCase.generateTestCaseReference(slangTestCase) + " because it is not in active test suites");
+            loggingService.logEvent(Level.INFO, "Skipping test: " +
+                    SlangTestCase.generateTestCaseReference(slangTestCase) +
+                    " because it is not in active test suites");
         }
     }
 

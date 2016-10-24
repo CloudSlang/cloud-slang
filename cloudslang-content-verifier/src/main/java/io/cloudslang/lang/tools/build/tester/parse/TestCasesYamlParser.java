@@ -55,7 +55,8 @@ public class TestCasesYamlParser {
     private LoggingService loggingService;
 
     // // TODO: 10/10/2016 this needs to be fixed and have proper autowiring
-    // object mapper is thread safe if not re-configured , alternatively we can use With 2.0 and above, above can be augmented by noting that there is an even better way: use ObjectWriter and ObjectReader objects,
+    // object mapper is thread safe if not re-configured , alternatively we can use With 2.0 and above,
+    // above can be augmented by noting that there is an even better way: use ObjectWriter and ObjectReader objects,
     // which are full thread safe
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -68,7 +69,8 @@ public class TestCasesYamlParser {
         Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
 
         try {
-            @SuppressWarnings("unchecked") Map<String, Map> parsedTestCases = yaml.loadAs(source.getContent(), Map.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Map> parsedTestCases = yaml.loadAs(source.getContent(), Map.class);
             if (MapUtils.isEmpty(parsedTestCases)) {
                 loggingService.logEvent(Level.INFO, "No tests cases were found in: " + source.getName());
                 return new HashMap<>();

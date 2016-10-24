@@ -53,7 +53,9 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
                     Map.Entry<String, ?> entry = ((Map<String, ?>) rawOutput).entrySet().iterator().next();
                     Serializable entryValue = (Serializable) entry.getValue();
                     if (entryValue == null) {
-                        throw new RuntimeException("Could not transform Output : " + rawOutput + " since it has a null value.\n\nMake sure a value is specified or that indentation is properly done.");
+                        throw new RuntimeException("Could not transform Output : " + rawOutput +
+                                " since it has a null value.\n\n" +
+                                "Make sure a value is specified or that indentation is properly done.");
                     }
                     if (entryValue instanceof Map) {
                         // - some_output:
@@ -67,7 +69,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
                     }
                 } else {
                     //- some_output
-                    //this is our default behavior that if the user specifies only a key, the key is also the ref we look for
+                    //this is our default behavior that if the user specifies only a key,
+                    // the key is also the ref we look for
                     addOutput(transformedData, createRefOutput((String) rawOutput, false), errors);
                 }
             } catch (RuntimeException rex) {
@@ -82,7 +85,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         return Output.class;
     }
 
-    abstract void handleOutputProperties(List<Output> transformedData, Map.Entry<String, ?> entry, List<RuntimeException> errors);
+    abstract void handleOutputProperties(List<Output> transformedData,
+                                         Map.Entry<String, ?> entry, List<RuntimeException> errors);
 
     void addOutput(List<Output> outputs, Output element, List<RuntimeException> errors) {
         List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(outputs, element);

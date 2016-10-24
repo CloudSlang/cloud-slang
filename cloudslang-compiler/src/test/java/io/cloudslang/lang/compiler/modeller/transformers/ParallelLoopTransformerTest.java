@@ -50,14 +50,16 @@ public class ParallelLoopTransformerTest extends TransformersTestParent {
 
     @Test
     public void testValidStatementWithSpaces() throws Exception {
-        ListLoopStatement statement = (ListLoopStatement) transformer.transform("x in range(0, 9)").getTransformedData();
+        ListLoopStatement statement =
+                (ListLoopStatement) transformer.transform("x in range(0, 9)").getTransformedData();
         Assert.assertEquals("x", statement.getVarName());
         Assert.assertEquals("range(0, 9)", statement.getExpression());
     }
 
     @Test
     public void testValidStatementAndTrim() throws Exception {
-        ListLoopStatement statement = (ListLoopStatement) transformer.transform(" min   in  collection  ").getTransformedData();
+        ListLoopStatement statement =
+                (ListLoopStatement) transformer.transform(" min   in  collection  ").getTransformedData();
         Assert.assertEquals("min", statement.getVarName());
         Assert.assertEquals("collection", statement.getExpression());
     }

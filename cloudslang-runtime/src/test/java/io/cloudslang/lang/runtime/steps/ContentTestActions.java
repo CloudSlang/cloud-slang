@@ -70,7 +70,8 @@ public class ContentTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> getNameFromNonSerializableSession(@Param("name") GlobalSessionObject<NonSerializableObject> name) {
+    public Map<String, String> getNameFromNonSerializableSession(
+            @Param("name") GlobalSessionObject<NonSerializableObject> name) {
         SessionResource<NonSerializableObject> sessionName = name.getResource();
         Map<String, String> returnMap = new HashMap<>();
         String value = null;
@@ -82,7 +83,8 @@ public class ContentTestActions {
     }
 
     @SuppressWarnings("unused")
-    public Map<String, String> setNameOnNonSerializableSession(@Param("name") GlobalSessionObject<NonSerializableObject> name,
+    public Map<String, String> setNameOnNonSerializableSession(
+            @Param("name") GlobalSessionObject<NonSerializableObject> name,
                                                                @Param("value") String value) {
         name.getResource();
         Map<String, String> returnMap = new HashMap<>();

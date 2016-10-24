@@ -35,7 +35,8 @@ public class Flow extends Executable {
                 List<Result> results,
                 Set<String> executableDependencies,
                 Set<String> systemPropertyDependencies) {
-        super(preOpActionData, postOpActionData, namespace, name, inputs, outputs, results, executableDependencies, systemPropertyDependencies);
+        super(preOpActionData, postOpActionData, namespace, name, inputs,
+                outputs, results, executableDependencies, systemPropertyDependencies);
         this.workflow = workflow;
     }
 

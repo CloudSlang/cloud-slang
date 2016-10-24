@@ -78,14 +78,16 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformSimple() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Serializable> actualPythonActionSimple = transformAndThrowErrorIfExists(pythonActionTransformer, initialPythonActionSimple);
+        Map<String, Serializable> actualPythonActionSimple =
+                transformAndThrowErrorIfExists(pythonActionTransformer, initialPythonActionSimple);
         Assert.assertEquals(expectedPythonActionSimple, actualPythonActionSimple);
     }
 
     @Test
     public void testTransformWithDependencies() throws Exception {
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Following tags are invalid: [dependencies]. Please take a look at the supported features per versions link");
+        exception.expectMessage("Following tags are invalid: [dependencies]. " +
+                "Please take a look at the supported features per versions link");
         transformAndThrowErrorIfExists(pythonActionTransformer, initialPythonActionWithDependencies);
     }
 
@@ -94,7 +96,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl"));
+        transformAndThrowFirstException(pythonActionTransformer,
+                loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl"));
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
@@ -102,7 +105,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     public void testTransformWithEmptyDependencies() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_1_part.sl"));
+        transformAndThrowFirstException(pythonActionTransformer,
+                loadPythonActionData("/python_action_with_dependencies_1_part.sl"));
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
@@ -110,7 +114,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     public void testTransformWithAllEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_2_parts.sl"));
+        transformAndThrowFirstException(pythonActionTransformer,
+                loadPythonActionData("/python_action_with_dependencies_2_parts.sl"));
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
@@ -118,7 +123,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     public void testTransformWithOnePart() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl"));
+        transformAndThrowFirstException(pythonActionTransformer,
+                loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl"));
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
@@ -126,7 +132,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     public void testTransformWithTwoEmptyParts() throws Exception {
         exception.expect(RuntimeException.class);
         exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer, loadPythonActionData("/python_action_with_dependencies_empty.sl"));
+        transformAndThrowFirstException(pythonActionTransformer,
+                loadPythonActionData("/python_action_with_dependencies_empty.sl"));
     }
 
     @Test
@@ -147,8 +154,10 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         return returnMap;
     }
 
-    private Map<String, Serializable> transformAndThrowErrorIfExists(PythonActionTransformer pythonActionTransformer, Map<String, Serializable> rawData) {
-        TransformModellingResult<Map<String, Serializable>> transformModellingResult = pythonActionTransformer.transform(rawData);
+    private Map<String, Serializable> transformAndThrowErrorIfExists(PythonActionTransformer pythonActionTransformer,
+                                                                     Map<String, Serializable> rawData) {
+        TransformModellingResult<Map<String, Serializable>> transformModellingResult =
+                pythonActionTransformer.transform(rawData);
         BasicTransformModellingResult<Map<String, Serializable>> basicTransformModellingResult =
                 (BasicTransformModellingResult<Map<String, Serializable>>) transformModellingResult;
         List<RuntimeException> errors = basicTransformModellingResult.getErrors();

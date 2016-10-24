@@ -75,7 +75,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             sendStartBindingInputsEvent(executableInputs, runEnv, executionRuntimeServices,
                     "Pre Input binding for " + stepType, stepType, nodeName);
 
-            Map<String, Value> executableContext = inputsBinding.bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
+            Map<String, Value> executableContext = inputsBinding
+                    .bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
 
             Map<String, Value> actionArguments = new HashMap<>();
 
@@ -95,7 +96,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();
         } catch (RuntimeException e) {
-            logger.error("There was an error running the start executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
+            logger.error("There was an error running the start executable execution step of: \'" + nodeName +
+                    "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
     }
@@ -117,7 +119,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
         try {
             runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
-            Map<String, Value> operationVariables = operationContext == null ? null : operationContext.getImmutableViewOfVariables();
+            Map<String, Value> operationVariables = operationContext == null ?
+                    null : operationContext.getImmutableViewOfVariables();
+
             ReturnValues actionReturnValues = buildReturnValues(runEnv, executableType);
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
@@ -155,8 +159,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     Pair.of(LanguageEventData.RESULT, returnValues.getResult())
             );
 
-            // If we have parent flow data on the stack, we pop it and request the score engine to switch to the parent
-            // execution plan id once it can, and we set the next position that was stored there for the use of the navigation
+            // If we have parent flow data on the stack, we pop it and request the score engine to switch
+            // to the parent execution plan id once it can, and we set the next position that was stored there
+            // for the use of the navigation
             if (!runEnv.getParentFlowStack().isEmpty()) {
                 handleNavigationToParent(runEnv, executionRuntimeServices);
             } else {
@@ -167,7 +172,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 );
             }
         } catch (RuntimeException e) {
-            logger.error("There was an error running the finish executable execution step of: \'" + nodeName + "\'.\n\tError is: " + e.getMessage());
+            logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
+                    "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }

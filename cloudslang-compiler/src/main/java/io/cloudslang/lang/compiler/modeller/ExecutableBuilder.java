@@ -92,7 +92,8 @@ public class ExecutableBuilder {
     private List<Transformer> postExecTransformers;
 
     private List<String> executableAdditionalKeywords = singletonList(SlangTextualKeys.EXECUTABLE_NAME_KEY);
-    private List<String> operationAdditionalKeywords = asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY);
+    private List<String> operationAdditionalKeywords =
+            asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY);
     private List<String> flowAdditionalKeywords = singletonList(SlangTextualKeys.WORKFLOW_KEY);
     private List<String> allExecutableAdditionalKeywords;
 
@@ -101,7 +102,8 @@ public class ExecutableBuilder {
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
-    private List<String> stepAdditionalKeyWords = asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
+    private List<String> stepAdditionalKeyWords =
+            asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
     private List<String> parallelLoopValidKeywords = asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.FOR_KEY);
 
     @PostConstruct
@@ -114,7 +116,8 @@ public class ExecutableBuilder {
         actionTransformers = filterTransformers(Transformer.Scope.ACTION);
 
         allExecutableAdditionalKeywords = new ArrayList<>(
-                executableAdditionalKeywords.size() + operationAdditionalKeywords.size() + flowAdditionalKeywords.size()
+                executableAdditionalKeywords.size() + operationAdditionalKeywords.size() +
+                        flowAdditionalKeywords.size()
         );
         allExecutableAdditionalKeywords.addAll(executableAdditionalKeywords);
         allExecutableAdditionalKeywords.addAll(operationAdditionalKeywords);
@@ -133,7 +136,8 @@ public class ExecutableBuilder {
         return filter(having(on(Transformer.class).getScopes().contains(scope)), transformers);
     }
 
-    public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang, Map<String, Object> executableRawData) {
+    public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang,
+                                                           Map<String, Object> executableRawData) {
         List<RuntimeException> errors = new ArrayList<>();
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
 
@@ -142,7 +146,8 @@ public class ExecutableBuilder {
                 "",
                 executableRawData,
                 ListUtils.union(preExecTransformers, postExecTransformers),
-                ParsedSlang.Type.DECISION.equals(parsedSlang.getType()) ? executableAdditionalKeywords : allExecutableAdditionalKeywords,
+                ParsedSlang.Type.DECISION.equals(parsedSlang.getType()) ?
+                        executableAdditionalKeywords : allExecutableAdditionalKeywords,
                 executableConstraintGroups
                 )
         );
@@ -150,14 +155,22 @@ public class ExecutableBuilder {
         Map<String, Serializable> preExecutableActionData = new HashMap<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
 
-        String errorMessagePrefix = "For " + parsedSlang.getType().toString().toLowerCase() + " '" + execName + "' syntax is illegal.\n";
-        preExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix));
-        postExecutableActionData.putAll(transformersHandler.runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix));
+        String errorMessagePrefix = "For " + parsedSlang.getType().toString().toLowerCase() + " '" + execName +
+                "' syntax is illegal.\n";
+        preExecutableActionData.putAll(
+                transformersHandler
+                        .runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix));
+        postExecutableActionData.putAll(
+                transformersHandler
+                        .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix));
 
-        @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
-        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Input> inputs =
+                (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
+        @SuppressWarnings("unchecked") List<Output> outputs =
+                (List<Output>) postExecutableActionData.remove(SlangTextualKeys.OUTPUTS_KEY);
 
-        @SuppressWarnings("unchecked") List<Result> results = (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
+        @SuppressWarnings("unchecked") List<Result> results =
+                (List<Result>) postExecutableActionData.remove(SlangTextualKeys.RESULTS_KEY);
         results = results == null ? new ArrayList<Result>() : results;
 
         String namespace = parsedSlang.getNamespace();
@@ -165,16 +178,20 @@ public class ExecutableBuilder {
         Set<String> systemPropertyDependencies = null;
         switch (parsedSlang.getType()) {
             case FLOW:
-                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.FLOW, results, errors);
+                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData
+                        .get(SlangTextualKeys.RESULTS_KEY), ExecutableType.FLOW, results, errors);
 
                 Map<String, String> imports = parsedSlang.getImports();
 
                 List<Map<String, Map<String, Object>>> workFlowRawData =
-                        preCompileValidator.validateWorkflowRawData(parsedSlang, executableRawData.get(WORKFLOW_KEY), execName, errors);
+                        preCompileValidator.validateWorkflowRawData(parsedSlang,
+                                        executableRawData.get(WORKFLOW_KEY), execName, errors);
 
-                Workflow onFailureWorkFlow = getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
+                Workflow onFailureWorkFlow =
+                        getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
 
-                WorkflowModellingResult workflowModellingResult = compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
+                WorkflowModellingResult workflowModellingResult =
+                        compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
                 errors.addAll(workflowModellingResult.getErrors());
                 Workflow workflow = workflowModellingResult.getWorkflow();
 
@@ -182,7 +199,8 @@ public class ExecutableBuilder {
 
                 executableDependencies = fetchDirectStepsDependencies(workflow);
                 try {
-                    systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
+                    systemPropertyDependencies = dependenciesHelper
+                            .getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
@@ -198,10 +216,12 @@ public class ExecutableBuilder {
                         executableDependencies,
                         systemPropertyDependencies
                 );
-                return preCompileValidator.validateResult(parsedSlang, execName, new ExecutableModellingResult(flow, errors));
+                return preCompileValidator
+                        .validateResult(parsedSlang, execName, new ExecutableModellingResult(flow, errors));
 
             case OPERATION:
-                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.OPERATION, results, errors);
+                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY),
+                        ExecutableType.OPERATION, results, errors);
 
                 Map<String, Object> actionRawData = getActionRawData(executableRawData, errors, parsedSlang, execName);
                 ActionModellingResult actionModellingResult = compileAction(actionRawData);
@@ -213,7 +233,8 @@ public class ExecutableBuilder {
                 preCompileValidator.validateDefaultResult(results, execName, errors);
 
                 try {
-                    systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForOperation(inputs, outputs, results);
+                    systemPropertyDependencies = dependenciesHelper
+                            .getSystemPropertiesForOperation(inputs, outputs, results);
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
@@ -230,16 +251,19 @@ public class ExecutableBuilder {
                         systemPropertyDependencies
                 );
 
-                return preCompileValidator.validateResult(parsedSlang, execName, new ExecutableModellingResult(operation, errors));
+                return preCompileValidator
+                        .validateResult(parsedSlang, execName, new ExecutableModellingResult(operation, errors));
             case DECISION:
-                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY), ExecutableType.DECISION, results, errors);
+                resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY),
+                        ExecutableType.DECISION, results, errors);
 
                 preCompileValidator.validateResultTypes(results, execName, errors);
                 preCompileValidator.validateDecisionResultsSection(executableRawData, execName, errors);
                 preCompileValidator.validateDefaultResult(results, execName, errors);
 
                 try {
-                    systemPropertyDependencies = dependenciesHelper.getSystemPropertiesForDecision(inputs, outputs, results);
+                    systemPropertyDependencies = dependenciesHelper
+                            .getSystemPropertiesForDecision(inputs, outputs, results);
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
@@ -260,7 +284,8 @@ public class ExecutableBuilder {
                         new ExecutableModellingResult(decision, errors)
                 );
             default:
-                throw new RuntimeException("Error compiling " + parsedSlang.getName() + ". It is not of flow, operations or decision type");
+                throw new RuntimeException("Error compiling " + parsedSlang.getName() +
+                        ". It is not of flow, operations or decision type");
         }
     }
 
@@ -272,18 +297,22 @@ public class ExecutableBuilder {
         Object javaActionRawData = executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
         Object pythonActionRawData = executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         if (javaActionRawData != null) {
-            actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY, executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
+            actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY,
+                    executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
         }
         if (pythonActionRawData != null) {
-            actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY, executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
+            actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY,
+                    executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
         }
         if (MapUtils.isEmpty(actionRawData)) {
-            errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() + ". Operation: " + execName + " has no action data"));
+            errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() +
+                    ". Operation: " + execName + " has no action data"));
         }
         return actionRawData;
     }
 
-    private Workflow getOnFailureWorkflow(List<Map<String, Map<String, Object>>> workFlowRawData, Map<String, String> imports, List<RuntimeException> errors,
+    private Workflow getOnFailureWorkflow(List<Map<String, Map<String, Object>>> workFlowRawData,
+                                          Map<String, String> imports, List<RuntimeException> errors,
                                           String namespace, String execName) {
 
         Map<String, Map<String, Object>> onFailureStepData = preCompileValidator.validateOnFailurePosition(
@@ -300,32 +329,42 @@ public class ExecutableBuilder {
                 onFailureData = (List<Map<String, Map<String, Object>>>) onFailureStepData.values().iterator().next();
             } catch (ClassCastException ex) {
                 onFailureData = new ArrayList<>();
-                errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be a list of steps and not a map"));
+                errors.add(new RuntimeException("Flow: '" +
+                        execName + "' syntax is illegal.\nBelow 'on_failure' property there " +
+                        "should be a list of steps and not a map"));
             }
             if (CollectionUtils.isNotEmpty(onFailureData)) {
                 if (onFailureData.size() > 1) {
-                    errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nBelow 'on_failure' property there should be only one step"));
+                    errors.add(new RuntimeException("Flow: '" + execName +
+                            "' syntax is illegal.\nBelow 'on_failure' property " +
+                            "there should be only one step"));
                 }
                 handleOnFailureStepNavigationSection(onFailureData, execName, errors);
 
-                WorkflowModellingResult workflowModellingResult = compileWorkFlow(onFailureData, imports, null, true, namespace);
+                WorkflowModellingResult workflowModellingResult =
+                        compileWorkFlow(onFailureData, imports, null, true, namespace);
                 errors.addAll(workflowModellingResult.getErrors());
                 onFailureWorkFlow = workflowModellingResult.getWorkflow();
             } else if (onFailureData == null) {
-                errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThere is no step below the 'on_failure' property."));
+                errors.add(new RuntimeException("Flow: '" + execName +
+                        "' syntax is illegal.\nThere is no step below the 'on_failure' property."));
             }
         }
         return onFailureWorkFlow;
     }
 
-    private void handleOnFailureStepNavigationSection(List<Map<String, Map<String, Object>>> onFailureData, String execName, List<RuntimeException> errors) {
+    private void handleOnFailureStepNavigationSection(List<Map<String, Map<String, Object>>> onFailureData,
+                                                      String execName, List<RuntimeException> errors) {
         Map.Entry<String, Map<String, Object>> onFailureStep = getFirstOnFailureStep(onFailureData);
         if (onFailureStep.getValue().containsKey(NAVIGATION_KEY)) {
-            errors.add(new RuntimeException("Flow: '" + execName + "' syntax is illegal.\nThe step below 'on_failure' property should not contain a \"navigate\" section."));
+            errors.add(new RuntimeException("Flow: '" + execName +
+                    "' syntax is illegal.\nThe step below 'on_failure' property should " +
+                    "not contain a \"navigate\" section."));
         }
     }
 
-    private Map.Entry<String, Map<String, Object>> getFirstOnFailureStep(List<Map<String, Map<String, Object>>> onFailureData) {
+    private Map.Entry<String, Map<String, Object>> getFirstOnFailureStep(List<Map<String,
+            Map<String, Object>>> onFailureData) {
         Map<String, Map<String, Object>> onFailureStepMap = onFailureData.iterator().next();
         return onFailureStepMap.entrySet().iterator().next();
     }
@@ -333,10 +372,12 @@ public class ExecutableBuilder {
     private ActionModellingResult compileAction(Map<String, Object> actionRawData) {
         Map<String, Serializable> actionData = new HashMap<>();
 
-        List<RuntimeException> errors = preCompileValidator.checkKeyWords("action data", "", actionRawData, actionTransformers, null, null);
+        List<RuntimeException> errors = preCompileValidator
+                .checkKeyWords("action data", "", actionRawData, actionTransformers, null, null);
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
-        actionData.putAll(transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
+        actionData.putAll(
+                transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
 
         Action action = new Action(actionData);
         return new ActionModellingResult(action, errors);
@@ -352,7 +393,8 @@ public class ExecutableBuilder {
 
         Deque<Step> steps = new LinkedList<>();
         Set<String> stepNames = new HashSet<>();
-        Deque<Step> onFailureSteps = !(onFailureSection || onFailureWorkFlow == null) ? onFailureWorkFlow.getSteps() : new LinkedList<Step>();
+        Deque<Step> onFailureSteps = !(onFailureSection || onFailureWorkFlow == null) ?
+                onFailureWorkFlow.getSteps() : new LinkedList<Step>();
         List<String> onFailureStepNames = getStepNames(onFailureSteps);
         boolean onFailureStepFound = onFailureStepNames.size() > 0;
         String defaultFailure = onFailureStepFound ? onFailureStepNames.get(0) : ScoreLangConstants.FAILURE_RESULT;
@@ -363,11 +405,13 @@ public class ExecutableBuilder {
             String stepName = getStepName(stepRawData);
             validateStepName(stepName, errors);
             if (stepNames.contains(stepName) || onFailureStepNames.contains(stepName)) {
-                errors.add(new RuntimeException("Step name: \'" + stepName + "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
+                errors.add(new RuntimeException("Step name: \'" + stepName +
+                        "\' appears more than once in the workflow. " + UNIQUE_STEP_NAME_MESSAGE_SUFFIX));
             }
             stepNames.add(stepName);
             Map<String, Object> stepRawDataValue;
-            String message = "Step: " + stepName + " syntax is illegal.\nBelow step name, there should be a map of values in the format:\ndo:\n\top_name:";
+            String message = "Step: " + stepName + " syntax is illegal.\nBelow step name, there should " +
+                    "be a map of values in the format:\ndo:\n\top_name:";
             try {
                 stepRawDataValue = stepRawData.values().iterator().next();
                 if (MapUtils.isNotEmpty(stepRawDataValue)) {
@@ -375,15 +419,23 @@ public class ExecutableBuilder {
                     boolean parallelLoopKeyFound = stepRawDataValue.containsKey(PARALLEL_LOOP_KEY);
                     if (loopKeyFound) {
                         if (parallelLoopKeyFound) {
-                            errors.add(new RuntimeException("Step: " + stepName + " syntax is illegal.\nBelow step name, there can be either \'loop\' or \'aync_loop\' key."));
+                            errors.add(new RuntimeException("Step: " + stepName +
+                                    " syntax is illegal.\nBelow step name, " +
+                                    "there can be either \'loop\' or \'aync_loop\' key."));
                         }
-                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> loopRawData = (Map<String, Object>) stepRawDataValue.remove(LOOP_KEY);
+                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'loop' keyword, there " +
+                                "should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> loopRawData = (Map<String, Object>) stepRawDataValue.remove(LOOP_KEY);
                         stepRawDataValue.putAll(loopRawData);
                     }
                     if (parallelLoopKeyFound) {
-                        message = "Step: " + stepName + " syntax is illegal.\nBelow the 'parallel_loop' keyword, there should be a map of values in the format:\nfor:\ndo:\n\top_name:";
-                        @SuppressWarnings("unchecked") Map<String, Object> parallelLoopRawData = (Map<String, Object>) stepRawDataValue.remove(PARALLEL_LOOP_KEY);
+                        message = "Step: " + stepName +
+                                " syntax is illegal.\nBelow the 'parallel_loop' keyword, there " +
+                                "should be a map of values in the format:\nfor:\ndo:\n\top_name:";
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> parallelLoopRawData =
+                                (Map<String, Object>) stepRawDataValue.remove(PARALLEL_LOOP_KEY);
 
                         errors.addAll(
                                 preCompileValidator.checkKeyWords(
@@ -410,7 +462,8 @@ public class ExecutableBuilder {
             if (nextStepData != null) {
                 defaultSuccess = nextStepData.keySet().iterator().next();
             } else {
-                defaultSuccess = onFailureSection ? ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
+                defaultSuccess = onFailureSection ?
+                        ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
             }
 
             String onFailureStepName = onFailureStepFound ? onFailureStepNames.get(0) : null;
@@ -468,11 +521,15 @@ public class ExecutableBuilder {
         Map<String, Serializable> preStepData = new HashMap<>();
         Map<String, Serializable> postStepData = new HashMap<>();
 
-        errors.addAll(preCompileValidator.checkKeyWords(stepName, "", stepRawData, ListUtils.union(preStepTransformers, postStepTransformers), stepAdditionalKeyWords, null));
+        errors.addAll(preCompileValidator
+                .checkKeyWords(stepName, "", stepRawData,
+                        ListUtils.union(preStepTransformers, postStepTransformers), stepAdditionalKeyWords, null));
 
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
-        preStepData.putAll(transformersHandler.runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
-        postStepData.putAll(transformersHandler.runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
+        preStepData.putAll(transformersHandler
+                .runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
+        postStepData.putAll(transformersHandler
+                .runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
@@ -498,7 +555,8 @@ public class ExecutableBuilder {
             }
         }
 
-        List<Map<String, String>> navigationStrings = getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
+        List<Map<String, String>> navigationStrings =
+                getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
         Step step = new Step(
                 stepName,

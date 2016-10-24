@@ -25,6 +25,9 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Bonczidai Levente
  * @since 11/6/2015
@@ -86,7 +89,7 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         expectedStepArguments.put("input_concat_2_folded", "prefix_ab_suffix");
         expectedStepArguments.put("step_argument_null", null);
 
-        Assert.assertTrue("Step arguments not bound correctly", includeAllPairs(stepData.getInputs(), expectedStepArguments));
+        assertTrue("Step arguments not bound correctly", includeAllPairs(stepData.getInputs(), expectedStepArguments));
     }
 
     private void verifyStepPublishValues(StepData stepData) {
@@ -98,6 +101,6 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         expectedStepPublishValues.put("publish_expression", "publish_str_value_suffix");
         expectedStepPublishValues.put("output_step_argument_null", "step_argument_null_value");
 
-        Assert.assertEquals("Step publish values not bound correctly", expectedStepPublishValues, stepData.getOutputs());
+        assertEquals("Step publish values not bound correctly", expectedStepPublishValues, stepData.getOutputs());
     }
 }

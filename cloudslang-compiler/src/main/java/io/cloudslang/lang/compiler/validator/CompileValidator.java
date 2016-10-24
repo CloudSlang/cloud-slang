@@ -20,10 +20,14 @@ import java.util.Map;
  */
 public interface CompileValidator {
 
-    List<RuntimeException> validateModelWithDependencies(Executable executable, Map<String, Executable> filteredDependencies);
+    List<RuntimeException> validateModelWithDependencies(Executable executable,
+                                                         Map<String, Executable> filteredDependencies);
 
-    List<RuntimeException> validateModelWithDirectDependencies(Executable executable, Map<String, Executable> directDependencies);
+    List<RuntimeException> validateModelWithDirectDependencies(Executable executable,
+                                                               Map<String, Executable> directDependencies);
 
-    List<RuntimeException> validateNoDuplicateExecutables(Executable currentExecutable, SlangSource currentSource, Map<Executable, SlangSource> allAvailableExecutables);
+    List<RuntimeException> validateNoDuplicateExecutables(Executable currentExecutable,
+                                                          SlangSource currentSource,
+                                                          Map<Executable, SlangSource> allAvailableExecutables);
 
 }

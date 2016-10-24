@@ -266,7 +266,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateDefaultCustom() throws Exception {
-        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_custom.sl").toURI();
+        final URI flow = getClass()
+                .getResource("/loops/parallel_loop/parallel_loop_navigate_default_custom.sl").toURI();
         final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_custom_only.sl").toURI();
         final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -314,7 +315,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testCompileParallelLoopFlowNavigateDefaultSuccessOnly() throws Exception {
-        final URI flow = getClass().getResource("/loops/parallel_loop/parallel_loop_navigate_default_success_only.sl").toURI();
+        final URI flow = getClass()
+                .getResource("/loops/parallel_loop/parallel_loop_navigate_default_success_only.sl").toURI();
         final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch_success_only.sl").toURI();
         final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -414,7 +416,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testPublishOnBranchThrowsException() throws Exception {
-        final URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_publish_on_branch.sl").toURI();
+        final URI flow = getClass()
+                .getResource("/corrupted/loops/parallel_loop/parallel_loop_publish_on_branch.sl").toURI();
         final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
         final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -422,7 +425,8 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation2));
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Artifact {print_values} has unrecognized tag {publish} under 'parallel_loop'. " +
+        expectedException
+                .expectMessage("Artifact {print_values} has unrecognized tag {publish} under 'parallel_loop'. " +
                 "Please take a look at the supported features per versions link");
 
         compiler.compile(SlangSource.fromFile(flow), path);
@@ -430,7 +434,8 @@ public class CompileParallelLoopFlowTest {
 
     @Test
     public void testAggregateKeyThrowsException() throws Exception {
-        final URI flow = getClass().getResource("/corrupted/loops/parallel_loop/parallel_loop_aggregate_key.sl").toURI();
+        final URI flow = getClass()
+                .getResource("/corrupted/loops/parallel_loop/parallel_loop_aggregate_key.sl").toURI();
         final URI operation1 = getClass().getResource("/loops/parallel_loop/print_branch.sl").toURI();
         final URI operation2 = getClass().getResource("/loops/parallel_loop/print_list.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
@@ -449,8 +454,12 @@ public class CompileParallelLoopFlowTest {
         @SuppressWarnings("unchecked") List<Output> actualPublishOutputs =
                 (List<Output>) joinBranchesActionData.get(ScoreLangConstants.STEP_PUBLISH_KEY);
         List<Output> expectedPublishOutputs = new ArrayList<>();
-        expectedPublishOutputs.add(new Output("name_list", ValueFactory.create("${ map(lambda x:str(x['name']), branches_context) }")));
-        expectedPublishOutputs.add(new Output("number_from_last_branch", ValueFactory.create("${ branches_context[-1]['number'] }")));
+        expectedPublishOutputs
+                .add(new Output("name_list",
+                        ValueFactory.create("${ map(lambda x:str(x['name']), branches_context) }")));
+        expectedPublishOutputs
+                .add(new Output("number_from_last_branch",
+                        ValueFactory.create("${ branches_context[-1]['number'] }")));
         assertEquals("publish values not as expected", expectedPublishOutputs, actualPublishOutputs);
     }
 
@@ -483,8 +492,10 @@ public class CompileParallelLoopFlowTest {
         assertTrue(addBranchesActionData.containsKey(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY));
         ListLoopStatement parallelLoopStatement =
                 (ListLoopStatement) addBranchesActionData.get(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY);
-        assertEquals("parallel loop statement value not as expected", "value", parallelLoopStatement.getVarName());
-        assertEquals("parallel loop statement expression not as expected", "values", parallelLoopStatement.getExpression());
+        assertEquals("parallel loop statement value not as expected",
+                "value", parallelLoopStatement.getVarName());
+        assertEquals("parallel loop statement expression not as expected",
+                "values", parallelLoopStatement.getExpression());
     }
 
     private void verifyParallelLoopStatement(Step step) {
@@ -505,7 +516,8 @@ public class CompileParallelLoopFlowTest {
 
     private List<Output> getPublishOutputs(Step step) {
         assertTrue(step.getPostStepActionData().containsKey(SlangTextualKeys.PUBLISH_KEY));
-        @SuppressWarnings("unchecked") List<Output> publishValues = (List<Output>) step.getPostStepActionData().get(SlangTextualKeys.PUBLISH_KEY);
+        @SuppressWarnings("unchecked") List<Output> publishValues =
+                (List<Output>) step.getPostStepActionData().get(SlangTextualKeys.PUBLISH_KEY);
         assertNotNull("publish list is null", publishValues);
         return publishValues;
     }

@@ -61,7 +61,8 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
                 } else if (rawResult instanceof Map) {
                     // - some_result: some_expression
                     // the value of the result is an expression we need to evaluate at runtime
-                    @SuppressWarnings("unchecked") Map.Entry<String, Serializable> entry = (Map.Entry<String, Serializable>) (((Map) rawResult).entrySet()).iterator().next();
+                    @SuppressWarnings("unchecked") Map.Entry<String, Serializable> entry =
+                            (Map.Entry<String, Serializable>) (((Map) rawResult).entrySet()).iterator().next();
                     addResult(transformedData, createExpressionResult(entry.getKey(), entry.getValue()), errors);
                 }
             } catch (RuntimeException rex) {
@@ -71,7 +72,8 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         return postProcessResults(transformedData, errors);
     }
 
-    public void addDefaultResultsIfNeeded(List rawResults, ExecutableType executableType, List<Result> resolvedResults, List<RuntimeException> errors) {
+    public void addDefaultResultsIfNeeded(List rawResults, ExecutableType executableType,
+                                          List<Result> resolvedResults, List<RuntimeException> errors) {
         if (rawResults == null && CollectionUtils.isEmpty(resolvedResults)) {
             switch (executableType) {
                 case FLOW:

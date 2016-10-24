@@ -34,7 +34,8 @@ public class ScriptExecutor extends ScriptProcessor {
     }
 
     public Map<String, Value> executeScript(Set<String> dependencies, String script, Map<String, Value> callArguments) {
-        Map<String, Serializable> executionResult = pythonRuntimeService.exec(dependencies, script, createPythonContext(callArguments)).getExecutionResult();
+        Map<String, Serializable> executionResult = pythonRuntimeService
+                .exec(dependencies, script, createPythonContext(callArguments)).getExecutionResult();
         Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = callArguments.get(entry.getKey());

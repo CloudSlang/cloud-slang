@@ -55,7 +55,8 @@ public class ScoreServicesImpl implements ScoreServices {
      * @return executionId
      */
     @Override
-    public Long trigger(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties) {
+    public Long trigger(CompilationArtifact compilationArtifact, Map<String, Value> inputs,
+                        Set<SystemProperty> systemProperties) {
         return slang.run(compilationArtifact, inputs, systemProperties);
     }
 
@@ -67,7 +68,8 @@ public class ScoreServicesImpl implements ScoreServices {
      * @return executionId
      */
     @Override
-    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Value> inputs, Set<SystemProperty> systemProperties, boolean isQuiet, boolean debug) {
+    public Long triggerSync(CompilationArtifact compilationArtifact, Map<String, Value> inputs,
+                            Set<SystemProperty> systemProperties, boolean isQuiet, boolean debug) {
         //add start event
         Set<String> handlerTypes = new HashSet<>();
         if (isQuiet) {

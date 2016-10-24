@@ -23,6 +23,8 @@ import java.util.Set;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Bonczidai Levente
  * @since 11/13/2015
@@ -62,7 +64,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         expectedInputs.put("enable_option_for_action", null);
         expectedInputs.put("enableOptionForAction", "default_value");
 
-        Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
+        assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
 
     protected void verifyExecutableInputs(StepData flowData) {
@@ -106,7 +108,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         );
         expectedInputs.put("step_argument_null", "step_argument_null_value");
 
-        Assert.assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
+        assertTrue("Executable inputs not bound correctly", includeAllPairs(flowData.getInputs(), expectedInputs));
     }
 
     protected void verifyExecutableOutputs(StepData flowData) {

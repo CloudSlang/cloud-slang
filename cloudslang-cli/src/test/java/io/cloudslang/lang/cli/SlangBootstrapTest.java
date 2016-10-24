@@ -43,11 +43,15 @@ public class SlangBootstrapTest {
         Assert.assertTrue(System.getProperty("cslang.encoding").endsWith("utf-8"));
         Assert.assertTrue(System.getProperty("app.home").endsWith("/slangbootstrap"));
         Assert.assertTrue(System.getProperty("maven.home").endsWith("/slangbootstrap/maven/apache-maven-3.3.9"));
-        Assert.assertTrue(System.getProperty("maven.multiModuleProjectDirectory").endsWith("/slangbootstrap/maven/apache-maven-3.3.9"));
-        Assert.assertTrue(System.getProperty("maven.settings.xml.path").endsWith("/slangbootstrap/maven/conf/settings.xml"));
+        Assert.assertTrue(System.getProperty("maven.multiModuleProjectDirectory")
+                .endsWith("/slangbootstrap/maven/apache-maven-3.3.9"));
+        Assert.assertTrue(System.getProperty("maven.settings.xml.path")
+                .endsWith("/slangbootstrap/maven/conf/settings.xml"));
         Assert.assertTrue(System.getProperty("maven.m2.conf.path").endsWith("/slangbootstrap/maven/conf/m2.conf"));
         Assert.assertTrue(System.getProperty("cloudslang.maven.repo.local").endsWith("/slangbootstrap/maven/repo"));
-        Assert.assertTrue(System.getProperty("cloudslang.maven.repo.remote.url").endsWith("http://repo1.maven.org/maven2"));
-        Assert.assertTrue(System.getProperty("cloudslang.maven.plugins.remote.url").endsWith("http://repo1.maven.org/maven2"));
+        Assert.assertTrue(System.getProperty("cloudslang.maven.repo.remote.url")
+                .endsWith("http://repo1.maven.org/maven2"));
+        Assert.assertTrue(System.getProperty("cloudslang.maven.plugins.remote.url")
+                .endsWith("http://repo1.maven.org/maven2"));
     }
 }

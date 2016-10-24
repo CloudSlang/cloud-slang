@@ -18,7 +18,8 @@ import java.util.List;
  **/
 
 /**
- * Holds the results of the CloudSlang build including the number of CloudSlang sources that were compiled, and the tests results
+ * Holds the results of the CloudSlang build including the number of CloudSlang sources
+ * that were compiled, and the tests results
  */
 public class SlangBuildResults {
 
@@ -26,7 +27,9 @@ public class SlangBuildResults {
     private final IRunTestResults runTestsResults;
     private List<RuntimeException> compilationExceptions;
 
-    public SlangBuildResults(int numberOfCompiledSources, IRunTestResults runTestsResults, List<RuntimeException> exceptions) {
+    public SlangBuildResults(int numberOfCompiledSources,
+                             IRunTestResults runTestsResults,
+                             List<RuntimeException> exceptions) {
         this.numberOfCompiledSources = numberOfCompiledSources;
         this.runTestsResults = runTestsResults;
         this.compilationExceptions = exceptions;
@@ -58,7 +61,8 @@ public class SlangBuildResults {
         if (numberOfCompiledSources != that.numberOfCompiledSources) {
             return false;
         }
-        return !(runTestsResults != null ? !runTestsResults.equals(that.runTestsResults) : that.runTestsResults != null);
+        return !(runTestsResults != null ?
+                !runTestsResults.equals(that.runTestsResults) : that.runTestsResults != null);
 
     }
 

@@ -22,7 +22,8 @@ public abstract class AbstractTransformer {
 
     public static final String MISSING_KEYS_ERROR_MESSAGE_PREFIX = "Following tags are missing: ";
     public static final String INVALID_KEYS_ERROR_MESSAGE_PREFIX = "Following tags are invalid: ";
-    public static final String INVALID_KEYS_ERROR_MESSAGE_SUFFIX = ". Please take a look at the supported features per versions link";
+    public static final String INVALID_KEYS_ERROR_MESSAGE_SUFFIX =
+            ". Please take a look at the supported features per versions link";
 
     protected void validateKeySet(
             Set<String> keySet,

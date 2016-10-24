@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -24,16 +25,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
+
 /**
  * Created by bancl on 8/30/2016.
  */
 @Component
 public class StaticValidatorImpl implements StaticValidator {
 
-    private static final Pattern PATTERN = Pattern.compile("^[\\w-\\.]+$");
+    private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z_0-9-.]+$");
 
     @Override
-    public void validateSlangFile(File slangFile, Executable executable, Metadata metadata, boolean shouldValidateDescription) {
+    public void validateSlangFile(File slangFile, Executable executable, Metadata metadata,
+                                  boolean shouldValidateDescription) {
         validateNamespace(slangFile, executable);
 
         validateExecutableName(slangFile, executable);
@@ -52,13 +56,15 @@ public class StaticValidatorImpl implements StaticValidator {
                 String.format("Error for executable %1$s: Result", executable.getId()));
     }
 
-    private void validateInOutParams(Map<String, String> metadataInOutParams, List<? extends InOutParam> inOutParams, String errorMessagePrefix) {
+    private void validateInOutParams(Map<String, String> metadataInOutParams,
+                                     List<? extends InOutParam> inOutParams, String errorMessagePrefix) {
         for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
             if (metadataInOutParams == null) {
                 throw new MetadataMissingException(errorMessagePrefix + "s are missing description entirely.");
             } else if (metadataInOutParams.get(inOutParam.getName()) == null &&
                     (!(inOutParam instanceof Input) || !((Input) inOutParam).isPrivateInput())) {
-                throw new MetadataMissingException(errorMessagePrefix + " '" + inOutParam.getName() + "' is missing description.");
+                throw new MetadataMissingException(errorMessagePrefix + " '" + inOutParam.getName() +
+                        "' is missing description.");
             }
         }
     }
@@ -75,11 +81,12 @@ public class StaticValidatorImpl implements StaticValidator {
                 "\'. Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
                 namespace + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
         String filePathWithoutFileName = slangFile.getParent();
-        Validate.isTrue(filePathWithoutFileName.toLowerCase().endsWith(executableNamespacePath.toLowerCase()), namespaceErrorMessage);
+        Validate.isTrue(endsWithIgnoreCase(filePathWithoutFileName, executableNamespacePath), namespaceErrorMessage);
 
         // Validate that the namespace is composed only of abc letters, _ or -
         Matcher matcher = PATTERN.matcher(namespace);
-        Validate.isTrue(matcher.matches(), "Namespace: " + namespace + " is invalid. It can contain only alphanumeric characters, underscore or hyphen");
+        Validate.isTrue(matcher.matches(), "Namespace: " + namespace + " is invalid. It can contain only " +
+                "alphanumeric characters, underscore or hyphen");
     }
 
     private void validateExecutableName(File slangFile, Executable executable) {

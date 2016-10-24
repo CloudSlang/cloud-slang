@@ -62,7 +62,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
                 executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             try {
-                Validate.notEmpty(path, "Source " + executable.getName() + " has dependencies but no path was given to the compiler");
+                Validate.notEmpty(path, "Source " + executable.getName() +
+                        " has dependencies but no path was given to the compiler");
                 Validate.noNullElements(path, "Source " + executable.getName() + " has empty dependencies");
             } catch (RuntimeException ex) {
                 exceptions.add(ex);
@@ -78,7 +79,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
 
                 handleOnFailureCustomResults(executable, filteredDependencies);
 
-                List<RuntimeException> errors = compileValidator.validateModelWithDependencies(executable, filteredDependencies);
+                List<RuntimeException> errors =
+                        compileValidator.validateModelWithDependencies(executable, filteredDependencies);
                 exceptions.addAll(errors);
             } catch (RuntimeException ex) {
                 exceptions.add(ex);
@@ -91,17 +93,19 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             ExecutionPlan executionPlan = compileToExecutionPlan(executable);
 
             //and also create execution plans for all other dependencies
-            Map<String, ExecutionPlan> dependencies = convertMap(filteredDependencies, new Converter<Executable, ExecutionPlan>() {
+            Converter<Executable, ExecutionPlan> converter = new Converter<Executable, ExecutionPlan>() {
                 @Override
                 public ExecutionPlan convert(Executable compiledExecutable) {
                     return compileToExecutionPlan(compiledExecutable);
                 }
-            });
+            };
+            Map<String, ExecutionPlan> dependencies = convertMap(filteredDependencies, converter);
             Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
             executables.add(executable);
 
             executionPlan.setSubflowsUUIDs(new HashSet<>(dependencies.keySet()));
-            CompilationArtifact compilationArtifact = new CompilationArtifact(executionPlan, dependencies, executable.getInputs(), getSystemPropertiesFromExecutables(executables));
+            CompilationArtifact compilationArtifact = new CompilationArtifact(executionPlan, dependencies,
+                    executable.getInputs(), getSystemPropertiesFromExecutables(executables));
             return new CompilationModellingResult(compilationArtifact, exceptions);
         } catch (RuntimeException ex) {
             exceptions.add(ex);
@@ -141,7 +145,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     }
 
     @Override
-    public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels) {
+    public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel,
+                                                                           Set<Executable> directDependenciesModels) {
         Map<String, Executable> dependenciesMap = new HashMap<>();
         for (Executable dependency : directDependenciesModels) {
             dependenciesMap.put(dependency.getId(), dependency);
@@ -154,7 +159,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
      * and create an {@link io.cloudslang.score.api.ExecutionPlan} for it
      *
      * @param executable the executable to create an {@link io.cloudslang.score.api.ExecutionPlan} for
-     * @return {@link io.cloudslang.score.api.ExecutionPlan} of the given {@link io.cloudslang.lang.compiler.modeller.model.Executable}
+     * @return {@link io.cloudslang.score.api.ExecutionPlan} of the given
+     * {@link io.cloudslang.lang.compiler.modeller.model.Executable}
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
 
@@ -166,7 +172,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             case SlangTextualKeys.DECISION_TYPE:
                 return executionPlanBuilder.createDecisionExecutionPlan((Decision) executable);
             default:
-                throw new RuntimeException("Executable: " + executable.getName() + " cannot be compiled to an ExecutionPlan since it is not of type flow, operation or decision");
+                throw new RuntimeException("Executable: " + executable.getName() +
+                        " cannot be compiled to an ExecutionPlan since it is not of type flow, operation or decision");
         }
     }
 

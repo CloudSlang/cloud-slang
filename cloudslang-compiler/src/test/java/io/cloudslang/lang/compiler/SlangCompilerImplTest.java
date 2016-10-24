@@ -68,7 +68,8 @@ public class SlangCompilerImplTest {
     public void testInvalidParsedSlangType() throws Exception {
         ParsedSlang parsedSlangInvalidTypeMock = mock(ParsedSlang.class);
         when(yamlParserMock.parse(eq(slangSource))).thenReturn(parsedSlangInvalidTypeMock);
-        when(yamlParserMock.validateAndThrowFirstError(eq(parsedSlangInvalidTypeMock))).thenReturn(parsedSlangInvalidTypeMock);
+        when(yamlParserMock.validateAndThrowFirstError(eq(parsedSlangInvalidTypeMock)))
+                .thenReturn(parsedSlangInvalidTypeMock);
         when(parsedSlangInvalidTypeMock.getType()).thenReturn(ParsedSlang.Type.FLOW);
         when(parsedSlangInvalidTypeMock.getName()).thenReturn("flow_name");
 

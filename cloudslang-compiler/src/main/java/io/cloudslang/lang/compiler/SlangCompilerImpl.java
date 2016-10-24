@@ -46,12 +46,18 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 @Component
 public class SlangCompilerImpl implements SlangCompiler {
 
-    public static final String NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX = "is not a valid system property file.";
-    public static final String ERROR_LOADING_PROPERTIES_FILE_MESSAGE = "Error loading properties source: '";
-    public static final String PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX = "Property list element should be map in 'key: value' format. Found: ";
-    public static final String SIZE_OF_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX = "Size of system property represented as a map should be 1 (key: value). For property: '";
-    public static final String SYSTEM_PROPERTY_KEY_WRONG_TYPE_ERROR_MESSAGE_PREFIX = "System property key must be string. Found: ";
-    public static final String DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX = "Duplicate system property key: '";
+    public static final String NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX =
+            "is not a valid system property file.";
+    public static final String ERROR_LOADING_PROPERTIES_FILE_MESSAGE =
+            "Error loading properties source: '";
+    public static final String PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX =
+            "Property list element should be map in 'key: value' format. Found: ";
+    public static final String SIZE_OF_SYSTEM_PROPERTY_ERROR_MESSAGE_PREFIX =
+            "Size of system property represented as a map should be 1 (key: value). For property: '";
+    public static final String SYSTEM_PROPERTY_KEY_WRONG_TYPE_ERROR_MESSAGE_PREFIX =
+            "System property key must be string. Found: ";
+    public static final String DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX =
+            "Duplicate system property key: '";
 
     @Autowired
     private YamlParser yamlParser;
@@ -95,7 +101,8 @@ public class SlangCompilerImpl implements SlangCompiler {
                 Executable preCompiledCurrentSource = result.getExecutable();
                 errors.addAll(result.getErrors());
 
-                List<RuntimeException> validatorErrors = compileValidator.validateNoDuplicateExecutables(preCompiledCurrentSource, currentSource, executablePairs);
+                List<RuntimeException> validatorErrors = compileValidator
+                        .validateNoDuplicateExecutables(preCompiledCurrentSource, currentSource, executablePairs);
                 errors.addAll(validatorErrors);
 
                 executablePairs.put(preCompiledCurrentSource, currentSource);
@@ -104,7 +111,8 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         executablePairs.remove(executableModellingResult.getExecutable());
 
-        CompilationModellingResult result = scoreCompiler.compile(executableModellingResult.getExecutable(), executablePairs.keySet());
+        CompilationModellingResult result = scoreCompiler
+                .compile(executableModellingResult.getExecutable(), executablePairs.keySet());
         errors.addAll(result.getErrors());
         return new CompilationModellingResult(result.getCompilationArtifact(), errors);
     }
@@ -143,7 +151,8 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
-    public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel, Set<Executable> directDependenciesModels) {
+    public List<RuntimeException> validateSlangModelWithDirectDependencies(Executable slangModel,
+                                                                           Set<Executable> directDependenciesModels) {
         return scoreCompiler.validateSlangModelWithDirectDependencies(slangModel, directDependenciesModels);
     }
 
@@ -194,8 +203,11 @@ public class SlangCompilerImpl implements SlangCompiler {
         Set<SystemProperty> modelledSystemProperties = new HashSet<>();
         Set<String> modelledSystemPropertyKeys = new HashSet<>();
 
-        if (parsedSlang != null) { // parsedSlang is null when properties yaml node is not defined in the property .sl file
-            List<Map<String, Object>> parsedSystemProperties = convertRawProperties(parsedSlang.getProperties(), source, exceptions);
+        if (parsedSlang != null) {
+            // parsedSlang is null when properties yaml node is not defined in the property .sl file
+
+            List<Map<String, Object>> parsedSystemProperties =
+                    convertRawProperties(parsedSlang.getProperties(), source, exceptions);
             for (Map<String, Object> propertyAsMap : parsedSystemProperties) {
                 Map.Entry<String, Object> propertyAsEntry = propertyAsMap.entrySet().iterator().next();
                 String propertyKey = getPropertyKey(propertyAsEntry, source, exceptions);
@@ -207,7 +219,8 @@ public class SlangCompilerImpl implements SlangCompiler {
                 }
 
                 Object propertyValue = propertyAsEntry.getValue();
-                SystemProperty property = transformSystemProperty(parsedSlang.getNamespace(), propertyKey, propertyValue);
+                SystemProperty property =
+                        transformSystemProperty(parsedSlang.getNamespace(), propertyKey, propertyValue);
                 modelledSystemProperties.add(property);
             }
         }
@@ -246,7 +259,8 @@ public class SlangCompilerImpl implements SlangCompiler {
                             } else {
                                 exceptions.add(getException(source, new RuntimeException(
                                         SYSTEM_PROPERTY_KEY_WRONG_TYPE_ERROR_MESSAGE_PREFIX +
-                                                propertyKeyAsObject + "(" + propertyKeyAsObject.getClass().getName() + ")."
+                                                propertyKeyAsObject +
+                                                "(" + propertyKeyAsObject.getClass().getName() + ")."
                                 )));
                             }
                         } else {
@@ -260,7 +274,8 @@ public class SlangCompilerImpl implements SlangCompiler {
                         if (propertyAsObject == null) {
                             errorMessageSuffix = "null.";
                         } else {
-                            errorMessageSuffix = propertyAsObject.toString() + "(" + propertyAsObject.getClass().getName() + ").";
+                            errorMessageSuffix = propertyAsObject.toString() + "(" +
+                                    propertyAsObject.getClass().getName() + ").";
                         }
                         exceptions.add(getException(source, new RuntimeException(
                                 PROPERTY_LIST_ELEMENT_WRONG_TYPE_ERROR_MESSAGE_PREFIX + errorMessageSuffix

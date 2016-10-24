@@ -108,7 +108,9 @@ public class SensitiveValueTest {
         verifyEncrypted(value, expectedDecryptedValue, encryptedString);
     }
 
-    private void verifyEncrypted(SensitiveValue value, Serializable expectedOriginalValue, String expectedEncryptedString) {
+    private void verifyEncrypted(SensitiveValue value, Serializable expectedOriginalValue,
+                                 String expectedEncryptedString) {
+
         verifySensitiveValue(value, expectedOriginalValue, expectedEncryptedString);
     }
 
@@ -118,7 +120,9 @@ public class SensitiveValueTest {
         verifySensitiveValue(value, expectedOriginalValue, expectedContent);
     }
 
-    private void verifySensitiveValue(SensitiveValue value, Serializable expectedOriginalValue, String expectedContent) {
+    private void verifySensitiveValue(SensitiveValue value, Serializable expectedOriginalValue,
+                                      String expectedContent) {
+
         assertEquals(expectedContent, value.getContent());
         assertEquals(expectedOriginalValue, value.get());
         assertEquals(SensitiveValue.SENSITIVE_VALUE_MASK, value.toString());

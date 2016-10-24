@@ -135,9 +135,11 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentAllSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        SystemProperty systemProperty1 = new SystemProperty("a.b", "sp1", ValueFactory.createEncryptedString("systemProperty1"));
+        SystemProperty systemProperty1 = new SystemProperty("a.b", "sp1",
+                ValueFactory.createEncryptedString("systemProperty1"));
         sp.add(systemProperty1);
-        SystemProperty systemProperty2 = new SystemProperty("a.b", "sp2", ValueFactory.createEncryptedString("systemProperty2"));
+        SystemProperty systemProperty2 = new SystemProperty("a.b", "sp2",
+                ValueFactory.createEncryptedString("systemProperty2"));
         sp.add(systemProperty2);
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
@@ -191,7 +193,8 @@ public class RunEnvironmentSensitiveTest {
         String sp2 = systemProperty2.getValue().get().toString();
         assertEquals("systemProperty2", sp2);
 
-        // Sensitive system property values are encrypted directly (without Base64 encoding), since they are simple strings
+        // Sensitive system property values are encrypted directly (without Base64 encoding)
+        // since they are simple strings
         assertEquals(encrypted ? "{Encrypted}" + sp1 : sp1, systemPropertyContent1);
         assertEquals(encrypted ? "{Encrypted}" + sp2 : sp2, systemPropertyContent2);
 

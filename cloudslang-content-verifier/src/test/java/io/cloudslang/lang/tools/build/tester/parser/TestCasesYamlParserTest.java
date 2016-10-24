@@ -89,7 +89,8 @@ public class TestCasesYamlParserTest {
         URI fileUri = getClass().getResource(filePath).toURI();
         Map<String, SlangTestCase> testCases = parser.parseTestCases(SlangSource.fromFile(fileUri));
         SlangTestCase testPrintFinishesWithSuccess = testCases.get("testPrintFinishesWithSuccess");
-        Assert.assertEquals("Tests that print_text operation finishes with SUCCESS", testPrintFinishesWithSuccess.getDescription());
+        Assert.assertEquals("Tests that print_text operation finishes with SUCCESS",
+                testPrintFinishesWithSuccess.getDescription());
         List<Map> expectedInputsList = new ArrayList<>();
         Map<String, Serializable> expectedInput1 = new HashMap<>();
         expectedInput1.put("text", ValueFactory.create("text to print", false));
@@ -105,7 +106,8 @@ public class TestCasesYamlParserTest {
         String filePath = "/test/base/test_print_text-unrecognized_tag.inputs.yaml";
         URI fileUri = getClass().getResource(filePath).toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Artifact {testPrintFinishesWithSuccess} has unrecognized tag {invalid_key}. Please take a look at the supported features per versions link");
+        exception.expectMessage("Artifact {testPrintFinishesWithSuccess} has unrecognized tag {invalid_key}. " +
+                "Please take a look at the supported features per versions link");
         parser.parseTestCases(SlangSource.fromFile(fileUri));
     }
 

@@ -58,7 +58,8 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     public void doAction(@Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
-                         @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA) Map<String, Object> nonSerializableExecutionData,
+                         @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA)
+                                 Map<String, Object> nonSerializableExecutionData,
                          @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
                          @Param(ScoreLangConstants.JAVA_ACTION_CLASS_KEY) String className,
@@ -76,7 +77,8 @@ public class ActionExecutionData extends AbstractExecutionData {
         }
 
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
-        fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " + actionType,
+        fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " +
+                        actionType,
                 runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
                 Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
         try {
@@ -112,8 +114,10 @@ public class ActionExecutionData extends AbstractExecutionData {
                                              Map<String, Value> currentContext,
                                              Map<String, Object> nonSerializableExecutionData,
                                              String gav, String className, String methodName) {
-        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService.execute(normalizeJavaGav(gav), className, methodName,
-                new CloudSlangJavaExecutionParameterProvider(serializableSessionData, createActionContext(currentContext), nonSerializableExecutionData));
+        Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService
+                .execute(normalizeJavaGav(gav), className, methodName,
+                new CloudSlangJavaExecutionParameterProvider(serializableSessionData,
+                        createActionContext(currentContext), nonSerializableExecutionData));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
@@ -128,7 +132,8 @@ public class ActionExecutionData extends AbstractExecutionData {
         return result;
     }
 
-    protected Map<String, Value> createActionResult(Map<String, Serializable> executionResult, Map<String, Value> context) {
+    protected Map<String, Value> createActionResult(Map<String, Serializable> executionResult,
+                                                    Map<String, Value> context) {
         Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = context.get(entry.getKey());
@@ -156,7 +161,8 @@ public class ActionExecutionData extends AbstractExecutionData {
     }
 
     private Set<String> normalizePythonDependencies(Collection<String> dependencies) {
-        Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ? Sets.<String>newHashSet() : new HashSet<>(dependencies);
+        Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ?
+                Sets.<String>newHashSet() : new HashSet<>(dependencies);
         Set<String> normalizedDependencies = new HashSet<>(pythonDependencies.size());
         for (String dependency : pythonDependencies) {
             normalizedDependencies.add(normalizeGav(dependency, PACKAGING_TYPE_ZIP));
@@ -164,9 +170,11 @@ public class ActionExecutionData extends AbstractExecutionData {
         return normalizedDependencies;
     }
 
-    private Map<String, Value> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript, Map<String, Value> callArguments) {
+    private Map<String, Value> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript,
+                                                         Map<String, Value> callArguments) {
         if (StringUtils.isNotBlank(pythonScript)) {
-            return scriptExecutor.executeScript(normalizePythonDependencies(dependencies), pythonScript, callArguments);
+            return scriptExecutor.executeScript(
+                    normalizePythonDependencies(dependencies), pythonScript, callArguments);
         }
 
         throw new RuntimeException("Python script not found in action data");

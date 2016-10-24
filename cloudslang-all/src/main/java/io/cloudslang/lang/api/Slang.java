@@ -60,7 +60,9 @@ public interface Slang {
      * @param systemProperties    the system properties for the flow or operation run
      * @return the execution ID in score
      */
-    Long run(CompilationArtifact compilationArtifact, Map<String, Value> runInputs, Set<SystemProperty> systemProperties);
+    Long run(CompilationArtifact compilationArtifact,
+             Map<String, Value> runInputs,
+             Set<SystemProperty> systemProperties);
 
     /**
      * Compile and run a flow or operation written in CloudSlang
@@ -71,7 +73,10 @@ public interface Slang {
      * @param systemProperties the system properties for the flow or operation run
      * @return the execution ID in score
      */
-    Long compileAndRun(SlangSource source, Set<SlangSource> dependencies, Map<String, Value> runInputs, Set<SystemProperty> systemProperties);
+    Long compileAndRun(SlangSource source,
+                       Set<SlangSource> dependencies,
+                       Map<String, Value> runInputs,
+                       Set<SystemProperty> systemProperties);
 
     /**
      * Subscribe to events of score or CloudSlang
@@ -79,7 +84,8 @@ public interface Slang {
      * @param eventListener listener for the events
      * @param eventTypes    set of types of events to subscribe to
      */
-    void subscribeOnEvents(ScoreEventListener eventListener, Set<String> eventTypes);
+    void subscribeOnEvents(ScoreEventListener eventListener,
+                           Set<String> eventTypes);
 
     /**
      * Unsubscribe from events of score or CloudSlang

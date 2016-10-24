@@ -27,6 +27,10 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static io.cloudslang.lang.compiler.SlangSource.fromFile;
+import static org.junit.Assert.assertTrue;
+
 /*
  * Created by orius123 on 12/11/14.
  */
@@ -40,13 +44,14 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
         URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
-                SlangSource.fromFile(operation1),
-                SlangSource.fromFile(operation2),
-                SlangSource.fromFile(operation3),
-                SlangSource.fromFile(operation4));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
-        Assert.assertEquals("the system properties size is not as expected", 2, compilationArtifact.getSystemProperties().size());
+        Set<SlangSource> path = newHashSet(fromFile(subFlow),
+                fromFile(operation1),
+                fromFile(operation2),
+                fromFile(operation3),
+                fromFile(operation4));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
+        Assert.assertEquals("the system properties size is not as expected",
+                2, compilationArtifact.getSystemProperties().size());
         Set<SystemProperty> systemProperties = new HashSet<>();
         systemProperties.add(new SystemProperty("user.sys", "props.port", "22"));
         systemProperties.add(new SystemProperty("user.sys", "props.alla", "balla"));
@@ -64,23 +69,26 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
         URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
-                SlangSource.fromFile(operation1),
-                SlangSource.fromFile(operation2),
-                SlangSource.fromFile(operation3),
-                SlangSource.fromFile(operation4));
+        Set<SlangSource> path = newHashSet(fromFile(subFlow),
+                fromFile(operation1),
+                fromFile(operation2),
+                fromFile(operation3),
+                fromFile(operation4));
         try {
-            slang.compile(SlangSource.fromFile(resource), path);
+            slang.compile(fromFile(resource), path);
             Assert.fail();
         } catch (RuntimeException e) {
             Assert.assertNotNull(e.getCause());
-            Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
+            assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" +
+                    e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
             String errorMessage = e.getCause().getMessage();
             Assert.assertNotNull(errorMessage);
-            Assert.assertTrue("Did not get error from expected parent flow [user.flows.parent_flow_missing_inputs]", errorMessage.contains("user.flows.parent_flow_missing_inputs"));
-            Assert.assertTrue("Did not get error from expected step [step1]", errorMessage.contains("step1"));
-            Assert.assertTrue("Did not get error from expected missing input [city]", errorMessage.contains("city"));
-            Assert.assertTrue("Did not get error from expected subflow [user.ops.check_weather]", errorMessage.contains("user.ops.check_weather"));
+            assertTrue("Did not get error from expected parent flow [user.flows.parent_flow_missing_inputs]",
+                    errorMessage.contains("user.flows.parent_flow_missing_inputs"));
+            assertTrue("Did not get error from expected step [step1]", errorMessage.contains("step1"));
+            assertTrue("Did not get error from expected missing input [city]", errorMessage.contains("city"));
+            assertTrue("Did not get error from expected subflow [user.ops.check_weather]",
+                    errorMessage.contains("user.ops.check_weather"));
         }
 
     }
@@ -93,26 +101,28 @@ public class SubFlowSystemTest extends SystemsTestsParent {
         URI operation2 = getClass().getResource("/yaml/check_weather.sl").toURI();
         URI operation3 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operation4 = getClass().getResource("/yaml/check_number.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(subFlow),
-                SlangSource.fromFile(operation1),
-                SlangSource.fromFile(operation2),
-                SlangSource.fromFile(operation3),
-                SlangSource.fromFile(operation4));
+        Set<SlangSource> path = newHashSet(fromFile(subFlow),
+                fromFile(operation1),
+                fromFile(operation2),
+                fromFile(operation3),
+                fromFile(operation4));
         try {
-            slang.compile(SlangSource.fromFile(resource), path);
+            slang.compile(fromFile(resource), path);
             Assert.fail();
         } catch (RuntimeException e) {
             Assert.assertNotNull(e.getCause());
-            Assert.assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" + e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
+            assertTrue("got wrong error type: expected [" + IllegalArgumentException.class + "] got [" +
+                    e.getCause().getClass() + "]", e.getCause() instanceof IllegalArgumentException);
             String errorMessage = e.getCause().getMessage();
             Assert.assertNotNull(errorMessage);
-            Assert.assertTrue(
+            assertTrue(
                     "Did not get error from expected parent flow [user.flows.child_flow_missing_inputs]",
                     errorMessage.contains("user.flows.child_flow_missing_inputs")
             );
-            Assert.assertTrue("Did not get error from expected step [step01]", errorMessage.contains("step01"));
-            Assert.assertTrue("Did not get error from expected missing input [time_zone_as_string]", errorMessage.contains("time_zone_as_string"));
-            Assert.assertTrue(
+            assertTrue("Did not get error from expected step [step01]", errorMessage.contains("step01"));
+            assertTrue("Did not get error from expected missing input [time_zone_as_string]",
+                    errorMessage.contains("time_zone_as_string"));
+            assertTrue(
                     "Did not get error from expected subflow [user.ops.get_time_zone]",
                     errorMessage.contains("user.ops.get_time_zone")
             );
