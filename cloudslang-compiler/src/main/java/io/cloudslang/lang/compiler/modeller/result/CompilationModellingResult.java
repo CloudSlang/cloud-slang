@@ -14,9 +14,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import java.io.File;
 import java.util.List;
 
-/**
- * Created by bancl on 9/20/2016.
- */
 public class CompilationModellingResult implements ModellingResult {
 
     private final CompilationArtifact compilationArtifact;

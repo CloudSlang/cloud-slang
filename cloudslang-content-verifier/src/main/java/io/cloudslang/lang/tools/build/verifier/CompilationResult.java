@@ -16,9 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
-/**
- * Created by bancl on 9/5/2016.
- */
 public class CompilationResult {
 
     private Map<String, Executable> results;

@@ -16,7 +16,6 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -27,9 +26,6 @@ import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 
-/**
- * Created by bancl on 8/30/2016.
- */
 @Component
 public class StaticValidatorImpl implements StaticValidator {
 

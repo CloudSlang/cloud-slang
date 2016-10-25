@@ -44,10 +44,6 @@ import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
-/**
- * User: bancl
- * Date: 6/17/2016
- */
 @Component
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
 

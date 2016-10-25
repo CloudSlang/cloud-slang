@@ -12,15 +12,12 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.MetadataModeller;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
-import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * User: bancl
- * Date: 1/11/2016
- */
+import java.util.Map;
+
 @Component
 public class MetadataExtractorImpl implements MetadataExtractor {
 

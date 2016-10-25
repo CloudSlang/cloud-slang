@@ -14,10 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-/**
- * User: bancl
- * Date: 7/4/2016
- */
 public class ExtensionTest {
 
     @Rule

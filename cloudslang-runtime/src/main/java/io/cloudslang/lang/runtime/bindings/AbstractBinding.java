@@ -24,10 +24,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.tuple.Pair;
 import org.python.core.PyObject;
 
-/**
- * User: bancl
- * Date: 8/12/2016
- */
 public class AbstractBinding {
 
     protected void validateStringValue(String errorMessagePrefix, Value value) {

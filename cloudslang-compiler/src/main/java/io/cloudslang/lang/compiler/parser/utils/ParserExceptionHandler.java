@@ -13,10 +13,6 @@ import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.scanner.ScannerException;
 
-/**
- * User: bancl
- * Date: 1/12/2016
- */
 @Component
 public class ParserExceptionHandler {
 

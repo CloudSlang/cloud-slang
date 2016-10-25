@@ -11,11 +11,6 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-
-import java.net.URI;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,31 +20,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- * User: bancl
- * Date: 1/12/2016
- */
+import java.net.URI;
+import java.util.Iterator;
+import java.util.Map;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 public class MetadataExtractorTest {
 
-    public static final String NEWLINE = System.lineSeparator();
+    private static final String NEWLINE = System.lineSeparator();
 
     private static final String DESCRIPTION_AND_PREREQUISITES = "description: " + System.lineSeparator() +
             "  Parses the given JSON input to retrieve the" + System.lineSeparator() +
             "  corresponding value addressed by the json_path input." + System.lineSeparator() +
             "prerequisites: jenkinsapi Python module";
-    public static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the" + NEWLINE +
+    private static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the" + NEWLINE +
             "corresponding value addressed by the json_path input.";
-    public static final String FIRST_INPUT_VALUE = "JSON data input" + NEWLINE +
+    private static final String FIRST_INPUT_VALUE = "JSON data input" + NEWLINE +
             "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'";
-    public static final String FIRST_OUTPUT_VALUE = "the corresponding value of the key referred to by json_path";
-    public static final String SECOND_OUTPUT_VALUE =
+    private static final String FIRST_OUTPUT_VALUE = "the corresponding value of the key referred to by json_path";
+    private static final String SECOND_OUTPUT_VALUE =
             "path from which to retrieve value represented as a list of keys and/or indices." + NEWLINE +
             "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]" + NEWLINE +
             "More information after newline";
-    public static final String PREREQUISITES = "jenkinsapi Python module";
-    public static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
+    private static final String PREREQUISITES = "jenkinsapi Python module";
+    private static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
