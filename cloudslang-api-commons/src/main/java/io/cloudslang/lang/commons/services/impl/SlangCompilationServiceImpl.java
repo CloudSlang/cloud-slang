@@ -16,7 +16,6 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.Validate;
@@ -95,13 +94,13 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
                 new IOFileFilter() {
                     @Override
                     public boolean accept(File file) {
-                        return Extension.SL.equals(Extension.findExtension(file.getName()));
+                        return Extension.SL == Extension.findExtension(file.getName());
                     }
 
                     @Override
                     public boolean accept(File file, String name) {
-                        return Extension.SL.equals(Extension.findExtension(name));
+                        return Extension.SL == Extension.findExtension(name);
                     }
-                }, recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
+                }, recursive ? TrueFileFilter.INSTANCE : null);
     }
 }
