@@ -182,6 +182,14 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
+    public void testFlowSamePrivateInputAndOutputName() throws Exception {
+        URI resource = getClass().getResource("/corrupted/same_private_input_and_output_name.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        assertEquals(0, result.getErrors().size());
+    }
+
+    @Test
     public void testFlowWithInputsAsString() throws Exception {
         URI resource = getClass().getResource("/corrupted/inputs_type_string_flow.sl").toURI();
 
