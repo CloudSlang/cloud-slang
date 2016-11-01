@@ -14,7 +14,7 @@
     + `flow` - `SUCCESS` and `FAILURE`
     + `operation` - `SUCCESS`
     + `decision` - no default results  
-  + A `loop` that contains a `break` section that includes a result that does not exisit in the called executable's `results` section fails.
+  + A `loop` that contains a `break` section that includes a result that does not exist in the called executable's `results` section fails.
   + Required `inputs` with an empty string value (`""`) fail compilation.
   + An `operation` or `decision` must have exactly one default result and it must be the last result.
   + Case insensitve validations:
