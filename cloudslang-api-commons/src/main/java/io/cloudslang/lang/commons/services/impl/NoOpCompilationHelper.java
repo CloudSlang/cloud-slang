@@ -10,8 +10,8 @@
 package io.cloudslang.lang.commons.services.impl;
 
 import io.cloudslang.lang.commons.services.api.CompilationHelper;
-import org.fusesource.jansi.Ansi;
 
+import java.io.File;
 import java.util.concurrent.Future;
 
 public class NoOpCompilationHelper implements CompilationHelper {
@@ -21,7 +21,7 @@ public class NoOpCompilationHelper implements CompilationHelper {
     }
 
     @Override
-    public Future<?> onEveryFile(Ansi.Color color, String message) {
+    public Future<?> onEveryFile(File file) {
         // Do nothing
         return null;
     }

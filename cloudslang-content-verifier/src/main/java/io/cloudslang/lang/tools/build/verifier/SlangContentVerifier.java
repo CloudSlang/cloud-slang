@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build.verifier;
 
-import io.cloudslang.lang.compiler.Extension;
+import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
@@ -21,7 +21,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,12 +56,15 @@ public class SlangContentVerifier {
     @Autowired
     private LoggingService loggingService;
 
+    @Autowired
+    private SlangCompilationService slangCompilationService;
+
     public CompilationResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" +
                 directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
-        Collection<File> slangFiles = listSlangFiles(new File(directoryPath), true);
+        Collection<File> slangFiles = slangCompilationService.listSlangFiles(new File(directoryPath), true);
         loggingService.logEvent(Level.INFO, "Start compiling all slang files under: " + directoryPath);
         loggingService.logEvent(Level.INFO, slangFiles.size() + " .sl files were found");
         loggingService.logEvent(Level.INFO, "");
@@ -148,19 +149,6 @@ public class SlangContentVerifier {
 
     private String getUniqueName(Executable sourceModel) {
         return sourceModel.getNamespace() + "." + sourceModel.getName();
-    }
-
-    // e.g. exclude .prop.sl from .sl set
-    private Collection<File> listSlangFiles(File directory, boolean recursive) {
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory,
-                Extension.getSlangFileExtensionValues(), recursive);
-        Collection<File> result = new ArrayList<>();
-        for (File file : dependenciesFiles) {
-            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
-                result.add(file);
-            }
-        }
-        return result;
     }
 
 }

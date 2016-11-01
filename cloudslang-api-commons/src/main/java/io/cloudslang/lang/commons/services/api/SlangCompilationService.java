@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +23,10 @@ public interface SlangCompilationService {
     List<CompilationModellingResult> compileFolders(final List<String> foldersPaths,
                                                     final CompilationHelper compilationHelper);
 
-    File getFile(String filePath);
+    File getFile(final String filePath);
 
-    Set<SlangSource> getSourcesFromFolders(List<String> dependencies);
+    Set<SlangSource> getSourcesFromFolders(final List<String> dependencies);
+
+    // e.g. exclude .prop.sl from .sl set
+    Collection<File> listSlangFiles(final File directory, final boolean recursive);
 }

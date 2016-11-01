@@ -157,7 +157,10 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(flowPath)
                 )
         );
-        verify(consolePrinter, times(2)).printWithColor(any(Ansi.Color.class), anyString());
+        InOrder inOrderConsolePrinter = inOrder(consolePrinter);
+        inOrderConsolePrinter.verify(consolePrinter, times(2)).printWithColor(any(Ansi.Color.class), anyString());
+        inOrderConsolePrinter.verify(consolePrinter).waitForAllPrintTasksToFinish();
+        inOrderConsolePrinter.verifyNoMoreInteractions();
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compileSource(
                 SlangSource.fromFile(flowPath),

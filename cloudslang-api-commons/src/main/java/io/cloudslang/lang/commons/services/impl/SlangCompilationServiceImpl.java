@@ -16,9 +16,10 @@ import io.cloudslang.lang.compiler.Extension;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
-import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
             Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
             for (SlangSource dependencySource : dependencySources) {
                 File file = getFile(dependencySource.getFilePath());
-                compilationHelper.onEveryFile(Ansi.Color.GREEN, "Compiling " + file.getName());
+                compilationHelper.onEveryFile(file);
                 try {
                     CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
                     result.setFile(file);
@@ -84,18 +85,21 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
         return dependencySources;
     }
 
-    // e.g. exclude .prop.sl from .sl set
-    private Collection<File> listSlangFiles(File directory, boolean recursive) {
+    @Override
+    public Collection<File> listSlangFiles(File directory, boolean recursive) {
         Validate.isTrue(directory.isDirectory(), "Parameter '" + directory.getPath() +
                 INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
-        Collection<File> dependenciesFiles = FileUtils.listFiles(directory,
-                Extension.getSlangFileExtensionValues(), recursive);
-        Collection<File> result = new ArrayList<>();
-        for (File file : dependenciesFiles) {
-            if (Extension.SL.equals(Extension.findExtension(file.getName()))) {
-                result.add(file);
-            }
-        }
-        return result;
+        return FileUtils.listFiles(directory,
+                new IOFileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        return Extension.SL == Extension.findExtension(file.getName());
+                    }
+
+                    @Override
+                    public boolean accept(File file, String name) {
+                        return Extension.SL == Extension.findExtension(name);
+                    }
+                }, recursive ? TrueFileFilter.INSTANCE : null);
     }
 }

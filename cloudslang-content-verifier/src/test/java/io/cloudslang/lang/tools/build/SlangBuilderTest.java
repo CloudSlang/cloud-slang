@@ -11,7 +11,9 @@ package io.cloudslang.lang.tools.build;
 
 import com.google.common.collect.Maps;
 import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
+import io.cloudslang.lang.commons.services.impl.SlangCompilationServiceImpl;
 import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
@@ -763,6 +765,11 @@ public class SlangBuilderTest {
         @Bean
         public LoggingService loggingService() {
             return new LoggingServiceImpl();
+        }
+
+        @Bean
+        public SlangCompilationService slangCompilationService() {
+            return new SlangCompilationServiceImpl();
         }
 
         @Bean
