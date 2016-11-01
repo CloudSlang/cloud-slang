@@ -13,7 +13,6 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.CompilationHelper;
 import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.compiler.SlangSource;
-import org.fusesource.jansi.Ansi;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -32,10 +31,10 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilationServiceImplTest.Config.class)
@@ -63,12 +62,23 @@ public class SlangCompilationServiceImplTest {
         folders.add(getClass().getResource("/executables").toURI().getPath());
         slangCompilationService.compileFolders(folders, compilationHelper);
 
+        File file1 = new File(getClass().getResource("/executables/dir1/flow2.sl").toURI());
+        File file2 = new File(getClass().getResource("/executables/dir2/flowprop.sl").toURI());
+        File file3 = new File(getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI());
+        File file4 = new File(getClass().getResource("/executables/dir1/flow2.sl").toURI());
+
+        verify(compilationHelper).onEveryFile(file1);
+        verify(compilationHelper).onEveryFile(file2);
+        verify(compilationHelper).onEveryFile(file3);
+        verify(compilationHelper).onEveryFile(file4);
+
         InOrder inOrderHelper = inOrder(compilationHelper);
-        inOrderHelper.verify(compilationHelper, times(4)).onEveryFile(any(Ansi.Color.class), anyString());
+        inOrderHelper.verify(compilationHelper, atLeast(1)).onEveryFile(any(File.class));
         inOrderHelper.verify(compilationHelper).onCompilationFinish();
         inOrderHelper.verifyNoMoreInteractions();
+
         InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang, times(4)).compileSource(
+        inOrder.verify(slang, atLeast(1)).compileSource(
                 any(SlangSource.class), any(Set.class));
         inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();

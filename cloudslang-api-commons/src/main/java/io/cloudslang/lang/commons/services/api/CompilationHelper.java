@@ -9,12 +9,11 @@
  *******************************************************************************/
 package io.cloudslang.lang.commons.services.api;
 
-import org.fusesource.jansi.Ansi;
-
+import java.io.File;
 import java.util.concurrent.Future;
 
 public interface CompilationHelper {
     void onCompilationFinish();
 
-    Future<?> onEveryFile(Ansi.Color color, String message);
+    Future<?> onEveryFile(File file);
 }

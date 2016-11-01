@@ -20,7 +20,6 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
-import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +46,7 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
             Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
             for (SlangSource dependencySource : dependencySources) {
                 File file = getFile(dependencySource.getFilePath());
-                compilationHelper.onEveryFile(Ansi.Color.GREEN, "Compiling " + file.getName());
+                compilationHelper.onEveryFile(file);
                 try {
                     CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
                     result.setFile(file);

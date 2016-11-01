@@ -15,6 +15,7 @@ import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.concurrent.Future;
 
 @Component
@@ -29,7 +30,7 @@ public class ConsoleOpCompilationHelper implements CompilationHelper {
     }
 
     @Override
-    public Future<?> onEveryFile(Ansi.Color color, String message) {
-        return consolePrinter.printWithColor(Ansi.Color.GREEN, message);
+    public Future<?> onEveryFile(File file) {
+        return consolePrinter.printWithColor(Ansi.Color.GREEN, "Compiling " + file.getName());
     }
 }
