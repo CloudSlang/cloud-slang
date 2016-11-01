@@ -17,14 +17,14 @@
   + A `loop` that contains a `break` section that includes a result that does not exist in the called executable's `results` section fails.
   + Required `inputs` with an empty string value (`""`) fail compilation.
   + An `operation` or `decision` must have exactly one default result and it must be the last result.
-  + Case insensitve validations:
+  + Case insensitive validations:
     + Names for `inputs`, `outputs`, `results` and `publish` variables must now differ ignoring case.
     + Within a system properties file all properties name's are checked against each other ignoring case.
     + Within multiple system properties files all properties name's are checked against each other ignoring case in the CLI, but not in the Builder.
     + Fully qualified executable names are validated as unique by the compiler ignoring case.
 + Engine Improvements
-	+ Added support for sensitive data transmition between components which use different encryption key
-  + Added support for creating a `Value` object fron a pre-encrypted simple string.
+	+ Added support for sensitive data transmission between components which use different encryption key
+  + Added support for creating a `Value` object from a pre-encrypted simple string.
 + Builder Improvements
   + Test suites can now be run sequentially or in parallel.
   + An HTML report about the build execution is created.
@@ -35,27 +35,28 @@
 + Other Additions/Changes
   + New Maven CloudSlang content compiler which can be used to compile CloudSlang source files and receive indications of errors without using the CloudSlang CLI or Build tool.
 + Content
+  + Restructure - Much of the content heirarchy has been restructured.
 	+ Updates and Additions - All code updated to reflect changes in the DSL. Other updates and additions include:
-      + base
-        + datetime
-        + http
-        + lists
-        + math
-        + strings
-        + xml
-      + cloud
-        + amazon_aws
-          + network
-          + samples
-          + signature
-          + snapshots
-          + tags
-          + volumes
-      + docker
-        + containers
-      + git
-      + haven_on_demand
-        + examples
+    + amazon_aws/ec2
+      + network
+      + samples
+      + signature
+      + snapshots
+      + tags
+      + volumes
+    + base
+      + datetime
+      + http
+      + lists
+      + math
+      + strings
+      + xml
+      + cloud  
+    + docker
+      + containers
+    + git
+    + haven_on_demand
+      + examples
 
 ##Version 0.9.60
 
