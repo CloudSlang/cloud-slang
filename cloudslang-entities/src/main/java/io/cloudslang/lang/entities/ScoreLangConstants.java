@@ -39,6 +39,9 @@ public interface ScoreLangConstants {
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
+    String MAVEN_DEPENDENCY_BUILD = "mavenDependencyBuild";
+    String MAVEN_DEPENDENCY_BUILD_FINISHED = "mavenDependencyBuildFinished";
+
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
     String PREVIOUS_STEP_ID_KEY = "previousStepId";

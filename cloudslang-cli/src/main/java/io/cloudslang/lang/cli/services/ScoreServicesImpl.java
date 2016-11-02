@@ -27,6 +27,8 @@ import java.util.Set;
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_EXECUTION_FINISHED;
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_OUTPUT_END;
 import static io.cloudslang.lang.entities.ScoreLangConstants.EVENT_STEP_START;
+import static io.cloudslang.lang.entities.ScoreLangConstants.MAVEN_DEPENDENCY_BUILD;
+import static io.cloudslang.lang.entities.ScoreLangConstants.MAVEN_DEPENDENCY_BUILD_FINISHED;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SLANG_EXECUTION_EXCEPTION;
 
 /**
@@ -83,6 +85,8 @@ public class ScoreServicesImpl implements ScoreServices {
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
             handlerTypes.add(EVENT_STEP_START);
             handlerTypes.add(EVENT_OUTPUT_END);
+            handlerTypes.add(MAVEN_DEPENDENCY_BUILD);
+            handlerTypes.add(MAVEN_DEPENDENCY_BUILD_FINISHED);
         }
 
         SyncTriggerEventListener scoreEventListener = new SyncTriggerEventListener();
