@@ -3,13 +3,13 @@
 ##Version 1.0
 
 + DSL Changes
-  + Added `decision` exectutable type. A `decision` is similar to an `operation`, but does not include an action section.
+  + Added `decision` executable type. A `decision` is similar to an `operation`, but does not include an action section.
   + All `inputs`, `outputs`, `results` and `publish` values must be strings.
   + The list of characters allowable in various naming situations has changed. (See the Naming section in the DSL Reference.)
   + The `gav` tag is now mandatory for a `java_action`.
   + The `on_failure` step must be the last step.
   + Steps and `results` cannot be named `on_failure`.
-  + A step's `navigation` items must exactly match the called exectutable's `results` list, even when using default results.
+  + A step's `navigation` items must exactly match the called executable's `results` list, even when using default results.
   + The default results for executable are as follows:
     + `flow` - `SUCCESS` and `FAILURE`
     + `operation` - `SUCCESS`
@@ -28,35 +28,39 @@
 + Builder Improvements
   + Test suites can now be run sequentially or in parallel.
   + An HTML report about the build execution is created.
-  + Added `-des` flag to validate content description section againt actual `inputs`, `outputs` and `results`.
+  + Added `-des` flag to validate content description section against actual `inputs`, `outputs` and `results`.
 + Bug Fixes
-	+ Under some circumstances leaks of python interpreters and java classloaders would occur due to bug in caching mechanism.
+	+ Under some circumstances leaks of python interpreters and java class loaders would occur due to bug in caching mechanism.
 	+ Jython modules management was not stable under stress test: custom python modules which already existed were not found.
 + Other Additions/Changes
   + New Maven CloudSlang content compiler which can be used to compile CloudSlang source files and receive indications of errors without using the CloudSlang CLI or Build tool.
 + Content
-  + Restructure - Much of the content heirarchy has been restructured.
+  + Restructure - Much of the content hierarchy has been restructured.
 	+ Updates and Additions - All code updated to reflect changes in the DSL. Other updates and additions include:
-    + amazon_aws/ec2
-      + network
-      + samples
-      + signature
-      + snapshots
-      + tags
-      + volumes
+    + amazon
+      + aws
+        + ec2
     + base
       + datetime
       + http
       + lists
+      + flow_control
+      + filesystem
+      + mail
       + math
       + strings
       + xml
-      + cloud  
+      + scripts
+      + utils
     + docker
       + containers
     + git
     + haven_on_demand
       + examples
+    + microsoft
+      + azure
+    + vmware
+      + vcenter
 
 ##Version 0.9.60
 
