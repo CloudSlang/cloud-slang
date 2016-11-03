@@ -84,12 +84,15 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public YamlParser yamlParser() {
-        return new YamlParser() {
+        YamlParser yamlParser = new YamlParser() {
             @Override
             public Yaml getYaml() {
                 return yaml();
             }
         };
+        yamlParser.setExecutableValidator(executableValidator());
+        yamlParser.setParserExceptionHandler(parserExceptionHandler());
+        return yamlParser;
     }
 
     @Bean
