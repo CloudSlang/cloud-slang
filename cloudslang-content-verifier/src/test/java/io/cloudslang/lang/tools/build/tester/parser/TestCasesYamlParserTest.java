@@ -22,7 +22,6 @@ import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.logging.LoggingServiceImpl;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
@@ -215,11 +214,6 @@ public class TestCasesYamlParserTest {
             Yaml yaml = new Yaml();
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
-        }
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
         }
 
         @Bean

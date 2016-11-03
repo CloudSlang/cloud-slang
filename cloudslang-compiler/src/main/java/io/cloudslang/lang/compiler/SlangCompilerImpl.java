@@ -34,8 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -43,7 +41,6 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 /*
  * Created by orius123 on 05/11/14.
  */
-@Component
 public class SlangCompilerImpl implements SlangCompiler {
 
     public static final String NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX =
@@ -59,22 +56,16 @@ public class SlangCompilerImpl implements SlangCompiler {
     public static final String DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX =
             "Duplicate system property key: '";
 
-    @Autowired
     private YamlParser yamlParser;
 
-    @Autowired
     private SlangModeller slangModeller;
 
-    @Autowired
     private ScoreCompiler scoreCompiler;
 
-    @Autowired
     private CompileValidator compileValidator;
 
-    @Autowired
     private SystemPropertyValidator systemPropertyValidator;
 
-    @Autowired
     private CachedPrecompileService cachedPrecompileService;
 
     @Override
@@ -351,4 +342,27 @@ public class SlangCompilerImpl implements SlangCompiler {
         return convertedMap;
     }
 
+    public void setYamlParser(YamlParser yamlParser) {
+        this.yamlParser = yamlParser;
+    }
+
+    public void setSlangModeller(SlangModeller slangModeller) {
+        this.slangModeller = slangModeller;
+    }
+
+    public void setScoreCompiler(ScoreCompiler scoreCompiler) {
+        this.scoreCompiler = scoreCompiler;
+    }
+
+    public void setCompileValidator(CompileValidator compileValidator) {
+        this.compileValidator = compileValidator;
+    }
+
+    public void setSystemPropertyValidator(SystemPropertyValidator systemPropertyValidator) {
+        this.systemPropertyValidator = systemPropertyValidator;
+    }
+
+    public void setCachedPrecompileService(CachedPrecompileService cachedPrecompileService) {
+        this.cachedPrecompileService = cachedPrecompileService;
+    }
 }

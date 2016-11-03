@@ -22,9 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Component;
 
-@Component
 public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>> {
 
     @Override

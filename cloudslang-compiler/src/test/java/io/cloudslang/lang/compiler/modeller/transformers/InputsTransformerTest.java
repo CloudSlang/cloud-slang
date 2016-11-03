@@ -24,7 +24,6 @@ import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -326,11 +325,6 @@ public class InputsTransformerTest extends TransformersTestParent {
         @Bean
         public InputsTransformer inputTransformer() {
             return new InputsTransformer();
-        }
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
         }
 
         @Bean

@@ -46,10 +46,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
@@ -65,27 +61,20 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 
-@Component
 public class ExecutableBuilder {
 
     public static final String UNIQUE_STEP_NAME_MESSAGE_SUFFIX = "Each step name in the workflow must be unique";
 
-    @Autowired
     private List<Transformer> transformers;
 
-    @Autowired
     private TransformersHandler transformersHandler;
 
-    @Autowired
     private DependenciesHelper dependenciesHelper;
 
-    @Autowired
     private PreCompileValidator preCompileValidator;
 
-    @Autowired
     private ResultsTransformer resultsTransformer;
 
-    @Autowired
     private ExecutableValidator executableValidator;
 
     private List<Transformer> preExecTransformers;
@@ -106,7 +95,6 @@ public class ExecutableBuilder {
             asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
     private List<String> parallelLoopValidKeywords = asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.FOR_KEY);
 
-    @PostConstruct
     public void initScopedTransformersAndKeys() {
         //executable transformers
         preExecTransformers = filterTransformers(Transformer.Scope.BEFORE_EXECUTABLE);

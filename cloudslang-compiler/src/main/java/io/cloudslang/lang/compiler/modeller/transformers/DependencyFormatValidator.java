@@ -10,12 +10,8 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Component;
 
-/**
- * Created by Genadi Rabinovich, genadi@hpe.com on 23/06/2016.
- */
-@Component
+
 public class DependencyFormatValidator {
     private static final int DEPENDENCY_PARTS = 3;
     public static final String INVALID_DEPENDENCY = "Dependency definition should contain exactly [" +

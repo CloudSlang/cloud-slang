@@ -21,7 +21,6 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import org.fusesource.jansi.Ansi;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -368,11 +367,6 @@ public class CompilerHelperTest {
         @Bean
         public CompilerHelper compilerHelper() {
             return new CompilerHelperImpl();
-        }
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
         }
 
         @Bean

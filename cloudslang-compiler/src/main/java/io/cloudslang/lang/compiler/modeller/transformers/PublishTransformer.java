@@ -22,9 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
 
-@Component
 public class PublishTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
     @Override

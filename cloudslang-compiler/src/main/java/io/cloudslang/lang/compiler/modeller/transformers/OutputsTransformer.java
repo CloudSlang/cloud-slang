@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -26,7 +25,6 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
  *
  * @author Bonczidai Levente
  */
-@Component
 public class OutputsTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
     private static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);

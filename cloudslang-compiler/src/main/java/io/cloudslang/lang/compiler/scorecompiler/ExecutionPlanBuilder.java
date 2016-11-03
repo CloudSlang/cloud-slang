@@ -25,9 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -37,10 +34,8 @@ import static org.hamcrest.Matchers.equalTo;
 /*
  * Created by orius123 on 11/11/14.
  */
-@Component
 public class ExecutionPlanBuilder {
 
-    @Autowired
     private ExecutionStepFactory stepFactory;
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
@@ -212,4 +207,7 @@ public class ExecutionPlanBuilder {
         return currentId;
     }
 
+    public void setStepFactory(ExecutionStepFactory stepFactory) {
+        this.stepFactory = stepFactory;
+    }
 }

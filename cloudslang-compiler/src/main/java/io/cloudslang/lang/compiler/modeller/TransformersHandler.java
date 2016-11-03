@@ -20,12 +20,10 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ResolvableType;
-import org.springframework.stereotype.Component;
 
 /*
  * Created by orius123 on 10/12/14.
  */
-@Component
 public class TransformersHandler {
 
     public static String keyToTransform(Transformer transformer) {

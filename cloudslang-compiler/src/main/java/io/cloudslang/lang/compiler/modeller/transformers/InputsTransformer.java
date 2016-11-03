@@ -22,10 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Component;
 
-
-@Component
 public class InputsTransformer extends AbstractInputsTransformer implements Transformer<List<Object>, List<Input>> {
 
     /**
