@@ -38,7 +38,8 @@ import static org.junit.Assert.assertTrue;
  * Created by Genadi Rabinovich, genadi@hpe.com on 10/07/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {RunEnvironmentSensitiveTest.RunEnvironmentSensitiveValueTestConfig.class, SlangEntitiesSpringConfig.class})
+@ContextConfiguration(classes = {RunEnvironmentSensitiveTest.RunEnvironmentSensitiveValueTestConfig.class,
+        SlangEntitiesSpringConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RunEnvironmentSensitiveTest {
     private static final String ENCYPTED = "{Encrypted}";
