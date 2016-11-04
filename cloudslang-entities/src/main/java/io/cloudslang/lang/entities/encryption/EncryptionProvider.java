@@ -11,6 +11,7 @@ package io.cloudslang.lang.entities.encryption;
 
 import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.spi.encryption.Encryption;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -33,7 +34,16 @@ public class EncryptionProvider {
     }
 
     private static Encryption create() {
-        Encryption[] encryptors = SlangEntitiesSpringConfig.getEncryptors();
+        Encryption[] encryptors;
+        try {
+            encryptors = SlangEntitiesSpringConfig.getEncryptors();
+        } catch (Exception theGivenEx) {
+            if (!StringUtils.containsIgnoreCase(theGivenEx.getMessage(), "ApplicationContextProvider bean missing")) {
+                return new DummyEncryptor(); // IntelliJ Plugin case
+            }
+            throw theGivenEx;
+
+        }
         if (encryptors.length == 0) {
             throw new RuntimeException("No encryptors found");
         } else if (encryptors.length == 1) {
