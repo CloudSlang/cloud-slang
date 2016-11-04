@@ -42,6 +42,6 @@ public class CachedPrecompileService {
     }
 
     public void cleanUp() {
-        cache.cleanUp();
+        cache.invalidateAll();
     }
 }
