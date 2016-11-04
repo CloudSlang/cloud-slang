@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -48,7 +49,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
  * Time: 16:12
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = PublishTransformerTest.Config.class)
+@ContextConfiguration(classes = {PublishTransformerTest.Config.class, SlangCompilerSpringConfig.class})
 public class PublishTransformerTest extends TransformersTestParent {
 
     private static final long DEFAULT_TIMEOUT = 10000;

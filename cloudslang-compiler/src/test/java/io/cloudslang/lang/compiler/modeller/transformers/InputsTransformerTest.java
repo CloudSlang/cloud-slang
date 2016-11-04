@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -49,7 +50,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = InputsTransformerTest.Config.class)
+@ContextConfiguration(classes = {InputsTransformerTest.Config.class, SlangCompilerSpringConfig.class})
 public class InputsTransformerTest extends TransformersTestParent {
 
     @Autowired

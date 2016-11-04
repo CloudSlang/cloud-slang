@@ -303,15 +303,6 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
-    public InputsTransformer abstractInputsTransformer() {
-        InputsTransformer inputsTransformer = new InputsTransformer();
-        inputsTransformer.setExecutableValidator(executableValidator());
-        inputsTransformer.setPreCompileValidator(precompileValidator());
-
-        return inputsTransformer;
-    }
-
-    @Bean
     public ExecutableBuilder executableBuilder() {
         ExecutableBuilder executableBuilder = new ExecutableBuilder();
         executableBuilder.setTransformers(transformers());
