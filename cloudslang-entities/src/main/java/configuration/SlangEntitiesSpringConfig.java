@@ -31,7 +31,7 @@ public class SlangEntitiesSpringConfig implements ApplicationContextAware {
             Map<String, Encryption> encryptorMap = applicationContext.getBeansOfType(Encryption.class);
             return encryptorMap.values().toArray(new Encryption[encryptorMap.size()]);
         } else {
-            throw new RuntimeException("ApplicationContextProvider bean missing");
+            return new Encryption[]{new DummyEncryptor()};
         }
     }
 
