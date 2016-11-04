@@ -52,8 +52,10 @@ public class JavaActionTransformerTest extends TransformersTestParent {
 
     @Autowired
     private JavaActionTransformer javaActionTransformer;
+
     @Autowired
     private YamlParser yamlParser;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
     private Map<String, String> initialJavaActionSimple;

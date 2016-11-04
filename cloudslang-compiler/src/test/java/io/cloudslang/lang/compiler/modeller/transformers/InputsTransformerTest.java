@@ -60,6 +60,7 @@ public class InputsTransformerTest extends TransformersTestParent {
     private YamlParser yamlParser;
 
     private List<Object> inputsMap;
+
     private List<Object> inputsMapWithFunctions;
 
     @Rule
