@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.fortest;
 
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.spi.encryption.Encryption;
@@ -31,7 +32,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Genadi Rabinovich, genadi@hpe.com on 10/07/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SensitiveValueTest.SensitiveValueTestConfig.class)
+@ContextConfiguration(classes = {SensitiveValueTest.SensitiveValueTestConfig.class, SlangEntitiesSpringConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class SensitiveValueTest {
     private static final String ENCRYPTED = "{Encrypted}";
@@ -65,7 +66,7 @@ public class SensitiveValueTest {
         final String originalValue = "foo";
         final String encryptedString = "{Encrypted}foo";
 
-        SensitiveValue value = (SensitiveValue) ValueFactory.createEncryptedString(originalValue, false);
+        SensitiveValue value = ValueFactory.createEncryptedString(originalValue, false);
         verifyEncrypted(value, originalValue, encryptedString);
 
         value.encrypt();
@@ -89,7 +90,7 @@ public class SensitiveValueTest {
         final String encryptedString = "{Encrypted}bar";
         final String expectedDecryptedValue = "bar";
 
-        SensitiveValue value = (SensitiveValue) ValueFactory.createEncryptedString(encryptedString, true);
+        SensitiveValue value = ValueFactory.createEncryptedString(encryptedString, true);
         verifyEncrypted(value, expectedDecryptedValue, encryptedString);
 
         value.encrypt();
@@ -132,6 +133,7 @@ public class SensitiveValueTest {
     @Configuration
     @ComponentScan("io.cloudslang.lang.entities.utils")
     static class SensitiveValueTestConfig {
+
         @Bean
         public Encryption getTestEncryption() {
             return new Encryption() {
