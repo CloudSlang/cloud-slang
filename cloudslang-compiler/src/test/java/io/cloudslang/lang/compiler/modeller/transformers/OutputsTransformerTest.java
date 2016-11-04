@@ -48,7 +48,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
  * @author Bonczidai Levente
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {OutputsTransformerTest.Config.class, SlangCompilerSpringConfig.class})
+@ContextConfiguration(classes = OutputsTransformerTest.Config.class)
 public class OutputsTransformerTest {
 
     private static final long DEFAULT_TIMEOUT = 10000;
@@ -122,7 +122,10 @@ public class OutputsTransformerTest {
 
         @Bean
         public OutputsTransformer outputTransformer() {
-            return new OutputsTransformer();
+            OutputsTransformer outputsTransformer = new OutputsTransformer();
+            outputsTransformer.setExecutableValidator(executableValidator());
+            outputsTransformer.setPreCompileValidator(preCompileValidator());
+            return outputsTransformer;
         }
 
         @Bean
