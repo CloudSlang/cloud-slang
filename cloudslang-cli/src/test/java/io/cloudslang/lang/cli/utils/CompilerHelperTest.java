@@ -10,6 +10,7 @@
 package io.cloudslang.lang.cli.utils;
 
 import com.google.common.collect.Lists;
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.cli.services.ConsolePrinter;
 import io.cloudslang.lang.commons.services.api.CompilationHelper;
@@ -65,7 +66,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CompilerHelperTest.Config.class)
+@ContextConfiguration(classes = {CompilerHelperTest.Config.class, SlangEntitiesSpringConfig.class})
 public class CompilerHelperTest {
 
     private static final String APP_HOME = "app.home";

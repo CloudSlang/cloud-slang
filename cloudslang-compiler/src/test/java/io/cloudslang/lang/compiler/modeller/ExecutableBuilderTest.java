@@ -370,7 +370,6 @@ public class ExecutableBuilderTest {
         public ExecutableBuilder executableBuilder() {
 
             ExecutableBuilder executableBuilder = new ExecutableBuilder();
-//            executableBuilder.setTransformers(transformers());
             executableBuilder.setTransformersHandler(transformersHandler());
             executableBuilder.setDependenciesHelper(dependenciesHelper());
             executableBuilder.setPreCompileValidator(preCompileValidator());
