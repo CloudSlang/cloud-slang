@@ -36,7 +36,7 @@ import java.net.URI;
 import static org.mockito.Mockito.mock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MetadataHelperTest.Config.class)
+@ContextConfiguration(classes = {MetadataHelperTest.Config.class})
 public class MetadataHelperTest {
 
     private static final String DESCRIPTION_AND_PREREQUISITES = "description: " + System.lineSeparator() +
@@ -132,7 +132,11 @@ public class MetadataHelperTest {
 
         @Bean
         public MetadataExtractor metadataExtractor() {
-            return new MetadataExtractorImpl();
+            MetadataExtractorImpl metadataExtractor = new MetadataExtractorImpl();
+            metadataExtractor.setMetadataModeller(metadataModeller());
+            metadataExtractor.setMetadataParser(metadataParser());
+
+            return metadataExtractor;
         }
 
         @Bean
@@ -142,7 +146,9 @@ public class MetadataHelperTest {
 
         @Bean
         public MetadataParser metadataParser() {
-            return new MetadataParser();
+            MetadataParser metadataParser = new MetadataParser();
+            metadataParser.setParserExceptionHandler(parserExceptionHandler());
+            return metadataParser;
         }
 
         @Bean

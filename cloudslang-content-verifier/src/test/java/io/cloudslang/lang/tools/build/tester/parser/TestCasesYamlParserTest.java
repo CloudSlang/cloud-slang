@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build.tester.parser;
 
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
@@ -59,7 +60,7 @@ import static org.mockito.Mockito.when;
  * Created by stoneo on 3/16/2015.
  **/
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TestCasesYamlParserTest.Config.class)
+@ContextConfiguration(classes = {TestCasesYamlParserTest.Config.class, SlangEntitiesSpringConfig.class})
 public class TestCasesYamlParserTest {
 
     @Autowired

@@ -177,8 +177,7 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public MetadataModeller metadataModeller() {
-        MetadataModellerImpl metadataModeller = new MetadataModellerImpl();
-        return metadataModeller;
+        return new MetadataModellerImpl();
     }
 
     @Bean
