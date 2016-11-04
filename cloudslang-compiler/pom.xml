@@ -26,12 +26,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.cloudslang.lang</groupId>
-            <artifactId>cloudslang-commons</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>score-api</artifactId>
         </dependency>
