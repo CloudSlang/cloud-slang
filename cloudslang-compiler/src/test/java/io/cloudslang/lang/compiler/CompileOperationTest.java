@@ -173,7 +173,8 @@ public class CompileOperationTest {
         assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
                 result.getErrors().get(0).getMessage());
 
-        assertNotNull("Cache should contain the object", cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+        assertNotNull("Cache should contain the ExecutableModellingResult",
+                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
     }
 
     @Test
@@ -188,6 +189,7 @@ public class CompileOperationTest {
 
         compiler.cleanUp();
 
-        assertNull("Cache should not contain objects", cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+        assertNull("Cache should not contain the ExecutableModellingResult",
+                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
     }
 }
