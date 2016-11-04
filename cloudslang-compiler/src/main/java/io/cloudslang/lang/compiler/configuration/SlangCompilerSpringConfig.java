@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.configuration;
 
 
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.compiler.CachedPrecompileService;
 import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.MetadataExtractorImpl;
@@ -58,6 +59,7 @@ import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -67,6 +69,7 @@ import java.util.List;
 
 @Configuration
 @ComponentScan("io.cloudslang.lang.compiler")
+@Import(SlangEntitiesSpringConfig.class)
 public class SlangCompilerSpringConfig {
 
     @Bean
