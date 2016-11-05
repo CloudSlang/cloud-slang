@@ -14,9 +14,9 @@ import com.beust.jcommander.ParameterException;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.UserConfigurationService;
 import io.cloudslang.lang.commons.services.impl.UserConfigurationServiceImpl;
-import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.logging.LoggingServiceImpl;
+import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
@@ -39,6 +39,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
@@ -102,6 +103,8 @@ public class SlangBuildMain {
             " Each test suite must have only one execution mode (parallel or sequential).";
     private static final String MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE = "Error loading smart " +
             "mode configuration file:";
+    private static final String LOG4J_CONFIGURATION_KEY = "log4j.configuration";
+
 
     // This class is a used in the interaction with the run configuration property file
     static class RunConfigurationProperties {
@@ -134,6 +137,7 @@ public class SlangBuildMain {
 
     public static void main(String[] args) {
         loadUserProperties();
+        configureLog4j();
 
         ApplicationArgs appArgs = new ApplicationArgs();
         parseArgs(args, appArgs);
@@ -279,6 +283,13 @@ public class SlangBuildMain {
             loggingService.logEvent(Level.ERROR, "Exception: " + e.getMessage());
             logErrorsSuffix(projectPath, loggingService);
             System.exit(1);
+        }
+    }
+
+    private static void configureLog4j() {
+        String configFilename = System.getProperty(LOG4J_CONFIGURATION_KEY);
+        if (StringUtils.isNotEmpty(configFilename)) {
+            PropertyConfigurator.configure(configFilename);
         }
     }
 
