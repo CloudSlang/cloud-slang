@@ -104,6 +104,8 @@ public class SlangBuildMain {
     private static final String MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE = "Error loading smart " +
             "mode configuration file:";
     private static final String LOG4J_CONFIGURATION_KEY = "log4j.configuration";
+    private static final String LOG4J_ERROR_PREFIX = "log4j: error loading log4j properties file.";
+    private static final String LOG4J_ERROR_SUFFIX = "Using default configuration.";
 
 
     // This class is a used in the interaction with the run configuration property file
@@ -288,8 +290,28 @@ public class SlangBuildMain {
 
     private static void configureLog4j() {
         String configFilename = System.getProperty(LOG4J_CONFIGURATION_KEY);
-        if (StringUtils.isNotEmpty(configFilename)) {
-            PropertyConfigurator.configure(configFilename);
+        String errorMessage = null;
+
+        if (StringUtils.isEmpty(configFilename)) {
+            errorMessage = "Config file name is empty.";
+        } else {
+            String normalizedPath = FilenameUtils.normalize(configFilename);
+            if (!get(normalizedPath).isAbsolute()) {
+                errorMessage = "Path[" + normalizedPath + "] is not an absolute path.";
+            } else {
+                if (!isRegularFile(get(normalizedPath), NOFOLLOW_LINKS)) {
+                    errorMessage = "Path[" + normalizedPath + "] does not lead to a regular file.";
+                } else {
+                    try {
+                        PropertyConfigurator.configure(configFilename);
+                    } catch (RuntimeException rex) {
+                        errorMessage = rex.getMessage();
+                    }
+                }
+            }
+        }
+        if (StringUtils.isNotEmpty(errorMessage)) {
+            System.out.printf("%s%n\t%s%n\t%s%n", LOG4J_ERROR_PREFIX, errorMessage, LOG4J_ERROR_SUFFIX);
         }
     }
 
