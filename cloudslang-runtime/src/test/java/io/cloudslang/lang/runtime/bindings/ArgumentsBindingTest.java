@@ -24,6 +24,8 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.EventBusImpl;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -372,6 +374,11 @@ public class ArgumentsBindingTest {
         @Bean
         public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
+        }
+
+        @Bean
+        public EventBus eventBus() {
+            return new EventBusImpl();
         }
     }
 }

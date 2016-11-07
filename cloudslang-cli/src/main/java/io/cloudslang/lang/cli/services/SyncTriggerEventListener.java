@@ -26,6 +26,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.Color.WHITE;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
+
 /**
  * Date: 2/26/2015
  *
@@ -74,8 +79,14 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         data.get(EventConstants.SCORE_ERROR_MSG));
                 break;
             case EventConstants.SCORE_FAILURE_EVENT:
-                consolePrinter.printWithColor(Ansi.Color.RED, FLOW_FINISHED_WITH_FAILURE_MSG);
+                consolePrinter.printWithColor(RED, FLOW_FINISHED_WITH_FAILURE_MSG);
                 flowFinished.set(true);
+                break;
+            case EventConstants.MAVEN_DEPENDENCY_BUILD:
+                printDownloadArtifactMessage((String) data.get(EventConstants.MAVEN_DEPENDENCY_BUILD));
+                break;
+            case EventConstants.MAVEN_DEPENDENCY_BUILD_FINISHED:
+                printDownloadArtifactMessage((String) data.get(EventConstants.MAVEN_DEPENDENCY_BUILD_FINISHED));
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                 errorMessage.set(SLANG_STEP_ERROR_MSG + data.get(LanguageEventData.EXCEPTION));
@@ -87,7 +98,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                     String path = eventData.getPath();
                     int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
                     String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
-                    consolePrinter.printWithColor(Ansi.Color.YELLOW, prefix + stepName);
+                    consolePrinter.printWithColor(YELLOW, prefix + stepName);
                 }
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
@@ -100,7 +111,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
 
                         for (Map.Entry<String, Serializable> entry : stepOutputs.entrySet()) {
-                            consolePrinter.printWithColor(Ansi.Color.WHITE, prefix +
+                            consolePrinter.printWithColor(WHITE, prefix +
                                     entry.getKey() + " = " + entry.getValue());
                         }
                     }
@@ -111,9 +122,9 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
                     if (outputs.size() > 0) {
-                        printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
+                        printForOperationOrFlow(data, WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
                         for (Map.Entry<String, Serializable> entry : outputs.entrySet()) {
-                            consolePrinter.printWithColor(Ansi.Color.WHITE, "- " +
+                            consolePrinter.printWithColor(WHITE, "- " +
                                     entry.getKey() + " = " + entry.getValue());
                         }
                     }
@@ -123,17 +134,13 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                 flowFinished.set(true);
                 printFinishEvent(data);
                 break;
-            case ScoreLangConstants.MAVEN_DEPENDENCY_BUILD:
-                consolePrinter.printWithColor(Ansi.Color.CYAN,
-                        (String) data.get(ScoreLangConstants.MAVEN_DEPENDENCY_BUILD));
-                break;
-            case ScoreLangConstants.MAVEN_DEPENDENCY_BUILD_FINISHED:
-                consolePrinter.printWithColor(Ansi.Color.CYAN,
-                        (String) data.get(ScoreLangConstants.MAVEN_DEPENDENCY_BUILD_FINISHED));
-                break;
             default:
                 break;
         }
+    }
+
+    private void printDownloadArtifactMessage(String message) {
+        consolePrinter.printWithColor(CYAN, message);
     }
 
     public static Map<String, Serializable> extractNotEmptyOutputs(Map<String, Serializable> data) {
@@ -157,7 +164,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     private void printFinishEvent(Map<String, Serializable> data) {
         String flowResult = (String) data.get(LanguageEventData.RESULT);
         String flowName = (String) data.get(LanguageEventData.STEP_NAME);
-        printForOperationOrFlow(data, Ansi.Color.CYAN, "Operation: " + flowName + FINISHED_WITH_RESULT + flowResult,
+        printForOperationOrFlow(data, CYAN, "Operation: " + flowName + FINISHED_WITH_RESULT + flowResult,
                 "Flow: " + flowName + FINISHED_WITH_RESULT + flowResult);
     }
 
