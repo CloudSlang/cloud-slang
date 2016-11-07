@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Date: 3/25/2015
@@ -30,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AbstractForTransformer extends AbstractInOutForTransformer {
 
-    @Autowired
     private ExecutableValidator executableValidator;
 
     // case: value in variable_name
@@ -108,4 +106,7 @@ public abstract class AbstractForTransformer extends AbstractInOutForTransformer
                     dependencyAccumulator.getSystemPropertyDependencies(), isParallelLoop);
     }
 
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
+    }
 }

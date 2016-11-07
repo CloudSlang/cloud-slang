@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.tools.build.tester.parser;
 
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
@@ -22,7 +23,6 @@ import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.logging.LoggingServiceImpl;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
  * Created by stoneo on 3/16/2015.
  **/
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TestCasesYamlParserTest.Config.class)
+@ContextConfiguration(classes = {TestCasesYamlParserTest.Config.class, SlangEntitiesSpringConfig.class})
 public class TestCasesYamlParserTest {
 
     @Autowired
@@ -215,11 +215,6 @@ public class TestCasesYamlParserTest {
             Yaml yaml = new Yaml();
             yaml.setBeanAccess(BeanAccess.FIELD);
             return yaml;
-        }
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
         }
 
         @Bean

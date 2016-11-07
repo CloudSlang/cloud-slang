@@ -15,8 +15,6 @@ import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +26,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Component
 public class MetadataParser {
 
     private static final String PREFIX = "#!";
@@ -37,7 +34,6 @@ public class MetadataParser {
     private static final String BLOCK_START_TAG = "#!!";
     private static final String COLON = ":";
 
-    @Autowired
     private ParserExceptionHandler parserExceptionHandler;
 
     public Map<String, String> parse(SlangSource source) {
@@ -185,5 +181,9 @@ public class MetadataParser {
         if (!blockEndTagFound && sb.length() > 0) {
             throw new RuntimeException("Closing tag missing in the description.");
         }
+    }
+
+    public void setParserExceptionHandler(ParserExceptionHandler parserExceptionHandler) {
+        this.parserExceptionHandler = parserExceptionHandler;
     }
 }

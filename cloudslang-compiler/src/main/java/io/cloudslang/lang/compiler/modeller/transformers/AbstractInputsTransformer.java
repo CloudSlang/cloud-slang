@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;
@@ -28,10 +27,8 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 
 public abstract class AbstractInputsTransformer extends InOutTransformer {
 
-    @Autowired
     protected PreCompileValidator preCompileValidator;
 
-    @Autowired
     private ExecutableValidator executableValidator;
 
     @Override
@@ -130,5 +127,13 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
                 .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
                 .build();
+    }
+
+    public void setPreCompileValidator(PreCompileValidator preCompileValidator) {
+        this.preCompileValidator = preCompileValidator;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
     }
 }

@@ -19,15 +19,12 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.yaml.snakeyaml.Yaml;
 
 public abstract class YamlParser {
 
-    @Autowired
     private ParserExceptionHandler parserExceptionHandler;
 
-    @Autowired
     private ExecutableValidator executableValidator;
 
     protected abstract Yaml getYaml();

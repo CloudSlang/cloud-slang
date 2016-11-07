@@ -13,18 +13,13 @@ import io.cloudslang.lang.compiler.modeller.MetadataModeller;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
 import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component
 public class MetadataExtractorImpl implements MetadataExtractor {
 
-    @Autowired
     private MetadataModeller metadataModeller;
 
-    @Autowired
     private MetadataParser metadataParser;
 
     @Override
@@ -32,5 +27,13 @@ public class MetadataExtractorImpl implements MetadataExtractor {
         Validate.notNull(source, "You must supply a source to extract the metadata from");
         Map<String, String> metadataMap = metadataParser.parse(source);
         return metadataModeller.createModel(metadataMap);
+    }
+
+    public void setMetadataModeller(MetadataModeller metadataModeller) {
+        this.metadataModeller = metadataModeller;
+    }
+
+    public void setMetadataParser(MetadataParser metadataParser) {
+        this.metadataParser = metadataParser;
     }
 }

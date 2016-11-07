@@ -32,16 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class ResultsTransformer extends InOutTransformer implements Transformer<List, List<Result>> {
 
-    @Autowired
     private PreCompileValidator preCompileValidator;
 
-    @Autowired
     private ExecutableValidator executableValidator;
 
     @Override

@@ -10,13 +10,11 @@
 package io.cloudslang.lang.compiler.validator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Bonczidai Levente
  * @since 8/11/2016
  */
-@Component
 public class SystemPropertyValidatorImpl extends AbstractValidator implements SystemPropertyValidator {
 
     @Override

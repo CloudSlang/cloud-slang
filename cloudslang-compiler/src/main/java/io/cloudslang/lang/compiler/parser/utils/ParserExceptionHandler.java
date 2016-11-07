@@ -9,11 +9,9 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.parser.utils;
 
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.scanner.ScannerException;
 
-@Component
 public class ParserExceptionHandler {
 
     public static final String CANNOT_CREATE_PROPERTY_ERROR = "Cannot create property";
