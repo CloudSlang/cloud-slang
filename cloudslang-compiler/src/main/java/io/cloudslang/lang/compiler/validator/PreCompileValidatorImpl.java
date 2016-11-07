@@ -25,6 +25,9 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,20 +37,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import io.cloudslang.utils.ValidationUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
-@Component
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
 
-    @Autowired
     private ExecutableValidator executableValidator;
 
     private static final String MULTIPLE_ON_FAILURE_MESSAGE_SUFFIX = "Multiple 'on_failure' steps found";
@@ -250,7 +246,14 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     @Override
     public void validateStringValue(String name, Serializable value, InOutTransformer transformer) {
         String prefix = StringUtils.capitalize(getMessagePart(transformer.getTransformedObjectsClass())) + ": '" + name;
-        ValidationUtils.validateStringValue(prefix, value);
+        validateStringValue(prefix, value);
+    }
+
+    public static void validateStringValue(String errorMessagePrefix, Serializable value) {
+        if (value != null && !(value instanceof String)) {
+            throw new RuntimeException(errorMessagePrefix + "' should have a String value, but got value '" + value +
+                    "' of type " + value.getClass().getSimpleName() + ".");
+        }
     }
 
     @Override

@@ -17,14 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 
-@Component
 public class SlangModellerImpl implements SlangModeller {
 
-    @Autowired
     private ExecutableBuilder executableBuilder;
 
     @Override

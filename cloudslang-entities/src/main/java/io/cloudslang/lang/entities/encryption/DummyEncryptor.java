@@ -10,14 +10,7 @@
 package io.cloudslang.lang.entities.encryption;
 
 import io.cloudslang.lang.spi.encryption.Encryption;
-import org.springframework.stereotype.Component;
 
-/**
- * Dummy encryptor
- * <p>
- * Created by Ifat Gavish on 29/05/2016
- */
-@Component
 public class DummyEncryptor implements Encryption {
 
     @Override

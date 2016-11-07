@@ -23,7 +23,6 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -553,11 +552,6 @@ public class StepExecutionDataTest {
         @Bean
         public StepExecutionData stepSteps() {
             return new StepExecutionData();
-        }
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
         }
 
         @Bean

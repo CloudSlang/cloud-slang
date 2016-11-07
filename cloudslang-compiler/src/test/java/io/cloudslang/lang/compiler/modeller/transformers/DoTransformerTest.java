@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -55,7 +56,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = DoTransformerTest.Config.class)
+@ContextConfiguration(classes = {DoTransformerTest.Config.class, SlangCompilerSpringConfig.class})
 public class DoTransformerTest extends TransformersTestParent {
 
     @Autowired

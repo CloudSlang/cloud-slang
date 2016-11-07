@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
@@ -52,9 +53,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ExecutableBuilderTest.Config.class)
+@ContextConfiguration(classes = {ExecutableBuilderTest.Config.class})
 public class ExecutableBuilderTest {
 
     @Rule
@@ -81,27 +84,27 @@ public class ExecutableBuilderTest {
     }
 
     private ParsedSlang mockFlowSlangFile() {
-        ParsedSlang parsedSlang = Mockito.mock(ParsedSlang.class);
-        Mockito.when(parsedSlang.getType()).thenReturn(ParsedSlang.Type.FLOW);
-        Mockito.when(parsedSlang.getName()).thenReturn(FILE_NAME);
+        ParsedSlang parsedSlang = mock(ParsedSlang.class);
+        when(parsedSlang.getType()).thenReturn(ParsedSlang.Type.FLOW);
+        when(parsedSlang.getName()).thenReturn(FILE_NAME);
         Map<String, String> imports = new HashMap<>();
         imports.put("ops", "ops");
-        Mockito.when(parsedSlang.getImports()).thenReturn(imports);
-        Mockito.when(parsedSlang.getNamespace()).thenReturn(NAMESPACE);
+        when(parsedSlang.getImports()).thenReturn(imports);
+        when(parsedSlang.getNamespace()).thenReturn(NAMESPACE);
 
         List<Result> results = new ArrayList<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
         postExecutableActionData.put(SlangTextualKeys.RESULTS_KEY, (Serializable) results);
-        Mockito.when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString()))
+        when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString()))
                 .thenReturn(postExecutableActionData);
 
         return parsedSlang;
     }
 
     private ParsedSlang mockOperationsSlangFile() {
-        ParsedSlang parsedSlang = Mockito.mock(ParsedSlang.class);
-        Mockito.when(parsedSlang.getType()).thenReturn(ParsedSlang.Type.OPERATION);
-        Mockito.when(parsedSlang.getName()).thenReturn(FILE_NAME);
+        ParsedSlang parsedSlang = mock(ParsedSlang.class);
+        when(parsedSlang.getType()).thenReturn(ParsedSlang.Type.OPERATION);
+        when(parsedSlang.getName()).thenReturn(FILE_NAME);
         return parsedSlang;
     }
 
@@ -172,8 +175,8 @@ public class ExecutableBuilderTest {
     @Test
     public void stepKeyThatHasTransformerNotInScopeThrowsException() throws Exception {
         String keyword = "a";
-        Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.ACTION));
+        when(transformer.keyToTransform()).thenReturn(keyword);
+        when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.ACTION));
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
@@ -193,10 +196,10 @@ public class ExecutableBuilderTest {
     @Test
     public void transformerThatCantCastTheDataThrowsException() throws Exception {
         String keyword = "a";
-        Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes())
+        when(transformer.keyToTransform()).thenReturn(keyword);
+        when(transformer.getScopes())
                 .thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
-        Mockito.when(transformer.transform(any())).thenThrow(ClassCastException.class);
+        when(transformer.transform(any())).thenThrow(ClassCastException.class);
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         Map<String, Object> executableRawData = new HashMap<>();
         LinkedHashMap<Object, Object> workFlowData = new LinkedHashMap<>();
@@ -216,8 +219,8 @@ public class ExecutableBuilderTest {
     @Test
     public void stepWithNoDoEntranceThrowsException() throws Exception {
         String keyword = "a";
-        Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_STEP));
+        when(transformer.keyToTransform()).thenReturn(keyword);
+        when(transformer.getScopes()).thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_STEP));
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
         final Map<String, Object> executableRawData = new HashMap<>();
         List<Map<String, Object>> workFlowData = new ArrayList<>();
@@ -337,8 +340,8 @@ public class ExecutableBuilderTest {
     @Test
     public void operationWithEmptyActionDataThrowException() throws Exception {
         String keyword = "a";
-        Mockito.when(transformer.keyToTransform()).thenReturn(keyword);
-        Mockito.when(transformer.getScopes())
+        when(transformer.keyToTransform()).thenReturn(keyword);
+        when(transformer.getScopes())
                 .thenReturn(Collections.singletonList(Transformer.Scope.BEFORE_EXECUTABLE));
 
         final ParsedSlang mockParsedSlang = mockOperationsSlangFile();
@@ -365,37 +368,49 @@ public class ExecutableBuilderTest {
     static class Config {
         @Bean
         public ExecutableBuilder executableBuilder() {
-            return new ExecutableBuilder();
+
+            ExecutableBuilder executableBuilder = new ExecutableBuilder();
+            executableBuilder.setTransformersHandler(transformersHandler());
+            executableBuilder.setDependenciesHelper(dependenciesHelper());
+            executableBuilder.setPreCompileValidator(preCompileValidator());
+            executableBuilder.setResultsTransformer(resultsTransformer());
+            executableBuilder.setExecutableValidator(executableValidator());
+
+            executableBuilder.initScopedTransformersAndKeys();
+            return executableBuilder;
         }
 
         @Bean
         public Transformer transformer() {
-            return Mockito.mock(Transformer.class);
+            return mock(Transformer.class);
         }
 
         @Bean
         public DependenciesHelper dependenciesHelper() {
-            return Mockito.mock(DependenciesHelper.class);
+            return mock(DependenciesHelper.class);
         }
 
         @Bean
         public PublishTransformer publishTransformer() {
-            return Mockito.mock(PublishTransformer.class);
+            return mock(PublishTransformer.class);
         }
 
         @Bean
         public TransformersHandler transformersHandler() {
-            return Mockito.mock(TransformersHandler.class);
+            return mock(TransformersHandler.class);
         }
 
         @Bean
         public PreCompileValidator preCompileValidator() {
-            return new PreCompileValidatorImpl();
+            PreCompileValidatorImpl preCompileValidator = new PreCompileValidatorImpl();
+
+            preCompileValidator.setExecutableValidator(executableValidator());
+            return preCompileValidator;
         }
 
         @Bean
         public ResultsTransformer resultsTransformer() {
-            return Mockito.mock(ResultsTransformer.class);
+            return mock(ResultsTransformer.class);
         }
 
         @Bean

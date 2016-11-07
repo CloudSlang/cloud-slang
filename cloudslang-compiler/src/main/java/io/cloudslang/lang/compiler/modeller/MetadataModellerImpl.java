@@ -11,12 +11,10 @@ package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
-import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Component
 public class MetadataModellerImpl implements MetadataModeller {
 
     @Override

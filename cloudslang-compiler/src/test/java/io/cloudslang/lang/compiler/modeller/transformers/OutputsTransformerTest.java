@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -121,7 +122,10 @@ public class OutputsTransformerTest {
 
         @Bean
         public OutputsTransformer outputTransformer() {
-            return new OutputsTransformer();
+            OutputsTransformer outputsTransformer = new OutputsTransformer();
+            outputsTransformer.setExecutableValidator(executableValidator());
+            outputsTransformer.setPreCompileValidator(preCompileValidator());
+            return outputsTransformer;
         }
 
         @Bean

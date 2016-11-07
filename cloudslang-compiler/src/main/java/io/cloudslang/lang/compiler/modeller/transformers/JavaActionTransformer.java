@@ -25,13 +25,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class JavaActionTransformer extends AbstractTransformer
         implements Transformer<Map<String, String>, Map<String, String>> {
-    @Autowired
+
     private DependencyFormatValidator dependencyFormatValidator;
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(
@@ -80,4 +77,7 @@ public class JavaActionTransformer extends AbstractTransformer
         rawData.put(ScoreLangConstants.JAVA_ACTION_GAV_KEY, gav);
     }
 
+    public void setDependencyFormatValidator(DependencyFormatValidator dependencyFormatValidator) {
+        this.dependencyFormatValidator = dependencyFormatValidator;
+    }
 }

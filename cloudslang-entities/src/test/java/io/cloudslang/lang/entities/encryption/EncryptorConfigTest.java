@@ -9,35 +9,35 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.encryption;
 
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.spi.encryption.Encryption;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Encryptor configuration test
- * <p>
- * Created by Ifat Gavish on 30/05/2016
- */
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = EncryptorConfigTest.Config.class)
+@ContextConfiguration(classes = {EncryptorConfigTest.Config.class, SlangEntitiesSpringConfig.class})
 public class EncryptorConfigTest {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Before
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -61,8 +61,9 @@ public class EncryptorConfigTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     public void testEncryptionWithoutEncryptorImplementation() {
         String text = "Str1";
-        ((BeanDefinitionRegistry) ApplicationContextProvider.getApplicationContext()
-                .getAutowireCapableBeanFactory()).removeBeanDefinition("getEncryption");
+        ((BeanDefinitionRegistry) applicationContext.getAutowireCapableBeanFactory())
+                .removeBeanDefinition("getEncryption");
+
         Encryption encryptor = EncryptionProvider.get();
         assertTrue(encryptor instanceof DummyEncryptor);
         assertEquals(encryptor.encrypt(text.toCharArray()), text);

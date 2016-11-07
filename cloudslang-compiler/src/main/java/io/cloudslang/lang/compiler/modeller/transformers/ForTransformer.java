@@ -14,9 +14,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.LoopStatement;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.stereotype.Component;
 
-@Component
 public class ForTransformer extends AbstractForTransformer implements Transformer<String, LoopStatement> {
 
     @Override

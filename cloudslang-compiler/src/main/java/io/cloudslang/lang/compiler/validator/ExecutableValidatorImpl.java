@@ -17,17 +17,13 @@ import java.util.Set;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Bonczidai Levente
  * @since 8/24/2016
  */
-@Component
 public class ExecutableValidatorImpl extends AbstractValidator implements ExecutableValidator {
 
-    @Autowired
     private SystemPropertyValidator systemPropertyValidator;
 
     @Override
@@ -150,4 +146,7 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
         }
     }
 
+    public void setSystemPropertyValidator(SystemPropertyValidator systemPropertyValidator) {
+        this.systemPropertyValidator = systemPropertyValidator;
+    }
 }
