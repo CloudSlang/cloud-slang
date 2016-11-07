@@ -26,6 +26,7 @@ import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -106,7 +107,7 @@ public class SlangBuildMain {
     private static final String LOG4J_CONFIGURATION_KEY = "log4j.configuration";
     private static final String LOG4J_ERROR_PREFIX = "log4j: error loading log4j properties file.";
     private static final String LOG4J_ERROR_SUFFIX = "Using default configuration.";
-
+    private static final String APP_HOME_KEY = "app.home";
 
     // This class is a used in the interaction with the run configuration property file
     static class RunConfigurationProperties {
@@ -292,27 +293,52 @@ public class SlangBuildMain {
         String configFilename = System.getProperty(LOG4J_CONFIGURATION_KEY);
         String errorMessage = null;
 
-        if (StringUtils.isEmpty(configFilename)) {
-            errorMessage = "Config file name is empty.";
-        } else {
-            String normalizedPath = FilenameUtils.normalize(configFilename);
-            if (!get(normalizedPath).isAbsolute()) {
-                errorMessage = "Path[" + normalizedPath + "] is not an absolute path.";
+        try {
+            if (StringUtils.isEmpty(configFilename)) {
+                errorMessage = "Config file name is empty.";
             } else {
-                if (!isRegularFile(get(normalizedPath), NOFOLLOW_LINKS)) {
-                    errorMessage = "Path[" + normalizedPath + "] does not lead to a regular file.";
+                String normalizedPath = FilenameUtils.normalize(configFilename);
+                if (normalizedPath == null) {
+                    errorMessage = "Normalized config file path is null.";
+                } else if (!isUnderAppHome(normalizedPath, getNormalizedApplicationHome())) {
+                    errorMessage = "Normalized config file path[" + normalizedPath + "] " +
+                            "is not under application home directory";
                 } else {
-                    try {
-                        PropertyConfigurator.configure(configFilename);
-                    } catch (RuntimeException rex) {
-                        errorMessage = rex.getMessage();
+                    if (!isRegularFile(get(normalizedPath), NOFOLLOW_LINKS)) {
+                        errorMessage = "Normalized config file path[" + normalizedPath + "]" +
+                                " does not lead to a regular file.";
+                    } else {
+                        Properties log4jProperties = new Properties();
+                        try (InputStream log4jInputStream = SlangBuildMain.class.getResourceAsStream(normalizedPath)) {
+                            log4jProperties.load(log4jInputStream);
+                            PropertyConfigurator.configure(log4jProperties);
+                        }
                     }
                 }
             }
+        } catch (IOException | RuntimeException ex) {
+            errorMessage = ex.getMessage();
         }
+
         if (StringUtils.isNotEmpty(errorMessage)) {
             System.out.printf("%s%n\t%s%n\t%s%n", LOG4J_ERROR_PREFIX, errorMessage, LOG4J_ERROR_SUFFIX);
         }
+    }
+
+    private static boolean isUnderAppHome(String normalizedFilePath, String normalizedAppHome) {
+        return normalizedFilePath.startsWith(normalizedAppHome);
+    }
+
+    private static String getNormalizedApplicationHome() {
+        String appHome = System.getProperty(APP_HOME_KEY);
+        if (StringUtils.isEmpty(appHome)) {
+            throw new RuntimeException(APP_HOME_KEY + " system property is empty");
+        }
+        String normalizedAppHome = FilenameUtils.normalize(appHome);
+        if (normalizedAppHome == null) {
+            throw new RuntimeException("Normalized app home path is null.");
+        }
+        return normalizedAppHome;
     }
 
     private static void printBuildModeInfo(BuildMode buildMode) {
@@ -422,7 +448,7 @@ public class SlangBuildMain {
 
     /**
      * Displays a warning message for test suites that have rules defined for sequential or parallel execution
-     *    but are not in active test suites.
+     * but are not in active test suites.
      *
      * @param testSuites          suite names contained in 'container' suites
      * @param testSuitesContained suite names contained in 'contained' suites
@@ -526,7 +552,7 @@ public class SlangBuildMain {
         } else {
             int defaultThreadCount = Runtime.getRuntime().availableProcessors();
             String threadCountErrorMessage = format("Thread count is misconfigured. The thread count value must be a " +
-                    "positive integer less than or equal to %d. Using %d threads.",
+                            "positive integer less than or equal to %d. Using %d threads.",
                     MAX_THREADS_TEST_RUNNER, defaultThreadCount);
             try {
                 String stringThreadCount = appArgs.getThreadCount();
