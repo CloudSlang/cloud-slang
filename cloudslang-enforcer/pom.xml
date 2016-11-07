@@ -17,6 +17,7 @@
         <maven.enforcer.maven.project.version>3.0-alpha-2</maven.enforcer.maven.project.version>
         <javapoet.version>1.7.0</javapoet.version>
         <javaparser.version>1.0.11</javaparser.version>
+        <plexus-container-default.version>1.7.1</plexus-container-default.version>
     </properties>
 
     <build>
@@ -76,7 +77,7 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
-            <version>1.7.1</version>
+            <version>${plexus-container-default.version}</version>
         </dependency>
 
         <dependency>
