@@ -95,6 +95,7 @@ public class ExecutableBuilder {
             asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
     private List<String> parallelLoopValidKeywords = asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.FOR_KEY);
 
+    // @PostConstruct
     public void initScopedTransformersAndKeys() {
         //executable transformers
         preExecTransformers = filterTransformers(Transformer.Scope.BEFORE_EXECUTABLE);

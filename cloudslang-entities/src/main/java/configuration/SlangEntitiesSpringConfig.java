@@ -24,6 +24,7 @@ import java.util.Map;
 @Configuration
 public class SlangEntitiesSpringConfig implements ApplicationContextAware {
 
+    public static final String APPLICATION_CONTEXT_BEAN_MISSING = "Application context bean is missing.";
     private static ApplicationContext applicationContext;
 
     public static Encryption[] getEncryptors() {
@@ -31,7 +32,7 @@ public class SlangEntitiesSpringConfig implements ApplicationContextAware {
             Map<String, Encryption> encryptorMap = applicationContext.getBeansOfType(Encryption.class);
             return encryptorMap.values().toArray(new Encryption[encryptorMap.size()]);
         } else {
-            throw new RuntimeException("ApplicationContextProvider bean missing");
+            throw new RuntimeException(APPLICATION_CONTEXT_BEAN_MISSING);
         }
     }
 

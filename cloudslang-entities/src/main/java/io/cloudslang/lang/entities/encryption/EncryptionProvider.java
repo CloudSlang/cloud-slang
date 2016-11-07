@@ -15,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import static configuration.SlangEntitiesSpringConfig.APPLICATION_CONTEXT_BEAN_MISSING;
+
 /**
  * Encryptor factory
  * <p>
@@ -38,7 +40,7 @@ public class EncryptionProvider {
         try {
             encryptors = SlangEntitiesSpringConfig.getEncryptors();
         } catch (Exception theGivenEx) {
-            if (!StringUtils.containsIgnoreCase(theGivenEx.getMessage(), "ApplicationContextProvider bean missing")) {
+            if (!StringUtils.containsIgnoreCase(theGivenEx.getMessage(), APPLICATION_CONTEXT_BEAN_MISSING)) {
                 return new DummyEncryptor(); // IntelliJ Plugin case
             }
             throw theGivenEx;
