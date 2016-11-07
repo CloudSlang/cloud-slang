@@ -14,9 +14,9 @@ import com.beust.jcommander.ParameterException;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.UserConfigurationService;
 import io.cloudslang.lang.commons.services.impl.UserConfigurationServiceImpl;
-import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.logging.LoggingServiceImpl;
+import io.cloudslang.lang.tools.build.commands.ApplicationArgs;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.TestRun;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;
@@ -26,6 +26,7 @@ import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
@@ -102,6 +104,10 @@ public class SlangBuildMain {
             " Each test suite must have only one execution mode (parallel or sequential).";
     private static final String MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE = "Error loading smart " +
             "mode configuration file:";
+    private static final String LOG4J_CONFIGURATION_KEY = "log4j.configuration";
+    private static final String LOG4J_ERROR_PREFIX = "log4j: error loading log4j properties file.";
+    private static final String LOG4J_ERROR_SUFFIX = "Using default configuration.";
+    private static final String APP_HOME_KEY = "app.home";
 
     // This class is a used in the interaction with the run configuration property file
     static class RunConfigurationProperties {
@@ -134,6 +140,7 @@ public class SlangBuildMain {
 
     public static void main(String[] args) {
         loadUserProperties();
+        configureLog4j();
 
         ApplicationArgs appArgs = new ApplicationArgs();
         parseArgs(args, appArgs);
@@ -282,6 +289,58 @@ public class SlangBuildMain {
         }
     }
 
+    private static void configureLog4j() {
+        String configFilename = System.getProperty(LOG4J_CONFIGURATION_KEY);
+        String errorMessage = null;
+
+        try {
+            if (StringUtils.isEmpty(configFilename)) {
+                errorMessage = "Config file name is empty.";
+            } else {
+                String normalizedPath = FilenameUtils.normalize(configFilename);
+                if (normalizedPath == null) {
+                    errorMessage = "Normalized config file path is null.";
+                } else if (!isUnderAppHome(normalizedPath, getNormalizedApplicationHome())) {
+                    errorMessage = "Normalized config file path[" + normalizedPath + "] " +
+                            "is not under application home directory";
+                } else {
+                    if (!isRegularFile(get(normalizedPath), NOFOLLOW_LINKS)) {
+                        errorMessage = "Normalized config file path[" + normalizedPath + "]" +
+                                " does not lead to a regular file.";
+                    } else {
+                        Properties log4jProperties = new Properties();
+                        try (InputStream log4jInputStream = SlangBuildMain.class.getResourceAsStream(normalizedPath)) {
+                            log4jProperties.load(log4jInputStream);
+                            PropertyConfigurator.configure(log4jProperties);
+                        }
+                    }
+                }
+            }
+        } catch (IOException | RuntimeException ex) {
+            errorMessage = ex.getMessage();
+        }
+
+        if (StringUtils.isNotEmpty(errorMessage)) {
+            System.out.printf("%s%n\t%s%n\t%s%n", LOG4J_ERROR_PREFIX, errorMessage, LOG4J_ERROR_SUFFIX);
+        }
+    }
+
+    private static boolean isUnderAppHome(String normalizedFilePath, String normalizedAppHome) {
+        return normalizedFilePath.startsWith(normalizedAppHome);
+    }
+
+    private static String getNormalizedApplicationHome() {
+        String appHome = System.getProperty(APP_HOME_KEY);
+        if (StringUtils.isEmpty(appHome)) {
+            throw new RuntimeException(APP_HOME_KEY + " system property is empty");
+        }
+        String normalizedAppHome = FilenameUtils.normalize(appHome);
+        if (normalizedAppHome == null) {
+            throw new RuntimeException("Normalized app home path is null.");
+        }
+        return normalizedAppHome;
+    }
+
     private static void printBuildModeInfo(BuildMode buildMode) {
         log.info("Build mode set to: " + buildMode);
     }
@@ -389,7 +448,7 @@ public class SlangBuildMain {
 
     /**
      * Displays a warning message for test suites that have rules defined for sequential or parallel execution
-     *    but are not in active test suites.
+     * but are not in active test suites.
      *
      * @param testSuites          suite names contained in 'container' suites
      * @param testSuitesContained suite names contained in 'contained' suites
@@ -493,7 +552,7 @@ public class SlangBuildMain {
         } else {
             int defaultThreadCount = Runtime.getRuntime().availableProcessors();
             String threadCountErrorMessage = format("Thread count is misconfigured. The thread count value must be a " +
-                    "positive integer less than or equal to %d. Using %d threads.",
+                            "positive integer less than or equal to %d. Using %d threads.",
                     MAX_THREADS_TEST_RUNNER, defaultThreadCount);
             try {
                 String stringThreadCount = appArgs.getThreadCount();
