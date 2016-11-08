@@ -35,7 +35,7 @@ import static org.apache.commons.lang3.StringUtils.countMatches;
 
 public class SpringCleansingRule implements EnforcerRule {
 
-    private static final java.lang.String JAVA = "java";
+    private static final String JAVA = "java";
     private static final String OPTIONAL_SPACER = "(\\s)*";
     private static final String REGEX_DOT = "\\.";
     private static final String OPTIONAL_STATIC = "(static )?";
@@ -75,7 +75,7 @@ public class SpringCleansingRule implements EnforcerRule {
     private static final String FOUND_UNWANTED_OCCURRENCE_OF_ORG_SPRINGFRAMEWORK = "Found unwanted occurrence of " +
             "org.springframework at line %d in source '%s'";
     private static final String IN_SOURCE = " in source '";
-    public static final String NEW_LINE = "\n";
+    private static final String NEW_LINE = "\n";
 
     /**
      * Simple param. This rule will fail if the value is true.
