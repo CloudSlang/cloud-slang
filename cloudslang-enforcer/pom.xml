@@ -15,9 +15,8 @@
         <maven.enforcer.api.version>1.4.1</maven.enforcer.api.version>
         <maven.enforcer.maven.version>3.2.1</maven.enforcer.maven.version>
         <maven.enforcer.maven.project.version>3.0-alpha-2</maven.enforcer.maven.project.version>
-        <javapoet.version>1.7.0</javapoet.version>
-        <javaparser.version>1.0.11</javaparser.version>
         <plexus-container-default.version>1.7.1</plexus-container-default.version>
+        <org.eclipse.sisu.version>0.3.1</org.eclipse.sisu.version>
     </properties>
 
     <build>
@@ -40,6 +39,30 @@
                     <configLocation>${project.parent.basedir}/google-checkstyle-rules.xml</configLocation>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugins.maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>analyze dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>true</failOnWarning>
+                            <ignoredUnusedDeclaredDependencies>
+                                <ignoredUnusedDeclaredDependency>org.codehaus.plexus:plexus-container-default:jar:${plexus-container-default.version}</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.apache.maven:maven-core:jar:${maven.enforcer.maven.version}</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.apache.maven:maven-artifact:jar:${maven.enforcer.maven.version}</ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -81,6 +104,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.plexus</artifactId>
+            <version>${org.eclipse.sisu.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
@@ -95,14 +124,10 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
+
         <!--Might be useful for the future to add javaparser-->
 
-        <!--Test dependencies-->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--Test dependencies go under this-->
     </dependencies>
 
 </project>
