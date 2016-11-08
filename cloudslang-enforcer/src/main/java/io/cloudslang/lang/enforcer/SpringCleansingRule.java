@@ -80,7 +80,7 @@ public class SpringCleansingRule implements EnforcerRule {
     /**
      * Simple param. This rule will fail if the value is true.
      */
-    private boolean shouldIfail = false;
+    private boolean shouldFail = false;
 
     public void execute(EnforcerRuleHelper helper) throws EnforcerRuleException {
         Log log = helper.getLog();
@@ -116,7 +116,7 @@ public class SpringCleansingRule implements EnforcerRule {
      */
     public String getCacheId() {
         //no hash on boolean...only parameter so no hash is needed.
-        return "" + this.shouldIfail;
+        return "" + this.shouldFail;
     }
 
     /**
@@ -184,7 +184,7 @@ public class SpringCleansingRule implements EnforcerRule {
         if (matcherImportForFile.find()) {
             int lineNumber = findLineNumber(contents.substring(0, matcherImportForFile.start()));
             log.info(format(FOUND_UNWANTED_OCCURRENCE_OF_ORG_SPRINGFRAMEWORK, lineNumber, javaFile.getAbsolutePath()));
-            if (shouldIfail) {
+            if (shouldFail) {
                 throw new EnforcerRuleException(message + valueOf(lineNumber) + IN_SOURCE +
                         javaFile.getAbsolutePath() + "'");
             }

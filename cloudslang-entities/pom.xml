@@ -166,7 +166,7 @@
                         <configuration>
                             <rules>
                                 <myCustomRule implementation="io.cloudslang.lang.enforcer.SpringCleansingRule">
-                                    <shouldIfail>true</shouldIfail>
+                                    <shouldFail>true</shouldFail>
                                 </myCustomRule>
                             </rules>
                         </configuration>
