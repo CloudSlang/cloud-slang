@@ -24,6 +24,9 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -55,6 +56,8 @@ public class SlangCompilerImpl implements SlangCompiler {
             "System property key must be string. Found: ";
     public static final String DUPLICATE_SYSTEM_PROPERTY_KEY_ERROR_MESSAGE_PREFIX =
             "Duplicate system property key: '";
+
+    private boolean isPrecompileCacheEnabled = false;
 
     private YamlParser yamlParser;
 
@@ -109,6 +112,18 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
+    public void enablePrecompileCache() {
+        this.isPrecompileCacheEnabled = true;
+        cleanUp();
+    }
+
+    @Override
+    public void disablePrecompileCache() {
+        this.isPrecompileCacheEnabled = false;
+        cleanUp();
+    }
+
+    @Override
     public void cleanUp() {
         cachedPrecompileService.cleanUp();
     }
@@ -126,9 +141,11 @@ public class SlangCompilerImpl implements SlangCompiler {
     public ExecutableModellingResult preCompileSource(SlangSource source) {
         Validate.notNull(source, "You must supply a source to compile");
         final String filePath = source.getFilePath();
-        ExecutableModellingResult result = cachedPrecompileService.getValueFromCache(filePath);
-        if (result != null) {
-            return result;
+        if (isPrecompileCacheEnabled) {
+            ExecutableModellingResult result = cachedPrecompileService.getValueFromCache(filePath);
+            if (result != null) {
+                return result;
+            }
         }
 
         //first thing we parse the yaml file into java maps
@@ -136,8 +153,10 @@ public class SlangCompilerImpl implements SlangCompiler {
         ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
 
         // Then we transform the parsed Slang source to a Slang model
-        result = slangModeller.createModel(parseModellingResult);
-        cachedPrecompileService.cacheResult(filePath, result);
+        ExecutableModellingResult result = slangModeller.createModel(parseModellingResult);
+        if (isPrecompileCacheEnabled) {
+            cachedPrecompileService.cacheResult(filePath, result);
+        }
         return result;
     }
 

@@ -164,32 +164,64 @@ public class CompileOperationTest {
     }
 
     @Test
-    public void testPrecompileCache() throws Exception {
-        URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
-        SlangSource slangSource = SlangSource.fromFile(resource.toURI());
-
-        CompilationModellingResult result = compiler.compileSource(slangSource, null);
-        assertEquals("Error missing", 1, result.getErrors().size());
-        assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
-                result.getErrors().get(0).getMessage());
-
-        assertNotNull("Cache should contain the ExecutableModellingResult",
-                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
-    }
-
-    @Test
     public void testPrecompileCacheCleanup() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         SlangSource slangSource = SlangSource.fromFile(resource.toURI());
 
+        compiler.enablePrecompileCache();
+
         CompilationModellingResult result = compiler.compileSource(slangSource, null);
-        assertEquals("Error missing", 1, result.getErrors().size());
+        assertEquals("The compilation result should have one error", 1, result.getErrors().size());
         assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
                 result.getErrors().get(0).getMessage());
 
+        assertNotNull("Cache should contain the ExecutableModellingResult before cache cleanUp",
+                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+
         compiler.cleanUp();
 
-        assertNull("Cache should not contain the ExecutableModellingResult",
+        assertNull("Cache should not contain the ExecutableModellingResult after cache cleanUp",
+                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+    }
+
+    @Test
+    public void testPrecompileCacheDisabledByDefault() throws Exception {
+        URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
+        SlangSource slangSource = SlangSource.fromFile(resource.toURI());
+
+        CompilationModellingResult result = compiler.compileSource(slangSource, null);
+        assertEquals("The compilation result should have one error", 1, result.getErrors().size());
+        assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
+                result.getErrors().get(0).getMessage());
+
+        assertNull("Cache should not contain the ExecutableModellingResult after cache cleanUp",
+                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+    }
+
+    @Test
+    public void testPrecompileCacheEnableDisable() throws Exception {
+        URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
+        SlangSource slangSource = SlangSource.fromFile(resource.toURI());
+
+
+        compiler.enablePrecompileCache();
+
+        CompilationModellingResult result = compiler.compileSource(slangSource, null);
+        assertEquals("The compilation result should have one error", 1, result.getErrors().size());
+        assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
+                result.getErrors().get(0).getMessage());
+
+        assertNotNull("Cache should contain the ExecutableModellingResult before cache cleanUp",
+                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+
+        compiler.disablePrecompileCache();
+
+        result = compiler.compileSource(slangSource, null);
+        assertEquals("The compilation result should have one error", 1, result.getErrors().size());
+        assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
+                result.getErrors().get(0).getMessage());
+
+        assertNull("Cache should not contain the ExecutableModellingResult after cache cleanUp",
                 cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
     }
 }

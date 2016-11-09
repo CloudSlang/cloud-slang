@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.events.ScoreEventListener;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +30,16 @@ import java.util.Set;
 public interface Slang {
 
     CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies);
+
+    /**
+     * Enable and clean up the precompile cache.
+     */
+    void enablePrecompileCache();
+
+    /**
+     * Disable and clean up the precompile cache.
+     */
+    void disablePrecompileCache();
 
     /**
      * Clean up the precompile cache.

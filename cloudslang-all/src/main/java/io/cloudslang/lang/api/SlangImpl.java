@@ -85,6 +85,16 @@ public class SlangImpl implements Slang {
     }
 
     @Override
+    public void enablePrecompileCache() {
+        compiler.enablePrecompileCache();
+    }
+
+    @Override
+    public void disablePrecompileCache() {
+        compiler.disablePrecompileCache();
+    }
+
+    @Override
     public void compileCleanUp() {
         compiler.cleanUp();
     }

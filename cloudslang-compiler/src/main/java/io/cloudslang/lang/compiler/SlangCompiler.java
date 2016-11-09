@@ -43,6 +43,16 @@ public interface SlangCompiler {
     CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> path);
 
     /**
+     * Enable and clean up the precompile cache.
+     */
+    void enablePrecompileCache();
+
+    /**
+     * Disable and clean up the precompile cache.
+     */
+    void disablePrecompileCache();
+
+    /**
      * Clean up the precompile cache.
      */
     void cleanUp();

@@ -31,7 +31,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -73,14 +73,15 @@ public class SlangCompilationServiceImplTest {
         verify(compilationHelper).onEveryFile(file4);
 
         InOrder inOrderHelper = inOrder(compilationHelper);
-        inOrderHelper.verify(compilationHelper, atLeast(1)).onEveryFile(any(File.class));
+        inOrderHelper.verify(compilationHelper, atLeastOnce()).onEveryFile(any(File.class));
         inOrderHelper.verify(compilationHelper).onCompilationFinish();
         inOrderHelper.verifyNoMoreInteractions();
 
         InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang, atLeast(1)).compileSource(
+        inOrder.verify(slang).enablePrecompileCache();
+        inOrder.verify(slang, atLeastOnce()).compileSource(
                 any(SlangSource.class), any(Set.class));
-        inOrder.verify(slang).compileCleanUp();
+        inOrder.verify(slang).disablePrecompileCache();
         inOrder.verifyNoMoreInteractions();
     }
 

@@ -58,6 +58,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -120,24 +121,6 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(flowPath)
                 )
         );
-        inOrder.verify(slang).compileCleanUp();
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void testCompileSourceCleanup() throws Exception {
-        final URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
-        final URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
-        compilerHelper.compileSource(flowPath.getPath(), null);
-        InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang).compileSource(
-                SlangSource.fromFile(flowPath),
-                newHashSet(
-                        SlangSource.fromFile(opPath),
-                        SlangSource.fromFile(flowPath)
-                )
-        );
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -162,14 +145,15 @@ public class CompilerHelperTest {
         inOrderConsolePrinter.verify(consolePrinter).waitForAllPrintTasksToFinish();
         inOrderConsolePrinter.verifyNoMoreInteractions();
         InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang).compileSource(
+        inOrder.verify(slang).enablePrecompileCache();
+        inOrder.verify(slang, atLeastOnce()).compileSource(
                 SlangSource.fromFile(flowPath),
                 newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
                 )
         );
-        inOrder.verify(slang).compileCleanUp();
+        inOrder.verify(slang).disablePrecompileCache();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -182,7 +166,6 @@ public class CompilerHelperTest {
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(SlangSource.fromFile(flowFilePath),
                 newHashSet(SlangSource.fromFile(flow2FilePath)));
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -203,7 +186,6 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(dependency2)
                 )
         );
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -222,7 +204,6 @@ public class CompilerHelperTest {
                 SlangSource.fromFile(flowFilePath),
                 newHashSet(SlangSource.fromFile(flow2FilePath))
         );
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
