@@ -39,6 +39,7 @@
         <plugins.maven-dependency-plugin.version.old>2.8</plugins.maven-dependency-plugin.version.old>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
     </properties>
 
     <distributionManagement>
@@ -626,6 +627,12 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+                <!--Check for org.springframework occurrences-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven.enforcer.plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -756,5 +763,6 @@
         <module>cloudslang-content-maven-compiler</module>
         <module>cloudslang-api-commons</module>
         <module>cloudslang-commons</module>
+        <module>cloudslang-enforcer</module>
     </modules>
 </project>

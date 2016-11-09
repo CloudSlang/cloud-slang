@@ -61,6 +61,34 @@
                 <artifactId>dependency-check-maven</artifactId>
             </plugin>
 
+            <!--Check for org.springframework occurrences-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.cloudslang.lang</groupId>
+                        <artifactId>cloudslang-enforcer</artifactId>
+                        <version>${project.parent.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>enforce</id>
+                        <configuration>
+                            <rules>
+                                <myCustomRule implementation="io.cloudslang.lang.enforcer.SpringCleansingRule">
+                                    <shouldFail>true</shouldFail>
+                                </myCustomRule>
+                            </rules>
+                        </configuration>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
