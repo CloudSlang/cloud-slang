@@ -33,6 +33,8 @@ public class MetadataParser {
     private static final String BLOCK_END_TAG = "#!!#";
     private static final String BLOCK_START_TAG = "#!!";
     private static final String COLON = ":";
+    private static final String DESCRIPTION_DELIMITER_LINE = "#######################################" +
+            "#################################################################################";
 
     private ParserExceptionHandler parserExceptionHandler;
 
@@ -132,26 +134,35 @@ public class MetadataParser {
         StrBuilder sb = new StrBuilder();
         boolean blockEndTagFound = false;
         boolean blockStartTagFound = false;
-        String firstLine = "";
+        String lineWithBlockStartTag = "";
+        String lineBeforeBlockStartTag = "";
+        String lineAfterBlockEndTag = "";
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getContent()))) {
             String line = getTrimmedLine(reader);
+            String previousLine = line;
             while (line != null) {
                 if (line.startsWith(BLOCK_END_TAG)) {
                     blockEndTagFound = true;
+                    lineAfterBlockEndTag = getTrimmedLine(reader);
                     break;
                 } else if (line.startsWith(BLOCK_START_TAG)) {
                     blockStartTagFound = true;
-                    firstLine = line;
+                    lineBeforeBlockStartTag = previousLine;
+                    lineWithBlockStartTag = line;
                     line = getTrimmedLine(reader);
-                    if (line.startsWith(BLOCK_END_TAG)) {
+                    if (line != null && line.startsWith(BLOCK_END_TAG)) {
+                        blockEndTagFound = true;
+                        lineAfterBlockEndTag = getTrimmedLine(reader);
                         break;
                     }
                 }
 
                 appendValidLineToOutput(sb, blockStartTagFound, line);
+                previousLine = line;
                 line = getTrimmedLine(reader);
             }
-            checkStartingAndClosingTags(sb, firstLine, blockEndTagFound, blockStartTagFound);
+            checkStartingAndClosingTags(sb, lineWithBlockStartTag,
+                    lineBeforeBlockStartTag, lineAfterBlockEndTag, blockEndTagFound, blockStartTagFound);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
@@ -170,10 +181,19 @@ public class MetadataParser {
         return line != null ? line.trim() : null;
     }
 
-    private void checkStartingAndClosingTags(StrBuilder sb, String firstLine, boolean blockEndTagFound,
-                                             boolean blockStartTagFound) {
-        if (firstLine.length() > BLOCK_START_TAG.length()) {
+    private void checkStartingAndClosingTags(StrBuilder sb, String lineWithBlockStartTag,
+                                             String lineBeforeBlockStartTag, String lineAfterBlockEndTag,
+                                             boolean blockEndTagFound, boolean blockStartTagFound) {
+        if (lineWithBlockStartTag.length() > BLOCK_START_TAG.length()) {
             throw new RuntimeException("Description is not accepted on the same line as the starting tag.");
+        }
+        if (blockStartTagFound && !StringUtils.contains(lineBeforeBlockStartTag, DESCRIPTION_DELIMITER_LINE)) {
+            throw new RuntimeException("Before the description start tag there should be a line containing " +
+                    "'#' characters");
+        }
+        if (blockEndTagFound && !StringUtils.contains(lineAfterBlockEndTag, DESCRIPTION_DELIMITER_LINE)) {
+            throw new RuntimeException("After the description end tag there should be a line containing " +
+                    "'#' characters");
         }
         if (blockEndTagFound && !blockStartTagFound) {
             throw new RuntimeException("Starting tag missing in the description.");

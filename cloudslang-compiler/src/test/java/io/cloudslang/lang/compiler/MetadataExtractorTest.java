@@ -96,6 +96,26 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractMetadataStartDelimiterLineMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_start_line_missing.sl").toURI();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Before the description start tag there should be a line containing '#' characters");
+
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
+    public void testExtractMetadataEndDelimiterLineMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_end_line_missing.sl").toURI();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("After the description end tag there should be a line containing '#' characters");
+
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
     public void testExtractMetadataEmptyDescriptionSection() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_empty_description.sl").toURI();
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));

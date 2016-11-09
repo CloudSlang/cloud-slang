@@ -5,7 +5,7 @@
 #   The Apache License is available at
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
-####################################################
+########################################################################################################################
 #!!
 #! @description: Adds or replaces a value to the given JSON at the keys or indices represented by the json_path.
 #!               If the last key in the path does not exist, the key is added as well.
@@ -17,7 +17,7 @@
 #! @output return_code: "0" if parsing was successful, "-1" otherwise
 #! @output error_message: error message if there was an error when executing, empty otherwise
 #!!#
-####################################################
+########################################################################################################################
 
 namespace: io.cloudslang.base.json
 
