@@ -46,7 +46,17 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     private CompileValidator compileValidator;
 
     @Override
-    public CompilationModellingResult compile(Executable executable, Set<Executable> path) {
+    public CompilationArtifact compile(Executable source, Set<Executable> path) {
+        CompilationModellingResult compilationModellingResult = compileSource(source, path);
+        List<RuntimeException> errors = compilationModellingResult.getErrors();
+        if (CollectionUtils.isNotEmpty(errors)) {
+            throw errors.get(0);
+        }
+        return compilationModellingResult.getCompilationArtifact();
+    }
+
+    @Override
+    public CompilationModellingResult compileSource(Executable executable, Set<Executable> path) {
         List<RuntimeException> exceptions = new ArrayList<>();
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
