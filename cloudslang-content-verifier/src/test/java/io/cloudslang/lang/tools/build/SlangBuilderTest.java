@@ -22,7 +22,6 @@ import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
@@ -125,13 +124,6 @@ import static org.python.google.common.collect.Sets.newHashSet;
 public class SlangBuilderTest {
 
     private static final Set<String> SYSTEM_PROPERTY_DEPENDENCIES = Collections.emptySet();
-    private static final CompilationModellingResult EMPTY_COMPILATION_MODELLING_RESULT =
-            new CompilationModellingResult(new CompilationArtifact(
-                    new ExecutionPlan(),
-                    new HashMap<String, ExecutionPlan>(),
-                    new ArrayList<Input>(),
-                    new HashSet<String>()
-            ), new ArrayList<RuntimeException>());
     private static final CompilationArtifact EMPTY_COMPILATION_ARTIFACT =
             new CompilationArtifact(
                     new ExecutionPlan(),
