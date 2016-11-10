@@ -16,6 +16,8 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+import java.net.URL;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,9 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URL;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -202,7 +201,6 @@ public class CompileOperationTest {
     public void testPrecompileCacheEnableDisable() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         SlangSource slangSource = SlangSource.fromFile(resource.toURI());
-
 
         compiler.enablePrecompileCache();
 
