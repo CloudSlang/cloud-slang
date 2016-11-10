@@ -22,7 +22,6 @@ import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
@@ -57,6 +56,19 @@ import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
+import java.io.File;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -74,20 +86,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
@@ -126,13 +124,13 @@ import static org.python.google.common.collect.Sets.newHashSet;
 public class SlangBuilderTest {
 
     private static final Set<String> SYSTEM_PROPERTY_DEPENDENCIES = Collections.emptySet();
-    private static final CompilationModellingResult EMPTY_COMPILATION_MODELLING_RESULT =
-            new CompilationModellingResult(new CompilationArtifact(
+    private static final CompilationArtifact EMPTY_COMPILATION_ARTIFACT =
+            new CompilationArtifact(
                     new ExecutionPlan(),
                     new HashMap<String, ExecutionPlan>(),
                     new ArrayList<Input>(),
                     new HashSet<String>()
-            ), new ArrayList<RuntimeException>());
+            );
     private static final Flow EMPTY_EXECUTABLE = new Flow(null, null, null, "no_dependencies", "empty_flow",
             null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
 
@@ -267,7 +265,7 @@ public class SlangBuilderTest {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>()))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
 
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
@@ -290,8 +288,7 @@ public class SlangBuilderTest {
     public void testNotAllSlangFilesWereCompiled() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
-        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(
-                new CompilationModellingResult(null, new ArrayList<RuntimeException>()));
+        when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(null);
         exception.expect(RuntimeException.class);
         exception.expectMessage("1");
         exception.expectMessage("0");
@@ -310,7 +307,7 @@ public class SlangBuilderTest {
                 flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(newExecutable);
         when(scoreCompiler.compile(newExecutable, new HashSet<Executable>()))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         when(metadataExtractor.extractMetadata(any(SlangSource.class))).thenReturn(EMPTY_METADATA);
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA), eq(false));
@@ -340,9 +337,9 @@ public class SlangBuilderTest {
         HashSet<Executable> dependencies = new HashSet<>();
         dependencies.add(dependencyExecutable);
         when(scoreCompiler.compile(emptyFlowExecutable, dependencies))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>()))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
@@ -396,7 +393,7 @@ public class SlangBuilderTest {
                 null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         when(scoreCompiler.compile(executable, new HashSet<Executable>()))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
@@ -411,7 +408,7 @@ public class SlangBuilderTest {
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(executable);
         when(scoreCompiler.compile(executable, new HashSet<Executable>()))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(),
                 resource.getPath(), null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
@@ -444,7 +441,7 @@ public class SlangBuilderTest {
         final URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>()))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
 
         doAnswer(new Answer() {
             @Override
@@ -473,7 +470,7 @@ public class SlangBuilderTest {
         final URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenReturn(EMPTY_EXECUTABLE);
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>()))
-                .thenReturn(EMPTY_COMPILATION_MODELLING_RESULT);
+                .thenReturn(EMPTY_COMPILATION_ARTIFACT);
 
         doNothing().when(slangTestRunner).runTestsSequential(
                 any(String.class),
