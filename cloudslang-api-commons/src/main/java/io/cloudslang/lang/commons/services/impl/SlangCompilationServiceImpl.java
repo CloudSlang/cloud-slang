@@ -42,6 +42,7 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
     public List<CompilationModellingResult> compileFolders(final List<String> foldersPaths,
                                                            final CompilationHelper compilationHelper) {
         List<CompilationModellingResult> results = new ArrayList<>();
+        slang.enablePrecompileCache();
         try {
             Set<SlangSource> dependencySources = getSourcesFromFolders(foldersPaths);
             for (SlangSource dependencySource : dependencySources) {
@@ -58,7 +59,7 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
             }
         } finally {
             compilationHelper.onCompilationFinish();
-            slang.compileCleanUp();
+            slang.disablePrecompileCache();
         }
         return results;
     }
