@@ -11,23 +11,20 @@
 #!               corresponding value addressed by the json_path input.
 #!
 #! @prerequisites: jenkinsapi Python module
-#!
 #! @input json_input: JSON data input
 #!                    Example: '{"k1": {"k2": ["v1", "v2"]}}'
-#!
-
-#! @output value: the corresponding value of the key referred to by json_path
-#!
 #! @input json_path: path from which to retrieve value represented as a list of keys and/or indices.
 #!                   Passing an empty list ([]) will retrieve the entire json_input. - Example: ["k1", "k2", 1]
 #!
+
+#! @output value: the corresponding value of the key referred to by json_path
 #! @output return_result: parsing was successful or not
-#! @output return_code: '0' if parsing was successful, '-1' otherwise
+#! @output return_code: will be '0' if parsing was successful, '-1' otherwise
 #! @output error_message: error message if there was an error when executing,
 #!                        empty otherwise
 #!
 #! @result SUCCESS: parsing was successful (return_code == '0')
-#! @result FAILURE: otherwise
+# @result FAILURE: otherwise
 #!!#
 ########################################################################################################################sdfdf
 #!#! comment

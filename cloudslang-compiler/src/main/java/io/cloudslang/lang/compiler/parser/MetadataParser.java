@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
+import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -28,26 +29,27 @@ import java.util.regex.Pattern;
 
 public class MetadataParser {
 
-    private static final String PREFIX = "#!";
+    public static final String PREFIX = "#!";
     private static final int BEGIN_INDEX = 3;
-    private static final String BLOCK_END_TAG = "#!!#";
-    private static final String BLOCK_START_TAG = "#!!";
+    public static final String BLOCK_END_TAG = "#!!#";
+    public static final String BLOCK_START_TAG = "#!!";
     private static final String COLON = ":";
-    private static final String DESCRIPTION_DELIMITER_LINE = "#######################################" +
-            "#################################################################################";
+
 
     private ParserExceptionHandler parserExceptionHandler;
+    private MetadataValidator metadataValidator;
 
     public Map<String, String> parse(SlangSource source) {
         Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
         try {
+            metadataValidator.validate(source);
             String description = extractDescriptionString(source);
             Map<String, String> tagMap = extractTagMap(description);
             checkMapOrder(tagMap);
             return tagMap;
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
-                    source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+                    source.getName() + "." + System.lineSeparator() + parserExceptionHandler.getErrorMessage(e), e);
         }
     }
 
@@ -135,34 +137,26 @@ public class MetadataParser {
         boolean blockEndTagFound = false;
         boolean blockStartTagFound = false;
         String lineWithBlockStartTag = "";
-        String lineBeforeBlockStartTag = "";
-        String lineAfterBlockEndTag = "";
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getContent()))) {
             String line = getTrimmedLine(reader);
-            String previousLine = line;
             while (line != null) {
                 if (line.startsWith(BLOCK_END_TAG)) {
                     blockEndTagFound = true;
-                    lineAfterBlockEndTag = getTrimmedLine(reader);
                     break;
                 } else if (line.startsWith(BLOCK_START_TAG)) {
                     blockStartTagFound = true;
-                    lineBeforeBlockStartTag = previousLine;
                     lineWithBlockStartTag = line;
                     line = getTrimmedLine(reader);
                     if (line != null && line.startsWith(BLOCK_END_TAG)) {
                         blockEndTagFound = true;
-                        lineAfterBlockEndTag = getTrimmedLine(reader);
                         break;
                     }
                 }
 
                 appendValidLineToOutput(sb, blockStartTagFound, line);
-                previousLine = line;
                 line = getTrimmedLine(reader);
             }
-            checkStartingAndClosingTags(sb, lineWithBlockStartTag,
-                    lineBeforeBlockStartTag, lineAfterBlockEndTag, blockEndTagFound, blockStartTagFound);
+            checkStartingAndClosingTags(sb, lineWithBlockStartTag, blockEndTagFound, blockStartTagFound);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
@@ -181,19 +175,10 @@ public class MetadataParser {
         return line != null ? line.trim() : null;
     }
 
-    private void checkStartingAndClosingTags(StrBuilder sb, String lineWithBlockStartTag,
-                                             String lineBeforeBlockStartTag, String lineAfterBlockEndTag,
-                                             boolean blockEndTagFound, boolean blockStartTagFound) {
+    private void checkStartingAndClosingTags(StrBuilder sb, String lineWithBlockStartTag, boolean blockEndTagFound,
+                                             boolean blockStartTagFound) {
         if (lineWithBlockStartTag.length() > BLOCK_START_TAG.length()) {
             throw new RuntimeException("Description is not accepted on the same line as the starting tag.");
-        }
-        if (blockStartTagFound && !StringUtils.contains(lineBeforeBlockStartTag, DESCRIPTION_DELIMITER_LINE)) {
-            throw new RuntimeException("Before the description start tag there should be a line containing " +
-                    "'#' characters");
-        }
-        if (blockEndTagFound && !StringUtils.contains(lineAfterBlockEndTag, DESCRIPTION_DELIMITER_LINE)) {
-            throw new RuntimeException("After the description end tag there should be a line containing " +
-                    "'#' characters");
         }
         if (blockEndTagFound && !blockStartTagFound) {
             throw new RuntimeException("Starting tag missing in the description.");
@@ -205,5 +190,9 @@ public class MetadataParser {
 
     public void setParserExceptionHandler(ParserExceptionHandler parserExceptionHandler) {
         this.parserExceptionHandler = parserExceptionHandler;
+    }
+
+    public void setMetadataValidator(MetadataValidator metadataValidator) {
+        this.metadataValidator = metadataValidator;
     }
 }

@@ -124,6 +124,16 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractMetadataNewlineMissing() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Newline with metadata prefix missing '#!' in the " +
+                "description before the following line: ");
+        exception.expectMessage("#! @input json_input: JSON data input");
+        URI operation = getClass().getResource("/metadata/metadata_newline_missing.sl").toURI();
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    }
+
+    @Test
     public void testExtractMetadataWrongOrder() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
         exception.expect(RuntimeException.class);

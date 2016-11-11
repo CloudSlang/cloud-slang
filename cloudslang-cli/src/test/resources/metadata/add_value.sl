@@ -9,9 +9,11 @@
 #!!
 #! @description: Adds or replaces a value to the given JSON at the keys or indices represented by the json_path.
 #!               If the last key in the path does not exist, the key is added as well.
+#!
 #! @input json_input: JSON data input - Example: '{"k1": {"k2": ["v1", "v2"]}}'
 #! @input json_path: path at which to add value represented as a list of keys and/or indices - Example: ["k1","k2",1]
 #! @input value: value to associate with key - Example: "v3"
+#!
 #! @output json_output: JSON with key:value added
 #! @output return_result: parsing was successful or not
 #! @output return_code: "0" if parsing was successful, "-1" otherwise

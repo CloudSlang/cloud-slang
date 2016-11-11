@@ -42,6 +42,7 @@ import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.modeller.transformers.WorkFlowTransformer;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionPlanBuilder;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionStepFactory;
@@ -167,7 +168,13 @@ public class SlangCompilerSpringConfig {
     public MetadataParser metadataParser() {
         MetadataParser metadataParser = new MetadataParser();
         metadataParser.setParserExceptionHandler(parserExceptionHandler());
+        metadataParser.setMetadataValidator(metadataValidator());
         return metadataParser;
+    }
+
+    @Bean
+    public MetadataValidator metadataValidator() {
+        return new MetadataValidator();
     }
 
     @Bean
