@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.compiler.caching;
 
 import io.cloudslang.lang.compiler.SlangSource;
@@ -31,27 +40,28 @@ public class CachedPrecompileServiceImplTest {
         Executable executableMock = mock(Executable.class);
         ExecutableModellingResult executableModellingResult =
                 new ExecutableModellingResult(executableMock, new ArrayList<RuntimeException>());
-        SlangSource slangSource_1 = new SlangSource("abc", "one");
-        SlangSource slangSource_2 = new SlangSource("def", "two");
+        SlangSource slangSource1 = new SlangSource("abc", "one");
 
         CacheResult cacheResult;
 
-        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource_1);
+        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource1);
         assertEquals(CacheValueState.MISSING, cacheResult.getState());
 
-        cachedPrecompileService.cacheValue(path, executableModellingResult, slangSource_1);
-        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource_1);
+        cachedPrecompileService.cacheValue(path, executableModellingResult, slangSource1);
+        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource1);
         assertEquals(CacheValueState.VALID, cacheResult.getState());
 
-        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource_2);
+        SlangSource slangSource2 = new SlangSource("def", "two");
+
+        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource2);
         assertEquals(CacheValueState.OUTDATED, cacheResult.getState());
 
-        cachedPrecompileService.cacheValue(path, executableModellingResult, slangSource_2);
-        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource_2);
+        cachedPrecompileService.cacheValue(path, executableModellingResult, slangSource2);
+        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource2);
         assertEquals(CacheValueState.VALID, cacheResult.getState());
 
         cachedPrecompileService.invalidateAll();
-        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource_2);
+        cacheResult = cachedPrecompileService.getValueFromCache(path, slangSource2);
         assertEquals(CacheValueState.MISSING, cacheResult.getState());
     }
 

@@ -104,7 +104,7 @@ public interface SlangCompiler {
      * @param source             the {@link SlangSource}
      * @param precompileStrategy whether to use caching in pre-compile.
      * @return an {@link ExecutableModellingResult} object, containing an executable which is either a flow
-     * or an operations in the file, and a list of all the errors that were found (if any).
+     *     or an operations in the file, and a list of all the errors that were found (if any).
      */
     ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy);
 
