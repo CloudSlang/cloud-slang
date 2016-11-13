@@ -18,10 +18,21 @@ import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.commons.services.impl.SlangCompilationServiceImpl;
 import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
+import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.fusesource.jansi.Ansi;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -42,17 +53,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Matchers.any;
@@ -138,22 +138,23 @@ public class CompilerHelperTest {
                 newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
-                )
+                ),
+                PrecompileStrategy.WITH_CACHE
         );
         InOrder inOrderConsolePrinter = inOrder(consolePrinter);
         inOrderConsolePrinter.verify(consolePrinter, times(2)).printWithColor(any(Ansi.Color.class), anyString());
         inOrderConsolePrinter.verify(consolePrinter).waitForAllPrintTasksToFinish();
         inOrderConsolePrinter.verifyNoMoreInteractions();
         InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang).enablePrecompileCache();
         inOrder.verify(slang, atLeastOnce()).compileSource(
                 SlangSource.fromFile(flowPath),
                 newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
-                )
+                ),
+                PrecompileStrategy.WITH_CACHE
         );
-        inOrder.verify(slang).disablePrecompileCache();
+        inOrder.verify(slang).invalidateAllInPreCompileCache();
         inOrder.verifyNoMoreInteractions();
     }
 

@@ -9,6 +9,9 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.caching.CacheResult;
+import io.cloudslang.lang.compiler.caching.CacheValueState;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileService;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
@@ -30,7 +33,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -81,7 +83,6 @@ public class CompileOperationTest {
         assertNotNull("results don't exist", results);
 
     }
-
 
     @Test
     public void testPreCompileOperationBasic() throws Exception {
@@ -167,20 +168,22 @@ public class CompileOperationTest {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
         SlangSource slangSource = SlangSource.fromFile(resource.toURI());
 
-        compiler.enablePrecompileCache();
-
         CompilationModellingResult result = compiler.compileSource(slangSource, null);
         assertEquals("The compilation result should have one error", 1, result.getErrors().size());
         assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
                 result.getErrors().get(0).getMessage());
 
-        assertNotNull("Cache should contain the ExecutableModellingResult before cache cleanUp",
-                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+        assertNotNull("Cache should contain the ExecutableModellingResult before cache invalidateAllInPreCompileCache",
+                cachedPrecompileService.getValueFromCache(slangSource.getFilePath(), slangSource));
 
-        compiler.cleanUp();
+        compiler.invalidateAllInPreCompileCache();
 
-        assertNull("Cache should not contain the ExecutableModellingResult after cache cleanUp",
-                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+        CacheResult cacheResult = cachedPrecompileService.getValueFromCache(slangSource.getFilePath(), slangSource);
+        assertEquals(
+                "Cache should not contain the ExecutableModellingResult after cache invalidateAllInPreCompileCache",
+                CacheValueState.MISSING,
+                cacheResult.getState()
+        );
     }
 
     @Test
@@ -193,33 +196,12 @@ public class CompileOperationTest {
         assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
                 result.getErrors().get(0).getMessage());
 
-        assertNull("Cache should not contain the ExecutableModellingResult after cache cleanUp",
-                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
+        CacheResult cacheResult = cachedPrecompileService.getValueFromCache(slangSource.getFilePath(), slangSource);
+        assertEquals(
+                "Cache should not contain the ExecutableModellingResult after cache invalidateAllInPreCompileCache",
+                CacheValueState.MISSING,
+                cacheResult.getState()
+        );
     }
 
-    @Test
-    public void testPrecompileCacheEnableDisable() throws Exception {
-        URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
-        SlangSource slangSource = SlangSource.fromFile(resource.toURI());
-
-        compiler.enablePrecompileCache();
-
-        CompilationModellingResult result = compiler.compileSource(slangSource, null);
-        assertEquals("The compilation result should have one error", 1, result.getErrors().size());
-        assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
-                result.getErrors().get(0).getMessage());
-
-        assertNotNull("Cache should contain the ExecutableModellingResult before cache cleanUp",
-                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
-
-        compiler.disablePrecompileCache();
-
-        result = compiler.compileSource(slangSource, null);
-        assertEquals("The compilation result should have one error", 1, result.getErrors().size());
-        assertEquals("Wrong error message", "For source[op_without_namespace.sl] namespace cannot be empty.",
-                result.getErrors().get(0).getMessage());
-
-        assertNull("Cache should not contain the ExecutableModellingResult after cache cleanUp",
-                cachedPrecompileService.getValueFromCache(slangSource.getFilePath()));
-    }
 }

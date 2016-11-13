@@ -11,6 +11,7 @@ package io.cloudslang.lang.api;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.MetadataExtractor;
+import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
@@ -27,14 +28,12 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,11 +103,14 @@ public class SlangImplTest {
     @Test
     public void testCompile() throws IOException {
         SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
-                .thenReturn(emptyCompilationArtifact);
+        Mockito.when(
+                compiler.compile(any(SlangSource.class),
+                        anySetOf(SlangSource.class),
+                        any(PrecompileStrategy.class))
+        ).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, new HashSet<SlangSource>());
         Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>());
+        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>(), PrecompileStrategy.WITHOUT_CACHE);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -124,11 +126,14 @@ public class SlangImplTest {
     @Test
     public void testCompileWithNullDependencies() throws IOException {
         SlangSource tempFile = createTempFile();
-        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
-                .thenReturn(emptyCompilationArtifact);
+        Mockito.when(
+                compiler.compile(any(SlangSource.class),
+                        anySetOf(SlangSource.class),
+                        any(PrecompileStrategy.class))
+        ).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, null);
         Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>());
+        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>(), PrecompileStrategy.WITHOUT_CACHE);
     }
 
     @Test
@@ -138,18 +143,23 @@ public class SlangImplTest {
         tempDependencyFile.deleteOnExit();
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(tempDependencyFile));
-        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
+        Mockito.when(
+                compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class), any(PrecompileStrategy.class)))
                 .thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, dependencies);
         Assert.assertNotNull(compilationArtifact);
         Set<SlangSource> dependencyFiles = new HashSet<>();
         dependencyFiles.add(SlangSource.fromFile(tempDependencyFile));
-        Mockito.verify(compiler).compile(tempFile, dependencyFiles);
+        Mockito.verify(compiler).compile(tempFile, dependencyFiles, PrecompileStrategy.WITHOUT_CACHE);
     }
 
     @Test(expected = Exception.class)
     public void testCompileOperationWithException() throws IOException {
-        Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class))).thenThrow(Exception.class);
+        Mockito.when(
+                compiler.compile(any(SlangSource.class),
+                        anySetOf(SlangSource.class),
+                        any(PrecompileStrategy.class))
+        ).thenThrow(Exception.class);
         SlangSource tempFile = createTempFile();
         slang.compile(tempFile, new HashSet<SlangSource>());
     }

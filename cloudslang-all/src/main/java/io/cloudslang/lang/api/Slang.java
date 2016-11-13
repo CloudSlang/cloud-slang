@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.api;
 
+import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
@@ -16,7 +17,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.events.ScoreEventListener;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -29,22 +29,27 @@ import java.util.Set;
  */
 public interface Slang {
 
+    /**
+     * Compile a CloudSlang source
+     *
+     * @param source the CloudSlang source file
+     * @param dependencies  a set of CloudSlang sources containing the source dependencies
+     * @return the model (may be partially correct) and the accumulated errors
+     */
     CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies);
 
     /**
-     * Enable and clean up the precompile cache.
+     * Compile a CloudSlang source
+     *
+     * @param source the CloudSlang source file
+     * @param dependencies  a set of CloudSlang sources containing the source dependencies
+     * @param precompileStrategy with / without cache
+     * @return the model (may be partially correct) and the accumulated errors
      */
-    void enablePrecompileCache();
-
-    /**
-     * Disable and clean up the precompile cache.
-     */
-    void disablePrecompileCache();
-
-    /**
-     * Clean up the precompile cache.
-     */
-    void compileCleanUp();
+    CompilationModellingResult compileSource(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            PrecompileStrategy precompileStrategy);
 
     /**
      * Extract the metadata of a flow or operation written in CloudSlang
@@ -62,6 +67,24 @@ public interface Slang {
      * @return the compiled artifact of the flow
      */
     CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies);
+
+    /**
+     * Compile a flow or operation written in CloudSlang
+     *
+     * @param source             the CloudSlang source containing the flow
+     * @param dependencies       a set of CloudSlang sources of of all the flow or operation's dependencies
+     * @param precompileStrategy with / without cache
+     * @return
+     */
+    CompilationArtifact compile(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            PrecompileStrategy precompileStrategy);
+
+    /**
+     * Remove all elements in pre-compile cache. No-cached calls are not affected.
+     */
+    void invalidateAllInPreCompileCache();
 
     /**
      * Run a flow or operation written in CloudSlang already compiled to a compilationArtifact

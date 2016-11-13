@@ -10,13 +10,11 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -32,7 +30,6 @@ public class SlangSource {
 
     public SlangSource(String content, String name) {
         Validate.notNull(content, "Source cannot be null");
-
         this.content = content;
         this.name = name;
         this.filePath = null;
