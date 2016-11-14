@@ -40,7 +40,7 @@ public interface CachedPrecompileService {
      *
      * @param path the key for caching: path from source
      */
-    void invalidate(String path);
+    void invalidateEntry(String path);
 
     /**
      * Remove all cached values.

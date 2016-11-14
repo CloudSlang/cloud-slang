@@ -50,7 +50,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.eq;
 
 /**
  * User: stoneo
@@ -110,7 +110,8 @@ public class SlangImplTest {
         ).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, new HashSet<SlangSource>());
         Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>(), PrecompileStrategy.WITHOUT_CACHE);
+        Mockito.verify(compiler)
+                .compile(eq(tempFile), eq(new HashSet<SlangSource>()), eq(PrecompileStrategy.WITHOUT_CACHE));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -133,7 +134,8 @@ public class SlangImplTest {
         ).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, null);
         Assert.assertNotNull(compilationArtifact);
-        Mockito.verify(compiler).compile(tempFile, new HashSet<SlangSource>(), PrecompileStrategy.WITHOUT_CACHE);
+        Mockito.verify(compiler)
+                .compile(eq(tempFile), eq(new HashSet<SlangSource>()), eq(PrecompileStrategy.WITHOUT_CACHE));
     }
 
     @Test
@@ -150,7 +152,7 @@ public class SlangImplTest {
         Assert.assertNotNull(compilationArtifact);
         Set<SlangSource> dependencyFiles = new HashSet<>();
         dependencyFiles.add(SlangSource.fromFile(tempDependencyFile));
-        Mockito.verify(compiler).compile(tempFile, dependencyFiles, PrecompileStrategy.WITHOUT_CACHE);
+        Mockito.verify(compiler).compile(eq(tempFile), eq(dependencyFiles), eq(PrecompileStrategy.WITHOUT_CACHE));
     }
 
     @Test(expected = Exception.class)

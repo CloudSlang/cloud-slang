@@ -150,20 +150,20 @@ public class SlangCompilerImpl implements SlangCompiler {
     @Override
     public ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy) {
         Validate.notNull(source, "You must supply a source to compile");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
+
         final String filePath = source.getFilePath();
 
         // handle caching
-        CacheResult cacheResult = handleStrategyBeforeModelling(source, precompileStrategy, filePath);
-        if (cacheResult != null) {
-            if (isValidCachedValue(cacheResult)) {
-                return cacheResult.getExecutableModellingResult();
-            }
+        CacheResult cacheResult = precompileCachePreExecute(source, precompileStrategy, filePath);
+        if (cacheResult != null && isValidCachedValue(cacheResult)) {
+            return cacheResult.getExecutableModellingResult();
         }
 
         ExecutableModellingResult executableModellingResult = preCompileModel(source);
 
         // handle caching
-        handleStrategyAfterModelling(source, precompileStrategy, filePath, executableModellingResult);
+        precompileCachePostExecute(source, precompileStrategy, filePath, executableModellingResult);
 
         return executableModellingResult;
     }
@@ -194,7 +194,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         return extractProperties(parseModellingResult.getParsedSlang(), source, parseModellingResult.getErrors());
     }
 
-    private void handleStrategyAfterModelling(
+    private void precompileCachePostExecute(
             SlangSource source,
             PrecompileStrategy precompileStrategy,
             String filePath,
@@ -210,7 +210,7 @@ public class SlangCompilerImpl implements SlangCompiler {
         }
     }
 
-    private CacheResult handleStrategyBeforeModelling(
+    private CacheResult precompileCachePreExecute(
             SlangSource source,
             PrecompileStrategy precompileStrategy,
             String filePath) {

@@ -51,8 +51,7 @@ public class CachedPrecompileServiceImpl implements CachedPrecompileService {
         if (cachedValue == null) {
             state = CacheValueState.MISSING;
         } else {
-            SlangSource cachedSource = cachedValue.getSource();
-            if (hasChangedSinceCached(currentSource, cachedSource)) {
+            if (hasChangedSinceCached(currentSource, cachedValue.getSource())) {
                 state = CacheValueState.OUTDATED;
             } else {
                 state = CacheValueState.VALID;
@@ -63,8 +62,8 @@ public class CachedPrecompileServiceImpl implements CachedPrecompileService {
     }
 
     @Override
-    public void invalidate(String path) {
-        if (!(path == null)) {
+    public void invalidateEntry(String path) {
+        if (path != null) {
             cache.invalidate(path);
         }
     }

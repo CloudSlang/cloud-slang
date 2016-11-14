@@ -66,6 +66,7 @@ public class SlangImpl implements Slang {
             Set<SlangSource> dependencies,
             PrecompileStrategy precompileStrategy) {
         Validate.notNull(source, "Source can not be null");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
         Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
@@ -92,6 +93,7 @@ public class SlangImpl implements Slang {
             Set<SlangSource> dependencies,
             PrecompileStrategy precompileStrategy) {
         Validate.notNull(source, "Source can not be null");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
         Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
