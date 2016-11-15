@@ -73,7 +73,7 @@ public class CachedPrecompileServiceImpl implements CachedPrecompileService {
         cache.invalidateAll();
     }
 
-    private boolean hasChangedSinceCached(SlangSource source1, SlangSource source2) {
+    boolean hasChangedSinceCached(SlangSource source1, SlangSource source2) {
         String source1AsStr = source1.toString();
         String source2AsStr = source2.toString();
         return (source1AsStr.length() != source2AsStr.length()) ||
