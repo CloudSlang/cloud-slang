@@ -39,12 +39,8 @@ public class EncryptionProvider {
         Encryption[] encryptors;
         try {
             encryptors = SlangEntitiesSpringConfig.getEncryptors();
-        } catch (Exception theGivenEx) {
-            if (!StringUtils.containsIgnoreCase(theGivenEx.getMessage(), APPLICATION_CONTEXT_BEAN_MISSING)) {
-                return new DummyEncryptor(); // IntelliJ Plugin case
-            }
-            throw theGivenEx;
-
+        } catch (NoClassDefFoundError theGivenEx) {
+            return new DummyEncryptor(); // IntelliJ Plugin case
         }
         if (encryptors.length == 0) {
             throw new RuntimeException("No encryptors found");

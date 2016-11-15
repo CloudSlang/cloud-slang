@@ -11,7 +11,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
-
+import io.cloudslang.lang.entities.CompilationArtifact;
 import java.util.List;
 import java.util.Set;
 
@@ -32,12 +32,24 @@ public interface ScoreCompiler {
     /**
      * Compile an {@link io.cloudslang.lang.compiler.modeller.model.Executable} and its path
      * to a {@link io.cloudslang.lang.entities.CompilationArtifact} object
+     * Fails by throwing the first exception from the accumulated exceptions.
      *
      * @param source the {@link Executable} source
      * @param path   a set of {@link Executable}s containing the source dependencies
      * @return the compiled {@link io.cloudslang.lang.entities.CompilationArtifact}
      */
-    CompilationModellingResult compile(Executable source, Set<Executable> path);
+    CompilationArtifact compile(Executable source, Set<Executable> path);
+
+    /**
+     * Compile an {@link io.cloudslang.lang.compiler.modeller.model.Executable} and its path
+     * to a {@link io.cloudslang.lang.entities.CompilationArtifact} object.
+     * Does not fail but returns all the accumulated exceptions.
+     *
+     * @param source the {@link Executable} source
+     * @param path   a set of {@link Executable}s containing the source dependencies
+     * @return modelling resutl containing the compiled {@link io.cloudslang.lang.entities.CompilationArtifact}
+     */
+    CompilationModellingResult compileSource(Executable source, Set<Executable> path);
 
     /**
      * Validate that the given {@Link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding
