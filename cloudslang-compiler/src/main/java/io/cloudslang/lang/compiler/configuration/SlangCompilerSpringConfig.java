@@ -11,11 +11,12 @@ package io.cloudslang.lang.compiler.configuration;
 
 
 import configuration.SlangEntitiesSpringConfig;
-import io.cloudslang.lang.compiler.CachedPrecompileService;
 import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.MetadataExtractorImpl;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangCompilerImpl;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileService;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileServiceImpl;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.compiler.modeller.MetadataModeller;
@@ -56,6 +57,8 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -63,9 +66,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 @ComponentScan("io.cloudslang.lang.compiler")
@@ -100,7 +100,7 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public CachedPrecompileService cachedPrecompileService() {
-        return new CachedPrecompileService();
+        return new CachedPrecompileServiceImpl();
     }
 
     @Bean

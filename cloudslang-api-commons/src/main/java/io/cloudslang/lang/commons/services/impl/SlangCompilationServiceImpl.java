@@ -13,8 +13,15 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.CompilationHelper;
 import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.compiler.Extension;
+import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -22,13 +29,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class SlangCompilationServiceImpl implements SlangCompilationService {
@@ -48,7 +48,8 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
                 File file = getFile(dependencySource.getFilePath());
                 compilationHelper.onEveryFile(file);
                 try {
-                    CompilationModellingResult result = slang.compileSource(dependencySource, dependencySources);
+                    CompilationModellingResult result =
+                            slang.compileSource(dependencySource, dependencySources, PrecompileStrategy.WITH_CACHE);
                     result.setFile(file);
                     results.add(result);
                 } catch (Exception e) {
@@ -58,7 +59,7 @@ public class SlangCompilationServiceImpl implements SlangCompilationService {
             }
         } finally {
             compilationHelper.onCompilationFinish();
-            slang.compileCleanUp();
+            slang.invalidateAllInPreCompileCache();
         }
         return results;
     }

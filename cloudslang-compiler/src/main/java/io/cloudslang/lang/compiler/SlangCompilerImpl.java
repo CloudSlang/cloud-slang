@@ -9,6 +9,9 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
+import io.cloudslang.lang.compiler.caching.CacheResult;
+import io.cloudslang.lang.compiler.caching.CacheValueState;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileService;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
@@ -34,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.NotImplementedException;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -70,7 +74,15 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencySources) {
-        CompilationModellingResult result = compileSource(source, dependencySources);
+        return compile(source, dependencySources, PrecompileStrategy.WITHOUT_CACHE);
+    }
+
+    @Override
+    public CompilationArtifact compile(
+            SlangSource source,
+            Set<SlangSource> path,
+            PrecompileStrategy precompileStrategy) {
+        CompilationModellingResult result = compileSource(source, path, precompileStrategy);
         if (result.getErrors().size() > 0) {
             throw result.getErrors().get(0);
         }
@@ -79,16 +91,24 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencySources) {
-        ExecutableModellingResult executableModellingResult = preCompileSource(source);
+        return compileSource(source, dependencySources, PrecompileStrategy.WITHOUT_CACHE);
+    }
+
+    @Override
+    public CompilationModellingResult compileSource(
+            SlangSource source,
+            Set<SlangSource> path,
+            PrecompileStrategy precompileStrategy) {
+        ExecutableModellingResult executableModellingResult = preCompileSource(source, precompileStrategy);
         List<RuntimeException> errors = executableModellingResult.getErrors();
 
         // we transform also all of the files in the given dependency sources to model objects
         Map<Executable, SlangSource> executablePairs = new HashMap<>();
         executablePairs.put(executableModellingResult.getExecutable(), source);
 
-        if (CollectionUtils.isNotEmpty(dependencySources)) {
-            for (SlangSource currentSource : dependencySources) {
-                ExecutableModellingResult result = preCompileSource(currentSource);
+        if (CollectionUtils.isNotEmpty(path)) {
+            for (SlangSource currentSource : path) {
+                ExecutableModellingResult result = preCompileSource(currentSource, precompileStrategy);
                 Executable preCompiledCurrentSource = result.getExecutable();
                 errors.addAll(result.getErrors());
 
@@ -109,13 +129,13 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
-    public void cleanUp() {
-        cachedPrecompileService.cleanUp();
+    public Executable preCompile(SlangSource source) {
+        return preCompile(source, PrecompileStrategy.WITHOUT_CACHE);
     }
 
     @Override
-    public Executable preCompile(SlangSource source) {
-        ExecutableModellingResult result = preCompileSource(source);
+    public Executable preCompile(SlangSource source, PrecompileStrategy precompileStrategy) {
+        ExecutableModellingResult result = preCompileSource(source, precompileStrategy);
         if (result.getErrors().size() > 0) {
             throw result.getErrors().get(0);
         }
@@ -124,21 +144,33 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public ExecutableModellingResult preCompileSource(SlangSource source) {
+        return preCompileSource(source, PrecompileStrategy.WITHOUT_CACHE);
+    }
+
+    @Override
+    public ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy) {
         Validate.notNull(source, "You must supply a source to compile");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
+
         final String filePath = source.getFilePath();
-        ExecutableModellingResult result = cachedPrecompileService.getValueFromCache(filePath);
-        if (result != null) {
-            return result;
+
+        // handle caching
+        CacheResult cacheResult = precompileCachePreExecute(source, precompileStrategy, filePath);
+        if (cacheResult != null && isValidCachedValue(cacheResult)) {
+            return cacheResult.getExecutableModellingResult();
         }
 
-        //first thing we parse the yaml file into java maps
-        ParsedSlang parsedSlang = yamlParser.parse(source);
-        ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
+        ExecutableModellingResult executableModellingResult = preCompileModel(source);
 
-        // Then we transform the parsed Slang source to a Slang model
-        result = slangModeller.createModel(parseModellingResult);
-        cachedPrecompileService.cacheResult(filePath, result);
-        return result;
+        // handle caching
+        precompileCachePostExecute(source, precompileStrategy, filePath, executableModellingResult);
+
+        return executableModellingResult;
+    }
+
+    @Override
+    public void invalidateAllInPreCompileCache() {
+        cachedPrecompileService.invalidateAll();
     }
 
     @Override
@@ -160,6 +192,65 @@ public class SlangCompilerImpl implements SlangCompiler {
     public SystemPropertyModellingResult loadSystemPropertiesFromSource(SlangSource source) {
         ParseModellingResult parseModellingResult = parseSystemPropertiesFile(source);
         return extractProperties(parseModellingResult.getParsedSlang(), source, parseModellingResult.getErrors());
+    }
+
+    private void precompileCachePostExecute(
+            SlangSource source,
+            PrecompileStrategy precompileStrategy,
+            String filePath,
+            ExecutableModellingResult executableModellingResult) {
+        switch (precompileStrategy) {
+            case WITH_CACHE:
+                cachedPrecompileService.cacheValue(filePath, executableModellingResult, source);
+                break;
+            case WITHOUT_CACHE:
+                break;
+            default:
+                throw new NotImplementedException(generatePreCompileTypeErrorMessage(precompileStrategy));
+        }
+    }
+
+    private CacheResult precompileCachePreExecute(
+            SlangSource source,
+            PrecompileStrategy precompileStrategy,
+            String filePath) {
+        CacheResult cacheResult = null;
+        switch (precompileStrategy) {
+            case WITH_CACHE:
+                cacheResult = cachedPrecompileService.getValueFromCache(filePath, source);
+                break;
+            case WITHOUT_CACHE:
+                break;
+            default:
+                throw new NotImplementedException(generatePreCompileTypeErrorMessage(precompileStrategy));
+        }
+        return cacheResult;
+    }
+
+    private String generatePreCompileTypeErrorMessage(PrecompileStrategy precompileStrategy) {
+        return "Precompile type[" + precompileStrategy + "] not yet implemented";
+    }
+
+    private ExecutableModellingResult preCompileModel(SlangSource source) {
+        //first thing we parse the yaml file into java maps
+        ParsedSlang parsedSlang = yamlParser.parse(source);
+        ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
+
+        // Then we transform the parsed Slang source to a Slang model
+        return slangModeller.createModel(parseModellingResult);
+    }
+
+    private boolean isValidCachedValue(CacheResult cacheResult) {
+        CacheValueState cacheValueState = cacheResult.getState();
+        switch (cacheValueState) {
+            case VALID:
+                return true;
+            case MISSING:
+            case OUTDATED:
+                return false;
+            default:
+                throw new NotImplementedException("Cache value state[" + cacheValueState + "] not yet implemented");
+        }
     }
 
     private ParseModellingResult parseSystemPropertiesFile(SlangSource source) {

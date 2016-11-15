@@ -81,26 +81,17 @@ public class CompilerHelperImpl implements CompilerHelper {
         } catch (Exception e) {
             handleException(file, e);
             return null;
-        } finally {
-            slang.compileCleanUp();
         }
     }
 
     @Override
     public CompilationModellingResult compileSource(String filePath, List<String> dependencies) {
         File file = slangCompilationService.getFile(filePath);
-        Set<SlangSource> dependencySources = getDependencySources(dependencies, file);
-        return compileSource(file, dependencySources);
-    }
-
-    private CompilationModellingResult compileSource(File file, Set<SlangSource> dependencySources) {
         try {
-            return slang.compileSource(SlangSource.fromFile(file), dependencySources);
+            return slang.compileSource(SlangSource.fromFile(file), getDependencySources(dependencies, file));
         } catch (Exception e) {
             handleException(file, e);
             return null;
-        } finally {
-            slang.compileCleanUp();
         }
     }
 

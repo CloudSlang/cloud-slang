@@ -10,6 +10,8 @@
 package io.cloudslang.lang.compiler;
 
 import com.google.common.collect.Sets;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileService;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileServiceImpl;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -20,6 +22,11 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.entities.SystemProperty;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,13 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.yaml.snakeyaml.Yaml;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -160,7 +160,7 @@ public class SlangCompilerImplTest {
 
         @Bean
         public CachedPrecompileService cachePrecompileService() {
-            return new CachedPrecompileService();
+            return new CachedPrecompileServiceImpl();
         }
 
         @Bean

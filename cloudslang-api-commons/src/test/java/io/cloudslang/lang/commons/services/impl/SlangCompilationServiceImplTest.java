@@ -12,7 +12,14 @@ package io.cloudslang.lang.commons.services.impl;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.commons.services.api.CompilationHelper;
 import io.cloudslang.lang.commons.services.api.SlangCompilationService;
+import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangSource;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -22,16 +29,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeast;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -73,14 +74,14 @@ public class SlangCompilationServiceImplTest {
         verify(compilationHelper).onEveryFile(file4);
 
         InOrder inOrderHelper = inOrder(compilationHelper);
-        inOrderHelper.verify(compilationHelper, atLeast(1)).onEveryFile(any(File.class));
+        inOrderHelper.verify(compilationHelper, atLeastOnce()).onEveryFile(any(File.class));
         inOrderHelper.verify(compilationHelper).onCompilationFinish();
         inOrderHelper.verifyNoMoreInteractions();
 
         InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang, atLeast(1)).compileSource(
-                any(SlangSource.class), any(Set.class));
-        inOrder.verify(slang).compileCleanUp();
+        inOrder.verify(slang, atLeastOnce()).compileSource(
+                any(SlangSource.class), any(Set.class), eq(PrecompileStrategy.WITH_CACHE));
+        inOrder.verify(slang).invalidateAllInPreCompileCache();
         inOrder.verifyNoMoreInteractions();
     }
 

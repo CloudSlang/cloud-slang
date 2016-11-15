@@ -10,6 +10,7 @@
 package io.cloudslang.lang.api;
 
 import io.cloudslang.lang.compiler.MetadataExtractor;
+import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
@@ -24,15 +25,14 @@ import io.cloudslang.score.api.TriggeringProperties;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEventListener;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author stoneo
@@ -57,12 +57,20 @@ public class SlangImpl implements Slang {
 
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies) {
+        return compile(source, dependencies, PrecompileStrategy.WITHOUT_CACHE);
+    }
 
+    @Override
+    public CompilationArtifact compile(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            PrecompileStrategy precompileStrategy) {
         Validate.notNull(source, "Source can not be null");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
         Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
-            return compiler.compile(source, dependencySources);
+            return compiler.compile(source, dependencySources, precompileStrategy);
         } catch (Exception e) {
             logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException(e);
@@ -70,23 +78,31 @@ public class SlangImpl implements Slang {
     }
 
     @Override
-    public CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies) {
+    public void invalidateAllInPreCompileCache() {
+        compiler.invalidateAllInPreCompileCache();
+    }
 
+    @Override
+    public CompilationModellingResult compileSource(SlangSource source, Set<SlangSource> dependencies) {
+        return compileSource(source, dependencies, PrecompileStrategy.WITHOUT_CACHE);
+    }
+
+    @Override
+    public CompilationModellingResult compileSource(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            PrecompileStrategy precompileStrategy) {
         Validate.notNull(source, "Source can not be null");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
         Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
-            return compiler.compileSource(source, dependencySources);
+            return compiler.compileSource(source, dependencySources, precompileStrategy);
         } catch (Exception e) {
             logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException("Failed compilation for source : " + source.getName() +
                     " ,Exception is : " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public void compileCleanUp() {
-        compiler.cleanUp();
     }
 
     private Set<SlangSource> filterOutNullSources(Set<SlangSource> dependencies) {
@@ -126,7 +142,8 @@ public class SlangImpl implements Slang {
         executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
 
         executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) runInputs);
-        TriggeringProperties triggeringProperties = TriggeringProperties.create(compilationArtifact.getExecutionPlan())
+        TriggeringProperties triggeringProperties =
+                TriggeringProperties.create(compilationArtifact.getExecutionPlan())
                 .setDependencies(compilationArtifact.getDependencies())
                 .setContext(executionContext);
         return score.trigger(triggeringProperties);
