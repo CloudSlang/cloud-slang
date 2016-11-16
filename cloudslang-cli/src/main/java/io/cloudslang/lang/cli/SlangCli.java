@@ -23,17 +23,6 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -46,6 +35,15 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author lesant
@@ -150,9 +148,11 @@ public class SlangCli implements CommandMarker {
 
     @CliCommand(value = "compile", help = "Display compile errors for an executable")
     public String compileSource(
-            @CliOption(key = {"", "d", "directory"}, mandatory = false, help = FILE_HELP)
+            @CliOption(key = {"", "d", "directory"}, mandatory = false,
+                    help = "Path to directory. e.g. compile --d c:/.../your_directory")
             final List<String> directories,
-            @CliOption(key = {"", "f", "file"}, mandatory = false, help = FILE_HELP) final File file,
+            @CliOption(key = {"", "f", "file"}, mandatory = false,
+                    help = "Path to filename. e.g. compile --f c:/.../your_flow.sl") final File file,
             @CliOption(key = {"cp", "classpath"}, mandatory = false, help = CLASSPATH_HELP)
             final List<String> classPath
     ) {
