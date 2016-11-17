@@ -169,17 +169,21 @@ public class SlangCli implements CommandMarker {
     }
 
     private String printAllCompileErrors(List<CompilationModellingResult> results) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (CompilationModellingResult result : results) {
-            printCompileErrors(result.getErrors(), result.getFile(), stringBuilder);
-            stringBuilder.append(System.lineSeparator());
+        if (results.size() > 0) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (CompilationModellingResult result : results) {
+                printCompileErrors(result.getErrors(), result.getFile(), stringBuilder);
+                stringBuilder.append(System.lineSeparator());
+            }
+            return stringBuilder.toString();
+        } else {
+            return "No files were found to compile.";
         }
-        return stringBuilder.toString();
     }
 
     private String printCompileErrors(List<RuntimeException> exceptions, File file, StringBuilder stringBuilder) {
         if (exceptions.size() > 0) {
-            stringBuilder.append("Following exceptions were found:" + System.lineSeparator());
+            stringBuilder.append("Following exceptions were found:").append(System.lineSeparator());
             for (RuntimeException exception : exceptions) {
                 stringBuilder.append("\t");
                 stringBuilder.append(exception.getClass());
@@ -189,7 +193,7 @@ public class SlangCli implements CommandMarker {
             }
             throw new RuntimeException(stringBuilder.toString());
         } else {
-            stringBuilder.append("Compilation was successful for " + file.getName());
+            stringBuilder.append("Compilation was successful for ").append(file.getName());
         }
         return StringUtils.trim(stringBuilder.toString());
     }
@@ -215,7 +219,7 @@ public class SlangCli implements CommandMarker {
         if (CollectionUtils.isEmpty(systemProperties)) {
             stringBuilder.append("No system properties found.");
         } else {
-            stringBuilder.append("Following system properties were loaded:" + System.lineSeparator());
+            stringBuilder.append("Following system properties were loaded:").append(System.lineSeparator());
             for (SystemProperty systemProperty : systemProperties) {
                 stringBuilder.append("\t");
                 stringBuilder.append(systemProperty.getFullyQualifiedName());

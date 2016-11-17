@@ -48,7 +48,9 @@ public class ConsolePrinterImpl implements ConsolePrinter, DisposableBean {
     @Override
     public synchronized void waitForAllPrintTasksToFinish() {
         try {
-            lastTask.get(1, TimeUnit.MINUTES);
+            if (lastTask != null) {
+                lastTask.get(1, TimeUnit.MINUTES);
+            }
         } catch (InterruptedException | ExecutionException | TimeoutException ignore) {
         }
     }
