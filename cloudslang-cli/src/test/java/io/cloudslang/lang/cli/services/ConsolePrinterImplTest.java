@@ -97,6 +97,14 @@ public class ConsolePrinterImplTest {
     }
 
     @Test
+    public void testWaitForAllPrintTasksToFinishNPENotThrown() {
+        ConsolePrinterImpl consolePrinter = new ConsolePrinterImpl();
+        consolePrinter.initialize();
+
+        consolePrinter.waitForAllPrintTasksToFinish();
+    }
+
+    @Test
     public void testConsolePrint() throws Exception {
         final List<Runnable> runnableList = new ArrayList<>();
         final MutableInt mutableInt = new MutableInt(0);
