@@ -97,7 +97,7 @@ public class ConsolePrinterImplTest {
     }
 
     @Test
-    public void testWaitForAllPrintTasksToFinishNPENotThrown() {
+    public void testNullPointerExceptionNotThrown() {
         ConsolePrinterImpl consolePrinter = new ConsolePrinterImpl();
         consolePrinter.initialize();
 
