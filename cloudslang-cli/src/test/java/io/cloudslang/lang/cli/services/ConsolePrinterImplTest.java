@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 public class ConsolePrinterImplTest {
 
     private static final String SINGLE_THREAD_EXECUTOR = "singleThreadExecutor";
+    public static final String LAST_TASK = "lastTask";
 
     @InjectMocks
     @Spy
@@ -97,9 +98,16 @@ public class ConsolePrinterImplTest {
     }
 
     @Test
-    public void testNullPointerExceptionNotThrown() {
+    public void testNullPointerExceptionNotThrown() throws NoSuchFieldException, IllegalAccessException {
         ConsolePrinterImpl consolePrinter = new ConsolePrinterImpl();
         consolePrinter.initialize();
+
+        Class<? extends ConsolePrinterImpl> consolePrinterClass = consolePrinter.getClass();
+        Field consolePrinterClassDeclaredField = consolePrinterClass.getDeclaredField(LAST_TASK);
+
+        consolePrinterClassDeclaredField.setAccessible(true);
+        Object lastTask = consolePrinterClassDeclaredField.get(consolePrinter);
+        assertNull(lastTask);
 
         consolePrinter.waitForAllPrintTasksToFinish();
     }
