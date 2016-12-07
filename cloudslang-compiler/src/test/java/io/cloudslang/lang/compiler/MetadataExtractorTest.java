@@ -107,7 +107,8 @@ public class MetadataExtractorTest {
     @Test
     public void testExtractMetadataBadInput() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_bad_input.sl").toURI();
-        MetadataModellingResult result = metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+        MetadataModellingResult result = metadataExtractor
+                .extractMetadataModellingResult(SlangSource.fromFile(operation));
 
         Metadata metadata = result.getMetadata();
 
