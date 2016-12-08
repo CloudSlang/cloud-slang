@@ -15,11 +15,18 @@ import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -28,10 +35,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -73,8 +76,15 @@ public class SlangContentVerifier {
                 Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() +
                         "\' must lead to a file");
                 SlangSource slangSource = SlangSource.fromFile(slangFile);
-                sourceModel = slangCompiler.preCompile(slangSource);
-                Metadata sourceMetadata = metadataExtractor.extractMetadata(slangSource);
+
+                ExecutableModellingResult preCompileResult = slangCompiler.preCompileSource(slangSource);
+                sourceModel = preCompileResult.getExecutable();
+                exceptions.addAll(preCompileResult.getErrors());
+
+                MetadataModellingResult metadataResult = metadataExtractor.extractMetadataModellingResult(slangSource);
+                Metadata sourceMetadata = metadataResult.getMetadata();
+                exceptions.addAll(metadataResult.getErrors());
+
                 if (sourceModel != null) {
                     staticValidator
                             .validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
