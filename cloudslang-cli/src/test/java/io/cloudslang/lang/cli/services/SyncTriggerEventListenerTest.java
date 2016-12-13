@@ -10,11 +10,6 @@
 package io.cloudslang.lang.cli.services;
 
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -26,6 +21,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.Mockito.mock;
+
 /**
  * Date: 2/26/2015
  *
@@ -35,22 +36,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = SyncTriggerEventListenerTest.Config.class)
 public class SyncTriggerEventListenerTest {
 
-    public static final String EXEC_START_PATH = "0";
-    public static final String FIRST_STEP_PATH = "0/1";
+    private static final String EXEC_START_PATH = "0";
 
-    public static final String RETURN_RESULT = "returnResult";
-    public static final String ERROR_MESSAGE = "errorMessage";
-    public static final String RESULT = "result";
-    public static final String LONG_RESULT = "result that is too long will be abbreviated so that it does not " +
+    private static final String RETURN_RESULT = "returnResult";
+    private static final String ERROR_MESSAGE = "errorMessage";
+    private static final String RESULT = "result";
+    private static final String LONG_RESULT = "result that is too long will be abbreviated so that it does not " +
             "affect CLI readability result that is too long will be abbreviated so that " +
             "it does not affect CLI readability";
-    public static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated " +
+    private static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated " +
             "so that it does not affect CLI readability result tha...";
 
-    LanguageEventData data;
-    Map<String, Serializable> outputs;
-    Map<String, Serializable> expectedFilteredOutputs;
-    Map<String, Serializable> actualFilteredOutputs;
+    private LanguageEventData data;
+    private Map<String, Serializable> outputs;
+    private Map<String, Serializable> expectedFilteredOutputs;
+    private Map<String, Serializable> actualFilteredOutputs;
 
     @Before
     public void before() throws Exception {
@@ -127,13 +127,14 @@ public class SyncTriggerEventListenerTest {
 
     @Test
     public void testExtractNotEmptyOutputs() throws InterruptedException {
-        outputs.put(ERROR_MESSAGE, StringUtils.EMPTY);
+        outputs.put(ERROR_MESSAGE, "error message");
         data.put(LanguageEventData.OUTPUTS, (Serializable) outputs);
         data.put(LanguageEventData.PATH, EXEC_START_PATH);
 
         actualFilteredOutputs = SyncTriggerEventListener.extractNotEmptyOutputs(data);
 
-        Assert.assertTrue("outputs different than expected", MapUtils.isEmpty(actualFilteredOutputs));
+        Assert.assertEquals(1, actualFilteredOutputs.size());
+        Assert.assertEquals("error message", actualFilteredOutputs.get(ERROR_MESSAGE));
     }
 
     @Configuration
@@ -146,7 +147,7 @@ public class SyncTriggerEventListenerTest {
 
         @Bean
         public ConsolePrinter consolePrinter() {
-            return new ConsolePrinterImpl();
+            return mock(ConsolePrinter.class);
         }
 
     }
