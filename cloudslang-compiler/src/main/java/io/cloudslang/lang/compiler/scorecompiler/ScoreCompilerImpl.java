@@ -33,28 +33,30 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.convertMap;
 
-/*
- * Created by stoneo on 2/2/2015.
- */
-@Component
+
 public class ScoreCompilerImpl implements ScoreCompiler {
 
-    @Autowired
     private ExecutionPlanBuilder executionPlanBuilder;
 
-    @Autowired
     private DependenciesHelper dependenciesHelper;
 
-    @Autowired
     private CompileValidator compileValidator;
 
     @Override
-    public CompilationModellingResult compile(Executable executable, Set<Executable> path) {
+    public CompilationArtifact compile(Executable source, Set<Executable> path) {
+        CompilationModellingResult compilationModellingResult = compileSource(source, path);
+        List<RuntimeException> errors = compilationModellingResult.getErrors();
+        if (CollectionUtils.isNotEmpty(errors)) {
+            throw errors.get(0);
+        }
+        return compilationModellingResult.getCompilationArtifact();
+    }
+
+    @Override
+    public CompilationModellingResult compileSource(Executable executable, Set<Executable> path) {
         List<RuntimeException> exceptions = new ArrayList<>();
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
@@ -185,4 +187,15 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         return result;
     }
 
+    public void setExecutionPlanBuilder(ExecutionPlanBuilder executionPlanBuilder) {
+        this.executionPlanBuilder = executionPlanBuilder;
+    }
+
+    public void setDependenciesHelper(DependenciesHelper dependenciesHelper) {
+        this.dependenciesHelper = dependenciesHelper;
+    }
+
+    public void setCompileValidator(CompileValidator compileValidator) {
+        this.compileValidator = compileValidator;
+    }
 }

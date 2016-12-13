@@ -23,18 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * User: stoneo
- * Date: 12/11/2014
- * Time: 11:33
- */
+
 public abstract class AbstractOutputsTransformer extends InOutTransformer {
 
-    @Autowired
     private PreCompileValidator preCompileValidator;
-    @Autowired
+
     private ExecutableValidator executableValidator;
 
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
@@ -117,4 +111,11 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         return ScoreLangConstants.EXPRESSION_START_DELIMITER + name + ScoreLangConstants.EXPRESSION_END_DELIMITER;
     }
 
+    public void setPreCompileValidator(PreCompileValidator preCompileValidator) {
+        this.preCompileValidator = preCompileValidator;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
+    }
 }

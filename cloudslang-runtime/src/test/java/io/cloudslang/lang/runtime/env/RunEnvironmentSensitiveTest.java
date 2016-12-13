@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -37,7 +38,8 @@ import static org.junit.Assert.assertTrue;
  * Created by Genadi Rabinovich, genadi@hpe.com on 10/07/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RunEnvironmentSensitiveTest.RunEnvironmentSensitiveValueTestConfig.class)
+@ContextConfiguration(classes = {RunEnvironmentSensitiveTest.RunEnvironmentSensitiveValueTestConfig.class,
+        SlangEntitiesSpringConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RunEnvironmentSensitiveTest {
     private static final String ENCYPTED = "{Encrypted}";

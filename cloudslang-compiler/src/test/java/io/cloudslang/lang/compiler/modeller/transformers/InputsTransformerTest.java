@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -24,7 +25,6 @@ import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -50,7 +50,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = InputsTransformerTest.Config.class)
+@ContextConfiguration(classes = {InputsTransformerTest.Config.class, SlangCompilerSpringConfig.class})
 public class InputsTransformerTest extends TransformersTestParent {
 
     @Autowired
@@ -60,6 +60,7 @@ public class InputsTransformerTest extends TransformersTestParent {
     private YamlParser yamlParser;
 
     private List<Object> inputsMap;
+
     private List<Object> inputsMapWithFunctions;
 
     @Rule
@@ -326,11 +327,6 @@ public class InputsTransformerTest extends TransformersTestParent {
         @Bean
         public InputsTransformer inputTransformer() {
             return new InputsTransformer();
-        }
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
         }
 
         @Bean

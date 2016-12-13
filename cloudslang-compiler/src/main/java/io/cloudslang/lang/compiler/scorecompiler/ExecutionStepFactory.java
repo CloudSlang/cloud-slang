@@ -26,12 +26,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.Validate;
-import org.springframework.stereotype.Component;
 
-/*
- * Created by orius123 on 05/11/14.
- */
-@Component
 public class ExecutionStepFactory {
 
     private static final String STEPS_PACKAGE = "io.cloudslang.lang.runtime.steps";

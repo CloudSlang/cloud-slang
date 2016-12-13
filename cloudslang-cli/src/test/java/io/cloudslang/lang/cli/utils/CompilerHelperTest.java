@@ -10,6 +10,7 @@
 package io.cloudslang.lang.cli.utils;
 
 import com.google.common.collect.Lists;
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.cli.services.ConsolePrinter;
 import io.cloudslang.lang.commons.services.api.CompilationHelper;
@@ -17,11 +18,21 @@ import io.cloudslang.lang.commons.services.api.SlangCompilationService;
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.commons.services.impl.SlangCompilationServiceImpl;
 import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
+import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.fusesource.jansi.Ansi;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -43,21 +54,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -66,7 +67,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CompilerHelperTest.Config.class)
+@ContextConfiguration(classes = {CompilerHelperTest.Config.class, SlangEntitiesSpringConfig.class})
 public class CompilerHelperTest {
 
     private static final String APP_HOME = "app.home";
@@ -120,24 +121,6 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(flowPath)
                 )
         );
-        inOrder.verify(slang).compileCleanUp();
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void testCompileSourceCleanup() throws Exception {
-        final URI flowPath = getClass().getResource("/executables/dir3/flow.sl").toURI();
-        final URI opPath = getClass().getResource("/executables/dir3/dir3_1/test_op.sl").toURI();
-        compilerHelper.compileSource(flowPath.getPath(), null);
-        InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang).compileSource(
-                SlangSource.fromFile(flowPath),
-                newHashSet(
-                        SlangSource.fromFile(opPath),
-                        SlangSource.fromFile(flowPath)
-                )
-        );
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -155,18 +138,23 @@ public class CompilerHelperTest {
                 newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
-                )
+                ),
+                PrecompileStrategy.WITH_CACHE
         );
-        verify(consolePrinter, times(2)).printWithColor(any(Ansi.Color.class), anyString());
+        InOrder inOrderConsolePrinter = inOrder(consolePrinter);
+        inOrderConsolePrinter.verify(consolePrinter, times(2)).printWithColor(any(Ansi.Color.class), anyString());
+        inOrderConsolePrinter.verify(consolePrinter).waitForAllPrintTasksToFinish();
+        inOrderConsolePrinter.verifyNoMoreInteractions();
         InOrder inOrder = inOrder(slang);
-        inOrder.verify(slang).compileSource(
+        inOrder.verify(slang, atLeastOnce()).compileSource(
                 SlangSource.fromFile(flowPath),
                 newHashSet(
                         SlangSource.fromFile(opPath),
                         SlangSource.fromFile(flowPath)
-                )
+                ),
+                PrecompileStrategy.WITH_CACHE
         );
-        inOrder.verify(slang).compileCleanUp();
+        inOrder.verify(slang).invalidateAllInPreCompileCache();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -179,7 +167,6 @@ public class CompilerHelperTest {
         InOrder inOrder = inOrder(slang);
         inOrder.verify(slang).compile(SlangSource.fromFile(flowFilePath),
                 newHashSet(SlangSource.fromFile(flow2FilePath)));
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -200,7 +187,6 @@ public class CompilerHelperTest {
                         SlangSource.fromFile(dependency2)
                 )
         );
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -219,7 +205,6 @@ public class CompilerHelperTest {
                 SlangSource.fromFile(flowFilePath),
                 newHashSet(SlangSource.fromFile(flow2FilePath))
         );
-        inOrder.verify(slang).compileCleanUp();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -368,11 +353,6 @@ public class CompilerHelperTest {
         @Bean
         public CompilerHelper compilerHelper() {
             return new CompilerHelperImpl();
-        }
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
         }
 
         @Bean

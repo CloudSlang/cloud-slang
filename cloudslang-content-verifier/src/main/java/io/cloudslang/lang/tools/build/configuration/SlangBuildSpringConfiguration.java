@@ -10,8 +10,8 @@
 package io.cloudslang.lang.tools.build.configuration;
 
 import io.cloudslang.lang.commons.configuration.SlangCommonsSpringConfig;
-import io.cloudslang.lang.tools.build.SlangBuilder;
 import io.cloudslang.lang.logging.LoggingServiceImpl;
+import io.cloudslang.lang.tools.build.SlangBuilder;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
 import io.cloudslang.lang.tools.build.tester.parallel.report.LoggingSlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.report.SlangTestCaseRunReportGeneratorService;

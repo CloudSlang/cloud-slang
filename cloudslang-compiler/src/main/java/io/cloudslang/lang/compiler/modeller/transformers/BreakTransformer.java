@@ -16,13 +16,9 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class BreakTransformer implements Transformer<List<String>, List<String>> {
 
-    @Autowired
     private ExecutableValidator executableValidator;
 
     @Override
@@ -52,5 +48,9 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
     @Override
     public String keyToTransform() {
         return null;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
     }
 }

@@ -21,9 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
-@Component
 public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map<String, Object>> {
 
     @Override

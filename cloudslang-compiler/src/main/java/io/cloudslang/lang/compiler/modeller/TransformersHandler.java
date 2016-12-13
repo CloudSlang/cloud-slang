@@ -12,21 +12,18 @@ package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.ResolvableType;
-import org.springframework.stereotype.Component;
-
-/*
- * Created by orius123 on 10/12/14.
- */
-@Component
 public class TransformersHandler {
+
+    public static final String CLASS = "class ";
 
     public static String keyToTransform(Transformer transformer) {
         String key;
@@ -92,8 +89,23 @@ public class TransformersHandler {
     }
 
     private Class getTransformerFromType(Transformer transformer) {
-        ResolvableType resolvableType = ResolvableType.forClass(Transformer.class, transformer.getClass());
-        return resolvableType.getGeneric(0).resolve();
+        // Always take the first interface Transformer<F, T> in case of many interfaces
+        // Always take the first parameter F of the Transformer interface
+        Type interfaceType = transformer.getClass().getGenericInterfaces()[0];
+        Type typeF = ((ParameterizedType) interfaceType).getActualTypeArguments()[0];
+        if (typeF instanceof ParameterizedType) {
+            return (Class) ((ParameterizedType) typeF).getRawType();
+        } else if (typeF instanceof Class) {
+            return (Class) typeF;
+        } else {
+            String fullName = typeF.toString();
+            try {
+                return fullName.startsWith(CLASS) ? Class.forName(fullName.substring(CLASS.length()))
+                        : Class.forName(fullName);
+            } catch (ClassNotFoundException e) {
+                return null;
+            }
+        }
     }
 
     private RuntimeException wrapErrorMessage(RuntimeException rex, String errorMessagePrefix) {

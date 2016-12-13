@@ -10,6 +10,8 @@
 package io.cloudslang.lang.compiler;
 
 import com.google.common.collect.Sets;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileService;
+import io.cloudslang.lang.compiler.caching.CachedPrecompileServiceImpl;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -20,13 +22,11 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.entities.SystemProperty;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,9 +37,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.yaml.snakeyaml.Yaml;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @since 4/12/2016
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SlangCompilerImplTest.Config.class)
+@ContextConfiguration(classes = {SlangCompilerImplTest.Config.class})
 public class SlangCompilerImplTest {
 
     private SlangSource slangSource;
@@ -67,9 +68,9 @@ public class SlangCompilerImplTest {
     @Test
     public void testInvalidParsedSlangType() throws Exception {
         ParsedSlang parsedSlangInvalidTypeMock = mock(ParsedSlang.class);
-        when(yamlParserMock.parse(eq(slangSource))).thenReturn(parsedSlangInvalidTypeMock);
-        when(yamlParserMock.validateAndThrowFirstError(eq(parsedSlangInvalidTypeMock)))
-                .thenReturn(parsedSlangInvalidTypeMock);
+        doReturn(parsedSlangInvalidTypeMock).when(yamlParserMock).parse(any(SlangSource.class));
+        doReturn(parsedSlangInvalidTypeMock).when(yamlParserMock).validateAndThrowFirstError(any(ParsedSlang.class));
+
         when(parsedSlangInvalidTypeMock.getType()).thenReturn(ParsedSlang.Type.FLOW);
         when(parsedSlangInvalidTypeMock.getName()).thenReturn("flow_name");
 
@@ -114,9 +115,18 @@ public class SlangCompilerImplTest {
 
     static class Config {
 
+        private static YamlParser yamlParserReference;
+
         @Bean
         public YamlParser yamlParser() {
-            return mock(YamlParser.class);
+            if (yamlParserReference != null) {
+                return yamlParserReference;
+            }
+            YamlParser mock = mock(YamlParser.class);
+            mock.setExecutableValidator(executableValidator());
+            mock.setParserExceptionHandler(parserExceptionHandler());
+            yamlParserReference = mock;
+            return mock;
         }
 
         @Bean
@@ -130,23 +140,27 @@ public class SlangCompilerImplTest {
         }
 
         @Bean
-        public Yaml yaml() {
-            return mock(Yaml.class);
-        }
-
-        @Bean
         public ParserExceptionHandler parserExceptionHandler() {
             return mock(ParserExceptionHandler.class);
         }
 
         @Bean
         public SlangCompiler slangCompiler() {
-            return new SlangCompilerImpl();
+            SlangCompilerImpl slangCompiler = new SlangCompilerImpl();
+
+            slangCompiler.setCachedPrecompileService(cachePrecompileService());
+            slangCompiler.setCompileValidator(compileValidator());
+            slangCompiler.setScoreCompiler(scoreCompiler());
+            slangCompiler.setSlangModeller(slangModeller());
+            slangCompiler.setSystemPropertyValidator(systemPropertyValidator());
+            slangCompiler.setYamlParser(yamlParser());
+
+            return slangCompiler;
         }
 
         @Bean
         public CachedPrecompileService cachePrecompileService() {
-            return new CachedPrecompileService();
+            return new CachedPrecompileServiceImpl();
         }
 
         @Bean

@@ -24,13 +24,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class PythonActionTransformer extends AbstractTransformer
         implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
-    @Autowired
+
     private DependencyFormatValidator dependencyFormatValidator;
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY);
@@ -76,4 +73,7 @@ public class PythonActionTransformer extends AbstractTransformer
         return SlangTextualKeys.PYTHON_ACTION_KEY;
     }
 
+    public void setDependencyFormatValidator(DependencyFormatValidator dependencyFormatValidator) {
+        this.dependencyFormatValidator = dependencyFormatValidator;
+    }
 }

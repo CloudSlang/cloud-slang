@@ -25,7 +25,6 @@ import io.cloudslang.lang.entities.utils.ListUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.python.google.common.collect.Lists;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Component
 public class CompileValidatorImpl extends AbstractValidator implements CompileValidator {
 
     public static final String DUPLICATE_EXECUTABLE_FOUND = "Duplicate executable found: '%s'";

@@ -1,5 +1,67 @@
 #CHANGE LOG
 
+##Version 1.0
+
++ DSL Changes
+  + Added `decision` executable type. A `decision` is similar to an `operation`, but does not include an action section.
+  + All `inputs`, `outputs`, `results` and `publish` values must be strings.
+  + The list of characters allowable in various naming situations has changed. (See the Naming section in the DSL Reference.)
+  + The `gav` tag is now mandatory for a `java_action`.
+  + The `on_failure` step must be the last step.
+  + Steps and `results` cannot be named `on_failure`.
+  + A step's `navigation` items must exactly match the called executable's `results` list, even when using default results.
+  + The default results for executable are as follows:
+    + `flow` - `SUCCESS` and `FAILURE`
+    + `operation` - `SUCCESS`
+    + `decision` - no default results  
+  + A `loop` that contains a `break` section that includes a result that does not exist in the called executable's `results` section fails.
+  + Required `inputs` with an empty string value (`""`) fail compilation.
+  + An `operation` or `decision` must have exactly one default result and it must be the last result.
+  + Case insensitive validations:
+    + Names for `inputs`, `outputs`, `results` and `publish` variables must now differ ignoring case.
+    + Within a system properties file all properties name's are checked against each other ignoring case.
+    + Within multiple system properties files all properties name's are checked against each other ignoring case in the CLI, but not in the Builder.
+    + Fully qualified executable names are validated as unique by the compiler ignoring case.
++ Engine Improvements
+	+ Added support for sensitive data transmission between components which use different encryption key
+  + Added support for creating a `Value` object from a pre-encrypted simple string.
++ Builder Improvements
+  + Test suites can now be run sequentially or in parallel.
+  + An HTML report about the build execution is created.
+  + Added `-des` flag to validate content description section against actual `inputs`, `outputs` and `results`.
++ Bug Fixes
+	+ Under some circumstances leaks of python interpreters and java class loaders would occur due to bug in caching mechanism.
+	+ Jython modules management was not stable under stress test: custom python modules which already existed were not found.
++ Other Additions/Changes
+  + New Maven CloudSlang content compiler which can be used to compile CloudSlang source files and receive indications of errors without using the CloudSlang CLI or Build tool.
++ Content
+  + Restructure - Much of the content hierarchy has been restructured.
+	+ Updates and Additions - All code updated to reflect changes in the DSL. Other updates and additions include:
+    + amazon
+      + aws
+        + ec2
+    + base
+      + datetime
+      + http
+      + lists
+      + flow_control
+      + filesystem
+      + mail
+      + math
+      + strings
+      + xml
+      + scripts
+      + utils
+    + docker
+      + containers
+    + git
+    + haven_on_demand
+      + examples
+    + microsoft
+      + azure
+    + vmware
+      + vcenter
+
 ##Version 0.9.60
 
 + DSL Changes

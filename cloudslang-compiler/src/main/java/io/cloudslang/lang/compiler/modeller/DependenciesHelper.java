@@ -38,18 +38,14 @@ import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
 
-@Component
 public class DependenciesHelper {
 
-    @Autowired
     private PublishTransformer publishTransformer;
 
     public Set<String> fetchDependencies(Executable executable, Map<String, Executable> availableDependencies) {

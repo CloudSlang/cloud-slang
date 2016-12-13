@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
@@ -32,7 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Bonczidai Levente
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ParallelLoopTransformerTest.Config.class)
+@ContextConfiguration(classes = {ParallelLoopTransformerTest.Config.class, SlangCompilerSpringConfig.class})
 public class ParallelLoopTransformerTest extends TransformersTestParent {
 
     @Rule

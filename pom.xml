@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
@@ -26,7 +26,7 @@
         <connection>scm:git:https://github.com/CloudSlang/cloud-slang.git</connection>
         <developerConnection>scm:git:git@github.com:CloudSlang/cloud-slang.git</developerConnection>
         <url>https://github.com/CloudSlang/cloud-slang.git</url>
-        <tag>cloudslang-0.9.70</tag>
+        <tag>master</tag>
     </scm>
 
     <properties>
@@ -39,6 +39,7 @@
         <plugins.maven-dependency-plugin.version.old>2.8</plugins.maven-dependency-plugin.version.old>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
     </properties>
 
     <distributionManagement>
@@ -411,6 +412,11 @@
                 <version>2.6.0</version>
             </dependency>
 
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.10</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -626,6 +632,12 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+                <!--Check for org.springframework occurrences-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven.enforcer.plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -756,5 +768,6 @@
         <module>cloudslang-content-maven-compiler</module>
         <module>cloudslang-api-commons</module>
         <module>cloudslang-commons</module>
+        <module>cloudslang-enforcer</module>
     </modules>
 </project>

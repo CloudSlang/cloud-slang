@@ -10,7 +10,6 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.ApplicationContextProvider;
 import io.cloudslang.lang.spi.encryption.Encryption;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -44,11 +43,6 @@ public class ValueFactoryTest {
     }
 
     static class Config {
-
-        @Bean
-        public ApplicationContextProvider applicationContextProvider() {
-            return new ApplicationContextProvider();
-        }
 
         @Bean
         public Encryption getEncryption() {

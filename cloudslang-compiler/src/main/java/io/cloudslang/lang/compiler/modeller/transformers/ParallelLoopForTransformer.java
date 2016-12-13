@@ -14,14 +14,12 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.LoopStatement;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.stereotype.Component;
 
 /**
  * Date: 3/25/2015
  *
  * @author Bonczidai Levente
  */
-@Component
 public class ParallelLoopForTransformer extends AbstractForTransformer implements Transformer<String, LoopStatement> {
 
     @Override
