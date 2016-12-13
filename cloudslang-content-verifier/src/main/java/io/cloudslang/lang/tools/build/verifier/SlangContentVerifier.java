@@ -60,7 +60,7 @@ public class SlangContentVerifier {
     @Autowired
     private SlangCompilationService slangCompilationService;
 
-    public CompilationResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
+    public PreCompileResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" +
                 directoryPath + "\' does not lead to a directory");
@@ -86,9 +86,12 @@ public class SlangContentVerifier {
                 exceptions.addAll(metadataResult.getErrors());
 
                 if (sourceModel != null) {
-                    staticValidator
-                            .validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
-                    slangModels.put(getUniqueName(sourceModel), sourceModel);
+                    int size = exceptions.size();
+                    staticValidator.validateSlangFile(slangFile, sourceModel,
+                                    sourceMetadata, shouldValidateDescription, exceptions);
+                    if (size == exceptions.size()) {
+                        slangModels.put(getUniqueName(sourceModel), sourceModel);
+                    }
                 }
             } catch (Exception e) {
                 String errorMessage = "Failed to extract metadata for file: \'" +
@@ -105,13 +108,14 @@ public class SlangContentVerifier {
                     " executable files in path: \'" + directoryPath +
                     "\' But managed to create slang models for only: " + slangModels.size()));
         }
-        CompilationResult compilationResult = new CompilationResult();
-        compilationResult.addExceptions(exceptions);
-        compilationResult.addResults(slangModels);
-        return compilationResult;
+        PreCompileResult preCompileResult = new PreCompileResult();
+        preCompileResult.addExceptions(exceptions);
+        preCompileResult.addResults(slangModels);
+        return preCompileResult;
     }
 
-    public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {
+    public CompileResult compileSlangModels(Map<String, Executable> slangModels) {
+        CompileResult compileResult = new CompileResult();
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
         for (Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
@@ -133,10 +137,12 @@ public class SlangContentVerifier {
                 String errorMessage = "Failed compiling Slang source: \'" + slangModel.getNamespace() + "." +
                         slangModel.getName() + "\'.\n" + e.getMessage();
                 loggingService.logEvent(Level.ERROR, errorMessage);
-                throw new RuntimeException(errorMessage, e);
+                compileResult.addException(new RuntimeException(errorMessage, e));
             }
         }
-        return compiledArtifacts;
+
+        compileResult.addResults(compiledArtifacts);
+        return compileResult;
     }
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels,

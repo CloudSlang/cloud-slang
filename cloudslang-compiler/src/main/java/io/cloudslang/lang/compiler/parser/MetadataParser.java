@@ -44,8 +44,8 @@ public class MetadataParser {
         try {
             List<RuntimeException> errors = new ArrayList<>();
             String description = extractDescriptionString(source, errors);
-            Map<String, String> tagMap = extractTagMap(description, errors);
-            checkMapOrder(tagMap, errors);
+            Map<String, String> tagMap = extractTagMap(description, source,  errors);
+            checkMapOrder(tagMap, source, errors);
             return new ParseMetadataModellingResult(tagMap, errors);
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
@@ -53,21 +53,21 @@ public class MetadataParser {
         }
     }
 
-    private void checkMapOrder(Map<String, String> tagMap, List<RuntimeException> errors) {
+    private void checkMapOrder(Map<String, String> tagMap, SlangSource source, List<RuntimeException> errors) {
         if (!tagMap.isEmpty()) {
             Iterator<String> it = tagMap.keySet().iterator();
             int previousTagPosition = DescriptionTag.asList().indexOf(DescriptionTag.getContainedTag(it.next()));
             while (it.hasNext()) {
                 int keyTagPosition = DescriptionTag.asList().indexOf(DescriptionTag.getContainedTag(it.next()));
                 if (previousTagPosition > keyTagPosition) {
-                    errors.add(new RuntimeException("Order is not preserved."));
+                    errors.add(new RuntimeException("Order is not preserved for " + source.getName()));
                 }
                 previousTagPosition = keyTagPosition;
             }
         }
     }
 
-    private Map<String, String> extractTagMap(String text, List<RuntimeException> errors) {
+    private Map<String, String> extractTagMap(String text, SlangSource source, List<RuntimeException> errors) {
         Map<String, String> map = new LinkedHashMap<>();
         StrBuilder valueStringBuilder = new StrBuilder();
         DescriptionTag tag;
@@ -77,7 +77,7 @@ public class MetadataParser {
             while (line != null) {
                 if (DescriptionTag.stringContainsTag(line)) {
                     tag = DescriptionTag.getContainedTag(line);
-                    if (checkTagIsFollowedByColon(line, tag, errors)) {
+                    if (checkTagIsFollowedByColon(line, tag, source, errors)) {
                         if (DescriptionTag.isUniqueTagType(tag)) {
                             line = line.substring(line.indexOf(COLON) + 1);
                             key = tag != null ? tag.getValue() : "";
@@ -94,28 +94,32 @@ public class MetadataParser {
                 putValueInMapAndResetBuilder(map, key, valueStringBuilder, line);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error processing metadata, error extracting metadata from ", e);
+            throw new RuntimeException("Error processing metadata, error extracting metadata from " +
+                    source.getName(), e);
         }
         return map;
     }
 
-    private boolean checkTagIsFollowedByColon(String line, DescriptionTag tag, List<RuntimeException> errors) {
+    private boolean checkTagIsFollowedByColon(String line, DescriptionTag tag, SlangSource source,
+                                              List<RuntimeException> errors) {
         Pattern pattern = Pattern.compile("@[\\w\\s]+:");
         Matcher matcher = pattern.matcher(line);
         if (!matcher.lookingAt()) {
-            throwExceptionIfColonMissing(line, tag, errors);
+            throwExceptionIfColonMissing(line, tag, source, errors);
             return false;
         }
         return true;
     }
 
-    private void throwExceptionIfColonMissing(String line, DescriptionTag tag, List<RuntimeException> errors) {
+    private void throwExceptionIfColonMissing(String line, DescriptionTag tag, SlangSource source,
+                                              List<RuntimeException> errors) {
         String lineWithoutTag = line.replace(tag.getValue(), "").trim();
         StringTokenizer stringTokenizer = new StringTokenizer(lineWithoutTag);
         if ((DescriptionTag.isUniqueTagType(tag) && stringTokenizer.countTokens() == 1) ||
                 stringTokenizer.countTokens() > 1) {
             errors.add(new RuntimeException("Line \"" + line +
-                    "\" does not contain colon between the tag name and the description of the tag."));
+                    "\" does not contain colon between the tag name and the description of the tag for " +
+                    source.getName()));
         }
     }
 
@@ -133,7 +137,7 @@ public class MetadataParser {
     }
 
     private String extractDescriptionString(SlangSource source, List<RuntimeException> errors) {
-        StrBuilder sb = new StrBuilder();
+        StrBuilder strBuilder = new StrBuilder();
         boolean blockEndTagFound = false;
         boolean blockStartTagFound = false;
         String firstLine = "";
@@ -152,15 +156,15 @@ public class MetadataParser {
                     }
                 }
 
-                appendValidLineToOutput(sb, blockStartTagFound, line);
+                appendValidLineToOutput(strBuilder, blockStartTagFound, line);
                 line = getTrimmedLine(reader);
             }
-            checkStartingAndClosingTags(sb, firstLine, blockEndTagFound, blockStartTagFound, errors);
+            checkStartingAndClosingTags(strBuilder, firstLine, blockEndTagFound, blockStartTagFound, source, errors);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
         }
-        return sb.build();
+        return strBuilder.build();
     }
 
     private void appendValidLineToOutput(StrBuilder sb, boolean blockStartTagFound, String line) {
@@ -175,15 +179,17 @@ public class MetadataParser {
     }
 
     private void checkStartingAndClosingTags(StrBuilder sb, String firstLine, boolean blockEndTagFound,
-                                             boolean blockStartTagFound, List<RuntimeException> errors) {
+                                             boolean blockStartTagFound, SlangSource source,
+                                             List<RuntimeException> errors) {
         if (firstLine.length() > BLOCK_START_TAG.length()) {
-            errors.add(new RuntimeException("Description is not accepted on the same line as the starting tag."));
+            errors.add(new RuntimeException("Description is not accepted on the same line as the starting tag for " +
+                    source.getName()));
         }
         if (blockEndTagFound && !blockStartTagFound) {
-            errors.add(new RuntimeException("Starting tag missing in the description."));
+            errors.add(new RuntimeException("Starting tag missing in the description for " + source.getName()));
         }
         if (!blockEndTagFound && sb.length() > 0) {
-            errors.add(new RuntimeException("Closing tag missing in the description."));
+            errors.add(new RuntimeException("Closing tag missing in the description for " + source.getName()));
         }
     }
 

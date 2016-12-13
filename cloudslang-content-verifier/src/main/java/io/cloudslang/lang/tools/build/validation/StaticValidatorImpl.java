@@ -15,12 +15,12 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang.Validate;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,43 +33,46 @@ public class StaticValidatorImpl implements StaticValidator {
 
     @Override
     public void validateSlangFile(File slangFile, Executable executable, Metadata metadata,
-                                  boolean shouldValidateDescription) {
-        validateNamespace(slangFile, executable);
+                                  boolean shouldValidateDescription, Queue<RuntimeException> exceptions) {
+        validateNamespace(slangFile, executable, exceptions);
 
-        validateExecutableName(slangFile, executable);
+        validateExecutableName(slangFile, executable, exceptions);
 
         if (shouldValidateDescription) {
-            validateExecutableAgainstMetadata(executable, metadata);
+            validateExecutableAgainstMetadata(executable, metadata, exceptions);
         }
     }
 
-    private void validateExecutableAgainstMetadata(Executable executable, Metadata metadata) {
+    private void validateExecutableAgainstMetadata(Executable executable, Metadata metadata,
+                                                   Queue<RuntimeException> exceptions) {
         validateInOutParams(metadata.getInputs(), executable.getInputs(),
-                String.format("Error for executable %1$s: Input", executable.getId()));
+                String.format("Error for executable %1$s: Input", executable.getId()), exceptions);
         validateInOutParams(metadata.getOutputs(), executable.getOutputs(),
-                String.format("Error for executable %1$s: Output", executable.getId()));
+                String.format("Error for executable %1$s: Output", executable.getId()), exceptions);
         validateInOutParams(metadata.getResults(), executable.getResults(),
-                String.format("Error for executable %1$s: Result", executable.getId()));
+                String.format("Error for executable %1$s: Result", executable.getId()), exceptions);
     }
 
     private void validateInOutParams(Map<String, String> metadataInOutParams,
-                                     List<? extends InOutParam> inOutParams, String errorMessagePrefix) {
+                                     List<? extends InOutParam> inOutParams, String errorMessagePrefix,
+                                     Queue<RuntimeException> exceptions) {
         for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
             if (metadataInOutParams == null) {
-                throw new MetadataMissingException(errorMessagePrefix + "s are missing description entirely.");
+                exceptions.add(new MetadataMissingException(errorMessagePrefix +
+                        "s are missing description entirely."));
             } else if (metadataInOutParams.get(inOutParam.getName()) == null &&
                     (!(inOutParam instanceof Input) || !((Input) inOutParam).isPrivateInput())) {
-                throw new MetadataMissingException(errorMessagePrefix + " '" + inOutParam.getName() +
-                        "' is missing description.");
+                exceptions.add(new MetadataMissingException(errorMessagePrefix + " '" + inOutParam.getName() +
+                        "' is missing description."));
             }
         }
     }
 
-    private void validateNamespace(File slangFile, Executable executable) {
+    private void validateNamespace(File slangFile, Executable executable, Queue<RuntimeException> exceptions) {
         // Validate that the namespace is not empty
         String namespace = executable.getNamespace();
-        Validate.notEmpty(namespace, "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
-                "\'. Namespace of slang source: \'" + executable.getName() + "\' cannot be empty.");
+        addExceptionIfEmptyString(namespace, "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
+                "\'. Namespace of slang source: \'" + executable.getName() + "\' cannot be empty.", exceptions);
 
         // Validate that the namespace matches the path of the file
         String executableNamespacePath = namespace.replace('.', File.separatorChar);
@@ -77,20 +80,33 @@ public class StaticValidatorImpl implements StaticValidator {
                 "\'. Namespace of slang source: " + executable.getName() + " is wrong.\nIt is currently \'" +
                 namespace + "\', but it should match the file path: \'" + slangFile.getPath() + "\'";
         String filePathWithoutFileName = slangFile.getParent();
-        Validate.isTrue(endsWithIgnoreCase(filePathWithoutFileName, executableNamespacePath), namespaceErrorMessage);
+        addExceptionIfTrue(endsWithIgnoreCase(filePathWithoutFileName, executableNamespacePath),
+                namespaceErrorMessage, exceptions);
 
         // Validate that the namespace is composed only of abc letters, _ or -
         Matcher matcher = PATTERN.matcher(namespace);
-        Validate.isTrue(matcher.matches(), "Namespace: " + namespace + " is invalid. It can contain only " +
-                "alphanumeric characters, underscore or hyphen");
+        addExceptionIfTrue(matcher.matches(), "Namespace: " + namespace + " is invalid. It can contain only " +
+                "alphanumeric characters, underscore or hyphen", exceptions);
     }
 
-    private void validateExecutableName(File slangFile, Executable executable) {
+    private void validateExecutableName(File slangFile, Executable executable, Queue<RuntimeException> exceptions) {
         // Validate executable name is the same as the file name
         String fileNameNoExtension = Extension.removeExtension(slangFile.getName());
         String executableNameErrorMessage = "Error validating Slang file: \'" + slangFile.getAbsoluteFile() +
                 "\'. Name of flow or operation: \'" + executable.getName() +
                 "\' is not valid.\nIt should be identical to the file name: \'" + fileNameNoExtension + "\'";
-        Validate.isTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage);
+        addExceptionIfTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage, exceptions);
+    }
+
+    public void addExceptionIfEmptyString(String string, String message, Queue<RuntimeException> exceptions) {
+        if (string == null || string.length() == 0) {
+            exceptions.add(new RuntimeException(message));
+        }
+    }
+
+    public void addExceptionIfTrue(boolean expression, String message, Queue<RuntimeException> exceptions) {
+        if (!expression) {
+            exceptions.add(new RuntimeException(message));
+        }
     }
 }
