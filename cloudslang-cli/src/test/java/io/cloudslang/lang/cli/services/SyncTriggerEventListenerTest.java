@@ -10,12 +10,16 @@
 package io.cloudslang.lang.cli.services;
 
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.score.events.EventConstants;
+import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,7 +29,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.fusesource.jansi.Ansi.Color.CYAN;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Date: 2/26/2015
@@ -46,18 +52,45 @@ public class SyncTriggerEventListenerTest {
             "it does not affect CLI readability";
     private static final String ABBREVIATED_RESULT = "result that is too long will be abbreviated " +
             "so that it does not affect CLI readability result tha...";
+    public static final String TEST_MESSAGE = "test message";
 
     private LanguageEventData data;
     private Map<String, Serializable> outputs;
     private Map<String, Serializable> expectedFilteredOutputs;
     private Map<String, Serializable> actualFilteredOutputs;
 
+    @Autowired
+    private SyncTriggerEventListener syncTriggerEventListener;
+
+    @Autowired
+    private ConsolePrinter consolePrinter;
+
     @Before
     public void before() throws Exception {
         data = new LanguageEventData();
         outputs = new HashMap<>();
+        Mockito.reset(consolePrinter);
     }
 
+    @Test
+    public void onMavenDependencyBuildEventPrintWithColor() throws InterruptedException {
+        Map<String, Serializable> data = new HashMap<>();
+        data.put(EventConstants.MAVEN_DEPENDENCY_BUILD, TEST_MESSAGE);
+        syncTriggerEventListener.onEvent(new ScoreEvent(EventConstants.MAVEN_DEPENDENCY_BUILD,
+                (Serializable) data));
+
+        verify(consolePrinter).printWithColor(CYAN, TEST_MESSAGE);
+    }
+
+    @Test
+    public void onMavenDependencyBuildFinishedEventPrintWithColor() throws InterruptedException {
+        Map<String, Serializable> data = new HashMap<>();
+        data.put(EventConstants.MAVEN_DEPENDENCY_BUILD_FINISHED, TEST_MESSAGE);
+        syncTriggerEventListener.onEvent(new ScoreEvent(EventConstants.MAVEN_DEPENDENCY_BUILD_FINISHED,
+                (Serializable) data));
+
+        verify(consolePrinter).printWithColor(CYAN, TEST_MESSAGE);
+    }
 
     @Test
     public void testExtractOutputs() throws InterruptedException {
