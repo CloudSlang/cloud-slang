@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -98,13 +99,13 @@ public class StaticValidatorImpl implements StaticValidator {
         addExceptionIfTrue(fileNameNoExtension.equals(executable.getName()), executableNameErrorMessage, exceptions);
     }
 
-    public void addExceptionIfEmptyString(String string, String message, Queue<RuntimeException> exceptions) {
-        if (string == null || string.length() == 0) {
+    private void addExceptionIfEmptyString(String string, String message, Queue<RuntimeException> exceptions) {
+        if (StringUtils.isEmpty(string)) {
             exceptions.add(new RuntimeException(message));
         }
     }
 
-    public void addExceptionIfTrue(boolean expression, String message, Queue<RuntimeException> exceptions) {
+    private void addExceptionIfTrue(boolean expression, String message, Queue<RuntimeException> exceptions) {
         if (!expression) {
             exceptions.add(new RuntimeException(message));
         }
