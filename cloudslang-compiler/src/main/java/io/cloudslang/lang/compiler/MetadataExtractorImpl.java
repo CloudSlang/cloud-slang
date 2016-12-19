@@ -11,10 +11,10 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.modeller.MetadataModeller;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.ParseMetadataModellingResult;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
 import org.apache.commons.lang.Validate;
-
-import java.util.Map;
 
 public class MetadataExtractorImpl implements MetadataExtractor {
 
@@ -24,9 +24,23 @@ public class MetadataExtractorImpl implements MetadataExtractor {
 
     @Override
     public Metadata extractMetadata(SlangSource source) {
+        ParseMetadataModellingResult result = getParseMetadataModellingResult(source);
+        if (result.getErrors().size() > 0) {
+            throw result.getErrors().get(0);
+        }
+        return metadataModeller.createModel(result.getParseResult());
+    }
+
+    @Override
+    public MetadataModellingResult extractMetadataModellingResult(SlangSource source) {
+        ParseMetadataModellingResult result = getParseMetadataModellingResult(source);
+        Metadata metadata = metadataModeller.createModel(result.getParseResult());
+        return new MetadataModellingResult(metadata, result.getErrors());
+    }
+
+    private ParseMetadataModellingResult getParseMetadataModellingResult(SlangSource source) {
         Validate.notNull(source, "You must supply a source to extract the metadata from");
-        Map<String, String> metadataMap = metadataParser.parse(source);
-        return metadataModeller.createModel(metadataMap);
+        return metadataParser.parse(source);
     }
 
     public void setMetadataModeller(MetadataModeller metadataModeller) {

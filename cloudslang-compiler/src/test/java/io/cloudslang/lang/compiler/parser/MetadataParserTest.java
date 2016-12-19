@@ -44,7 +44,7 @@ public class MetadataParserTest {
     @Test
     public void noNullsWhenEmptyValues() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_empty_values.sl").toURI();
-        Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation));
+        Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation)).getParseResult();
         boolean containsNulls = false;
         for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
             if (entry.getValue() == null) {
@@ -57,7 +57,7 @@ public class MetadataParserTest {
     @Test
     public void fullDescriptionMissing() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_full_description_missing.sl").toURI();
-        Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation));
+        Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation)).getParseResult();
         Assert.assertTrue("metadata map should have size 0", metadataMap.size() == 0);
     }
 }
