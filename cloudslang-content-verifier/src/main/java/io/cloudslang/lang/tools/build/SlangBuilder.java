@@ -11,9 +11,9 @@ package io.cloudslang.lang.tools.build;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode;
 import io.cloudslang.lang.tools.build.constants.Messages;
-import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.tester.IRunTestResults;
 import io.cloudslang.lang.tools.build.tester.RunTestsResults;
 import io.cloudslang.lang.tools.build.tester.SlangTestRunner;
@@ -21,8 +21,16 @@ import io.cloudslang.lang.tools.build.tester.SlangTestRunner.TestCaseRunState;
 import io.cloudslang.lang.tools.build.tester.parallel.report.ThreadSafeRunTestResults;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig;
-import io.cloudslang.lang.tools.build.verifier.CompilationResult;
+import io.cloudslang.lang.tools.build.verifier.CompileResult;
+import io.cloudslang.lang.tools.build.verifier.PreCompileResult;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,12 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_SEQUENTIAL;
@@ -81,21 +83,23 @@ public class SlangBuilder {
 
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- compiling sources ---");
-        CompilationResult compilationResult =
+        PreCompileResult preCompileResult =
                 slangContentVerifier.createModelsAndValidate(contentPath, shouldValidateDescription);
-        Map<String, Executable> slangModels = compilationResult.getResults();
+        Map<String, Executable> slangModels = preCompileResult.getResults();
 
+        List<RuntimeException> exceptions = new ArrayList<>(preCompileResult.getExceptions());
 
-        Map<String, CompilationArtifact> compiledSources = compileModels(slangModels);
+        CompileResult compileResult = compileModels(slangModels);
+        exceptions.addAll(compileResult.getExceptions());
 
         IRunTestResults runTestsResults = new RunTestsResults();
-        if (StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
+        if (compileResult.getExceptions().size() == 0 &&
+                StringUtils.isNotBlank(testsPath) && new File(testsPath).isDirectory()) {
             runTestsResults =
                     runTests(slangModels, projectPath, testsPath, testSuits, bulkRunMode, buildMode, changedFiles);
         }
-        List<RuntimeException> exceptions = new ArrayList<>(runTestsResults.getExceptions());
-        exceptions.addAll(compilationResult.getExceptions());
-        return new SlangBuildResults(compiledSources.size(), runTestsResults, exceptions);
+        exceptions.addAll(runTestsResults.getExceptions());
+        return new SlangBuildResults(compileResult.getResults().size(), runTestsResults, exceptions);
     }
 
     /**
@@ -103,19 +107,20 @@ public class SlangBuilder {
      *
      * @return the number of valid CloudSlang files in the given directory
      */
-    private Map<String, CompilationArtifact> compileModels(Map<String, Executable> slangModels) {
-        Map<String, CompilationArtifact> compiledSlangFiles =
-                slangContentVerifier.compileSlangModels(slangModels);
+    private CompileResult compileModels(Map<String, Executable> slangModels) {
+        CompileResult compileResult = slangContentVerifier.compileSlangModels(slangModels);
+        Map<String, CompilationArtifact> compiledSlangFiles = compileResult.getResults();
+
 
         if (compiledSlangFiles.size() != slangModels.size()) {
-            throw new RuntimeException("Some Slang files were not compiled.\n" +
+            compileResult.addException(new RuntimeException("Some Slang files were not compiled.\n" +
                     "Found: " + slangModels.size() + " slang models, but managed to compile only: " +
-                    compiledSlangFiles.size());
+                    compiledSlangFiles.size()));
         }
 
         loggingService.logEvent(Level.INFO, "Successfully finished Compilation of: " +
                 compiledSlangFiles.size() + " Slang files");
-        return compiledSlangFiles;
+        return compileResult;
     }
 
     IRunTestResults runTests(
@@ -129,15 +134,16 @@ public class SlangBuilder {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
-        CompilationResult compilationResult = slangContentVerifier.createModelsAndValidate(testsPath, false);
-        Map<String, Executable> testFlowModels = compilationResult.getResults();
+        PreCompileResult preCompileResult = slangContentVerifier.createModelsAndValidate(testsPath, false);
+        Map<String, Executable> testFlowModels = preCompileResult.getResults();
         // Add also all of the slang models of the content in order to allow for compilation of the test flows
         Map<String, Executable> allTestedFlowModels = new HashMap<>(testFlowModels);
         allTestedFlowModels.putAll(contentSlangModels);
 
         // Compiling all the test flows
+        CompileResult compileResult = slangContentVerifier.compileSlangModels(allTestedFlowModels);
         final Map<String, CompilationArtifact> compiledFlows =
-                slangContentVerifier.compileSlangModels(allTestedFlowModels);
+                compileResult.getResults();
 
         Set<String> allTestedFlowsFqn = mapExecutablesToFullyQualifiedName(allTestedFlowModels.values());
         Map<String, SlangTestCase> testCases = slangTestRunner.createTestCases(testsPath, allTestedFlowsFqn);
@@ -151,7 +157,8 @@ public class SlangBuilder {
         runTestsResults =
                 processRunTests(projectPath, testSuites, bulkRunMode, compiledFlows, testCases, buildModeConfig);
 
-        runTestsResults.addExceptions(compilationResult.getExceptions());
+        runTestsResults.addExceptions(preCompileResult.getExceptions());
+        runTestsResults.addExceptions(compileResult.getExceptions());
         addCoverageDataToRunTestsResults(contentSlangModels, testFlowModels, testCases, runTestsResults);
         return runTestsResults;
     }

@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -124,20 +125,28 @@ public class MetadataExtractorTest {
     }
 
     @Test
-    public void testExtractMetadataNewlineMissing() throws Exception {
+    public void testExtractMetadataBadInput() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_bad_inputs.sl").toURI();
+        MetadataModellingResult result = metadataExtractor
+                .extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Metadata metadata = result.getMetadata();
+
+        Assert.assertEquals("@input json_input_#1: JSON data input" + System.lineSeparator() +
+                "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'",
+                metadata.getInputs().get("json_input_#1: JSON data input"));
+        Assert.assertEquals(2, result.getErrors().size());
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Newline with metadata prefix missing '#!' in the " +
-                "description before the following line: ");
-        exception.expectMessage("#! @input json_input: JSON data input");
-        URI operation = getClass().getResource("/metadata/metadata_newline_missing.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        exception.expectMessage("does not contain colon between the tag name and the description of the " +
+                "tag for metadata_bad_inputs.sl");
+        throw result.getErrors().get(0);
     }
 
     @Test
     public void testExtractMetadataWrongOrder() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Order is not preserved.");
+        exception.expectMessage("Order is not preserved for metadata_wrong_order.sl");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
@@ -153,7 +162,8 @@ public class MetadataExtractorTest {
     public void colonMissingSingleTag() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name1.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("does not contain colon the tag name and the description of the tag.");
+        exception.expectMessage("does not contain colon between the tag name and the description of the " +
+                "tag for metadata_colon_missing_after_tag_name1.sl");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
@@ -161,7 +171,8 @@ public class MetadataExtractorTest {
     public void colonMissingRegularTag() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name2.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("does not contain colon the tag name and the description of the tag.");
+        exception.expectMessage("does not contain colon between the tag name and the description of the " +
+                "tag for metadata_colon_missing_after_tag_name2.sl");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
@@ -175,7 +186,8 @@ public class MetadataExtractorTest {
     public void descriptionAfterStartingTag() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_description_after_starting_tag.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Description is not accepted on the same line as the starting tag.");
+        exception.expectMessage("Description is not accepted on the same line as the starting " +
+                "tag for metadata_description_after_starting_tag.sl");
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 

@@ -13,10 +13,12 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 
 import java.io.File;
+import java.util.Queue;
 
 public interface StaticValidator {
     void validateSlangFile(File slangFile,
                            Executable executable,
                            Metadata sourceMetadata,
-                           boolean shouldValidateDescription);
+                           boolean shouldValidateDescription,
+                           Queue<RuntimeException> exceptions);
 }

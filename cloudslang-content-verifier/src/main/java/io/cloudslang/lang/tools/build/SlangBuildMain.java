@@ -24,6 +24,15 @@ import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.runconfiguration.TestRunInfoService;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,14 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getBooleanFromPropertiesWithDefault;
 import static io.cloudslang.lang.tools.build.ArgumentProcessorUtils.getEnumInstanceFromPropertiesWithDefault;
@@ -285,6 +286,7 @@ public class SlangBuildMain {
             logErrorsPrefix(loggingService);
             loggingService.logEvent(Level.ERROR, "Exception: " + e.getMessage());
             logErrorsSuffix(projectPath, loggingService);
+            loggingService.waitForAllLogTasksToFinish();
             System.exit(1);
         }
     }
@@ -483,6 +485,7 @@ public class SlangBuildMain {
             loggingService.logEvent(Level.ERROR, "Exception: " + runtimeException.getMessage());
         }
         logErrorsSuffix(projectPath, loggingService);
+        loggingService.waitForAllLogTasksToFinish();
         System.exit(1);
     }
 
