@@ -22,14 +22,14 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
-
+import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.EventBusImpl;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +37,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.python.core.PyDictionary;
-import org.python.google.common.collect.Sets;
 import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -187,6 +186,11 @@ public class ScriptEvaluatorTest {
                     };
                 }
             };
+        }
+
+        @Bean
+        public EventBus eventBus() {
+            return new EventBusImpl();
         }
     }
 }

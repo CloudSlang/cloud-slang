@@ -35,15 +35,15 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.api.EndBranchDataContainer;
+import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +51,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -585,6 +584,11 @@ public class ParallelLoopStepsTest {
         @Bean
         public DummyEncryptor dummyEncryptor() {
             return new DummyEncryptor();
+        }
+
+        @Bean
+        public EventBus eventBus() {
+            return new EventBusImpl();
         }
     }
 }
