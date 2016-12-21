@@ -71,12 +71,12 @@ public class MetadataValidatorImpl implements MetadataValidator {
         if (lineBeforeBlockStartTag != null &&
                 !StringUtils.contains(lineBeforeBlockStartTag, DESCRIPTION_DELIMITER_LINE)) {
             exceptions.add(new RuntimeException("Before the description start tag there should be a line containing " +
-                    "'#' characters for " + source.getName()));
+                    "120 '#' characters for " + source.getFilePath()));
         }
         if (lineAfterBlockEndTag != null &&
                 !StringUtils.contains(lineAfterBlockEndTag, DESCRIPTION_DELIMITER_LINE)) {
             exceptions.add(new RuntimeException("After the description end tag there should be a line containing " +
-                    "'#' characters for " + source.getName()));
+                    "120 '#' characters for " + source.getFilePath()));
         }
     }
 
@@ -85,7 +85,7 @@ public class MetadataValidatorImpl implements MetadataValidator {
         if (previousTagLine != null && bothLinesContainTags(previousTagLine, line) &&
                 containedTagsAreDifferent(previousTagLine, line) &&
                 isNotEmptyLineWithPrefix(previousMetadataLine)) {
-            exceptions.add(new RuntimeException("For " + source.getName() +
+            exceptions.add(new RuntimeException("For " + source.getFilePath() +
                     " the newline with metadata prefix '#!' is missing " +
                     "in the description before the following line: " + System.lineSeparator() + line));
         }

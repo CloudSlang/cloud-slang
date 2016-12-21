@@ -61,7 +61,7 @@ public class MetadataParser {
             while (it.hasNext()) {
                 int keyTagPosition = DescriptionTag.asList().indexOf(DescriptionTag.getContainedTag(it.next()));
                 if (previousTagPosition > keyTagPosition) {
-                    errors.add(new RuntimeException("Order is not preserved for " + source.getName()));
+                    errors.add(new RuntimeException("Order is not preserved for " + source.getFilePath()));
                 }
                 previousTagPosition = keyTagPosition;
             }
@@ -120,7 +120,7 @@ public class MetadataParser {
                 stringTokenizer.countTokens() > 1) {
             errors.add(new RuntimeException("Line \"" + line +
                     "\" does not contain colon between the tag name and the description of the tag for " +
-                    source.getName()));
+                    source.getFilePath()));
         }
     }
 
@@ -186,13 +186,13 @@ public class MetadataParser {
                                              List<RuntimeException> errors) {
         if (lineWithBlockStartTag.length() > BLOCK_START_TAG.length()) {
             errors.add(new RuntimeException("Description is not accepted on the same line as the starting tag for " +
-                    source.getName()));
+                    source.getFilePath()));
         }
         if (blockEndTagFound && !blockStartTagFound) {
-            errors.add(new RuntimeException("Starting tag missing in the description for " + source.getName()));
+            errors.add(new RuntimeException("Starting tag missing in the description for " + source.getFilePath()));
         }
         if (!blockEndTagFound && sb.length() > 0) {
-            errors.add(new RuntimeException("Closing tag missing in the description for " + source.getName()));
+            errors.add(new RuntimeException("Closing tag missing in the description for " + source.getFilePath()));
         }
     }
 
