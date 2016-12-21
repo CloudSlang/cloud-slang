@@ -12,7 +12,6 @@ package io.cloudslang.lang.compiler.parser;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.ParseMetadataModellingResult;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
-import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -40,12 +39,10 @@ public class MetadataParser {
 
 
     private ParserExceptionHandler parserExceptionHandler;
-    private MetadataValidator metadataValidator;
 
     public ParseMetadataModellingResult parse(SlangSource source) {
         Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
         try {
-            metadataValidator.validate(source);
             List<RuntimeException> errors = new ArrayList<>();
             String description = extractDescriptionString(source, errors);
             Map<String, String> tagMap = extractTagMap(description, source,  errors);
@@ -164,7 +161,8 @@ public class MetadataParser {
                 appendValidLineToOutput(strBuilder, blockStartTagFound, line);
                 line = getTrimmedLine(reader);
             }
-            checkStartingAndClosingTags(strBuilder, lineWithBlockStartTag, blockEndTagFound, blockStartTagFound, source, errors);
+            checkStartingAndClosingTags(strBuilder, lineWithBlockStartTag, blockEndTagFound,
+                    blockStartTagFound, source, errors);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
@@ -200,9 +198,5 @@ public class MetadataParser {
 
     public void setParserExceptionHandler(ParserExceptionHandler parserExceptionHandler) {
         this.parserExceptionHandler = parserExceptionHandler;
-    }
-
-    public void setMetadataValidator(MetadataValidator metadataValidator) {
-        this.metadataValidator = metadataValidator;
     }
 }

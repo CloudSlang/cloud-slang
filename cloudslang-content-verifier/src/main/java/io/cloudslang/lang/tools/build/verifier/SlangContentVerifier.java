@@ -81,7 +81,8 @@ public class SlangContentVerifier {
                 sourceModel = preCompileResult.getExecutable();
                 exceptions.addAll(preCompileResult.getErrors());
 
-                MetadataModellingResult metadataResult = metadataExtractor.extractMetadataModellingResult(slangSource);
+                MetadataModellingResult metadataResult = metadataExtractor
+                        .extractMetadataModellingResult(slangSource, shouldValidateDescription);
                 Metadata sourceMetadata = metadataResult.getMetadata();
                 exceptions.addAll(metadataResult.getErrors());
 

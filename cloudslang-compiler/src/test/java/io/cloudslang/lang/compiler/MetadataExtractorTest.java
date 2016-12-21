@@ -103,7 +103,7 @@ public class MetadataExtractorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Before the description start tag there should be a line containing '#' characters");
 
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
     }
 
     @Test
@@ -113,7 +113,19 @@ public class MetadataExtractorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("After the description end tag there should be a line containing '#' characters");
 
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
+    }
+
+    @Test
+    public void testExtractMetadataNewLineMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_newline_error.sl").toURI();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("For metadata_newline_error.sl the newline with metadata prefix '#!' " +
+                "is missing in the description before the following line: " + System.lineSeparator() +
+                "#! @input json_input: JSON data input");
+
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
     }
 
     @Test
@@ -128,7 +140,7 @@ public class MetadataExtractorTest {
     public void testExtractMetadataBadInput() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_bad_inputs.sl").toURI();
         MetadataModellingResult result = metadataExtractor
-                .extractMetadataModellingResult(SlangSource.fromFile(operation));
+                .extractMetadataModellingResult(SlangSource.fromFile(operation), true);
 
         Metadata metadata = result.getMetadata();
 

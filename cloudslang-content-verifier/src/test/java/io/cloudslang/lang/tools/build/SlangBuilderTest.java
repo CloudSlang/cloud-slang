@@ -254,7 +254,7 @@ public class SlangBuilderTest {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(null, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         exception.expect(RuntimeException.class);
         exception.expectMessage("1");
@@ -272,7 +272,7 @@ public class SlangBuilderTest {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(EMPTY_EXECUTABLE, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(null, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
@@ -289,7 +289,7 @@ public class SlangBuilderTest {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(EMPTY_EXECUTABLE, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(null, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
@@ -305,7 +305,7 @@ public class SlangBuilderTest {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(EMPTY_EXECUTABLE, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(null, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(null);
         exception.expect(RuntimeException.class);
@@ -331,7 +331,7 @@ public class SlangBuilderTest {
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(newExecutable, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA),
@@ -370,6 +370,8 @@ public class SlangBuilderTest {
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         when(scoreCompiler.compile(dependencyExecutable, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
+                .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
@@ -385,7 +387,7 @@ public class SlangBuilderTest {
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA),
@@ -407,7 +409,7 @@ public class SlangBuilderTest {
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable),
@@ -450,7 +452,7 @@ public class SlangBuilderTest {
                 .thenReturn(new ExecutableModellingResult(executable, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(executable, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(),
                 resource.getPath(), null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
@@ -466,7 +468,7 @@ public class SlangBuilderTest {
                 null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA),
@@ -487,7 +489,7 @@ public class SlangBuilderTest {
         final URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(EMPTY_EXECUTABLE, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(null, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
@@ -519,7 +521,7 @@ public class SlangBuilderTest {
         final URI testResource = getClass().getResource("/test/valid").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(EMPTY_EXECUTABLE, new ArrayList<RuntimeException>()));
-        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(null, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);

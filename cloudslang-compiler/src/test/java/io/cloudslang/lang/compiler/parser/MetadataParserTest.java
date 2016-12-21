@@ -10,7 +10,6 @@
 package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -34,9 +33,6 @@ public class MetadataParserTest {
 
     @Mock
     private ParserExceptionHandler parserExceptionHandler;
-
-    @Mock
-    private MetadataValidator metadataValidator;
 
     @Test
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
