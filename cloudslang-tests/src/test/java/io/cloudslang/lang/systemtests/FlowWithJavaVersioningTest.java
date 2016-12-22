@@ -22,7 +22,6 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -220,5 +218,21 @@ public class FlowWithJavaVersioningTest extends SystemsTestsParent {
             assertNotNull("expected result 'muls_result' was not found", actualResult);
             assertEquals(sumOfMulSum.toString(), actualResult);
         }
+    }
+
+    @Test
+    public void testClasspathIsolationSerializableSessionDataParallelLoop() throws Exception {
+        URI flow = getClass().getResource("/yaml/versioning/flow_sdk_serilizable_session_object.sl").toURI();
+        URI op = getClass().getResource("/yaml/versioning/op_sdk_serilizable_session_object.sl").toURI();
+        URI noop = getClass().getResource("/yaml/noop.sl").toURI();
+
+        Set<SlangSource> dependencies = Sets.newHashSet(fromFile(op), fromFile(noop));
+        CompilationArtifact compilationArtifact = slang.compile(fromFile(flow), dependencies);
+        RuntimeInformation runtimeInformation =
+                triggerWithData(compilationArtifact, new HashMap<String, Value>(), new HashSet<SystemProperty>());
+
+        // assert all the steps were invoked
+        assertEquals(6, runtimeInformation.getSteps().size());
+        // flow should pass without exception
     }
 }
