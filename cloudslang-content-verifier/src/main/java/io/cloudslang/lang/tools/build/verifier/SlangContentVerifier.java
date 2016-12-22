@@ -15,11 +15,18 @@ import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -28,10 +35,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Created by stoneo on 3/15/2015.
@@ -57,7 +60,7 @@ public class SlangContentVerifier {
     @Autowired
     private SlangCompilationService slangCompilationService;
 
-    public CompilationResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
+    public PreCompileResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" +
                 directoryPath + "\' does not lead to a directory");
@@ -73,12 +76,22 @@ public class SlangContentVerifier {
                 Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() +
                         "\' must lead to a file");
                 SlangSource slangSource = SlangSource.fromFile(slangFile);
-                sourceModel = slangCompiler.preCompile(slangSource);
-                Metadata sourceMetadata = metadataExtractor.extractMetadata(slangSource);
+
+                ExecutableModellingResult preCompileResult = slangCompiler.preCompileSource(slangSource);
+                sourceModel = preCompileResult.getExecutable();
+                exceptions.addAll(preCompileResult.getErrors());
+
+                MetadataModellingResult metadataResult = metadataExtractor.extractMetadataModellingResult(slangSource);
+                Metadata sourceMetadata = metadataResult.getMetadata();
+                exceptions.addAll(metadataResult.getErrors());
+
                 if (sourceModel != null) {
-                    staticValidator
-                            .validateSlangFile(slangFile, sourceModel, sourceMetadata, shouldValidateDescription);
-                    slangModels.put(getUniqueName(sourceModel), sourceModel);
+                    int size = exceptions.size();
+                    staticValidator.validateSlangFile(slangFile, sourceModel,
+                                    sourceMetadata, shouldValidateDescription, exceptions);
+                    if (size == exceptions.size()) {
+                        slangModels.put(getUniqueName(sourceModel), sourceModel);
+                    }
                 }
             } catch (Exception e) {
                 String errorMessage = "Failed to extract metadata for file: \'" +
@@ -95,13 +108,14 @@ public class SlangContentVerifier {
                     " executable files in path: \'" + directoryPath +
                     "\' But managed to create slang models for only: " + slangModels.size()));
         }
-        CompilationResult compilationResult = new CompilationResult();
-        compilationResult.addExceptions(exceptions);
-        compilationResult.addResults(slangModels);
-        return compilationResult;
+        PreCompileResult preCompileResult = new PreCompileResult();
+        preCompileResult.addExceptions(exceptions);
+        preCompileResult.addResults(slangModels);
+        return preCompileResult;
     }
 
-    public Map<String, CompilationArtifact> compileSlangModels(Map<String, Executable> slangModels) {
+    public CompileResult compileSlangModels(Map<String, Executable> slangModels) {
+        CompileResult compileResult = new CompileResult();
         Map<String, CompilationArtifact> compiledArtifacts = new HashMap<>();
         for (Map.Entry<String, Executable> slangModelEntry : slangModels.entrySet()) {
             Executable slangModel = slangModelEntry.getValue();
@@ -123,10 +137,12 @@ public class SlangContentVerifier {
                 String errorMessage = "Failed compiling Slang source: \'" + slangModel.getNamespace() + "." +
                         slangModel.getName() + "\'.\n" + e.getMessage();
                 loggingService.logEvent(Level.ERROR, errorMessage);
-                throw new RuntimeException(errorMessage, e);
+                compileResult.addException(new RuntimeException(errorMessage, e));
             }
         }
-        return compiledArtifacts;
+
+        compileResult.addResults(compiledArtifacts);
+        return compileResult;
     }
 
     private Set<Executable> getModelDependenciesRecursively(Map<String, Executable> slangModels,

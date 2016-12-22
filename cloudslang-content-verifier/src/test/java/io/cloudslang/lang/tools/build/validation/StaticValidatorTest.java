@@ -24,11 +24,13 @@ import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 public class StaticValidatorTest {
@@ -58,11 +60,15 @@ public class StaticValidatorTest {
         inputMap.put("input2", "description2");
         metadata.setInputs(inputMap);
 
+        Queue<RuntimeException> exceptions = new ArrayDeque<>();
+        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
+                newExecutable, metadata, true, exceptions);
+
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
                 "Input 'input3' is missing description.");
-        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata, true);
+
+        throw exceptions.peek();
     }
 
     @Test
@@ -78,8 +84,10 @@ public class StaticValidatorTest {
         inputMap.put("input2", "description2");
         metadata.setInputs(inputMap);
 
+        Queue<RuntimeException> exceptions = new ArrayDeque<>();
+
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata, true);
+                newExecutable, metadata, true, exceptions);
     }
 
     @Test
@@ -98,11 +106,14 @@ public class StaticValidatorTest {
         outputMap.put("output2", "description2");
         metadata.setOutputs(outputMap);
 
+        Queue<RuntimeException> exceptions = new ArrayDeque<>();
+
+        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
+                newExecutable, metadata, true, exceptions);
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
                 "Output 'output3' is missing description.");
-        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata, true);
+        throw exceptions.peek();
     }
 
     @Test
@@ -118,11 +129,14 @@ public class StaticValidatorTest {
         inputMap.put("result2", "description2");
         metadata.setResults(inputMap);
 
+        Queue<RuntimeException> exceptions = new ArrayDeque<>();
+        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
+                newExecutable, metadata, true, exceptions);
+
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
                 "Result 'result3' is missing description.");
-        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata, true);
+        throw exceptions.peek();
     }
 
     @Test
@@ -134,11 +148,14 @@ public class StaticValidatorTest {
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
 
+        Queue<RuntimeException> exceptions = new ArrayDeque<>();
+        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
+                newExecutable, metadata, true, exceptions);
+
         exception.expect(RuntimeException.class);
         exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
                 "Results are missing description entirely.");
-        staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
-                newExecutable, metadata, true);
+        throw exceptions.peek();
     }
 
 }
