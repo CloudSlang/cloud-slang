@@ -79,6 +79,8 @@ public class ScoreServicesImpl implements ScoreServices {
             handlerTypes.add(EventConstants.SCORE_FINISHED_EVENT);
             handlerTypes.add(EventConstants.SCORE_ERROR_EVENT);
             handlerTypes.add(EventConstants.SCORE_FAILURE_EVENT);
+            handlerTypes.add(EventConstants.MAVEN_DEPENDENCY_BUILD);
+            handlerTypes.add(EventConstants.MAVEN_DEPENDENCY_BUILD_FINISHED);
             handlerTypes.add(SLANG_EXECUTION_EXCEPTION);
             handlerTypes.add(EVENT_EXECUTION_FINISHED);
             handlerTypes.add(EVENT_STEP_START);

@@ -15,19 +15,21 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.fusesource.jansi.Ansi.ansi;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.Color.WHITE;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
 
 /**
  * Date: 2/26/2015
@@ -35,15 +37,15 @@ import static org.fusesource.jansi.Ansi.ansi;
  * @author lesant
  */
 public class SyncTriggerEventListener implements ScoreEventListener {
-    public static final String SLANG_STEP_ERROR_MSG = "Slang Error: ";
-    public static final String SCORE_ERROR_EVENT_MSG = "Score Error Event:";
-    public static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
-    public static final String EXEC_START_PATH = "0";
-    public static final int OUTPUT_VALUE_LIMIT = 100;
+    private static final String SLANG_STEP_ERROR_MSG = "Slang Error: ";
+    private static final String SCORE_ERROR_EVENT_MSG = "Score Error Event:";
+    private static final String FLOW_FINISHED_WITH_FAILURE_MSG = "Flow finished with failure";
+    private static final String EXEC_START_PATH = "0";
+    private static final int OUTPUT_VALUE_LIMIT = 100;
     private static final String STEP_PATH_PREFIX = "- ";
-    public static final String FLOW_OUTPUTS = "Flow outputs:";
-    public static final String OPERATION_OUTPUTS = "Operation outputs:";
-    public static final String FINISHED_WITH_RESULT = " finished with result: ";
+    private static final String FLOW_OUTPUTS = "Flow outputs:";
+    private static final String OPERATION_OUTPUTS = "Operation outputs:";
+    private static final String FINISHED_WITH_RESULT = " finished with result: ";
 
     private AtomicBoolean flowFinished = new AtomicBoolean(false);
     private AtomicReference<String> errorMessage = new AtomicReference<>("");
@@ -77,8 +79,14 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         data.get(EventConstants.SCORE_ERROR_MSG));
                 break;
             case EventConstants.SCORE_FAILURE_EVENT:
-                consolePrinter.printWithColor(Ansi.Color.RED, FLOW_FINISHED_WITH_FAILURE_MSG);
+                consolePrinter.printWithColor(RED, FLOW_FINISHED_WITH_FAILURE_MSG);
                 flowFinished.set(true);
+                break;
+            case EventConstants.MAVEN_DEPENDENCY_BUILD:
+                printDownloadArtifactMessage((String) data.get(EventConstants.MAVEN_DEPENDENCY_BUILD));
+                break;
+            case EventConstants.MAVEN_DEPENDENCY_BUILD_FINISHED:
+                printDownloadArtifactMessage((String) data.get(EventConstants.MAVEN_DEPENDENCY_BUILD_FINISHED));
                 break;
             case ScoreLangConstants.SLANG_EXECUTION_EXCEPTION:
                 errorMessage.set(SLANG_STEP_ERROR_MSG + data.get(LanguageEventData.EXCEPTION));
@@ -90,7 +98,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                     String path = eventData.getPath();
                     int matches = StringUtils.countMatches(path, ExecutionPath.PATH_SEPARATOR);
                     String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
-                    consolePrinter.printWithColor(Ansi.Color.YELLOW, prefix + stepName);
+                    consolePrinter.printWithColor(YELLOW, prefix + stepName);
                 }
                 break;
             case ScoreLangConstants.EVENT_OUTPUT_END:
@@ -103,7 +111,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         String prefix = StringUtils.repeat(STEP_PATH_PREFIX, matches);
 
                         for (Map.Entry<String, Serializable> entry : stepOutputs.entrySet()) {
-                            consolePrinter.printWithColor(Ansi.Color.WHITE, prefix +
+                            consolePrinter.printWithColor(WHITE, prefix +
                                     entry.getKey() + " = " + entry.getValue());
                         }
                     }
@@ -114,9 +122,9 @@ public class SyncTriggerEventListener implements ScoreEventListener {
                         data.get(LanguageEventData.PATH).equals(EXEC_START_PATH)) {
                     Map<String, Serializable> outputs = extractNotEmptyOutputs(data);
                     if (outputs.size() > 0) {
-                        printForOperationOrFlow(data, Ansi.Color.WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
+                        printForOperationOrFlow(data, WHITE, "\n" + OPERATION_OUTPUTS, "\n" + FLOW_OUTPUTS);
                         for (Map.Entry<String, Serializable> entry : outputs.entrySet()) {
-                            consolePrinter.printWithColor(Ansi.Color.WHITE, "- " +
+                            consolePrinter.printWithColor(WHITE, "- " +
                                     entry.getKey() + " = " + entry.getValue());
                         }
                     }
@@ -131,16 +139,17 @@ public class SyncTriggerEventListener implements ScoreEventListener {
         }
     }
 
+    private void printDownloadArtifactMessage(String message) {
+        consolePrinter.printWithColor(CYAN, message);
+    }
+
     public static Map<String, Serializable> extractNotEmptyOutputs(Map<String, Serializable> data) {
 
         Map<String, Serializable> originalOutputs = (Map<String, Serializable>) data.get(LanguageEventData.OUTPUTS);
         Map<String, Serializable> extractedOutputs = new HashMap<>();
 
         if (MapUtils.isNotEmpty(originalOutputs)) {
-            Iterator<Map.Entry<String, Serializable>> iterator = originalOutputs.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, Serializable> output = iterator.next();
-
+            for (Map.Entry<String, Serializable> output : originalOutputs.entrySet()) {
                 if (output.getValue() != null && !(StringUtils.isEmpty(output.getValue().toString()))) {
                     extractedOutputs.put(output.getKey(),
                             StringUtils.abbreviate(output.getValue().toString(), 0, OUTPUT_VALUE_LIMIT));
@@ -155,7 +164,7 @@ public class SyncTriggerEventListener implements ScoreEventListener {
     private void printFinishEvent(Map<String, Serializable> data) {
         String flowResult = (String) data.get(LanguageEventData.RESULT);
         String flowName = (String) data.get(LanguageEventData.STEP_NAME);
-        printForOperationOrFlow(data, Ansi.Color.CYAN, "Operation: " + flowName + FINISHED_WITH_RESULT + flowResult,
+        printForOperationOrFlow(data, CYAN, "Operation: " + flowName + FINISHED_WITH_RESULT + flowResult,
                 "Flow: " + flowName + FINISHED_WITH_RESULT + flowResult);
     }
 
