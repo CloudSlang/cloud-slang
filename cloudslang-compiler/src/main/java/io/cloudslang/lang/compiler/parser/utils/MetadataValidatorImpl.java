@@ -24,7 +24,7 @@ public class MetadataValidatorImpl implements MetadataValidator {
     private static final String DESCRIPTION_DELIMITER_LINE = "#######################################" +
             "#################################################################################";
 
-    public List<RuntimeException> validate(SlangSource source) {
+    public List<RuntimeException> validateCheckstyle(SlangSource source) {
         List<RuntimeException> exceptions = new ArrayList<>();
         String lineBeforeBlockStartTag = null;
         String lineAfterBlockEndTag = null;

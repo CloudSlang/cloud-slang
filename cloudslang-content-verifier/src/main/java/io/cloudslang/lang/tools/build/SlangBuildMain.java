@@ -155,6 +155,7 @@ public class SlangBuildMain {
         String testCaseTimeout = parseTestTimeout(appArgs);
         setProperty(TEST_CASE_TIMEOUT_IN_MINUTES_KEY, valueOf(testCaseTimeout));
         final boolean shouldValidateDescription = appArgs.shouldValidateDescription();
+        final boolean shouldValidateCheckstyle = appArgs.shouldValidateCheckstyle();
         String runConfigPath = FilenameUtils.normalize(appArgs.getRunConfigPath());
 
         BuildMode buildMode = null;
@@ -229,6 +230,7 @@ public class SlangBuildMain {
 
         log.info("Print coverage data: " + valueOf(shouldPrintCoverageData));
         log.info("Validate description: " + valueOf(shouldValidateDescription));
+        log.info("Validate checkstyle: " + valueOf(shouldValidateCheckstyle));
         log.info("Thread count: " + threadCount);
         log.info("Test case timeout in minutes: " + (isEmpty(testCaseTimeout) ?
                 valueOf(MAX_TIME_PER_TESTCASE_IN_MINUTES) : testCaseTimeout));
@@ -252,7 +254,7 @@ public class SlangBuildMain {
 
             SlangBuildResults buildResults =
                     slangBuilder.buildSlangContent(projectPath, contentPath, testsPath, testSuites,
-                            shouldValidateDescription, bulkRunMode, buildMode, changedFiles);
+                            shouldValidateDescription, shouldValidateCheckstyle, bulkRunMode, buildMode, changedFiles);
             exceptions.addAll(buildResults.getCompilationExceptions());
             if (exceptions.size() > 0) {
                 logErrors(exceptions, projectPath, loggingService);

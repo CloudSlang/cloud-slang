@@ -18,5 +18,5 @@ public interface MetadataExtractor {
 
     Metadata extractMetadata(SlangSource source, boolean shouldValidateDescription);
 
-    MetadataModellingResult extractMetadataModellingResult(SlangSource source, boolean shouldValidateDescription);
+    MetadataModellingResult extractMetadataModellingResult(SlangSource source, boolean shouldValidateCheckstyle);
 }

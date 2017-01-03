@@ -71,6 +71,7 @@ public class SlangBuilder {
             String testsPath,
             List<String> testSuits,
             boolean shouldValidateDescription,
+            boolean shouldValidateCheckstyle,
             BulkRunMode bulkRunMode,
             SlangBuildMain.BuildMode buildMode,
             Set<String> changedFiles) {
@@ -84,7 +85,8 @@ public class SlangBuilder {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- compiling sources ---");
         PreCompileResult preCompileResult =
-                slangContentVerifier.createModelsAndValidate(contentPath, shouldValidateDescription);
+                slangContentVerifier.createModelsAndValidate(contentPath,
+                        shouldValidateDescription, shouldValidateCheckstyle);
         Map<String, Executable> slangModels = preCompileResult.getResults();
 
         List<RuntimeException> exceptions = new ArrayList<>(preCompileResult.getExceptions());
@@ -134,7 +136,7 @@ public class SlangBuilder {
         loggingService.logEvent(Level.INFO, "");
         loggingService.logEvent(Level.INFO, "--- compiling tests sources ---");
         // Compile all slang test flows under the test directory
-        PreCompileResult preCompileResult = slangContentVerifier.createModelsAndValidate(testsPath, false);
+        PreCompileResult preCompileResult = slangContentVerifier.createModelsAndValidate(testsPath, false, false);
         Map<String, Executable> testFlowModels = preCompileResult.getResults();
         // Add also all of the slang models of the content in order to allow for compilation of the test flows
         Map<String, Executable> allTestedFlowModels = new HashMap<>(testFlowModels);

@@ -191,14 +191,15 @@ public class SlangBuilderTest {
     public void testNullDirPath() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
-        slangBuilder.buildSlangContent(null, null, null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+        slangBuilder.buildSlangContent(null, null, null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
     }
 
     @Test
     public void testEmptyDirPath() throws Exception {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("path");
-        slangBuilder.buildSlangContent("", "content", null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+        slangBuilder.buildSlangContent("", "content", null,
+                null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
     }
 
     @Test
@@ -234,7 +235,7 @@ public class SlangBuilderTest {
         exception.expectMessage("c/h/j");
         exception.expectMessage("directory");
         slangBuilder.buildSlangContent("c/h/j", "c/h/j/content", null,
-                null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
     }
 
     @Test
@@ -243,7 +244,7 @@ public class SlangBuilderTest {
         when(slangCompiler.preCompile(any(SlangSource.class))).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -261,7 +262,7 @@ public class SlangBuilderTest {
         exception.expectMessage("0");
         exception.expectMessage("compiled");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -278,7 +279,7 @@ public class SlangBuilderTest {
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
 
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " +
                 numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
@@ -294,7 +295,7 @@ public class SlangBuilderTest {
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
         exception.expect(RuntimeException.class);
         SlangBuildResults results = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false,
+                null, null, false, false,
                 ALL_SEQUENTIAL, buildMode, changedFiles);
 
         throw results.getCompilationExceptions().get(0);
@@ -314,7 +315,7 @@ public class SlangBuilderTest {
         exception.expectMessage("compile");
         exception.expectMessage("models");
         SlangBuildResults results = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false,
+                null, null, false, false,
                 ALL_SEQUENTIAL, buildMode, changedFiles);
 
         throw results.getCompilationExceptions().get(0);
@@ -340,7 +341,7 @@ public class SlangBuilderTest {
         exception.expectMessage("dependency");
         exception.expectMessage("dep1");
         SlangBuildResults results = slangBuilder.buildSlangContent(resource.getPath(),
-                resource.getPath(), null, null, false,
+                resource.getPath(), null, null, false, false,
                 ALL_SEQUENTIAL, buildMode, changedFiles);
 
         throw results.getCompilationExceptions().get(0);
@@ -373,7 +374,7 @@ public class SlangBuilderTest {
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         // properties file should be ignored
         assertEquals("Did not compile all Slang files. Expected to compile: 2, but compiled: " +
@@ -396,7 +397,7 @@ public class SlangBuilderTest {
         exception.expectMessage("Namespace");
         exception.expectMessage("wrong.namespace");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -420,7 +421,7 @@ public class SlangBuilderTest {
         exception.expectMessage("wrong_name");
 
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(),
-                resource.getPath(), null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                resource.getPath(), null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
 
@@ -437,7 +438,7 @@ public class SlangBuilderTest {
         when(scoreCompiler.compile(executable, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
-                null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " +
                 numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
@@ -455,7 +456,7 @@ public class SlangBuilderTest {
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(),
-                resource.getPath(), null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                resource.getPath(), null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " +
                 numberOfCompiledSlangFiles, 1, numberOfCompiledSlangFiles);
@@ -477,7 +478,7 @@ public class SlangBuilderTest {
         exception.expectMessage("invalid-chars$");
         exception.expectMessage("alphanumeric");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(),
-                resource.getPath(), null, null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                resource.getPath(), null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
         throw slangBuildResults.getCompilationExceptions().get(0);
@@ -507,7 +508,7 @@ public class SlangBuilderTest {
                 .runTestsSequential((any(String.class)), anyMap(), anyMap(), any(RunTestsResults.class));
         SlangBuildResults buildResults = slangBuilder
                 .buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(),
-                        null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                        null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         int numberOfCompiledSlangFiles = buildResults.getNumberOfCompiledSources();
         IRunTestResults actualRunTestsResults = buildResults.getRunTestsResults();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " +
@@ -549,7 +550,7 @@ public class SlangBuilderTest {
 
         SlangBuildResults buildResults = slangBuilder
                 .buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(),
-                        null, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+                        null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
 
         // test case: test flow path points to non existing executable
         // validate execution does not return when detects this situation and coverage data is added to results

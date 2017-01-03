@@ -47,18 +47,18 @@ public class MetadataExtractorImpl implements MetadataExtractor {
 
     @Override
     public MetadataModellingResult extractMetadataModellingResult(SlangSource source,
-                                                                  boolean shouldValidateDescription) {
-        ParseMetadataModellingResult result = getParseMetadataModellingResult(source, shouldValidateDescription);
+                                                                  boolean shouldValidateCheckstyle) {
+        ParseMetadataModellingResult result = getParseMetadataModellingResult(source, shouldValidateCheckstyle);
         Metadata metadata = metadataModeller.createModel(result.getParseResult());
         return new MetadataModellingResult(metadata, result.getErrors());
     }
 
     private ParseMetadataModellingResult getParseMetadataModellingResult(SlangSource source,
-                                                                         boolean shouldValidateDescription) {
+                                                                         boolean shouldValidateCheckstyle) {
         Validate.notNull(source, "You must supply a source to extract the metadata from");
         ParseMetadataModellingResult result = metadataParser.parse(source);
-        if (shouldValidateDescription) {
-            List<RuntimeException> exceptions = metadataValidator.validate(source);
+        if (shouldValidateCheckstyle) {
+            List<RuntimeException> exceptions = metadataValidator.validateCheckstyle(source);
             result.getErrors().addAll(exceptions);
         }
         return result;

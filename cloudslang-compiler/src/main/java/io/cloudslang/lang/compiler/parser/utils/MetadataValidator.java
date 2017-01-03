@@ -15,5 +15,5 @@ import java.util.List;
 
 public interface MetadataValidator {
 
-    List<RuntimeException> validate(SlangSource source);
+    List<RuntimeException> validateCheckstyle(SlangSource source);
 }
