@@ -7,16 +7,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler;
+package io.cloudslang.lang.compiler.parser.utils;
 
-import io.cloudslang.lang.compiler.modeller.model.Metadata;
-import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
+import io.cloudslang.lang.compiler.SlangSource;
 
-public interface MetadataExtractor {
+import java.util.List;
 
-    Metadata extractMetadata(SlangSource source);
+public interface MetadataValidator {
 
-    Metadata extractMetadata(SlangSource source, boolean shouldValidateDescription);
-
-    MetadataModellingResult extractMetadataModellingResult(SlangSource source, boolean shouldValidateCheckstyle);
+    List<RuntimeException> validateCheckstyle(SlangSource source);
 }

@@ -12,6 +12,7 @@ package io.cloudslang.lang.tools.build.commands;
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.CommaParameterSplitter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +63,10 @@ public class ApplicationArgs {
             description = "Whether or not to validate the inputs, outputs and results have description")
     public boolean validateDescription = false;
 
+    @Parameter(names = {"--checkstyle", "-cs"},
+            description = "Whether or not to validate the checkstyle of the description")
+    public boolean validateCheckstyle = false;
+
     @Parameter(names = {"--changes-only", "-co"},
             description = "Run only tests from active suites that were affected by this changelist")
     public String changesOnlyConfigPath;
@@ -99,6 +104,10 @@ public class ApplicationArgs {
 
     public boolean shouldValidateDescription() {
         return validateDescription;
+    }
+
+    public boolean shouldValidateCheckstyle() {
+        return validateCheckstyle;
     }
 
     public boolean isHelp() {

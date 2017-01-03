@@ -17,6 +17,8 @@ import io.cloudslang.lang.compiler.SlangCompiler;
 import io.cloudslang.lang.compiler.modeller.MetadataModeller;
 import io.cloudslang.lang.compiler.modeller.MetadataModellerImpl;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
+import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
+import io.cloudslang.lang.compiler.parser.utils.MetadataValidatorImpl;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.events.EventBus;
@@ -52,7 +54,7 @@ public class MetadataHelperTest {
             System.lineSeparator() +
             "inputs: ";
     private static final String RESULTS = "results:";
-    public static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
+    private static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
 
     @Autowired
     private MetadataHelper metadataHelper;
@@ -134,8 +136,8 @@ public class MetadataHelperTest {
         public MetadataExtractor metadataExtractor() {
             MetadataExtractorImpl metadataExtractor = new MetadataExtractorImpl();
             metadataExtractor.setMetadataModeller(metadataModeller());
+            metadataExtractor.setMetadataValidator(metadataValidator());
             metadataExtractor.setMetadataParser(metadataParser());
-
             return metadataExtractor;
         }
 
@@ -149,6 +151,11 @@ public class MetadataHelperTest {
             MetadataParser metadataParser = new MetadataParser();
             metadataParser.setParserExceptionHandler(parserExceptionHandler());
             return metadataParser;
+        }
+
+        @Bean
+        public MetadataValidator metadataValidator() {
+            return new MetadataValidatorImpl();
         }
 
         @Bean

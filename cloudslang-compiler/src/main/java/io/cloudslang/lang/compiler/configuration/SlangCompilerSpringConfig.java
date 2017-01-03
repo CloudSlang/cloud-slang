@@ -43,6 +43,8 @@ import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.modeller.transformers.WorkFlowTransformer;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
+import io.cloudslang.lang.compiler.parser.utils.MetadataValidatorImpl;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionPlanBuilder;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionStepFactory;
@@ -57,8 +59,6 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -66,6 +66,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @ComponentScan("io.cloudslang.lang.compiler")
@@ -160,6 +163,7 @@ public class SlangCompilerSpringConfig {
         MetadataExtractorImpl metadataExtractor = new MetadataExtractorImpl();
         metadataExtractor.setMetadataModeller(metadataModeller());
         metadataExtractor.setMetadataParser(metadataParser());
+        metadataExtractor.setMetadataValidator(metadataValidator());
         return metadataExtractor;
     }
 
@@ -168,6 +172,11 @@ public class SlangCompilerSpringConfig {
         MetadataParser metadataParser = new MetadataParser();
         metadataParser.setParserExceptionHandler(parserExceptionHandler());
         return metadataParser;
+    }
+
+    @Bean
+    public MetadataValidator metadataValidator() {
+        return new MetadataValidatorImpl();
     }
 
     @Bean

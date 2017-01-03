@@ -60,7 +60,8 @@ public class SlangContentVerifier {
     @Autowired
     private SlangCompilationService slangCompilationService;
 
-    public PreCompileResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription) {
+    public PreCompileResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription,
+                                                    boolean shouldValidateCheckstyle) {
         Validate.notEmpty(directoryPath, "You must specify a path");
         Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" +
                 directoryPath + "\' does not lead to a directory");
@@ -81,7 +82,8 @@ public class SlangContentVerifier {
                 sourceModel = preCompileResult.getExecutable();
                 exceptions.addAll(preCompileResult.getErrors());
 
-                MetadataModellingResult metadataResult = metadataExtractor.extractMetadataModellingResult(slangSource);
+                MetadataModellingResult metadataResult = metadataExtractor
+                        .extractMetadataModellingResult(slangSource, shouldValidateCheckstyle);
                 Metadata sourceMetadata = metadataResult.getMetadata();
                 exceptions.addAll(metadataResult.getErrors());
 

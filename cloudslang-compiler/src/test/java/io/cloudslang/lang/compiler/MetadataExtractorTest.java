@@ -97,6 +97,40 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractMetadataStartDelimiterLineMissing() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Before the description start tag there should be a line " +
+                "containing 120 '#' characters for");
+        exception.expectMessage("metadata_start_line_missing.sl");
+
+        URI operation = getClass().getResource("/metadata/metadata_start_line_missing.sl").toURI();
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
+    }
+
+    @Test
+    public void testExtractMetadataEndDelimiterLineMissing() throws Exception {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("After the description end tag there should be a " +
+                "line containing 120 '#' characters for");
+        exception.expectMessage("metadata_end_line_missing.sl");
+
+        URI operation = getClass().getResource("/metadata/metadata_end_line_missing.sl").toURI();
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
+    }
+
+    @Test
+    public void testExtractMetadataNewLineMissing() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_newline_error.sl").toURI();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("metadata_newline_error.sl the newline with metadata prefix '#!' " +
+                "is missing in the description before the following line: " + System.lineSeparator() +
+                "#! @input json_input: JSON data input");
+
+        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
+    }
+
+    @Test
     public void testExtractMetadataEmptyDescriptionSection() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_empty_description.sl").toURI();
         Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
@@ -108,7 +142,7 @@ public class MetadataExtractorTest {
     public void testExtractMetadataBadInput() throws Exception {
         URI operation = getClass().getResource("/metadata/metadata_bad_inputs.sl").toURI();
         MetadataModellingResult result = metadataExtractor
-                .extractMetadataModellingResult(SlangSource.fromFile(operation));
+                .extractMetadataModellingResult(SlangSource.fromFile(operation), true);
 
         Metadata metadata = result.getMetadata();
 
@@ -118,15 +152,17 @@ public class MetadataExtractorTest {
         Assert.assertEquals(2, result.getErrors().size());
         exception.expect(RuntimeException.class);
         exception.expectMessage("does not contain colon between the tag name and the description of the " +
-                "tag for metadata_bad_inputs.sl");
+                "tag for");
+        exception.expectMessage("metadata_bad_inputs.sl");
         throw result.getErrors().get(0);
     }
 
     @Test
     public void testExtractMetadataWrongOrder() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Order is not preserved for metadata_wrong_order.sl");
+        exception.expectMessage("Order is not preserved for");
+        exception.expectMessage("metadata_wrong_order.sl");
+        URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
@@ -140,19 +176,21 @@ public class MetadataExtractorTest {
 
     @Test
     public void colonMissingSingleTag() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name1.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("does not contain colon between the tag name and the description of the " +
-                "tag for metadata_colon_missing_after_tag_name1.sl");
+                "tag for");
+        exception.expectMessage("metadata_colon_missing_after_tag_name1.sl");
+        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name1.sl").toURI();
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
     @Test
     public void colonMissingRegularTag() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name2.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("does not contain colon between the tag name and the description of the " +
-                "tag for metadata_colon_missing_after_tag_name2.sl");
+                "tag for");
+        exception.expectMessage("metadata_colon_missing_after_tag_name2.sl");
+        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name2.sl").toURI();
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 
@@ -164,10 +202,11 @@ public class MetadataExtractorTest {
 
     @Test
     public void descriptionAfterStartingTag() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_description_after_starting_tag.sl").toURI();
         exception.expect(RuntimeException.class);
         exception.expectMessage("Description is not accepted on the same line as the starting " +
-                "tag for metadata_description_after_starting_tag.sl");
+                "tag for");
+        exception.expectMessage("metadata_description_after_starting_tag.sl");
+        URI operation = getClass().getResource("/metadata/metadata_description_after_starting_tag.sl").toURI();
         metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
     }
 

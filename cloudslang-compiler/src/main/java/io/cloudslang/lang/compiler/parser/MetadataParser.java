@@ -31,11 +31,12 @@ import java.util.regex.Pattern;
 
 public class MetadataParser {
 
-    private static final String PREFIX = "#!";
+    public static final String PREFIX = "#!";
     private static final int BEGIN_INDEX = 3;
-    private static final String BLOCK_END_TAG = "#!!#";
-    private static final String BLOCK_START_TAG = "#!!";
+    public static final String BLOCK_END_TAG = "#!!#";
+    public static final String BLOCK_START_TAG = "#!!";
     private static final String COLON = ":";
+
 
     private ParserExceptionHandler parserExceptionHandler;
 
@@ -49,7 +50,7 @@ public class MetadataParser {
             return new ParseMetadataModellingResult(tagMap, errors);
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
-                    source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+                    source.getName() + "." + System.lineSeparator() + parserExceptionHandler.getErrorMessage(e), e);
         }
     }
 
@@ -60,7 +61,7 @@ public class MetadataParser {
             while (it.hasNext()) {
                 int keyTagPosition = DescriptionTag.asList().indexOf(DescriptionTag.getContainedTag(it.next()));
                 if (previousTagPosition > keyTagPosition) {
-                    errors.add(new RuntimeException("Order is not preserved for " + source.getName()));
+                    errors.add(new RuntimeException("Order is not preserved for " + source.getFilePath()));
                 }
                 previousTagPosition = keyTagPosition;
             }
@@ -119,7 +120,7 @@ public class MetadataParser {
                 stringTokenizer.countTokens() > 1) {
             errors.add(new RuntimeException("Line \"" + line +
                     "\" does not contain colon between the tag name and the description of the tag for " +
-                    source.getName()));
+                    source.getFilePath()));
         }
     }
 
@@ -140,7 +141,7 @@ public class MetadataParser {
         StrBuilder strBuilder = new StrBuilder();
         boolean blockEndTagFound = false;
         boolean blockStartTagFound = false;
-        String firstLine = "";
+        String lineWithBlockStartTag = "";
         try (BufferedReader reader = new BufferedReader(new StringReader(source.getContent()))) {
             String line = getTrimmedLine(reader);
             while (line != null) {
@@ -149,9 +150,10 @@ public class MetadataParser {
                     break;
                 } else if (line.startsWith(BLOCK_START_TAG)) {
                     blockStartTagFound = true;
-                    firstLine = line;
+                    lineWithBlockStartTag = line;
                     line = getTrimmedLine(reader);
-                    if (line.startsWith(BLOCK_END_TAG)) {
+                    if (line != null && line.startsWith(BLOCK_END_TAG)) {
+                        blockEndTagFound = true;
                         break;
                     }
                 }
@@ -159,7 +161,8 @@ public class MetadataParser {
                 appendValidLineToOutput(strBuilder, blockStartTagFound, line);
                 line = getTrimmedLine(reader);
             }
-            checkStartingAndClosingTags(strBuilder, firstLine, blockEndTagFound, blockStartTagFound, source, errors);
+            checkStartingAndClosingTags(strBuilder, lineWithBlockStartTag, blockEndTagFound,
+                    blockStartTagFound, source, errors);
         } catch (IOException e) {
             throw new RuntimeException("Error processing metadata, error extracting metadata from " +
                     source.getName(), e);
@@ -178,18 +181,18 @@ public class MetadataParser {
         return line != null ? line.trim() : null;
     }
 
-    private void checkStartingAndClosingTags(StrBuilder sb, String firstLine, boolean blockEndTagFound,
+    private void checkStartingAndClosingTags(StrBuilder sb, String lineWithBlockStartTag, boolean blockEndTagFound,
                                              boolean blockStartTagFound, SlangSource source,
                                              List<RuntimeException> errors) {
-        if (firstLine.length() > BLOCK_START_TAG.length()) {
+        if (lineWithBlockStartTag.length() > BLOCK_START_TAG.length()) {
             errors.add(new RuntimeException("Description is not accepted on the same line as the starting tag for " +
-                    source.getName()));
+                    source.getFilePath()));
         }
         if (blockEndTagFound && !blockStartTagFound) {
-            errors.add(new RuntimeException("Starting tag missing in the description for " + source.getName()));
+            errors.add(new RuntimeException("Starting tag missing in the description for " + source.getFilePath()));
         }
         if (!blockEndTagFound && sb.length() > 0) {
-            errors.add(new RuntimeException("Closing tag missing in the description for " + source.getName()));
+            errors.add(new RuntimeException("Closing tag missing in the description for " + source.getFilePath()));
         }
     }
 
