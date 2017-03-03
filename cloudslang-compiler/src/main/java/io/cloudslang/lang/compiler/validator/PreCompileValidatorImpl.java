@@ -25,9 +25,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
@@ -369,42 +368,67 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             Set<String> reachableStepNames,
             Set<String> reachableResultNames,
             List<RuntimeException> errors) {
+        validateNavigation(
+                currentStep,
+                steps,
+                resultNames,
+                reachableStepNames,
+                reachableResultNames,
+                errors,
+                new ArrayList<String>()
+        );
+    }
+
+    private void validateNavigation(
+            Step currentStep,
+            Deque<Step> steps,
+            List<String> resultNames,
+            Set<String> reachableStepNames,
+            Set<String> reachableResultNames,
+            List<RuntimeException> errors,
+            List<String> stepResultCollisionNames) {
         String currentStepName = currentStep.getName();
         reachableStepNames.add(currentStepName);
         for (Map<String, String> map : currentStep.getNavigationStrings()) {
             Map.Entry<String, String> entry = map.entrySet().iterator().next();
             String navigationTarget = entry.getValue();
-            if (!isProcessed(navigationTarget, reachableStepNames, reachableResultNames)) {
-                boolean isResult = resultNames.contains(navigationTarget);
 
-                Step nextStepToCompile = selectNextStepToCompile(steps, navigationTarget);
+            boolean isResult = resultNames.contains(navigationTarget);
+            Step nextStepToCompile = selectNextStepToCompile(steps, navigationTarget);
+            boolean isStep = nextStepToCompile != null;
 
-                boolean isStep = nextStepToCompile != null;
-
-                if (isStep && isResult) {
+            if (isStep && isResult && !stepResultCollisionNames.contains(navigationTarget)) {
+                stepResultCollisionNames.add(navigationTarget);
+                errors.add(
+                        new RuntimeException(
+                                "Navigation target: '" + navigationTarget +
+                                        "' is declared both as step name and flow result."
+                        )
+                );
+            }
+            if (isResult) {
+                reachableResultNames.add(navigationTarget);
+            }
+            if (!isProcessed(navigationTarget, isStep, reachableStepNames, reachableResultNames)) {
+                if (isStep) {
+                    validateNavigation(
+                            nextStepToCompile,
+                            steps,
+                            resultNames,
+                            reachableStepNames,
+                            reachableResultNames,
+                            errors,
+                            stepResultCollisionNames
+                    );
+                } else if (!isResult) {
                     errors.add(
                             new RuntimeException(
-                                    "Navigation target: '" + navigationTarget +
-                                            "' is declared both as step name and flow result."
+                                    "Failed to compile step: " + currentStepName +
+                                            ". The step/result name: " + entry.getValue() +
+                                            " of navigation: " + entry.getKey() + " -> " + entry.getValue() +
+                                            " is missing"
                             )
                     );
-                }
-                if (isResult) {
-                    reachableResultNames.add(navigationTarget);
-                } else {
-                    if (isStep) {
-                        validateNavigation(nextStepToCompile, steps, resultNames, reachableStepNames,
-                                reachableResultNames, errors);
-                    } else {
-                        errors.add(
-                                new RuntimeException(
-                                        "Failed to compile step: " + currentStepName +
-                                                ". The step/result name: " + entry.getValue() +
-                                                " of navigation: " + entry.getKey() + " -> " + entry.getValue() +
-                                                " is missing"
-                                )
-                        );
-                    }
                 }
             }
         }
@@ -419,10 +443,16 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         return null;
     }
 
-    private boolean isProcessed(String navigationTarget, Set<String> reachableStepNames,
-                                Set<String> reachableResultNames) {
-
-        return reachableStepNames.contains(navigationTarget) || reachableResultNames.contains(navigationTarget);
+    private boolean isProcessed(
+            String navigationTarget,
+            boolean pointsToStep,
+            Set<String> reachableStepNames,
+            Set<String> reachableResultNames) {
+        if (pointsToStep) {
+            return reachableStepNames.contains(navigationTarget);
+        } else {
+            return reachableResultNames.contains(navigationTarget);
+        }
     }
 
     private void validateStepsAreReachable(

@@ -12,10 +12,8 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
-
 import java.net.URI;
 import java.util.List;
-
 import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -655,16 +653,63 @@ public class PreCompilerErrorsTest {
     }
 
     @Test
-    public void testFlowBothResultAndStepName() throws Exception {
-        URI resource = getClass().getResource("/corrupted/flow_both_result_and_step_name.sl").toURI();
+    public void testFlowBothResultAndStepNameAfter() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_name_step_result_after.sl").toURI();
 
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
-        assertTrue(result.getErrors().size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(
-                "Navigation target: 'BOTH_RESULT_AND_STEP_NAME' is declared both as step name and flow result."
+        List<RuntimeException> errors = result.getErrors();
+
+        assertTrue(errors.size() == 1);
+        assertContains(
+                errors,
+                0,
+                "Navigation target: 'COLLISION_ITEM' is declared both as step name and flow result."
         );
-        throw result.getErrors().get(0);
+    }
+
+    @Test
+    public void testFlowBothResultAndStepNameBefore() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_name_step_result_before.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        List<RuntimeException> errors = result.getErrors();
+
+        assertTrue(errors.size() == 1);
+        assertContains(
+                errors,
+                0,
+                "Navigation target: 'COLLISION_ITEM' is declared both as step name and flow result."
+        );
+    }
+
+    @Test
+    public void testFlowBothResultAndStepNameCurrent() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_name_step_result_current.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        List<RuntimeException> errors = result.getErrors();
+
+        assertTrue(errors.size() == 1);
+        assertContains(
+                errors,
+                0,
+                "Navigation target: 'COLLISION_ITEM' is declared both as step name and flow result."
+        );
+    }
+
+    @Test
+    public void testFlowBothResultAndStepNameAfterCurrent() throws Exception {
+        URI resource = getClass().getResource("/corrupted/flow_name_step_result_after_current.sl").toURI();
+
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+        List<RuntimeException> errors = result.getErrors();
+
+        assertTrue(errors.size() == 1);
+        assertContains(
+                errors,
+                0,
+                "Navigation target: 'COLLISION_ITEM' is declared both as step name and flow result."
+        );
     }
 
     @Test
