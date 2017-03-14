@@ -14,15 +14,12 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -38,6 +35,32 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
     public void testValues() throws Exception {
         // compile
         URI resource = getClass().getResource("/yaml/formats/values_flow.sl").toURI();
+        URI operation1 = getClass().getResource("/yaml/formats/values_op.sl").toURI();
+        URI operation2 = getClass().getResource("/yaml/noop.sl").toURI();
+
+        SlangSource dep1 = SlangSource.fromFile(operation1);
+        SlangSource dep2 = SlangSource.fromFile(operation2);
+        Set<SlangSource> path = Sets.newHashSet(dep1, dep2);
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), path);
+
+        // trigger
+        Map<String, StepData> steps = prepareAndRun(compilationArtifact);
+
+        // verify
+        StepData flowData = steps.get(EXEC_START_PATH);
+        StepData stepData = steps.get(FIRST_STEP_PATH);
+
+        verifyExecutableInputs(flowData);
+        verifyExecutableOutputs(flowData);
+        verifyStepInputs(stepData);
+        verifyStepPublishValues(stepData);
+        verifySuccessResult(flowData);
+    }
+
+    @Test
+    public void testValuesStepsWithModifiers() throws Exception {
+        // compile
+        URI resource = getClass().getResource("/yaml/formats/values_steps_modifiers.sl").toURI();
         URI operation1 = getClass().getResource("/yaml/formats/values_op.sl").toURI();
         URI operation2 = getClass().getResource("/yaml/noop.sl").toURI();
 
