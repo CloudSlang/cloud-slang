@@ -75,14 +75,46 @@ public class ValueSyntaxInFlowTest extends ValueSyntaxParent {
         StepData flowData = steps.get(EXEC_START_PATH);
         StepData stepData = steps.get(FIRST_STEP_PATH);
 
-        verifyExecutableInputs(flowData);
+        verifyExecutableInputsStepInputModifiers(flowData);
         verifyExecutableOutputs(flowData);
-        verifyStepInputs(stepData);
+        verifyStepInputsStepInputModifiers(stepData);
         verifyStepPublishValues(stepData);
         verifySuccessResult(flowData);
     }
 
     private void verifyStepInputs(StepData stepData) {
+        Map<String, Serializable> expectedStepArguments = new HashMap<>();
+
+        // properties
+        expectedStepArguments.put("input_no_expression", "input_no_expression_value");
+
+        // loaded by Yaml
+        expectedStepArguments.put("input_int", "22");
+        expectedStepArguments.put("input_str_no_quotes", "Hi");
+        expectedStepArguments.put("input_str_single", "Hi");
+        expectedStepArguments.put("input_str_double", "Hi");
+        expectedStepArguments.put("input_yaml_list", "[1, 2, 3]");
+        expectedStepArguments.put("input_yaml_map_folded", "{key1: medium, key2: false}");
+
+        // evaluated via Python
+        expectedStepArguments.put("input_python_null", null);
+        // uncomment when types will be supported
+        // expectedStepArguments.put("input_python_list", Lists.newArrayList(1, 2, 3));
+        // HashMap<String, Serializable> expectedInputPythonMap = new HashMap<>();
+        // expectedInputPythonMap.put("key1", "value1");
+        // expectedInputPythonMap.put("key2", "value2");
+        // expectedInputPythonMap.put("key3", "value3");
+        // expectedStepArguments.put("input_python_map", expectedInputPythonMap);
+        expectedStepArguments.put("b", "b");
+        expectedStepArguments.put("b_copy", "b");
+        expectedStepArguments.put("input_concat_1", "ab");
+        expectedStepArguments.put("input_concat_2_folded", "prefix_ab_suffix");
+        expectedStepArguments.put("step_argument_null", null);
+
+        assertEquals("Step arguments not bound correctly", expectedStepArguments, stepData.getInputs());
+    }
+
+    private void verifyStepInputsStepInputModifiers(StepData stepData) {
         Map<String, Serializable> expectedStepArguments = new HashMap<>();
 
         // properties
