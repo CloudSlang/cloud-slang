@@ -24,6 +24,7 @@ flow:
     - output_no_expression_input: 'output_no_expression_value'
     - authorized_keys_path: './auth'
     - scp_host_port: '8888'
+    - input_no_value_tag: 'input_no_value_tag_value'
 
     # properties
     - input_no_expression
@@ -114,6 +115,8 @@ flow:
                 sensitive: false
             - step_argument_null:
                 value: null
+            - input_no_value_tag:
+                sensitive: false
         publish:
           - output_no_expression
           - publish_int: '22'
