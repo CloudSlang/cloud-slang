@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
+import com.google.common.collect.Lists;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -18,9 +19,11 @@ import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -86,6 +88,67 @@ public class CompileForLoopsFlowTest {
                 step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY));
     }
 
+    @Test
+    public void testPreCompileLoopStepModifiers() throws Exception {
+        final URI flow = getClass().getResource("/loops/for_loop_step_modifiers.sl").toURI();
+        final Executable executable = compiler.preCompile(SlangSource.fromFile(flow));
+
+        // usual stuff
+        assertNotNull("executable is null", executable);
+        Step step = ((Flow) executable).getWorkflow()
+                .getSteps()
+                .getFirst();
+        assertTrue(step.getPreStepActionData().containsKey(SlangTextualKeys.FOR_KEY));
+        LoopStatement forStatement = (LoopStatement) step.getPreStepActionData()
+                .get(SlangTextualKeys.FOR_KEY);
+        ListLoopStatement listLoopStatement = validateListForLoopStatement(forStatement);
+        assertEquals("values.split(\",\")", listLoopStatement.getExpression());
+        assertEquals("x", listLoopStatement.getVarName());
+        @SuppressWarnings("unchecked") List<Output> outputs = (List<Output>) step.getPostStepActionData()
+                .get(SlangTextualKeys.PUBLISH_KEY);
+        assertEquals("a", outputs.get(0).getValue().get());
+        assertEquals(Collections.singletonList(ScoreLangConstants.FAILURE_RESULT),
+                step.getPostStepActionData().get(SlangTextualKeys.BREAK_KEY));
+
+        // step inputs
+        // noinspection unchecked
+        List<Argument> actualStepInputs = (List<Argument>) step.getPreStepActionData().get(SlangTextualKeys.DO_KEY);
+        List<Argument> expectedStepInputs = getExpectedStepInputs();
+        assertEquals(expectedStepInputs, actualStepInputs);
+    }
+
+    private List<Argument> getExpectedStepInputs() {
+        return Lists.newArrayList(
+                new Argument(
+                        "step_input_01",
+                        ValueFactory.create("${ x }"),
+                        true,
+                        Collections.<ScriptFunction>emptySet(),
+                        Collections.<String>emptySet()
+                ),
+                new Argument(
+                        "step_input_02",
+                        ValueFactory.create(null),
+                        false,
+                        Collections.<ScriptFunction>emptySet(),
+                        Collections.<String>emptySet()
+                ),
+                new Argument(
+                        "step_input_03",
+                        ValueFactory.create("${ step_input_03_value }"),
+                        true,
+                        Collections.<ScriptFunction>emptySet(),
+                        Collections.<String>emptySet()
+                ),
+                new Argument(
+                        "step_input_04",
+                        ValueFactory.create("${ step_input_04_value }", true),
+                        true,
+                        Collections.<ScriptFunction>emptySet(),
+                        Collections.<String>emptySet()
+                )
+        );
+    }
 
     @Test
     public void testPreCompileLoopFlowWithBreak() throws Exception {
