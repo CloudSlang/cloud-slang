@@ -331,7 +331,7 @@ flow:
             - argument_input_get_sensitive_input_no_value:                          ${input_get_sensitive_input_no_value}
             - argument_input_get_sensitive_input_no_value_sensitive:                ${input_get_sensitive_input_no_value_sensitive}
             
-            - argument_python_get_input_no_value                                    ${get("input_no_value", "default_value")}
+            - argument_python_get_input_no_value:                                    ${get("input_no_value", "default_value")}
             - argument_python_get_sensitive_input_no_value:                         ${get("input_no_value_sensitive", "default_value")}
             - argument_input_python_get_input_no_value:                             ${input_python_get_input_no_value}
             - argument_input_python_get_input_no_value_sensitive:                   ${input_python_get_input_no_value_sensitive}
