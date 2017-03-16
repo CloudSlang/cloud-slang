@@ -318,6 +318,19 @@ flow:
         default: ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path_sensitive + '} -p ' + input_scp_host_port_sensitive + ':22 --name test1 -v /data:'}
         sensitive: true
 
+    - input_no_default_sensitive:
+        sensitive: true
+    - input_02:
+        default: 'abc'
+        private: true
+        sensitive: false
+        required: true
+    - input_01_sensitive:
+        default: ${ 'abc' }
+        sensitive: true
+    - input_03_sensitive:
+        default: ${ input_02 }
+        sensitive: true
   workflow:
     - get_data:
         do:
