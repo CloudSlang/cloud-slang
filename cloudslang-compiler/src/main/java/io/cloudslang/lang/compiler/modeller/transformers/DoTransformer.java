@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
@@ -35,6 +36,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
     private PreCompileValidator preCompileValidator;
+    private ExecutableValidator executableValidator;
 
     @Override
     public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData) {
@@ -159,6 +161,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             Serializable entryValue,
             boolean sensitive,
             boolean privateArgument) {
+        executableValidator.validateInputName(entryName);
         preCompileValidator.validateStringValue(entryName, entryValue, this);
         Accumulator accumulator = extractFunctionData(entryValue);
         return new Argument(
@@ -172,5 +175,9 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     public void setPreCompileValidator(PreCompileValidator preCompileValidator) {
         this.preCompileValidator = preCompileValidator;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
     }
 }
