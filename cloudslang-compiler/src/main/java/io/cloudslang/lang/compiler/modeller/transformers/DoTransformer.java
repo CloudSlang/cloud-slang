@@ -98,7 +98,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawArgument instanceof String) {
             String argumentName = (String) rawArgument;
-            return new Argument(argumentName);
+            return createArgument(argumentName, null, false, false);
         } else if (rawArgument instanceof Map) {
             // not so nice casts here - validation happens later on
             // noinspection unchecked

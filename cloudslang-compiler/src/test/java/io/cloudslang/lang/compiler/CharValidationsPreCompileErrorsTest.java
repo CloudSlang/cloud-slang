@@ -137,6 +137,15 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
+    @Test
+    public void testStepInputNameMissingColon() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/flow_12.sl",
+                "For step 'CheckWeather' syntax is illegal.",
+                "Argument[input_python_null ${ None }] violates character rules."
+        );
+    }
+
     public void runAndValidateError(String sourcePath, String... messages) throws Exception {
         URI resource = getClass().getResource(sourcePath).toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
