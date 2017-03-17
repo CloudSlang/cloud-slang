@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.functions;
+package io.cloudslang.lang.compiler.system_properties;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangCompiler;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class FunctionDependenciesCompileTest {
+public class SystemPropertyDependenciesCompileTest {
 
     @Autowired
     private SlangCompiler slangCompiler;
