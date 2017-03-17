@@ -13,12 +13,12 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.RuntimeInformation;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,22 +38,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class FunctionDependenciesTest extends ValueSyntaxParent {
 
-    @SuppressWarnings("unchecked")
-    private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
-
-    @Test
-    public void testSystemPropertyDependencies() throws Exception {
-        URL resource = getClass().getResource("/yaml/functions/system_property_dependencies_flow.sl");
-        URI operation = getClass().getResource("/yaml/functions/system_property_dependencies_op.sl").toURI();
-        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
-        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
-
-        assertEquals(
-                "system property dependencies not as expected",
-                prepareSystemPropertiesForDependencyTest(),
-                compilationArtifact.getSystemProperties()
-        );
-    }
+    private static final Set<SystemProperty> EMPTY_SET = Collections.emptySet();
 
     @Test
     public void testFunctionsBasic() throws Exception {
@@ -80,6 +64,36 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         verifyStepArguments(stepData);
         verifyStepPublishValues(stepData);
         verifyFlowOutputs(flowData);
+
+        // verify 'get' function worked in result expressions
+        assertEquals("Function evaluation problem in result expression",
+                "FUNCTIONS_KEY_EXISTS", flowData.getResult());
+    }
+
+    @Test
+    public void testFunctionsBasicStepInputModifiers() throws Exception {
+        URL resource = getClass().getResource("/yaml/functions/functions_test_flow_step_input_modifiers.sl");
+        URI operation = getClass().getResource("/yaml/functions/functions_test_op.sl").toURI();
+        Set<SlangSource> path = Sets.newHashSet(SlangSource.fromFile(operation));
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), path);
+
+        Map<String, Value> userInputs = prepareUserInputs();
+        Set<SystemProperty> systemProperties = prepareSystemProperties();
+
+        // trigger ExecutionPlan
+        RuntimeInformation runtimeInformation = triggerWithData(compilationArtifact, userInputs, systemProperties);
+
+        Map<String, StepData> executionData = runtimeInformation.getSteps();
+
+        StepData flowData = executionData.get(EXEC_START_PATH);
+        StepData stepData = executionData.get(FIRST_STEP_PATH);
+        Assert.assertNotNull("flow data is null", flowData);
+        Assert.assertNotNull("step data is null", stepData);
+
+        verifyFlowInputs(flowData);
+        verifyStepArgumentsStepInputModifiersCase(stepData);
+        verifyStepPublishValuesStepInputModifiersCase(stepData);
+        verifyFlowOutputsStepInputModifiersCase(flowData);
 
         // verify 'get' function worked in result expressions
         assertEquals("Function evaluation problem in result expression",
@@ -129,6 +143,30 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         assertEquals("step arguments not as expected", expectedArguments, actualArguments);
     }
 
+    private void verifyStepArgumentsStepInputModifiersCase(StepData stepData) {
+        // verify `get`, `get_sp()`, `locals().get()` and mixed mode works
+        Map<String, Serializable> expectedArguments = new LinkedHashMap<>();
+        expectedArguments.put("exist", "exist_value");
+        expectedArguments.put("input_3", null);
+        expectedArguments.put("input_4", "default_str");
+        expectedArguments.put("input_5", "localhost");
+        expectedArguments.put("input_6", "localhost");
+        expectedArguments.put("input_7", "localhost");
+        expectedArguments.put("input_8", "exist_value");
+        expectedArguments.put("input_9", "localhost");
+        expectedArguments.put("input_10", "localhost");
+        expectedArguments.put("input_11", "default_str");
+        expectedArguments.put("value_propagate_input", SensitiveValue.SENSITIVE_VALUE_MASK);
+        expectedArguments.put("input_12", "hyphen_value");
+        expectedArguments.put("input_13", "hyphen_value");
+        expectedArguments.put("input_14", "localhost");
+        expectedArguments.put("input_15", "localhost");
+        expectedArguments.put("input_16", null);
+        expectedArguments.put("input_17", "default_str");
+        Map<String, Serializable> actualArguments = stepData.getInputs();
+        assertEquals("step arguments not as expected", expectedArguments, actualArguments);
+    }
+
     private void verifyFlowInputs(StepData flowData) {
         // verify `get`, `get_sp()`, `locals().get()` and mixed mode works
         Map<String, Serializable> expectedFlowInputs = new LinkedHashMap<>();
@@ -167,6 +205,13 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
     }
 
+    private void verifyFlowOutputsStepInputModifiersCase(StepData flowData) {
+        Map<String, Serializable> expectedFlowOutputs = new LinkedHashMap<>();
+        expectedFlowOutputs.put("value_propagate", SensitiveValue.SENSITIVE_VALUE_MASK);
+        Map<String, Serializable> actualFlowOutputs = flowData.getOutputs();
+        assertEquals("flow output values not as expected", expectedFlowOutputs, actualFlowOutputs);
+    }
+
     private void verifyStepPublishValues(StepData stepData) {
         // verify `get`, `get_sp()` and mixed mode works
         Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
@@ -193,6 +238,32 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
     }
 
+    private void verifyStepPublishValuesStepInputModifiersCase(StepData stepData) {
+        // verify `get`, `get_sp()` and mixed mode works
+        Map<String, Serializable> expectedPublishValues = new LinkedHashMap<>();
+        expectedPublishValues.put("output1_safe", "CloudSlang");
+        expectedPublishValues.put("output2_safe", "output2_default");
+        expectedPublishValues.put("output_same_name", "output_same_name_default");
+        expectedPublishValues.put("output_1", null);
+        expectedPublishValues.put("output_2", "default_str");
+        expectedPublishValues.put("output_3", "localhost");
+        expectedPublishValues.put("output_4", "localhost");
+        expectedPublishValues.put("output_5", "localhost");
+        expectedPublishValues.put("output_6", "exist_value");
+        expectedPublishValues.put("output_7", "localhost");
+        expectedPublishValues.put("output_8", "localhost");
+        expectedPublishValues.put("output_9", "default_str");
+        expectedPublishValues.put("output_10", "hyphen_value");
+        expectedPublishValues.put("output_11", "hyphen_value");
+        expectedPublishValues.put("output_12", "localhost");
+        expectedPublishValues.put("output_13", "localhost");
+        expectedPublishValues.put("output_14", null);
+        expectedPublishValues.put("output_15", "default_str");
+        expectedPublishValues.put("value_propagate", SensitiveValue.SENSITIVE_VALUE_MASK);
+        Map<String, Serializable> actualPublishValues = stepData.getOutputs();
+        assertEquals("operation publish values not as expected", expectedPublishValues, actualPublishValues);
+    }
+
     private Set<SystemProperty> prepareSystemProperties() {
         return Sets.newHashSet(
                 new SystemProperty("a.b", "c.host", "localhost"),
@@ -212,38 +283,6 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("exist", ValueFactory.create("exist_value"));
         return userInputs;
-    }
-
-    private Set<String> prepareSystemPropertiesForDependencyTest() {
-        return Sets.newHashSet(
-                "flow.input.prop1",
-                "flow.input.prop2",
-                "flow.input.prop3",
-                "flow.input.prop4",
-                "flow.input.prop5",
-                "flow.output.prop1",
-                "step.input.prop1",
-                "step.input.prop2",
-                "step.input.prop3",
-                "step.input.prop4",
-                "step.publish.prop1",
-                "step.publish.prop2",
-                "step.publish.prop3",
-                "step.publish.prop4",
-                "op.input.prop1",
-                "op.input.prop2",
-                "op.input.prop3",
-                "op.input.prop4",
-                "op.input.prop5",
-                "op.output.prop1",
-                "op.result.prop1",
-                "parallel_loop.publish.prop1",
-                "parallel_loop.publish.prop2",
-                "for.input.prop1",
-                "for.input.prop2",
-                "for.publish.prop1",
-                "for.publish.prop2"
-        );
     }
 
 }

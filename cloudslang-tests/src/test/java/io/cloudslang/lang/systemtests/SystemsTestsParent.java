@@ -20,7 +20,6 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -41,6 +39,7 @@ import static ch.lambdaj.Lambda.select;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /*
  * Created by orius123 on 12/11/14.
@@ -150,6 +149,33 @@ public abstract class SystemsTestsParent {
                 }
                 assertTrue(errorMessage, success);
             }
+        }
+    }
+
+    protected void verifyParamsSensitivity(
+            Map<String, Serializable> params,
+            Map<String, Boolean> expectedSensitivityMap,
+            String scope) {
+        List<String> errorsInSensitivity = new ArrayList<>();
+        for (Map.Entry<String, Serializable> entry : params.entrySet()) {
+            String name = entry.getKey();
+            boolean actualSensitive = entry.getValue() != null &&
+                    entry.getValue().equals(SensitiveValue.SENSITIVE_VALUE_MASK);
+            Boolean expectedSensitive = expectedSensitivityMap.get(name);
+            if (expectedSensitive == null) {
+                fail("Expected sensitivity not defined for: " + name);
+            }
+            if (expectedSensitive != actualSensitive) {
+                errorsInSensitivity.add(name);
+            }
+            boolean success = true;
+            String errorMessage = "\nSensitivity not set properly for " + scope + ": " +
+                    Arrays.toString(errorsInSensitivity.toArray(new String[errorsInSensitivity.size()]));
+            if (errorsInSensitivity.size() > 0) {
+                System.out.println(errorMessage);
+                success = false;
+            }
+            assertTrue(errorMessage, success);
         }
     }
 }

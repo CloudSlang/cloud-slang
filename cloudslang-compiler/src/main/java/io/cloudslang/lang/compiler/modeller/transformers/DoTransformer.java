@@ -9,30 +9,34 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-
-
-/*
- * Created by orius123 on 05/11/14.
- */
-
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
+
+/*
+ * Created by orius123 on 05/11/14.
+ */
 public class DoTransformer extends InOutTransformer implements Transformer<Map<String, Object>, List<Argument>> {
 
     private PreCompileValidator preCompileValidator;
+    private ExecutableValidator executableValidator;
 
     @Override
     public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData) {
@@ -94,24 +98,76 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawArgument instanceof String) {
             String argumentName = (String) rawArgument;
-            return new Argument(argumentName);
+            return createArgument(argumentName, null, false, false);
         } else if (rawArgument instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map.Entry<String, Serializable> entry = ((Map<String, Serializable>) rawArgument).entrySet()
-                    .iterator().next();
-            Serializable entryValue = entry.getValue();
-            // - some_input: some_expression
-            return createArgument(entry, entryValue);
+            // not so nice casts here - validation happens later on
+            // noinspection unchecked
+            Map<String, Serializable> rawDataMap = (Map<String, Serializable>) rawArgument;
+            Iterator<Map.Entry<String, Serializable>> iterator = rawDataMap.entrySet().iterator();
+            Map.Entry<String, ?> entry = iterator.next();
+            String entryKey = entry.getKey();
+            if (rawDataMap.size() > 1) {
+                throw new RuntimeException(
+                        "Invalid syntax after step input \"" + entryKey + "\". " +
+                                "Please check all step inputs are provided as a list and each input" +
+                                " is preceded by a hyphen. Step input \"" + iterator.next().getKey() + "\" is" +
+                                " missing the hyphen."
+                );
+            }
+            Serializable entryValue = (Serializable) entry.getValue();
+            if (entryValue instanceof Map) {
+                // - some_inputs:
+                //     property1: value1
+                //     property2: value2
+                // this is the verbose way of defining inputs with all of the properties available
+                // noinspection unchecked
+                return createArgumentWithProperties((Map.Entry<String, Map<String, Serializable>>) entry);
+            } else {
+                // - some_input: some_expression
+                return createArgument(entryKey, entryValue);
+            }
         }
         throw new RuntimeException("Could not transform step argument: " + rawArgument);
     }
 
-    private Argument createArgument(Map.Entry<String, Serializable> entry, Serializable entryValue) {
-        preCompileValidator.validateStringValue(entry.getKey(), entryValue, this);
+    private Argument createArgumentWithProperties(Map.Entry<String, Map<String, Serializable>> entry) {
+        Map<String, Serializable> props = entry.getValue();
+        List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
+
+        String entryKey = entry.getKey();
+
+        for (String key : props.keySet()) {
+            if (!knownKeys.contains(key)) {
+                throw new RuntimeException("key: " + key + " in step input: " + entryKey +
+                        " is not a known property");
+            }
+        }
+
+        // default is sensitive=false
+        boolean sensitive = props.containsKey(SENSITIVE_KEY) &&
+                (boolean) props.get(SENSITIVE_KEY);
+        boolean valueKeyFound = props.containsKey(VALUE_KEY);
+        Serializable value = valueKeyFound ? props.get(VALUE_KEY) : null;
+
+        return createArgument(entryKey, value, sensitive, valueKeyFound);
+    }
+
+    private Argument createArgument(String entryName, Serializable entryValue) {
+        return createArgument(entryName, entryValue, false, true);
+    }
+
+    private Argument createArgument(
+            String entryName,
+            Serializable entryValue,
+            boolean sensitive,
+            boolean privateArgument) {
+        executableValidator.validateInputName(entryName);
+        preCompileValidator.validateStringValue(entryName, entryValue, this);
         Accumulator accumulator = extractFunctionData(entryValue);
         return new Argument(
-                entry.getKey(),
-                ValueFactory.create(entryValue),
+                entryName,
+                ValueFactory.create(entryValue, sensitive),
+                privateArgument,
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()
         );
@@ -119,5 +175,9 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     public void setPreCompileValidator(PreCompileValidator preCompileValidator) {
         this.preCompileValidator = preCompileValidator;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
     }
 }

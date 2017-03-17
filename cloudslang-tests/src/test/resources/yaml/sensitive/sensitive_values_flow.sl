@@ -318,6 +318,19 @@ flow:
         default: ${'docker run -d -e AUTHORIZED_KEYS=${base64 -w0 ' + input_authorized_keys_path_sensitive + '} -p ' + input_scp_host_port_sensitive + ':22 --name test1 -v /data:'}
         sensitive: true
 
+    - input_no_default_sensitive:
+        sensitive: true
+    - input_02:
+        default: 'abc'
+        private: true
+        sensitive: false
+        required: true
+    - input_01_sensitive:
+        default: ${ 'abc' }
+        sensitive: true
+    - input_03_sensitive:
+        default: ${ input_02 }
+        sensitive: true
   workflow:
     - get_data:
         do:
@@ -331,7 +344,7 @@ flow:
             - argument_input_get_sensitive_input_no_value:                          ${input_get_sensitive_input_no_value}
             - argument_input_get_sensitive_input_no_value_sensitive:                ${input_get_sensitive_input_no_value_sensitive}
             
-            - argument_python_get_input_no_value                                    ${get("input_no_value", "default_value")}
+            - argument_python_get_input_no_value:                                    ${get("input_no_value", "default_value")}
             - argument_python_get_sensitive_input_no_value:                         ${get("input_no_value_sensitive", "default_value")}
             - argument_input_python_get_input_no_value:                             ${input_python_get_input_no_value}
             - argument_input_python_get_input_no_value_sensitive:                   ${input_python_get_input_no_value_sensitive}
