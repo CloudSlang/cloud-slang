@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.system_properties;
+package io.cloudslang.lang.compiler.dependencies;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangCompiler;
