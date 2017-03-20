@@ -10,6 +10,7 @@
 package io.cloudslang.lang.entities.bindings;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.util.Set;
 
 /**
@@ -34,8 +35,18 @@ public class Argument extends InOutParam {
         privateArgument = true;
     }
 
+    public Argument(
+            String name,
+            Value value,
+            boolean privateArgument,
+            Set<ScriptFunction> scriptFunctions,
+            Set<String> systemPropertyDependencies) {
+        super(name, value, scriptFunctions, systemPropertyDependencies);
+        this.privateArgument = privateArgument;
+    }
+
     public Argument(String name) {
-        super(name, null);
+        super(name, ValueFactory.create(null));
         privateArgument = false;
     }
 

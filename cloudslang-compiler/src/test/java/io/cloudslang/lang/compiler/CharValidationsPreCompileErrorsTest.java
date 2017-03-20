@@ -11,9 +11,7 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
-
 import java.net.URI;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -127,6 +125,24 @@ public class CharValidationsPreCompileErrorsTest {
                 "/corrupted/chars/flow_10.sl",
                 "For step 'CheckWeather' syntax is illegal.",
                 "Argument[${var}] violates character rules."
+        );
+    }
+
+    @Test
+    public void testStepInputName() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/flow_11.sl",
+                "For step 'CheckWeather' syntax is illegal.",
+                "Argument[bo$$] violates character rules."
+        );
+    }
+
+    @Test
+    public void testStepInputNameMissingColon() throws Exception {
+        runAndValidateError(
+                "/corrupted/chars/flow_12.sl",
+                "For step 'CheckWeather' syntax is illegal.",
+                "Argument[input_python_null ${ None }] violates character rules."
         );
     }
 
