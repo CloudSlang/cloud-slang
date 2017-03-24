@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller.model;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
@@ -29,6 +30,11 @@ public class Metadata {
     private Map<String, String> results;
 
     public Metadata() {
+        description = "";
+        prerequisites = "";
+        inputs = new HashMap<>();
+        outputs = new HashMap<>();
+        results = new HashMap<>();
     }
 
     public Metadata(

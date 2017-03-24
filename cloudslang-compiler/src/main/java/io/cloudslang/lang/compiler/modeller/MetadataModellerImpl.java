@@ -62,7 +62,7 @@ public class MetadataModellerImpl implements MetadataModeller {
         errors.addAll(stepsModellingResult.getRight());
 
         return new MetadataModellingResult(
-                executableMetadata == null ? null : executableMetadata.getLeft(),
+                executableMetadata == null ? new Metadata() : executableMetadata.getLeft(),
                 stepDescriptions,
                 errors
         );

@@ -13,8 +13,6 @@ flow:
       #! @input step_input_2: description step input 2 line 1
       #!                        description step input 2 line 2
       #! @input step_input_3:
-      #! @output step_output_1: description step output 1
-      #! @output step_output_2 : description step output 2
       #!!#
       - step_1:
           do:

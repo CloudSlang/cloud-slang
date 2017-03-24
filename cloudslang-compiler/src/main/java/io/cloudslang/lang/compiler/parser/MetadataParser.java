@@ -97,7 +97,7 @@ public class MetadataParser {
                     new RuntimeException(
                             MetadataUtils.generateErrorMessage(
                                     lineNumberZeroBased,
-                                    "Line is acceptable inside description section"
+                                    "Line is not acceptable inside description section"
                             )
                     )
             );
@@ -128,7 +128,7 @@ public class MetadataParser {
             String currentLine = lines.get(lineNr);
 
             while (isIgnorableLine(currentLine) && inRange(lineNr, nrOfLines)) {
-                currentLine = lines.get(++lineNr);
+                currentLine = lines.get(lineNr++);
             }
 
             if (inRange(lineNr, nrOfLines)) {

@@ -124,6 +124,75 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractDescription03() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_06.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 1);
+        assertErrorMessages(metadata.getErrors(), "Multiple top level descriptions found at line numbers: [9, 53]");
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 0);
+
+        assertExecutableMetadata04(metadata);
+    }
+
+    @Test
+    public void testExtractDescription04() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_07.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 1);
+        assertErrorMessages(metadata.getErrors(),
+                "Error at line [7] - Line is not acceptable inside description section");
+
+        Assert.assertEquals(new Metadata(), metadata.getMetadata());
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 1);
+
+        assertStep07(stepDescriptions);
+    }
+
+    @Test
+    public void testExtractDescription08() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_08.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 0);
+
+        Assert.assertEquals(new Metadata(), metadata.getMetadata());
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 1);
+
+        assertStep01(stepDescriptions);
+    }
+
+    @Test
+    public void testExtractDescription09() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_09.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 0);
+
+        Assert.assertEquals(new Metadata(), metadata.getMetadata());
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 5);
+
+        assertStep08(stepDescriptions);
+        assertStep03(stepDescriptions);
+        assertStep04(stepDescriptions);
+        assertStep05(stepDescriptions);
+        assertStep06(stepDescriptions);
+    }
+
+    @Test
     public void testCheckstyle01() throws Exception {
         URI operation = getClass().getResource("/metadata/step/invalid/step_description_02.sl").toURI();
         List<RuntimeException> checkstyleViolations =
@@ -215,6 +284,44 @@ public class MetadataExtractorTest {
         Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(4));
     }
 
+    private void assertStep07(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        stepInputs.put("step_input_1",
+                "description step input 1" +
+                        NEWLINE +
+                        "@input step_input_2 description step input 2 line 1" +
+                        NEWLINE +
+                        "description step input 2 line 2"
+        );
+        stepInputs.put("step_input_3", "");
+        Map<String, String> stepOutputs = new HashMap<>();
+        stepOutputs.put("step_output_1",
+                "description step output 11" +
+                        NEWLINE +
+                        "description step output 12"
+        );
+        stepOutputs.put("step_output_2", "description step output 2");
+        StepMetadata expectedStepMetadata = new StepMetadata("step_1", stepInputs, stepOutputs);
+
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(0));
+    }
+
+    private void assertStep08(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        stepInputs.put("step_input_1", "description step input 1");
+        stepInputs.put("step_input_2",
+                "description step input 2 line 1" +
+                        NEWLINE +
+                        "description step input 2 line 2"
+        );
+        stepInputs.put("step_input_3", "");
+        Map<String, String> stepOutputs = new HashMap<>();
+        StepMetadata expectedStepMetadata = new StepMetadata("step_1", stepInputs, stepOutputs);
+
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(0));
+    }
+
+
     private void assertExecutableMetadata01(MetadataModellingResult metadata) {
         Metadata expectedExecutableMetadata = new Metadata();
         expectedExecutableMetadata.setDescription("Generated flow description");
@@ -299,6 +406,24 @@ public class MetadataExtractorTest {
         expectedResults.put("SUCCESS", "parsing was successful (return_code == '0')");
         expectedResults.put("FAILURE", "otherwise");
         expectedResults.put("SOME_OTHER_RESULT", "");
+        expectedExecutableMetadata.setResults(expectedResults);
+        Metadata actualExecutableMetadata = metadata.getMetadata();
+        Assert.assertEquals(expectedExecutableMetadata, actualExecutableMetadata);
+    }
+
+    private void assertExecutableMetadata04(MetadataModellingResult metadata) {
+        Metadata expectedExecutableMetadata = new Metadata();
+        expectedExecutableMetadata.setDescription("Generated flow description");
+        expectedExecutableMetadata.setPrerequisites("Generated flow prerequisites");
+        Map<String, String> expectedInputs = new HashMap<>();
+        expectedInputs.put("input_1", "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'");
+        expectedInputs.put("input_2", "Generated description flow input 2");
+        expectedExecutableMetadata.setInputs(expectedInputs);
+        Map<String, String> outputs = new HashMap<>();
+        outputs.put("output_1", "Generated description flow output 1");
+        outputs.put("return_code", "'0' if parsing was successful, '-1' otherwise");
+        expectedExecutableMetadata.setOutputs(outputs);
+        Map<String, String> expectedResults = new HashMap<>();
         expectedExecutableMetadata.setResults(expectedResults);
         Metadata actualExecutableMetadata = metadata.getMetadata();
         Assert.assertEquals(expectedExecutableMetadata, actualExecutableMetadata);
