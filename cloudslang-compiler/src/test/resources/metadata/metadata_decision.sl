@@ -18,9 +18,8 @@
 #!                   Passing an empty list ([]) will retrieve the entire json_input. - Example: ["k1", "k2", 1]
 #!
 #! More information after newline
-# whatever description that will be ignored
+#! whatever description that will be ignored.
 #!
-
 #! @output value: the corresponding value of the key referred to by json_path
 #! @output return_result: parsing was successful or not
 #! @output return_code: '0' if parsing was successful, '-1' otherwise
@@ -31,7 +30,7 @@
 #! @result FAILURE: otherwise
 #! @result SOME_OTHER_RESULT
 #!!#
-########################################################################################################################sdfdf
+########################################################################################################################
 #!#! comment
 #!
 

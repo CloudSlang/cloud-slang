@@ -7,20 +7,20 @@
 #
 ########################################################################################################################
 #!!
-#! @description: Parses the given JSON input to retrieve the
+ #! @description: Parses the given JSON input to retrieve the
 #!               corresponding value addressed by the json_path input.
 #!
 #! @prerequisites: jenkinsapi Python module
 #!
 #! @input json_input: JSON data input
 #!                    Example: '{"k1": {"k2": ["v1", "v2"]}}'
-#!
-
-#! @output value: the corresponding value of the key referred to by json_path
-#!
 #! @input json_path: path from which to retrieve value represented as a list of keys and/or indices.
 #!                   Passing an empty list ([]) will retrieve the entire json_input. - Example: ["k1", "k2", 1]
 #!
+#! More information after newline
+#! whatever description that will be ignored.
+#!
+#! @output value: the corresponding value of the key referred to by json_path
 #! @output return_result: parsing was successful or not
 #! @output return_code: '0' if parsing was successful, '-1' otherwise
 #! @output error_message: error message if there was an error when executing,
@@ -28,11 +28,11 @@
 #!
 #! @result SUCCESS: parsing was successful (return_code == '0')
 #! @result FAILURE: otherwise
+#! @result SOME_OTHER_RESULT
 #!!#
-########################################################################################################################sdfdf
+########################################################################################################################
 #!#! comment
 #!
-
 namespace: io.cloudslang.base.json
 
 operation:

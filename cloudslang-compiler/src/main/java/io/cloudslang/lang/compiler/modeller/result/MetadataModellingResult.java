@@ -10,20 +10,37 @@
 package io.cloudslang.lang.compiler.modeller.result;
 
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-
+import io.cloudslang.lang.compiler.modeller.model.StepMetadata;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MetadataModellingResult implements ModellingResult {
     private final Metadata metadata;
+    private final List<StepMetadata> stepDescriptions;
     private final List<RuntimeException> errors;
 
+    public MetadataModellingResult(
+            Metadata metadata,
+            List<StepMetadata> stepDescriptions,
+            List<RuntimeException> errors) {
+        this.metadata = metadata;
+        this.stepDescriptions = stepDescriptions;
+        this.errors = errors;
+    }
+
+    @Deprecated
     public MetadataModellingResult(Metadata metadata, List<RuntimeException> errors) {
         this.metadata = metadata;
+        this.stepDescriptions = new ArrayList<>();
         this.errors = errors;
     }
 
     public Metadata getMetadata() {
         return metadata;
+    }
+
+    public List<StepMetadata> getStepDescriptions() {
+        return stepDescriptions;
     }
 
     @Override

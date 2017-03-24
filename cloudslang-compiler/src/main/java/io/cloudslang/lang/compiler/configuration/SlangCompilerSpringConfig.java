@@ -175,7 +175,9 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public MetadataValidator metadataValidator() {
-        return new MetadataValidatorImpl();
+        MetadataValidatorImpl metadataValidator = new MetadataValidatorImpl();
+        metadataValidator.setMetadataParser(metadataParser());
+        return metadataValidator;
     }
 
     @Bean

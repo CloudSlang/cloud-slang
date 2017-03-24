@@ -11,19 +11,18 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.model.StepMetadata;
 import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.URI;
-import java.util.Iterator;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
@@ -31,38 +30,37 @@ public class MetadataExtractorTest {
 
     private static final String NEWLINE = System.lineSeparator();
 
-    private static final String DESCRIPTION_AND_PREREQUISITES = "description: " + System.lineSeparator() +
-            "  Parses the given JSON input to retrieve the" + System.lineSeparator() +
-            "  corresponding value addressed by the json_path input." + System.lineSeparator() +
+    private static final String DESCRIPTION_AND_PREREQUISITES = "description: " + NEWLINE +
+            "  Parses the given JSON input to retrieve the" + NEWLINE +
+            "  corresponding value addressed by the json_path input." + NEWLINE +
             "prerequisites: jenkinsapi Python module";
-    private static final String OPERATION_DESCRIPTION = "Parses the given JSON input to retrieve the" + NEWLINE +
-            "corresponding value addressed by the json_path input.";
-    private static final String FIRST_INPUT_VALUE = "JSON data input" + NEWLINE +
-            "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'";
-    private static final String FIRST_OUTPUT_VALUE = "the corresponding value of the key referred to by json_path";
-    private static final String SECOND_OUTPUT_VALUE =
-            "path from which to retrieve value represented as a list of keys and/or indices." + NEWLINE +
-            "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]" + NEWLINE +
-            "More information after newline";
-    private static final String PREREQUISITES = "jenkinsapi Python module";
     private static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private MetadataExtractor metadataExtractor;
 
     @Test
-    public void testExtractMetadata() throws Exception {
-        URI executable = getClass().getResource("/metadata/metadata.sl").toURI();
-        validateMetadata(executable);
+    public void testExtractMetadataDecision() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_decision.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 0);
+        Assert.assertTrue(metadata.getStepDescriptions().size() == 0);
+
+        assertExecutableMetadata03(metadata);
     }
 
     @Test
-    public void testExtractMetadataDecision() throws Exception {
-        URI executable = getClass().getResource("/metadata/metadata_decision.sl").toURI();
-        validateMetadata(executable);
+    public void testExtractMetadataOperation() throws Exception {
+        URI operation = getClass().getResource("/metadata/metadata_operation.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 0);
+        Assert.assertTrue(metadata.getStepDescriptions().size() == 0);
+
+        assertExecutableMetadata03(metadata);
     }
 
     @Test
@@ -78,226 +76,240 @@ public class MetadataExtractorTest {
     }
 
     @Test
-    public void testExtractMetadataNoPrerequisites() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_no_prerequisites.sl").toURI();
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
-        Assert.assertEquals("different prerequisites", "", metadata.getPrerequisites());
-        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 2, metadata.getResults().size());
-        Iterator<Map.Entry<String, String>> it = metadata.getInputs().entrySet().iterator();
-        Map.Entry<String, String> entry = it.next();
-        Assert.assertEquals("different input name", "json_input", entry.getKey());
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
-        Map.Entry<String, String> entry2 = it.next();
-        Assert.assertEquals("different input name", "json_path", entry2.getKey());
-        Assert.assertEquals("different input value", SECOND_OUTPUT_VALUE, entry2.getValue());
+    public void testExtractDescription01() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_01.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 0);
+
+        assertExecutableMetadata01(metadata);
+
+        // step description
+        Map<String, String> stepInputs = new HashMap<>();
+        stepInputs.put("step_input_1", "description step input 1");
+        stepInputs.put("step_input_2",
+                "description step input 2 line 1" +
+                        NEWLINE +
+                        "description step input 2 line 2"
+        );
+        Map<String, String> stepOutputs = new HashMap<>();
+        stepOutputs.put("step_output_1", "description step output 1");
+        stepOutputs.put("step_output_2", "description step output 2");
+        StepMetadata expectedStepMetadata = new StepMetadata("step_1", stepInputs, stepOutputs);
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 1);
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(0));
     }
 
     @Test
-    public void testExtractMetadataStartDelimiterLineMissing() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Before the description start tag there should be a line " +
-                "containing 120 '#' characters for");
-        exception.expectMessage("metadata_start_line_missing.sl");
+    public void testExtractDescription02() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_05.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
 
-        URI operation = getClass().getResource("/metadata/metadata_start_line_missing.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
+        Assert.assertTrue(metadata.getErrors().size() == 0);
+
+        assertExecutableMetadata02(metadata);
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 5);
+
+        assertStep01(stepDescriptions);
+        assertStep03(stepDescriptions);
+        assertStep04(stepDescriptions);
+        assertStep05(stepDescriptions);
+        assertStep06(stepDescriptions);
     }
 
     @Test
-    public void testExtractMetadataEndDelimiterLineMissing() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("After the description end tag there should be a " +
-                "line containing 120 '#' characters for");
-        exception.expectMessage("metadata_end_line_missing.sl");
-
-        URI operation = getClass().getResource("/metadata/metadata_end_line_missing.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
+    public void testCheckstyle01() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/invalid/step_description_02.sl").toURI();
+        List<RuntimeException> checkstyleViolations =
+                metadataExtractor.validateCheckstyle(SlangSource.fromFile(operation));
+        assertErrorMessages(
+                checkstyleViolations,
+                "Error at line [1] - Previous line should be delimiter line (120 characters of `#`)",
+                "Error at line [7] - " +
+                        "There should be an empty line between two sections of different tags (@input and @output)",
+                "Error at line [30] - " +
+                        "There should be an empty line between two sections of different tags (@input and @output)",
+                "Error at line [32] - " +
+                        "Next line should be delimiter line (90 characters of `#`)"
+        );
     }
 
-    @Test
-    public void testExtractMetadataNewLineMissing() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_newline_error.sl").toURI();
+    private void assertStep01(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        stepInputs.put("step_input_1", "description step input 1");
+        stepInputs.put("step_input_2",
+                "description step input 2 line 1" +
+                        NEWLINE +
+                        "description step input 2 line 2"
+        );
+        stepInputs.put("step_input_3", "");
+        Map<String, String> stepOutputs = new HashMap<>();
+        stepOutputs.put("step_output_1", "description step output 1");
+        stepOutputs.put("step_output_2", "description step output 2");
+        StepMetadata expectedStepMetadata = new StepMetadata("step_1", stepInputs, stepOutputs);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("metadata_newline_error.sl the newline with metadata prefix '#!' " +
-                "is missing in the description before the following line: " + System.lineSeparator() +
-                "#! @input json_input: JSON data input");
-
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation), true);
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(0));
     }
 
-    @Test
-    public void testExtractMetadataEmptyDescriptionSection() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_empty_description.sl").toURI();
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", "", metadata.getDescription());
+    private void assertStep03(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        stepInputs.put("step_input_1",
+                "description step input 1 line 1" +
+                        NEWLINE +
+                        "description step input 1 line 2" +
+                        NEWLINE +
+                        "description step input 1 line 3" +
+                        NEWLINE +
+                        "description step input 1 line 4" +
+                        NEWLINE +
+                        "`abc`65756756765753545^&&&&###@21321"
+        );
+        stepInputs.put("step_input_4", "description step input 4 line 1");
+        Map<String, String> stepOutputs = new HashMap<>();
+        stepOutputs.put("step_output_1", "description step output 1");
+        stepOutputs.put("step_output_2",
+                "description step output 2 line 1" +
+                        NEWLINE +
+                        "description step output 2 line 2"
+
+        );
+        StepMetadata expectedStepMetadata = new StepMetadata("step_3", stepInputs, stepOutputs);
+
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(1));
     }
 
-    @Test
-    public void testExtractMetadataBadInput() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_bad_inputs.sl").toURI();
-        MetadataModellingResult result = metadataExtractor
-                .extractMetadataModellingResult(SlangSource.fromFile(operation), true);
+    private void assertStep04(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        Map<String, String> stepOutputs = new HashMap<>();
+        stepOutputs.put("step_output_1", "description step output 1");
+        stepOutputs.put("step_output_2",
+                "description step output 2 line 1" +
+                        NEWLINE +
+                        "description step output 2 line 2"
 
-        Metadata metadata = result.getMetadata();
+        );
+        StepMetadata expectedStepMetadata = new StepMetadata("step_4", stepInputs, stepOutputs);
 
-        Assert.assertEquals("@input json_input_#1: JSON data input" + System.lineSeparator() +
-                "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'",
-                metadata.getInputs().get("json_input_#1: JSON data input"));
-        Assert.assertEquals(2, result.getErrors().size());
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("does not contain colon between the tag name and the description of the " +
-                "tag for");
-        exception.expectMessage("metadata_bad_inputs.sl");
-        throw result.getErrors().get(0);
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(2));
     }
 
-    @Test
-    public void testExtractMetadataWrongOrder() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Order is not preserved for");
-        exception.expectMessage("metadata_wrong_order.sl");
-        URI operation = getClass().getResource("/metadata/metadata_wrong_order.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    private void assertStep05(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        Map<String, String> stepOutputs = new HashMap<>();
+        StepMetadata expectedStepMetadata = new StepMetadata("step_5", stepInputs, stepOutputs);
+
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(3));
     }
 
-    @Test
-    public void startingTagMissing() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_starting_tag_missing.sl").toURI();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Starting tag missing");
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    private void assertStep06(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        Map<String, String> stepOutputs = new HashMap<>();
+        StepMetadata expectedStepMetadata = new StepMetadata("step_6", stepInputs, stepOutputs);
+
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(4));
     }
 
-    @Test
-    public void colonMissingSingleTag() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("does not contain colon between the tag name and the description of the " +
-                "tag for");
-        exception.expectMessage("metadata_colon_missing_after_tag_name1.sl");
-        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name1.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    private void assertExecutableMetadata01(MetadataModellingResult metadata) {
+        Metadata expectedExecutableMetadata = new Metadata();
+        expectedExecutableMetadata.setDescription("Generated flow description");
+        expectedExecutableMetadata.setPrerequisites("");
+        Map<String, String> expectedInputs = new HashMap<>();
+        expectedInputs.put("input_1",
+                "Generated description flow input 1 line 1" +
+                        NEWLINE +
+                        "Generated description flow input 1 line 2"
+        );
+        expectedInputs.put("input_2", "Generated description flow input 2");
+        expectedExecutableMetadata.setInputs(expectedInputs);
+        Map<String, String> outputs = new HashMap<>();
+        outputs.put("output_1", "Generated description flow output 1");
+        expectedExecutableMetadata.setOutputs(outputs);
+        Map<String, String> expectedResults = new HashMap<>();
+        expectedResults.put("SUCCESS", "Flow completed successfully.");
+        expectedResults.put("FAILURE", "Failure occurred during execution.");
+        expectedExecutableMetadata.setResults(expectedResults);
+        Metadata actualExecutableMetadata = metadata.getMetadata();
+        Assert.assertEquals(expectedExecutableMetadata, actualExecutableMetadata);
     }
 
-    @Test
-    public void colonMissingRegularTag() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("does not contain colon between the tag name and the description of the " +
-                "tag for");
-        exception.expectMessage("metadata_colon_missing_after_tag_name2.sl");
-        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name2.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    private void assertExecutableMetadata02(MetadataModellingResult metadata) {
+        Metadata expectedExecutableMetadata = new Metadata();
+        expectedExecutableMetadata.setDescription("Generated flow description");
+        expectedExecutableMetadata.setPrerequisites("Generated flow prerequisites");
+        Map<String, String> expectedInputs = new HashMap<>();
+        expectedInputs.put("input_1",
+                "Generated description flow input 1 line 1" +
+                        NEWLINE +
+                        "Generated description flow input 1 line 2"
+        );
+        expectedInputs.put("input_2", "Generated description flow input 2");
+        expectedExecutableMetadata.setInputs(expectedInputs);
+        Map<String, String> outputs = new HashMap<>();
+        outputs.put("output_1", "Generated description flow output 1");
+        expectedExecutableMetadata.setOutputs(outputs);
+        Map<String, String> expectedResults = new HashMap<>();
+        expectedResults.put("SUCCESS", "Flow completed successfully.");
+        expectedResults.put("FAILURE", "Failure occurred during execution.");
+        expectedExecutableMetadata.setResults(expectedResults);
+        Metadata actualExecutableMetadata = metadata.getMetadata();
+        Assert.assertEquals(expectedExecutableMetadata, actualExecutableMetadata);
     }
 
-    @Test
-    public void colonMissingOkScenario() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_colon_missing_after_tag_name_ok.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
+    private void assertExecutableMetadata03(MetadataModellingResult metadata) {
+        Metadata expectedExecutableMetadata = new Metadata();
+        expectedExecutableMetadata.setDescription(
+                "Parses the given JSON input to retrieve the"
+                        + NEWLINE +
+                        "corresponding value addressed by the json_path input."
+        );
+        expectedExecutableMetadata.setPrerequisites("jenkinsapi Python module");
+        Map<String, String> expectedInputs = new HashMap<>();
+        expectedInputs.put("json_input",
+                "JSON data input" +
+                        NEWLINE +
+                        "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'"
+        );
+        expectedInputs.put("json_path",
+                "path from which to retrieve value represented as a list of keys and/or indices."
+                        + NEWLINE +
+                        "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]"
+                        + NEWLINE +
+                        "More information after newline"
+                        + NEWLINE +
+                        "whatever description that will be ignored."
+        );
+        expectedExecutableMetadata.setInputs(expectedInputs);
+        Map<String, String> outputs = new HashMap<>();
+        outputs.put("value", "the corresponding value of the key referred to by json_path");
+        outputs.put("return_result", "parsing was successful or not");
+        outputs.put("return_code", "'0' if parsing was successful, '-1' otherwise");
+        outputs.put("error_message",
+                "error message if there was an error when executing," +
+                        NEWLINE +
+                        "empty otherwise"
+        );
+        expectedExecutableMetadata.setOutputs(outputs);
+        Map<String, String> expectedResults = new HashMap<>();
+        expectedResults.put("SUCCESS", "parsing was successful (return_code == '0')");
+        expectedResults.put("FAILURE", "otherwise");
+        expectedResults.put("SOME_OTHER_RESULT", "");
+        expectedExecutableMetadata.setResults(expectedResults);
+        Metadata actualExecutableMetadata = metadata.getMetadata();
+        Assert.assertEquals(expectedExecutableMetadata, actualExecutableMetadata);
     }
 
-    @Test
-    public void descriptionAfterStartingTag() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Description is not accepted on the same line as the starting " +
-                "tag for");
-        exception.expectMessage("metadata_description_after_starting_tag.sl");
-        URI operation = getClass().getResource("/metadata/metadata_description_after_starting_tag.sl").toURI();
-        metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-    }
+    private void assertErrorMessages(List<RuntimeException> actualErrors, String... expectedErrorMessages) {
+        Assert.assertEquals(expectedErrorMessages.length, actualErrors.size());
 
-    @Test
-    public void testExtractMetadataNoResults() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_no_results.sl").toURI();
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
-        Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
-        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 0, metadata.getResults().size());
-        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
-        Assert.assertEquals("different input name", "json_input", entry.getKey());
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
+        int current = 0;
+        for (RuntimeException ex : actualErrors) {
+            Assert.assertEquals(expectedErrorMessages[current++], ex.getMessage());
+        }
     }
-
-    @Test
-    public void testExtractMetadataNoOutputs() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_no_outputs.sl").toURI();
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
-        Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
-        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 0, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 2, metadata.getResults().size());
-        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
-        Assert.assertEquals("different input name", "json_input", entry.getKey());
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
-    }
-
-    @Test
-    public void testExtractMetadataNoInputs() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_no_inputs.sl").toURI();
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
-        Assert.assertEquals("different number of inputs", 0, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 2, metadata.getResults().size());
-        Map.Entry<String, String> entry = metadata.getOutputs().entrySet().iterator().next();
-        Assert.assertEquals("different input name", "value", entry.getKey());
-        Assert.assertEquals("different input value", FIRST_OUTPUT_VALUE, entry.getValue());
-    }
-
-    @Test
-    public void testExtractMetadataSingleHashForResults() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_single_hash_for_results.sl").toURI();
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
-        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 0, metadata.getResults().size());
-        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
-        Assert.assertEquals("different input name", "json_input", entry.getKey());
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
-    }
-
-    @Test
-    public void testExtractMetadataSingleHashForAResult() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_single_hash_for_a_result.sl").toURI();
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
-        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 1, metadata.getResults().size());
-        Map.Entry<String, String> entry = metadata.getInputs().entrySet().iterator().next();
-        Assert.assertEquals("different input name", "json_input", entry.getKey());
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
-    }
-
-    private void validateMetadata(URI operation) {
-        Metadata metadata = metadataExtractor.extractMetadata(SlangSource.fromFile(operation));
-        Assert.assertNotNull("metadata is null", metadata);
-        Assert.assertEquals("different description", OPERATION_DESCRIPTION, metadata.getDescription());
-        Assert.assertEquals("different prerequisites", PREREQUISITES, metadata.getPrerequisites());
-        Assert.assertEquals("different number of inputs", 2, metadata.getInputs().size());
-        Assert.assertEquals("different number of outputs", 4, metadata.getOutputs().size());
-        Assert.assertEquals("different number of results", 3, metadata.getResults().size());
-        Iterator<Map.Entry<String, String>> it = metadata.getInputs().entrySet().iterator();
-        Map.Entry<String, String> entry = it.next();
-        Assert.assertEquals("different input name", "json_input", entry.getKey());
-        Assert.assertEquals("different input value", FIRST_INPUT_VALUE, entry.getValue());
-        Map.Entry<String, String> entry2 = it.next();
-        Assert.assertEquals("different input name", "json_path", entry2.getKey());
-        Assert.assertEquals("different input value", SECOND_OUTPUT_VALUE, entry2.getValue());
-        Assert.assertEquals("different result value", "", metadata.getResults().get(SOME_OTHER_RESULT));
-    }
-
 }

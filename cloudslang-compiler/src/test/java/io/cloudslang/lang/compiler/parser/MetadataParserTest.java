@@ -10,54 +10,79 @@
 package io.cloudslang.lang.compiler.parser;
 
 import io.cloudslang.lang.compiler.SlangSource;
-import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionData;
+import java.net.URI;
+import java.util.LinkedHashMap;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.net.URI;
-import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataParserTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
     private MetadataParser metadataParser = new MetadataParser();
 
-    @Mock
-    private ParserExceptionHandler parserExceptionHandler;
-
     @Test
-    public void throwExceptionWhenSourceIsEmpty() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("empty");
-        metadataParser.parse(new SlangSource("", null));
+    public void testParse() throws Exception {
+        URI executable = getClass().getResource("/metadata/step/step_description_01.sl").toURI();
+        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
+
+        // flow description
+        LinkedHashMap<String, String> flowDescription = new LinkedHashMap<>(); // preserver order
+        flowDescription.put("@description", "Generated flow description");
+        flowDescription.put(
+                "@input input_1",
+                "Generated description flow input 1 line 1" +
+                        System.lineSeparator() +
+                        "Generated description flow input 1 line 2"
+        );
+        flowDescription.put("@input input_2", "Generated description flow input 2");
+        flowDescription.put("@output output_1", "Generated description flow output 1");
+        flowDescription.put("@result SUCCESS", "Flow completed successfully.");
+        flowDescription.put("@result FAILURE", "Failure occurred during execution.");
+
+        Assert.assertTrue(parseResult.getTopLevelDescriptions().size() == 1);
+        Assert.assertEquals(flowDescription, parseResult.getTopLevelDescriptions().get(0).getData());
+
+        // step description
+        LinkedHashMap<String, String> stepDescription = new LinkedHashMap<>();
+        stepDescription.put("@input step_input_1", "description step input 1");
+        stepDescription.put(
+                "@input step_input_2",
+                "description step input 2 line 1" +
+                        System.lineSeparator() +
+                        "description step input 2 line 2"
+        );
+        stepDescription.put("@output step_output_1", "description step output 1");
+        stepDescription.put("@output step_output_2", "description step output 2");
+
+        Assert.assertTrue(parseResult.getStepDescriptions().size() == 1);
+        Assert.assertTrue(parseResult.getStepDescriptions().containsKey("step_1"));
+        Assert.assertEquals(stepDescription, parseResult.getStepDescriptions().get("step_1").getData());
+
+        Assert.assertTrue(parseResult.getErrors().size() == 0);
     }
 
     @Test
-    public void noNullsWhenEmptyValues() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_empty_values.sl").toURI();
-        Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation)).getParseResult();
-        boolean containsNulls = false;
-        for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
-            if (entry.getValue() == null) {
-                containsNulls = true;
-            }
-        }
-        Assert.assertFalse("metadata map contains nulls", containsNulls);
+    public void testParseNoDescription() throws Exception {
+        URI executable = getClass().getResource("/metadata/step/step_description_03.sl").toURI();
+        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
+
+        Assert.assertTrue(parseResult.getTopLevelDescriptions().size() == 0);
+        Assert.assertTrue(parseResult.getStepDescriptions().size() == 0);
+        Assert.assertTrue(parseResult.getErrors().size() == 0);
     }
 
     @Test
-    public void fullDescriptionMissing() throws Exception {
-        URI operation = getClass().getResource("/metadata/metadata_full_description_missing.sl").toURI();
-        Map<String, String> metadataMap = metadataParser.parse(SlangSource.fromFile(operation)).getParseResult();
-        Assert.assertTrue("metadata map should have size 0", metadataMap.size() == 0);
+    public void testParseEmptySource() throws Exception {
+        URI executable = getClass().getResource("/metadata/step/step_description_04.sl").toURI();
+        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
+
+        Assert.assertTrue(parseResult.getTopLevelDescriptions().size() == 0);
+        Assert.assertTrue(parseResult.getStepDescriptions().size() == 0);
+        Assert.assertTrue(parseResult.getErrors().size() == 0);
     }
 }

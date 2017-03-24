@@ -11,7 +11,6 @@ package io.cloudslang.lang.tools.build.validation;
 
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
-
 import java.io.File;
 import java.util.Queue;
 

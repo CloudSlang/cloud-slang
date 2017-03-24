@@ -12,54 +12,82 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.modeller.MetadataModeller;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
-import io.cloudslang.lang.compiler.modeller.result.ParseMetadataModellingResult;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
+import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionData;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
-import org.apache.commons.lang.Validate;
-
 import java.util.List;
+import org.apache.commons.lang.Validate;
 
 public class MetadataExtractorImpl implements MetadataExtractor {
 
     private MetadataModeller metadataModeller;
-
     private MetadataParser metadataParser;
-
     private MetadataValidator metadataValidator;
 
     @Override
     public Metadata extractMetadata(SlangSource source) {
-        return getMetadata(source, false);
+        validateSlangSource(source);
+        return getExecutableMetadata(source);
     }
 
+    @Override
+    public MetadataModellingResult extractMetadataModellingResult(SlangSource source) {
+        validateSlangSource(source);
+        ParsedDescriptionData parsedDescriptionData = metadataParser.parse(source);
+        return metadataModeller.createModel(parsedDescriptionData);
+    }
+
+    @Override
+    public List<RuntimeException> validateCheckstyle(SlangSource source) {
+        validateSlangSource(source);
+        return metadataValidator.validateCheckstyle(source);
+    }
+
+    @Deprecated
     @Override
     public Metadata extractMetadata(SlangSource source, boolean shouldValidateDescription) {
         return getMetadata(source, shouldValidateDescription);
     }
 
     private Metadata getMetadata(SlangSource source, boolean shouldValidateDescription) {
-        ParseMetadataModellingResult result = getParseMetadataModellingResult(source, shouldValidateDescription);
+        MetadataModellingResult result = extractMetadataModellingResult(source);
         if (result.getErrors().size() > 0) {
             throw result.getErrors().get(0);
         }
-        return metadataModeller.createModel(result.getParseResult());
+        if (shouldValidateDescription) {
+            List<RuntimeException> checkstyleErrors = validateCheckstyle(source);
+            if (checkstyleErrors.size() > 0) {
+                throw checkstyleErrors.get(0);
+            }
+        }
+        return result.getMetadata();
     }
 
+    @Deprecated
     @Override
-    public MetadataModellingResult extractMetadataModellingResult(SlangSource source,
-                                                                  boolean shouldValidateCheckstyle) {
-        ParseMetadataModellingResult result = getParseMetadataModellingResult(source, shouldValidateCheckstyle);
-        Metadata metadata = metadataModeller.createModel(result.getParseResult());
-        return new MetadataModellingResult(metadata, result.getErrors());
+    public MetadataModellingResult extractMetadataModellingResult(
+            SlangSource source,
+            boolean shouldValidateCheckstyle) {
+        MetadataModellingResult metadataModellingResult = extractMetadataModellingResult(source);
+        if (shouldValidateCheckstyle) {
+            metadataModellingResult.getErrors().addAll(validateCheckstyle(source));
+        }
+        return metadataModellingResult;
     }
 
-    private ParseMetadataModellingResult getParseMetadataModellingResult(SlangSource source,
-                                                                         boolean shouldValidateCheckstyle) {
+    private void validateSlangSource(SlangSource source) {
         Validate.notNull(source, "You must supply a source to extract the metadata from");
-        ParseMetadataModellingResult result = metadataParser.parse(source);
-        if (shouldValidateCheckstyle) {
-            List<RuntimeException> exceptions = metadataValidator.validateCheckstyle(source);
-            result.getErrors().addAll(exceptions);
+    }
+
+    private Metadata getExecutableMetadata(SlangSource source) {
+        MetadataModellingResult result = getMetadataModellingResultThrowFirstError(source);
+        return result.getMetadata();
+    }
+
+    private MetadataModellingResult getMetadataModellingResultThrowFirstError(SlangSource source) {
+        MetadataModellingResult result = extractMetadataModellingResult(source);
+        if (result.getErrors().size() > 0) {
+            throw result.getErrors().get(0);
         }
         return result;
     }
@@ -75,4 +103,5 @@ public class MetadataExtractorImpl implements MetadataExtractor {
     public void setMetadataValidator(MetadataValidator metadataValidator) {
         this.metadataValidator = metadataValidator;
     }
+
 }

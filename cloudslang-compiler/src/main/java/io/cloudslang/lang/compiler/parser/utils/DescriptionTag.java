@@ -11,7 +11,6 @@ package io.cloudslang.lang.compiler.parser.utils;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 
 public enum DescriptionTag {
@@ -21,9 +20,8 @@ public enum DescriptionTag {
     OUTPUT("@output"),
     RESULT("@result");
 
-    private static final List<DescriptionTag> DESCRIPTION_TAGS_LIST = Collections.unmodifiableList(
-            Arrays.asList(DescriptionTag.values()));
-    private static final EnumSet<DescriptionTag> uniqueTagsPerDescriptionSet = EnumSet.of(DESCRIPTION, PREREQUISITES);
+    private static final List<DescriptionTag> DESCRIPTION_TAGS_LIST =
+            Collections.unmodifiableList(Arrays.asList(DescriptionTag.values()));
     private final String value;
 
     DescriptionTag(String value) {
@@ -38,11 +36,7 @@ public enum DescriptionTag {
         return DESCRIPTION_TAGS_LIST;
     }
 
-    public static boolean isUniqueTagType(DescriptionTag tag) {
-        return uniqueTagsPerDescriptionSet.contains(tag);
-    }
-
-    public static boolean stringContainsTag(String str) {
+    public static boolean isDescriptionTag(String str) {
         for (DescriptionTag descriptionTag : DescriptionTag.asList()) {
             if (str.contains(descriptionTag.getValue())) {
                 return true;
@@ -51,7 +45,7 @@ public enum DescriptionTag {
         return false;
     }
 
-    public static DescriptionTag getContainedTag(String str) {
+    public static DescriptionTag fromString(String str) {
         for (DescriptionTag descriptionTag : DescriptionTag.asList()) {
             if (str.contains(descriptionTag.getValue())) {
                 return descriptionTag;

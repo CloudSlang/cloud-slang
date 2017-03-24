@@ -10,10 +10,8 @@
 package io.cloudslang.lang.compiler.parser.utils;
 
 import io.cloudslang.lang.compiler.SlangSource;
-
 import java.util.List;
 
 public interface MetadataValidator {
-
     List<RuntimeException> validateCheckstyle(SlangSource source);
 }

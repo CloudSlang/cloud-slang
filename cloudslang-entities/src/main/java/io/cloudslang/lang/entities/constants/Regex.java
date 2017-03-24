@@ -43,4 +43,52 @@ public class Regex {
     public static final String GET_REGEX = "get\\((.+)\\)";
     public static final String GET_REGEX_WITH_DEFAULT = "get\\((.+?),(.+?)\\)";
     public static final String CHECK_EMPTY_REGEX = "check_empty\\((.+?),(.+?)\\)";
+
+    //////////////// description
+    public static final String DESCRIPTION_START_LINE = "(\\s*)(#!!)(([^#])(.*))*";
+    public static final String DESCRIPTION_END_LINE = "(\\s*)(#!!#)(.*)";
+
+    // #! @input var: content
+    public static final String DESCRIPTION_VARIABLE_LINE =
+            "(\\s*)(#!)(\\s*)(@(\\w+)(\\s+)" + VARIABLE_NAME_CHARS + ")(\\s*)(:)(\\s*)(.*)";
+    public static final int DESCRIPTION_VARIABLE_LINE_DECLARATION_GROUP_NR = 4;
+    public static final int DESCRIPTION_VARIABLE_LINE_CONTENT_GROUP_NR = 13;
+
+    // #! @input var <=> #! @input var: content
+    public static final String DESCRIPTION_VARIABLE_LINE_DECLARATION_ONLY =
+            "(\\s*)(#!)(\\s*)(@(\\w+)(\\s+)" + VARIABLE_NAME_CHARS + ")(\\s*)";
+    public static final int DESCRIPTION_VARIABLE_LINE_DECLARATION_ONLY_GROUP_NR = 4;
+
+    // #! @description: content
+    public static final String DESCRIPTION_GENERAL_LINE = "(\\s*)(#!)(\\s*)(@(\\w+))(\\s*)(:)(\\s*)(.*)";
+    public static final int DESCRIPTION_GENERAL_LINE_DECLARATION_GROUP_NR = 4;
+    public static final int DESCRIPTION_GENERAL_LINE_CONTENT_GROUP_NR = 9;
+
+    // #! description span on multi line
+    public static final String DESCRIPTION_COMPLEMENTARY_LINE = "(\\s*)(#!)(([^!])(.*))*";
+    public static final int DESCRIPTION_COMPLEMENTARY_LINE_GROUP_NR = 3;
+
+    // # abc
+    public static final String COMMENT_LINE = "(\\s*)(#)(.*)";
+
+    // - step_name: data
+    public static final String STEP_START_LINE = "(\\s*)-(\\s*)" + VARIABLE_NAME_CHARS + "(\\s*):(.*)";
+    public static final int STEP_START_LINE_DATA_GROUP_NR = 3;
+
+    public static final String DESCRIPTION_DECLARATION_DELIMITER = "\\s+";
+
+    public static final String EXECUTABLE_DESCRIPTION_DELIMITER_CHARS = "#######################################" +
+            "#################################################################################";
+    public static final String EXECUTABLE_DESCRIPTION_DELIMITER_LINE =
+            "(\\s*)(" + EXECUTABLE_DESCRIPTION_DELIMITER_CHARS + ")(\\s*)";
+
+    public static final String STEP_DESCRIPTION_DELIMITER_CHARS =
+            "##########################################################################################";
+    public static final String STEP_DESCRIPTION_DELIMITER_LINE =
+            "(\\s*)(" + STEP_DESCRIPTION_DELIMITER_CHARS + ")(\\s*)";
+
+    public static final String DESCRIPTION_TOKEN = "#!";
+
+    public static final String DESCRIPTION_EMPTY_LINE = "(\\s*)(#!)(\\s*)";
+    ////////////////////////////////////////////////
 }

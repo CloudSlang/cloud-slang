@@ -11,96 +11,233 @@ package io.cloudslang.lang.compiler.parser.utils;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
+import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionData;
+import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionSection;
+import io.cloudslang.lang.compiler.utils.MetadataUtils;
+import io.cloudslang.lang.compiler.utils.SlangSourceUtils;
+import io.cloudslang.lang.compiler.validator.matcher.DescriptionPatternMatcher;
+import io.cloudslang.lang.entities.constants.Regex;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class MetadataValidatorImpl implements MetadataValidator {
 
-    private static final String DESCRIPTION_DELIMITER_LINE = "#######################################" +
-            "#################################################################################";
+    private MetadataParser metadataParser;
+    private DescriptionPatternMatcher descriptionPatternMatcher;
 
+    public MetadataValidatorImpl() {
+        descriptionPatternMatcher = new DescriptionPatternMatcher();
+    }
+
+    @Override
     public List<RuntimeException> validateCheckstyle(SlangSource source) {
-        List<RuntimeException> exceptions = new ArrayList<>();
-        String lineBeforeBlockStartTag = null;
-        String lineAfterBlockEndTag = null;
-        try (BufferedReader reader = new BufferedReader(new StringReader(source.getContent()))) {
-            String line = reader.readLine();
-            String previousLine = line;
-            String previousMetadataLine = null;
-            String previousTagLine = null;
-            while (line != null) {
-                if (DescriptionTag.stringContainsTag(line)) {
-                    previousTagLine = line;
-                }
-                if (line.startsWith(MetadataParser.BLOCK_END_TAG)) {
-                    lineAfterBlockEndTag = reader.readLine();
-                    break;
-                } else if (line.startsWith(MetadataParser.BLOCK_START_TAG)) {
-                    lineBeforeBlockStartTag = previousLine;
-                    line = reader.readLine();
-                    if (line != null && line.startsWith(MetadataParser.BLOCK_END_TAG)) {
-                        lineAfterBlockEndTag = reader.readLine();
-                        break;
-                    }
+        Validate.notNull(source.getContent(), "Source " + source.getName() + " cannot be null");
+        try {
+            return extractCheckstyleData(source);
+        } catch (Throwable e) {
+            throw new RuntimeException(
+                    "There was a problem extracting checkstyle data for source [" +
+                            source.getName() + "]  - " + e.getMessage(), e
+            );
+        }
+    }
+
+    private List<RuntimeException> extractCheckstyleData(SlangSource source) {
+        List<String> lines = SlangSourceUtils.readLines(source);
+        ParsedDescriptionData parsedDescriptionData = metadataParser.parse(source);
+        List<RuntimeException> errors = new ArrayList<>();
+
+        // process flow descriptions
+        List<ParsedDescriptionSection> topLevelDescriptions = parsedDescriptionData.getTopLevelDescriptions();
+        for (ParsedDescriptionSection topLevelDescription : topLevelDescriptions) {
+            errors.addAll(processCommonRules(lines, topLevelDescription, false));
+        }
+
+        // process step descriptions
+        Collection<ParsedDescriptionSection> stepDescriptions = parsedDescriptionData.getStepDescriptions().values();
+        for (ParsedDescriptionSection stepDescription : stepDescriptions) {
+            errors.addAll(processCommonRules(lines, stepDescription, true));
+        }
+
+        return errors;
+    }
+
+    private List<RuntimeException> processCommonRules(
+            List<String> lines,
+            ParsedDescriptionSection parsedDescriptionSection,
+            boolean isStep) {
+        List<RuntimeException> errors = new ArrayList<>();
+        int startLineNumberZeroBased = parsedDescriptionSection.getStartLineNumber() - 1;
+
+        // validate begin wrapper line
+        validateBeginWrapperLine(lines, isStep, errors, startLineNumberZeroBased);
+
+        boolean finished = false;
+        String previousTag = null;
+        int previousItemEndLineNumber = -1;
+        for (int lineNrZeroBased = startLineNumberZeroBased + 1;
+             !finished && lineNrZeroBased < lines.size();
+             lineNrZeroBased++) {
+            String currentLine = lines.get(lineNrZeroBased);
+
+            // #! @tag var: content
+            // #! @tag: content
+            boolean variableLine = isVariableLine(currentLine);
+            boolean variableLineDeclarationOnly = isVariableLineDeclarationOnly(currentLine);
+            if (variableLine || variableLineDeclarationOnly || isGeneralLine(currentLine)) {
+                // extract tag
+                String currentTag;
+                if (variableLine) {
+                    Pair<String, String> declaration = descriptionPatternMatcher.getDescriptionVariableLineData(currentLine);
+                    String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
+                    currentTag = declarationElements[0];
+                } else if (variableLineDeclarationOnly) {
+                    Pair<String, String> declaration =
+                            descriptionPatternMatcher.getDescriptionVariableLineDataDeclarationOnly(currentLine);
+                    String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
+                    currentTag = declarationElements[0];
                 } else {
-                    if (line.startsWith(MetadataParser.PREFIX)) {
-                        previousMetadataLine = line;
-                    }
-                    previousLine = line;
-                    line = reader.readLine();
+                    Pair<String, String> declaration = descriptionPatternMatcher.getDescriptionGeneralLineData(currentLine);
+                    String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
+                    currentTag = declarationElements[0];
                 }
-                validateNewlineBetweenDifferentTags(previousTagLine, previousMetadataLine,
-                        line, exceptions, source);
+
+                // validate empty line
+                validateEmptyLine(lines, errors, previousTag, previousItemEndLineNumber, currentTag);
+
+                previousTag = currentTag;
+                previousItemEndLineNumber = lineNrZeroBased;
+            } else {
+                // #! continued from previous line
+                if (isNonEmptyComplementaryLine(currentLine)) {
+                    previousItemEndLineNumber = lineNrZeroBased;
+                } else {
+                    // #!!#
+                    if (descriptionPatternMatcher.matchesDescriptionEnd(currentLine)) {
+                        // validate ending wrapper line
+                        validateEndingWrapperLine(lines, isStep, errors, lineNrZeroBased);
+
+                        finished = true;
+                    }
+                    // otherwise ignore
+                }
             }
-            validateHashTagLines(lineBeforeBlockStartTag, lineAfterBlockEndTag, exceptions, source);
-        } catch (IOException e) {
-            throw new RuntimeException("Error processing metadata, error extracting metadata from " +
-                    source.getName(), e);
         }
-
-        return exceptions;
+        return errors;
     }
 
-    private void validateHashTagLines(String lineBeforeBlockStartTag, String lineAfterBlockEndTag,
-                                      List<RuntimeException> exceptions, SlangSource source) {
-        if (lineBeforeBlockStartTag != null &&
-                !StringUtils.contains(lineBeforeBlockStartTag, DESCRIPTION_DELIMITER_LINE)) {
-            exceptions.add(new RuntimeException("Before the description start tag there should be a line containing " +
-                    "120 '#' characters for " + source.getFilePath()));
+    private void validateEndingWrapperLine(
+            List<String> lines,
+            boolean isStep,
+            List<RuntimeException> errors,
+            int lineNrZeroBased) {
+        int targetedLineNumberZeroBased = lineNrZeroBased + 1;
+        String nextLine = tryExtractLine(lines, targetedLineNumberZeroBased);
+        if (isStep) {
+            if (nextLine == null || !descriptionPatternMatcher.matchesStepDelimiterLine(nextLine)) {
+                errors.add(
+                        new RuntimeException(
+                                generateErrorMessage(lineNrZeroBased,
+                                        "Next line should be delimiter line (90 characters of `#`)"
+                                )
+                        )
+                );
+            }
+        } else {
+            if (nextLine == null || !descriptionPatternMatcher.matchesExecutableDelimiterLine(nextLine)) {
+                errors.add(
+                        new RuntimeException(
+                                generateErrorMessage(lineNrZeroBased,
+                                        "Next line should be delimiter line (120 characters of `#`)"
+                                )
+                        )
+                );
+            }
         }
-        if (lineAfterBlockEndTag != null &&
-                !StringUtils.contains(lineAfterBlockEndTag, DESCRIPTION_DELIMITER_LINE)) {
-            exceptions.add(new RuntimeException("After the description end tag there should be a line containing " +
-                    "120 '#' characters for " + source.getFilePath()));
+    }
+
+    private void validateEmptyLine(List<String> lines, List<RuntimeException> errors, String previousTag, int previousItemEndLineNumber, String currentTag) {
+        if (previousTag != null && !previousTag.equals(currentTag)) {
+            int targetedLineNumberZeroBased = previousItemEndLineNumber + 1;
+            String targetedLine = lines.get(targetedLineNumberZeroBased);
+            if (!descriptionPatternMatcher.matchesEmptyLine(targetedLine)) {
+                errors.add(
+                        new RuntimeException(
+                                generateErrorMessage(
+                                        targetedLineNumberZeroBased,
+                                        "There should be an empty line between two sections of different tags" +
+                                                " (" + previousTag + " and " + currentTag + ")"
+                                )
+                        )
+                );
+            }
         }
     }
 
-    private void validateNewlineBetweenDifferentTags(String previousTagLine, String previousMetadataLine, String line,
-                                                     List<RuntimeException> exceptions, SlangSource source) {
-        if (previousTagLine != null && bothLinesContainTags(previousTagLine, line) &&
-                containedTagsAreDifferent(previousTagLine, line) &&
-                isNotEmptyLineWithPrefix(previousMetadataLine)) {
-            exceptions.add(new RuntimeException("For " + source.getFilePath() +
-                    " the newline with metadata prefix '#!' is missing " +
-                    "in the description before the following line: " + System.lineSeparator() + line));
+    private void validateBeginWrapperLine(
+            List<String> lines,
+            boolean isStep,
+            List<RuntimeException> errors,
+            int startLineNumberZeroBased) {
+        int targetedLineNumberZeroBased = startLineNumberZeroBased - 1;
+        String previousLine = tryExtractLine(lines, targetedLineNumberZeroBased);
+        if (isStep) {
+            if (previousLine == null || !descriptionPatternMatcher.matchesStepDelimiterLine(previousLine)) {
+                errors.add(
+                        new RuntimeException(
+                                generateErrorMessage(startLineNumberZeroBased,
+                                        "Previous line should be delimiter line (90 characters of `#`)"
+                                )
+                        )
+                );
+            }
+        } else {
+            if (previousLine == null || !descriptionPatternMatcher.matchesExecutableDelimiterLine(previousLine)) {
+                errors.add(
+                        new RuntimeException(
+                                generateErrorMessage(startLineNumberZeroBased,
+                                        "Previous line should be delimiter line (120 characters of `#`)"
+                                )
+                        )
+                );
+            }
         }
     }
 
-    private boolean bothLinesContainTags(String previousTagLine, String line) {
-        return DescriptionTag.stringContainsTag(previousTagLine) && DescriptionTag.stringContainsTag(line);
+    private String generateErrorMessage(int lineNumberZeroBased, String data) {
+        return MetadataUtils.generateErrorMessage(lineNumberZeroBased, data);
     }
 
-    private boolean containedTagsAreDifferent(String tagLine, String line) {
-        return DescriptionTag.getContainedTag(tagLine).compareTo(DescriptionTag.getContainedTag(line)) != 0;
+    private boolean isNonEmptyComplementaryLine(String currentLine) {
+        return
+                descriptionPatternMatcher.matchesDescriptionComplementaryLine(currentLine) &&
+                        !currentLine.trim().equals(Regex.DESCRIPTION_TOKEN);
     }
 
-    private boolean isNotEmptyLineWithPrefix(String previousMetadataLine) {
-        return !StringUtils.isBlank(StringUtils.remove(previousMetadataLine, MetadataParser.PREFIX));
+    private boolean isGeneralLine(String currentLine) {
+        return descriptionPatternMatcher.matchesDescriptionGeneralLine(currentLine);
+    }
+
+    private boolean isVariableLine(String currentLine) {
+        return descriptionPatternMatcher.matchesDescriptionVariableLine(currentLine);
+    }
+
+    private boolean isVariableLineDeclarationOnly(String currentLine) {
+        return descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(currentLine);
+    }
+
+    private String tryExtractLine(List<String> lines, int lineNr) {
+        if (lineNr >= 0 && lineNr < lines.size()) {
+            return lines.get(lineNr);
+        }
+        return null;
+    }
+
+    public void setMetadataParser(MetadataParser metadataParser) {
+        this.metadataParser = metadataParser;
     }
 
 }
