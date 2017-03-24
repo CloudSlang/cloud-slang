@@ -68,6 +68,7 @@ flow:
       #! @output step_output_1 :                      description step output 1
       #! @output step_output_2: description step output 2 line 1
       #!                        description step output 2 line 2
+      #! @step_invalid_tag: content
       #!!#
       - step_4:
           do:

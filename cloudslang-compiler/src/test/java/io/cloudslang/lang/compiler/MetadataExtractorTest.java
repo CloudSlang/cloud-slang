@@ -178,7 +178,9 @@ public class MetadataExtractorTest {
         MetadataModellingResult metadata =
                 metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
 
-        Assert.assertTrue(metadata.getErrors().size() == 0);
+        Assert.assertTrue(metadata.getErrors().size() == 1);
+        assertErrorMessages(metadata.getErrors(),
+                "Unrecognized tag for step description section: @step_invalid_tag");
 
         Assert.assertEquals(new Metadata(), metadata.getMetadata());
 
@@ -190,6 +192,36 @@ public class MetadataExtractorTest {
         assertStep04(stepDescriptions);
         assertStep05(stepDescriptions);
         assertStep06(stepDescriptions);
+    }
+
+    @Test
+    public void testExtractDescription10() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_10.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 1);
+        assertErrorMessages(metadata.getErrors(),
+                "Unrecognized tag for executable description section: @invalid_flow_tag");
+
+        assertExecutableMetadata01(metadata);
+
+        // step description
+        Map<String, String> stepInputs = new HashMap<>();
+        stepInputs.put("step_input_1", "description step input 1");
+        stepInputs.put("step_input_2",
+                "description step input 2 line 1" +
+                        NEWLINE +
+                        "description step input 2 line 2"
+        );
+        Map<String, String> stepOutputs = new HashMap<>();
+        stepOutputs.put("step_output_1", "description step output 1");
+        stepOutputs.put("step_output_2", "description step output 2");
+        StepMetadata expectedStepMetadata = new StepMetadata("step_1", stepInputs, stepOutputs);
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 1);
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(0));
     }
 
     @Test
