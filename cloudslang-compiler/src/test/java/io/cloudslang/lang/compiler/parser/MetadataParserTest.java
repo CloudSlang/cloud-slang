@@ -28,7 +28,6 @@ public class MetadataParserTest {
     @Test
     public void testParse() throws Exception {
         URI executable = getClass().getResource("/metadata/step/step_description_01.sl").toURI();
-        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
 
         // flow description
         LinkedHashMap<String, String> flowDescription = new LinkedHashMap<>(); // preserver order
@@ -44,6 +43,7 @@ public class MetadataParserTest {
         flowDescription.put("@result SUCCESS", "Flow completed successfully.");
         flowDescription.put("@result FAILURE", "Failure occurred during execution.");
 
+        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
         Assert.assertTrue(parseResult.getTopLevelDescriptions().size() == 1);
         Assert.assertEquals(flowDescription, parseResult.getTopLevelDescriptions().get(0).getData());
 

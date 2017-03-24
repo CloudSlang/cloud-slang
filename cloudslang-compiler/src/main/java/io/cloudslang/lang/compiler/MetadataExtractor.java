@@ -17,12 +17,12 @@ public interface MetadataExtractor {
 
     Metadata extractMetadata(SlangSource source);
 
-    MetadataModellingResult extractMetadataModellingResult(SlangSource source);
-
-    List<RuntimeException> validateCheckstyle(SlangSource source);
-
     Metadata extractMetadata(SlangSource source, boolean shouldValidateDescription);
 
+    MetadataModellingResult extractMetadataModellingResult(SlangSource source);
+
     MetadataModellingResult extractMetadataModellingResult(SlangSource source, boolean shouldValidateCheckstyle);
+
+    List<RuntimeException> validateCheckstyle(SlangSource source);
 
 }

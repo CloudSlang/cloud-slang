@@ -403,8 +403,8 @@ public class MetadataExtractorTest {
     private void assertExecutableMetadata03(MetadataModellingResult metadata) {
         Metadata expectedExecutableMetadata = new Metadata();
         expectedExecutableMetadata.setDescription(
-                "Parses the given JSON input to retrieve the"
-                        + NEWLINE +
+                "Parses the given JSON input to retrieve the" +
+                        NEWLINE +
                         "corresponding value addressed by the json_path input."
         );
         expectedExecutableMetadata.setPrerequisites("jenkinsapi Python module");
@@ -415,12 +415,13 @@ public class MetadataExtractorTest {
                         "Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'"
         );
         expectedInputs.put("json_path",
-                "path from which to retrieve value represented as a list of keys and/or indices."
-                        + NEWLINE +
-                        "Passing an empty list ([]) will retrieve the entire json_input. - Example: [\"k1\", \"k2\", 1]"
-                        + NEWLINE +
-                        "More information after newline"
-                        + NEWLINE +
+                "path from which to retrieve value represented as a list of keys and/or indices." +
+                        NEWLINE +
+                        "Passing an empty list ([]) will retrieve the " +
+                        "entire json_input. - Example: [\"k1\", \"k2\", 1]" +
+                        NEWLINE +
+                        "More information after newline" +
+                        NEWLINE +
                         "whatever description that will be ignored."
         );
         expectedExecutableMetadata.setInputs(expectedInputs);

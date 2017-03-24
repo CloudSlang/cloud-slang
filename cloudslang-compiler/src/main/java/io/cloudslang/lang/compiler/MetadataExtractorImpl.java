@@ -30,6 +30,12 @@ public class MetadataExtractorImpl implements MetadataExtractor {
         return getExecutableMetadata(source);
     }
 
+    @Deprecated
+    @Override
+    public Metadata extractMetadata(SlangSource source, boolean shouldValidateDescription) {
+        return getMetadata(source, shouldValidateDescription);
+    }
+
     @Override
     public MetadataModellingResult extractMetadataModellingResult(SlangSource source) {
         validateSlangSource(source);
@@ -37,16 +43,22 @@ public class MetadataExtractorImpl implements MetadataExtractor {
         return metadataModeller.createModel(parsedDescriptionData);
     }
 
+    @Deprecated
+    @Override
+    public MetadataModellingResult extractMetadataModellingResult(
+            SlangSource source,
+            boolean shouldValidateCheckstyle) {
+        MetadataModellingResult metadataModellingResult = extractMetadataModellingResult(source);
+        if (shouldValidateCheckstyle) {
+            metadataModellingResult.getErrors().addAll(validateCheckstyle(source));
+        }
+        return metadataModellingResult;
+    }
+
     @Override
     public List<RuntimeException> validateCheckstyle(SlangSource source) {
         validateSlangSource(source);
         return metadataValidator.validateCheckstyle(source);
-    }
-
-    @Deprecated
-    @Override
-    public Metadata extractMetadata(SlangSource source, boolean shouldValidateDescription) {
-        return getMetadata(source, shouldValidateDescription);
     }
 
     private Metadata getMetadata(SlangSource source, boolean shouldValidateDescription) {
@@ -61,18 +73,6 @@ public class MetadataExtractorImpl implements MetadataExtractor {
             }
         }
         return result.getMetadata();
-    }
-
-    @Deprecated
-    @Override
-    public MetadataModellingResult extractMetadataModellingResult(
-            SlangSource source,
-            boolean shouldValidateCheckstyle) {
-        MetadataModellingResult metadataModellingResult = extractMetadataModellingResult(source);
-        if (shouldValidateCheckstyle) {
-            metadataModellingResult.getErrors().addAll(validateCheckstyle(source));
-        }
-        return metadataModellingResult;
     }
 
     private void validateSlangSource(SlangSource source) {

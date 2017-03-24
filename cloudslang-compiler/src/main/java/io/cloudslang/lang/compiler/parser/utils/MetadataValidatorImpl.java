@@ -91,7 +91,8 @@ public class MetadataValidatorImpl implements MetadataValidator {
                 // extract tag
                 String currentTag;
                 if (variableLine) {
-                    Pair<String, String> declaration = descriptionPatternMatcher.getDescriptionVariableLineData(currentLine);
+                    Pair<String, String> declaration =
+                            descriptionPatternMatcher.getDescriptionVariableLineData(currentLine);
                     String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
                     currentTag = declarationElements[0];
                 } else if (variableLineDeclarationOnly) {
@@ -100,7 +101,8 @@ public class MetadataValidatorImpl implements MetadataValidator {
                     String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
                     currentTag = declarationElements[0];
                 } else {
-                    Pair<String, String> declaration = descriptionPatternMatcher.getDescriptionGeneralLineData(currentLine);
+                    Pair<String, String> declaration =
+                            descriptionPatternMatcher.getDescriptionGeneralLineData(currentLine);
                     String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
                     currentTag = declarationElements[0];
                 }
@@ -159,7 +161,12 @@ public class MetadataValidatorImpl implements MetadataValidator {
         }
     }
 
-    private void validateEmptyLine(List<String> lines, List<RuntimeException> errors, String previousTag, int previousItemEndLineNumber, String currentTag) {
+    private void validateEmptyLine(
+            List<String> lines,
+            List<RuntimeException> errors,
+            String previousTag,
+            int previousItemEndLineNumber,
+            String currentTag) {
         if (previousTag != null && !previousTag.equals(currentTag)) {
             int targetedLineNumberZeroBased = previousItemEndLineNumber + 1;
             String targetedLine = lines.get(targetedLineNumberZeroBased);
