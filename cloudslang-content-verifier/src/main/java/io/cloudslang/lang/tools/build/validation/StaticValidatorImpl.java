@@ -21,6 +21,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +58,7 @@ public class StaticValidatorImpl implements StaticValidator {
                                      List<? extends InOutParam> inOutParams, String errorMessagePrefix,
                                      Queue<RuntimeException> exceptions) {
         for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
-            if (metadataInOutParams == null) {
+            if (MapUtils.isEmpty(metadataInOutParams)) {
                 exceptions.add(new MetadataMissingException(errorMessagePrefix +
                         "s are missing description entirely."));
             } else if (metadataInOutParams.get(inOutParam.getName()) == null &&
