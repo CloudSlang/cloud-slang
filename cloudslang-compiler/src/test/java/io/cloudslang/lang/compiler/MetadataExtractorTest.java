@@ -226,7 +226,7 @@ public class MetadataExtractorTest {
 
     @Test
     public void testCheckstyle01() throws Exception {
-        URI operation = getClass().getResource("/metadata/step/invalid/step_description_02.sl").toURI();
+        URI operation = getClass().getResource("/metadata/step/step_description_02.sl").toURI();
         List<RuntimeException> checkstyleViolations =
                 metadataExtractor.validateCheckstyle(SlangSource.fromFile(operation));
         assertErrorMessages(
@@ -238,6 +238,21 @@ public class MetadataExtractorTest {
                         "There should be an empty line between two sections of different tags (@input and @output)",
                 "Error at line [32] - " +
                         "Next line should be delimiter line (90 characters of `#`)"
+        );
+    }
+
+    @Test
+    public void testCheckstyle02() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_11.sl").toURI();
+        List<RuntimeException> checkstyleViolations =
+                metadataExtractor.validateCheckstyle(SlangSource.fromFile(operation));
+        assertErrorMessages(
+                checkstyleViolations,
+                "Error at line [4] - There should be an empty line between two " +
+                        "sections of different tags (@description and @input)",
+                "Error at line [9] - There should be an empty line between two " +
+                        "sections of different tags (@output and @result)",
+                "Error at line [25] - Previous line should be delimiter line (90 characters of `#`)"
         );
     }
 
