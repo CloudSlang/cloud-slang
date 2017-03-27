@@ -10,43 +10,192 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.model.StepMetadata;
+import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
+import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionData;
+import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionSection;
 import io.cloudslang.lang.compiler.parser.utils.DescriptionTag;
-
+import io.cloudslang.lang.compiler.parser.utils.StepDescriptionTag;
+import io.cloudslang.lang.compiler.validator.matcher.DescriptionPatternMatcher;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class MetadataModellerImpl implements MetadataModeller {
+    private DescriptionPatternMatcher descriptionPatternMatcher;
+
+    public MetadataModellerImpl() {
+        descriptionPatternMatcher = new DescriptionPatternMatcher();
+    }
 
     @Override
-    public Metadata createModel(Map<String, String> metadataMap) {
-        return transformToMetadata(metadataMap);
+    public MetadataModellingResult createModel(ParsedDescriptionData parsedDescriptionData) {
+        List<ParsedDescriptionSection> topLevelDescriptions = parsedDescriptionData.getTopLevelDescriptions();
+        List<RuntimeException> errors = new ArrayList<>(parsedDescriptionData.getErrors());
+        Pair<Metadata, List<RuntimeException>> executableMetadata = null;
+
+        // executable metadata
+        if (CollectionUtils.isNotEmpty(topLevelDescriptions)) {
+            if (topLevelDescriptions.size() > 1) {
+                errors.add(
+                        new RuntimeException(
+                                "Multiple top level descriptions found at line numbers: " +
+                                        getLineNumbers(topLevelDescriptions)
+                        )
+                );
+            }
+            executableMetadata =
+                    transformToExecutableMetadata(topLevelDescriptions.get(0).getData());
+            errors.addAll(executableMetadata.getRight());
+        }
+
+        // step metadata
+        Pair<List<StepMetadata>, List<RuntimeException>> stepsModellingResult =
+                transformStepsData(parsedDescriptionData.getStepDescriptions());
+        List<StepMetadata> stepDescriptions = stepsModellingResult.getLeft();
+        errors.addAll(stepsModellingResult.getRight());
+
+        return new MetadataModellingResult(
+                executableMetadata == null ? new Metadata() : executableMetadata.getLeft(),
+                stepDescriptions,
+                errors
+        );
     }
 
-    private Metadata transformToMetadata(Map<String, String> fullMap) {
-        Metadata metadata = new Metadata();
-        String description = fullMap.get(DescriptionTag.DESCRIPTION.getValue());
-        metadata.setDescription(description != null ? description : "");
-        String prerequisites = fullMap.get(DescriptionTag.PREREQUISITES.getValue());
-        metadata.setPrerequisites(prerequisites != null ? prerequisites : "");
-        metadata.setInputs(getTagMap(fullMap, DescriptionTag.INPUT));
-        metadata.setOutputs(getTagMap(fullMap, DescriptionTag.OUTPUT));
-        metadata.setResults(getTagMap(fullMap, DescriptionTag.RESULT));
-
-        return metadata;
+    private String getLineNumbers(List<ParsedDescriptionSection> topLevelDescriptions) {
+        int[] lineNumbers = new int[topLevelDescriptions.size()];
+        for (int i = 0; i < topLevelDescriptions.size(); i++) {
+            lineNumbers[i] = topLevelDescriptions.get(i).getStartLineNumber();
+        }
+        return Arrays.toString(lineNumbers);
     }
 
-    private Map<String, String> getTagMap(Map<String, String> fullMap, DescriptionTag tag) {
-        Map<String, String> map = new LinkedHashMap<>();
-        for (Map.Entry<String, String> entry : fullMap.entrySet()) {
-            if (entry.getKey().contains(tag.getValue())) {
-                map.put(getName(entry, tag), entry.getValue());
+    private Pair<Metadata, List<RuntimeException>> transformToExecutableMetadata(
+            Map<String, String> parsedData) {
+        String description = "";
+        String prerequisites = "";
+        Map<String, String> inputs = new LinkedHashMap<>();
+        Map<String, String> outputs = new LinkedHashMap<>();
+        Map<String, String> results = new LinkedHashMap<>();
+        List<RuntimeException> errors = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : parsedData.entrySet()) {
+            String declaration = entry.getKey();
+            String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration);
+            String tag = declarationElements[0];
+            if (DescriptionTag.isDescriptionTag(tag)) {
+                String content = entry.getValue();
+                String name;
+                DescriptionTag descriptionTag = DescriptionTag.fromString(tag);
+                if (descriptionTag != null) {
+                    switch (descriptionTag) {
+                        case DESCRIPTION:
+                            description = content;
+                            break;
+                        case PREREQUISITES:
+                            prerequisites = content;
+                            break;
+                        case INPUT:
+                            name = declarationElements[1];
+                            inputs.put(name, content);
+                            break;
+                        case OUTPUT:
+                            name = declarationElements[1];
+                            outputs.put(name, content);
+                            break;
+                        case RESULT:
+                            name = declarationElements[1];
+                            results.put(name, content);
+                            break;
+                        default:
+                            // shouldn't get here
+                            errors.add(new NotImplementedException("Unrecognized tag: " + descriptionTag));
+                    }
+                } else {
+                    // shouldn't get here
+                    errors.add(new RuntimeException("Unrecognized tag: " + tag));
+                }
+            } else {
+                errors.add(new RuntimeException("Unrecognized tag for executable description section: " + tag));
             }
         }
-        return map;
+
+        Metadata executableMetadata = new Metadata(
+                description,
+                prerequisites,
+                inputs,
+                outputs,
+                results
+        );
+        return new ImmutablePair<>(executableMetadata, errors);
     }
 
-    private String getName(Map.Entry<String, String> entry, DescriptionTag tag) {
-        return entry.getKey().substring(tag.getValue().length()).trim();
+    private Pair<List<StepMetadata>, List<RuntimeException>> transformStepsData(
+            Map<String, ParsedDescriptionSection> stepsData) {
+        List<StepMetadata> stepsMetadata = new ArrayList<>();
+        List<RuntimeException> errors = new ArrayList<>();
+        for (Map.Entry<String, ParsedDescriptionSection> entry : stepsData.entrySet()) {
+            String stepName = entry.getKey();
+            ParsedDescriptionSection parsedData = entry.getValue();
+            Pair<StepMetadata, List<RuntimeException>> transformResult =
+                    transformToStepMetadata(stepName, parsedData.getData());
+            stepsMetadata.add(transformResult.getLeft());
+            errors.addAll(transformResult.getRight());
+        }
+
+        return new ImmutablePair<>(stepsMetadata, errors);
+    }
+
+    private Pair<StepMetadata, List<RuntimeException>> transformToStepMetadata(
+            String stepName,
+            Map<String, String> parsedData) {
+        Map<String, String> inputs = new LinkedHashMap<>();
+        Map<String, String> outputs = new LinkedHashMap<>();
+        List<RuntimeException> errors = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : parsedData.entrySet()) {
+            String declaration = entry.getKey();
+            String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration);
+            String tag = declarationElements[0];
+            if (StepDescriptionTag.isDescriptionTag(tag)) {
+                String content = entry.getValue();
+                String name;
+                DescriptionTag descriptionTag = DescriptionTag.fromString(tag);
+                if (descriptionTag != null) {
+                    switch (descriptionTag) {
+                        case INPUT:
+                            name = declarationElements[1];
+                            inputs.put(name, content);
+                            break;
+                        case OUTPUT:
+                            name = declarationElements[1];
+                            outputs.put(name, content);
+                            break;
+                        default:
+                            // shouldn't get here
+                            errors.add(new NotImplementedException("Unrecognized tag: " + descriptionTag));
+                    }
+                } else {
+                    // shouldn't get here
+                    errors.add(new RuntimeException("Unrecognized tag: " + tag));
+                }
+            } else {
+                errors.add(new RuntimeException("Unrecognized tag for step description section: " + tag));
+            }
+        }
+
+        StepMetadata stepMetadata = new StepMetadata(
+                stepName,
+                inputs,
+                outputs
+        );
+        return new ImmutablePair<>(stepMetadata, errors);
     }
 
 }

@@ -9,10 +9,9 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.compiler.modeller.model.Metadata;
-
-import java.util.Map;
+import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
+import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionData;
 
 public interface MetadataModeller {
-    Metadata createModel(Map<String, String> metadataMap);
+    MetadataModellingResult createModel(ParsedDescriptionData parsedDescriptionData);
 }

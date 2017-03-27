@@ -14,16 +14,16 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 
@@ -58,7 +58,7 @@ public class StaticValidatorImpl implements StaticValidator {
                                      List<? extends InOutParam> inOutParams, String errorMessagePrefix,
                                      Queue<RuntimeException> exceptions) {
         for (InOutParam inOutParam : ListUtils.emptyIfNull(inOutParams)) {
-            if (metadataInOutParams == null) {
+            if (MapUtils.isEmpty(metadataInOutParams)) {
                 exceptions.add(new MetadataMissingException(errorMessagePrefix +
                         "s are missing description entirely."));
             } else if (metadataInOutParams.get(inOutParam.getName()) == null &&

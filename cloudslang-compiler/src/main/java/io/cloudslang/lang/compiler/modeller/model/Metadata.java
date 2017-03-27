@@ -9,15 +9,17 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.model;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Metadata {
 
@@ -26,6 +28,27 @@ public class Metadata {
     private Map<String, String> inputs;
     private Map<String, String> outputs;
     private Map<String, String> results;
+
+    public Metadata() {
+        description = "";
+        prerequisites = "";
+        inputs = new HashMap<>();
+        outputs = new HashMap<>();
+        results = new HashMap<>();
+    }
+
+    public Metadata(
+            String description,
+            String prerequisites,
+            Map<String, String> inputs,
+            Map<String, String> outputs,
+            Map<String, String> results) {
+        this.description = description;
+        this.prerequisites = prerequisites;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.results = results;
+    }
 
     public Map<String, String> getInputs() {
         return inputs;
@@ -128,5 +151,48 @@ public class Metadata {
         } else {
             stringBuilder.append(fieldValue).append(System.lineSeparator());
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Metadata that = (Metadata) o;
+
+        return new EqualsBuilder()
+                .append(description, that.description)
+                .append(prerequisites, that.prerequisites)
+                .append(inputs, that.inputs)
+                .append(outputs, that.outputs)
+                .append(results, that.results)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(description)
+                .append(prerequisites)
+                .append(inputs)
+                .append(outputs)
+                .append(results)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Metadata{" +
+                "description='" + description + '\'' +
+                ", prerequisites='" + prerequisites + '\'' +
+                ", inputs=" + inputs +
+                ", outputs=" + outputs +
+                ", results=" + results +
+                '}';
     }
 }

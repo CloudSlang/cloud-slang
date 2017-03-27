@@ -7,11 +7,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.parser.utils;
+package io.cloudslang.lang.compiler.utils;
 
-import io.cloudslang.lang.compiler.SlangSource;
-import java.util.List;
-
-public interface MetadataValidator {
-    List<RuntimeException> validateCheckstyle(SlangSource source);
+/**
+ * @author Bonczidai Levente
+ * @since 3/24/2017
+ */
+public abstract class MetadataUtils {
+    public static String generateErrorMessage(int lineNumberZeroBased, String message) {
+        return "Error at line [" + (lineNumberZeroBased + 1) + "] - " + message;
+    }
 }

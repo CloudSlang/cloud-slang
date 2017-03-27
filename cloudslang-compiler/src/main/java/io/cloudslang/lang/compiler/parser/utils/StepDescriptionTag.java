@@ -13,18 +13,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public enum DescriptionTag {
-    DESCRIPTION("@description"),
-    PREREQUISITES("@prerequisites"),
+/**
+ * @author Bonczidai Levente
+ * @since 3/21/2017
+ */
+public enum StepDescriptionTag {
     INPUT("@input"),
-    OUTPUT("@output"),
-    RESULT("@result");
+    OUTPUT("@output");
 
     private static final List<DescriptionTag> DESCRIPTION_TAGS_LIST =
             Collections.unmodifiableList(Arrays.asList(DescriptionTag.values()));
     private final String value;
 
-    DescriptionTag(String value) {
+    StepDescriptionTag(String value) {
         this.value = value;
     }
 
@@ -45,12 +46,4 @@ public enum DescriptionTag {
         return false;
     }
 
-    public static DescriptionTag fromString(String str) {
-        for (DescriptionTag descriptionTag : DescriptionTag.asList()) {
-            if (str.contains(descriptionTag.getValue())) {
-                return descriptionTag;
-            }
-        }
-        return null;
-    }
 }
