@@ -1,11 +1,12 @@
 #!/bin/bash
 
+BUILD_DIR=$WORKSPACE
+
 REPO=cloudslang/cloud-slang
 GHUSERTOKEN=$GH_TOKEN
 BRANCH=$GIT_BRANCH
-BUILD_DIR=$WORKSPACE
 
-CLI_DIR=build/target/cli
+CLI_DIR=${WORKSPACE}/build/target/cli
 CLI_ZIP_PATH=${CLI_DIR}/cslang-cli.zip
 CLI_GZIP_PATH=${CLI_DIR}/cslang-cli.tar.gz
 
@@ -24,7 +25,7 @@ curl ${RELEASES_URL}/tags/${BRANCH} > ${BUILD_DIR}/res.json
 #Get release id
 RELEASEID=$(grep -e id ${BUILD_DIR}/res.json | head -n 1 | awk '{print $2}' | grep -oe '[0-9]*')
 
-echo -e "\n\nUpoloading artifacts using curl\n=================================================================================\n"
+echo -e "\n\nUploading artifacts using curl\n=================================================================================\n"
 
 UPLOAD_URL="https://uploads.github.com/repos/${REPO}/releases/${RELEASEID}/assets"
 
