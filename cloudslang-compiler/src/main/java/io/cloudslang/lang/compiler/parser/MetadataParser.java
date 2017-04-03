@@ -51,38 +51,38 @@ public class MetadataParser {
             // block start -  #!!
             if (descriptionPatternMatcher.matchesDescriptionStart(currentLine)) {
                 handleBlockStart(descriptionBuilder, lineNrZeroBased);
-            } else {
-                // #! @tag var: content <=> @tag var
-                if (descriptionPatternMatcher.matchesDescriptionVariableLine(currentLine)) {
-                    handleDescriptionLineVariableSyntax(descriptionBuilder, currentLine);
-                } else if (descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(currentLine)) {
-                    handleDescriptionLineVariableDeclarationOnlySyntax(descriptionBuilder, currentLine);
+            } else
+                // #!!#
+                if (descriptionPatternMatcher.matchesDescriptionEnd(currentLine)) {
+                    handleDescriptionEnd(descriptionBuilder, lines, lineNrZeroBased);
                 } else {
-                    // #! @tag: content
-                    if (descriptionPatternMatcher.matchesDescriptionGeneralLine(currentLine)) {
-                        handleDescriptionLineGeneralSyntax(descriptionBuilder, currentLine);
-                    } else {
-                        // #! continued from previous line
-                        if (descriptionPatternMatcher.matchesDescriptionComplementaryLine(currentLine)) {
-                            handleDescriptionLineComplementarySyntax(descriptionBuilder, currentLine);
+                    // #! @tag var: content <=> @tag var
+                    if (descriptionPatternMatcher.matchesDescriptionVariableLine(currentLine)) {
+                        handleDescriptionLineVariableSyntax(descriptionBuilder, currentLine);
+                    } else
+                        // #! @tag: content
+                        if (descriptionPatternMatcher.matchesDescriptionGeneralLine(currentLine)) {
+                            handleDescriptionLineGeneralSyntax(descriptionBuilder, currentLine);
                         } else {
-                            // #!!#
-                            if (descriptionPatternMatcher.matchesDescriptionEnd(currentLine)) {
-                                handleDescriptionEnd(descriptionBuilder, lines, lineNrZeroBased);
+                            if (descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(currentLine)) {
+                                handleDescriptionLineVariableDeclarationOnlySyntax(descriptionBuilder, currentLine);
                             } else {
-                                // check if line is allowed inside description
-                                if (descriptionBuilder.descriptionOpened()) {
-                                    handleNonDescriptionLineInsideDescription(
-                                            descriptionBuilder,
-                                            currentLine,
-                                            lineNrZeroBased
-                                    );
+                                // #! continued from previous line
+                                if (descriptionPatternMatcher.matchesDescriptionComplementaryLine(currentLine)) {
+                                    handleDescriptionLineComplementarySyntax(descriptionBuilder, currentLine);
+                                } else {
+                                    // check if line is allowed inside description
+                                    if (descriptionBuilder.descriptionOpened()) {
+                                        handleNonDescriptionLineInsideDescription(
+                                                descriptionBuilder,
+                                                currentLine,
+                                                lineNrZeroBased
+                                        );
+                                    }
                                 }
                             }
                         }
-                    }
                 }
-            }
         }
         return descriptionBuilder.build();
     }

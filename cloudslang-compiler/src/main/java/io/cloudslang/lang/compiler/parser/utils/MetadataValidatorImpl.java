@@ -86,8 +86,8 @@ public class MetadataValidatorImpl implements MetadataValidator {
             // #! @tag var: content
             // #! @tag: content
             boolean variableLine = isVariableLine(currentLine);
-            boolean variableLineDeclarationOnly = isVariableLineDeclarationOnly(currentLine);
-            if (variableLine || variableLineDeclarationOnly || isGeneralLine(currentLine)) {
+            boolean isGeneralLine = isGeneralLine(currentLine);
+            if (variableLine || isGeneralLine || isVariableLineDeclarationOnly(currentLine)) {
                 // extract tag
                 String currentTag;
                 if (variableLine) {
@@ -95,14 +95,14 @@ public class MetadataValidatorImpl implements MetadataValidator {
                             descriptionPatternMatcher.getDescriptionVariableLineData(currentLine);
                     String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
                     currentTag = declarationElements[0];
-                } else if (variableLineDeclarationOnly) {
+                } else if (isGeneralLine) {
                     Pair<String, String> declaration =
-                            descriptionPatternMatcher.getDescriptionVariableLineDataDeclarationOnly(currentLine);
+                            descriptionPatternMatcher.getDescriptionGeneralLineData(currentLine);
                     String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
                     currentTag = declarationElements[0];
                 } else {
                     Pair<String, String> declaration =
-                            descriptionPatternMatcher.getDescriptionGeneralLineData(currentLine);
+                            descriptionPatternMatcher.getDescriptionVariableLineDataDeclarationOnly(currentLine);
                     String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration.getLeft());
                     currentTag = declarationElements[0];
                 }

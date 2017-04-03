@@ -225,6 +225,36 @@ public class MetadataExtractorTest {
     }
 
     @Test
+    public void testExtractDescription11() throws Exception {
+        URI operation = getClass().getResource("/metadata/step/step_description_12.sl").toURI();
+        MetadataModellingResult metadata =
+                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+
+        Assert.assertTrue(metadata.getErrors().size() == 10);
+        assertErrorMessages(
+                metadata.getErrors(),
+                "Unrecognized tag for executable description section: @bo$$First",
+                "Unrecognized tag for executable description section: @bo$$",
+                "For executable parameter name for tag[@output] is missing. Format should be [@output name]",
+                "For executable parameter name for tag[@result] is missing. Format should be [@result name]",
+                "Unrecognized tag for executable description section: @nasty_tag",
+
+                "Unrecognized tag for step description section: @description",
+                "Unrecognized tag for step description section: @bo$$First",
+                "Unrecognized tag for step description section: @bo$$",
+                "For step[step_1] parameter name for tag[@output] is missing. Format should be [@output name]",
+                "Unrecognized tag for step description section: @nasty_tag"
+        );
+
+        List<StepMetadata> stepDescriptions = metadata.getStepDescriptions();
+        Assert.assertTrue(stepDescriptions.size() == 1);
+
+        assertExecutableMetadata05(metadata);
+
+        assertStep09(stepDescriptions);
+    }
+
+    @Test
     public void testCheckstyle01() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_02.sl").toURI();
         List<RuntimeException> checkstyleViolations =
@@ -475,6 +505,67 @@ public class MetadataExtractorTest {
         expectedExecutableMetadata.setResults(expectedResults);
         Metadata actualExecutableMetadata = metadata.getMetadata();
         Assert.assertEquals(expectedExecutableMetadata, actualExecutableMetadata);
+    }
+
+    private void assertExecutableMetadata05(MetadataModellingResult metadata) {
+        Metadata expectedExecutableMetadata = new Metadata();
+        expectedExecutableMetadata.setDescription("Generated flow description");
+        expectedExecutableMetadata.setPrerequisites("");
+        Map<String, String> expectedInputs = new HashMap<>();
+        expectedInputs.put("input_1",
+                "Generated description flow input 1 line 1" +
+                        NEWLINE +
+                        "Generated description flow input 1 line 2"
+        );
+        expectedInputs.put("input_2#", "4$3#####*909009885^: Generated description flow input 2");
+        expectedExecutableMetadata.setInputs(expectedInputs);
+        Map<String, String> outputs = new HashMap<>();
+        outputs.put("output_1",
+                "Generated description flow output 1" +
+                        NEWLINE +
+                        "@ output output_2: Generated description flow output 2"
+        );
+        outputs.put("bo$$Second", "Generated description @bo$$ line 1");
+        outputs.put("bo$$",
+                "Generated description @bo$$ line 1" +
+                        NEWLINE +
+                        "X @bo$$: Generated description @bo$$ line 1"
+        );
+        expectedExecutableMetadata.setOutputs(outputs);
+        Map<String, String> expectedResults = new HashMap<>();
+        expectedResults.put("SUCCESS", "Flow completed successfully.");
+        expectedResults.put("FAILURE", "Failure occurred during execution." + NEWLINE + "@");
+        expectedExecutableMetadata.setResults(expectedResults);
+        Metadata actualExecutableMetadata = metadata.getMetadata();
+        Assert.assertEquals(expectedExecutableMetadata, actualExecutableMetadata);
+    }
+
+    private void assertStep09(List<StepMetadata> stepDescriptions) {
+        Map<String, String> stepInputs = new HashMap<>();
+        stepInputs.put("input_1",
+                "Generated description flow input 1 line 1" +
+                        NEWLINE +
+                        "Generated description flow input 1 line 2"
+        );
+        stepInputs.put("input_2#", "4$3#####*909009885^: Generated description flow input 2");
+        Map<String, String> stepOutputs = new HashMap<>();
+        stepOutputs.put("output_1",
+                "Generated description flow output 1" +
+                        NEWLINE +
+                        "@ output output_2: Generated description flow output 2"
+        );
+        stepOutputs.put("bo$$Second", "Generated description @bo$$ line 1");
+        stepOutputs.put("bo$$",
+                "Generated description @bo$$ line 1" +
+                        NEWLINE +
+                        "X @bo$$: Generated description @bo$$ line 1"
+        );
+        stepOutputs.put("output_SUCCESS", "Flow completed successfully.");
+        stepOutputs.put("output_FAILURE", "Failure occurred during execution." + NEWLINE + "@");
+
+        StepMetadata expectedStepMetadata = new StepMetadata("step_1", stepInputs, stepOutputs);
+
+        Assert.assertEquals(expectedStepMetadata, stepDescriptions.get(0));
     }
 
     private void assertErrorMessages(List<RuntimeException> actualErrors, String... expectedErrorMessages) {
