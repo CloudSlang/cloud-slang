@@ -38,12 +38,8 @@ public enum StepDescriptionTag {
     }
 
     public static boolean isStepDescriptionTag(String str) {
-        for (StepDescriptionTag stepDescriptionTag : StepDescriptionTag.asList()) {
-            if (str.contains(stepDescriptionTag.getValue())) {
-                return true;
-            }
-        }
-        return false;
+        StepDescriptionTag stepDescriptionTag = fromString(str);
+        return stepDescriptionTag != null;
     }
 
     public static StepDescriptionTag fromString(String str) {
