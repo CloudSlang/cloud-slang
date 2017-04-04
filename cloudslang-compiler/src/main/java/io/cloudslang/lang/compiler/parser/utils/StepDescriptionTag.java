@@ -21,8 +21,8 @@ public enum StepDescriptionTag {
     INPUT("@input"),
     OUTPUT("@output");
 
-    private static final List<DescriptionTag> DESCRIPTION_TAGS_LIST =
-            Collections.unmodifiableList(Arrays.asList(DescriptionTag.values()));
+    private static final List<StepDescriptionTag> DESCRIPTION_TAGS_LIST =
+            Collections.unmodifiableList(Arrays.asList(StepDescriptionTag.values()));
     private final String value;
 
     StepDescriptionTag(String value) {
@@ -33,17 +33,22 @@ public enum StepDescriptionTag {
         return value;
     }
 
-    public static List<DescriptionTag> asList() {
+    public static List<StepDescriptionTag> asList() {
         return DESCRIPTION_TAGS_LIST;
     }
 
-    public static boolean isDescriptionTag(String str) {
-        for (DescriptionTag descriptionTag : DescriptionTag.asList()) {
-            if (str.contains(descriptionTag.getValue())) {
-                return true;
+    public static boolean isStepDescriptionTag(String str) {
+        StepDescriptionTag stepDescriptionTag = fromString(str);
+        return stepDescriptionTag != null;
+    }
+
+    public static StepDescriptionTag fromString(String str) {
+        for (StepDescriptionTag stepDescriptionTag : StepDescriptionTag.asList()) {
+            if (str.contains(stepDescriptionTag.getValue())) {
+                return stepDescriptionTag;
             }
         }
-        return false;
+        return null;
     }
 
 }

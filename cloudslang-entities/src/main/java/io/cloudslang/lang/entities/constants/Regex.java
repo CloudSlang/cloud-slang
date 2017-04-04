@@ -50,17 +50,17 @@ public class Regex {
 
     // #! @input var: content
     public static final String DESCRIPTION_VARIABLE_LINE =
-            "(\\s*)(#!)(\\s*)(@(\\w+)(\\s+)" + VARIABLE_NAME_CHARS + ")(\\s*)(:)(\\s*)(.*)";
+            "(\\s*)(#!)(\\s*)(@([^:\\s]+)(\\s+)([^:\\s]+))(\\s*)(:)(\\s*)(.*)";
     public static final int DESCRIPTION_VARIABLE_LINE_DECLARATION_GROUP_NR = 4;
-    public static final int DESCRIPTION_VARIABLE_LINE_CONTENT_GROUP_NR = 13;
+    public static final int DESCRIPTION_VARIABLE_LINE_CONTENT_GROUP_NR = 11;
 
     // #! @input var <=> #! @input var: content
     public static final String DESCRIPTION_VARIABLE_LINE_DECLARATION_ONLY =
-            "(\\s*)(#!)(\\s*)(@(\\w+)(\\s+)" + VARIABLE_NAME_CHARS + ")(\\s*)";
+            "(\\s*)(#!)(\\s*)((@[^:\\s]+)(\\s+([^:\\s]*))?)";
     public static final int DESCRIPTION_VARIABLE_LINE_DECLARATION_ONLY_GROUP_NR = 4;
 
     // #! @description: content
-    public static final String DESCRIPTION_GENERAL_LINE = "(\\s*)(#!)(\\s*)(@(\\w+))(\\s*)(:)(\\s*)(.*)";
+    public static final String DESCRIPTION_GENERAL_LINE = "(\\s*)(#!)(\\s*)(@([^:\\s]+))(\\s*)(:)(\\s*)(.*)";
     public static final int DESCRIPTION_GENERAL_LINE_DECLARATION_GROUP_NR = 4;
     public static final int DESCRIPTION_GENERAL_LINE_CONTENT_GROUP_NR = 9;
 
@@ -90,5 +90,5 @@ public class Regex {
     public static final String DESCRIPTION_TOKEN = "#!";
 
     public static final String DESCRIPTION_EMPTY_LINE = "(\\s*)(#!)(\\s*)";
-    ////////////////////////////////////////////////
+    //////////////// description end
 }

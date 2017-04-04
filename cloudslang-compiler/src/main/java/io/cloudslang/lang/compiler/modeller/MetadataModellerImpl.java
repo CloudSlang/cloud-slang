@@ -91,7 +91,6 @@ public class MetadataModellerImpl implements MetadataModeller {
             String tag = declarationElements[0];
             if (DescriptionTag.isDescriptionTag(tag)) {
                 String content = entry.getValue();
-                String name;
                 DescriptionTag descriptionTag = DescriptionTag.fromString(tag);
                 if (descriptionTag != null) {
                     switch (descriptionTag) {
@@ -102,16 +101,13 @@ public class MetadataModellerImpl implements MetadataModeller {
                             prerequisites = content;
                             break;
                         case INPUT:
-                            name = declarationElements[1];
-                            inputs.put(name, content);
+                            processExecutableDeclaration(declarationElements, errors, tag, inputs, content);
                             break;
                         case OUTPUT:
-                            name = declarationElements[1];
-                            outputs.put(name, content);
+                            processExecutableDeclaration(declarationElements, errors, tag, outputs, content);
                             break;
                         case RESULT:
-                            name = declarationElements[1];
-                            results.put(name, content);
+                            processExecutableDeclaration(declarationElements, errors, tag, results, content);
                             break;
                         default:
                             // shouldn't get here
@@ -134,6 +130,45 @@ public class MetadataModellerImpl implements MetadataModeller {
                 results
         );
         return new ImmutablePair<>(executableMetadata, errors);
+    }
+
+    private void processExecutableDeclaration(
+            String[] declarationElements,
+            List<RuntimeException> errors,
+            String tag,
+            Map<String, String> parameters,
+            String content) {
+        processDeclaration(declarationElements, errors, tag, parameters, content, "executable");
+    }
+
+    private void processStepDeclaration(
+            String[] declarationElements,
+            List<RuntimeException> errors,
+            String tag,
+            Map<String, String> parameters,
+            String content,
+            String stepName) {
+        processDeclaration(declarationElements, errors, tag, parameters, content, "step[" + stepName + "]");
+    }
+
+    private void processDeclaration(
+            String[] declarationElements,
+            List<RuntimeException> errors,
+            String tag,
+            Map<String, String> parameters,
+            String content,
+            String identifier) {
+        if (declarationElements.length != 2) {
+            errors.add(
+                    new RuntimeException(
+                            "For " + identifier + " parameter name for tag[" + tag + "] is missing. " +
+                                    "Format should be [" + tag + " name]"
+                    )
+            );
+        } else {
+            String name = declarationElements[1];
+            parameters.put(name, content);
+        }
     }
 
     private Pair<List<StepMetadata>, List<RuntimeException>> transformStepsData(
@@ -163,19 +198,16 @@ public class MetadataModellerImpl implements MetadataModeller {
             String declaration = entry.getKey();
             String[] declarationElements = descriptionPatternMatcher.splitDeclaration(declaration);
             String tag = declarationElements[0];
-            if (StepDescriptionTag.isDescriptionTag(tag)) {
+            if (StepDescriptionTag.isStepDescriptionTag(tag)) {
                 String content = entry.getValue();
-                String name;
-                DescriptionTag descriptionTag = DescriptionTag.fromString(tag);
+                StepDescriptionTag descriptionTag = StepDescriptionTag.fromString(tag);
                 if (descriptionTag != null) {
                     switch (descriptionTag) {
                         case INPUT:
-                            name = declarationElements[1];
-                            inputs.put(name, content);
+                            processStepDeclaration(declarationElements, errors, tag, inputs, content, stepName);
                             break;
                         case OUTPUT:
-                            name = declarationElements[1];
-                            outputs.put(name, content);
+                            processStepDeclaration(declarationElements, errors, tag, outputs, content, stepName);
                             break;
                         default:
                             // shouldn't get here
