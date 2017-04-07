@@ -36,7 +36,7 @@ import java.util.Map;
 public class OperationSystemTest extends SystemsTestsParent {
 
     @Test
-    public void testCompileAndRunOperationBasic() throws Exception {
+    public void proveCloudSlangRocks() throws Exception {
         URL resource = getClass().getResource("/yaml/test_op.sl");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
         //Trigger ExecutionPlan
