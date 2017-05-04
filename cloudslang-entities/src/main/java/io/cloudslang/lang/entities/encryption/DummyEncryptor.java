@@ -25,7 +25,7 @@ public class DummyEncryptor implements Encryption {
 
     @Override
     public String obfuscate(String cypherText) {
-        return new cypherText;
+        return cypherText;
     }
 
     @Override
