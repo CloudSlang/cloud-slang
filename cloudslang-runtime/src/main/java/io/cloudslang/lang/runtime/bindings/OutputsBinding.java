@@ -13,15 +13,15 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
 
@@ -59,7 +59,7 @@ public class OutputsBinding extends AbstractBinding {
                         //evaluate expression
                         Value value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext,
                                 systemProperties, output.getFunctionDependencies());
-                        valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive());
+                        valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive(), false);
                     } catch (Throwable t) {
                         throw new RuntimeException(errorMessagePrefix + "',\n\tError is: " + t.getMessage(), t);
                     }

@@ -112,11 +112,11 @@ public class InputsBindingTest {
 
     @Test
     public void testAssignFromInput() {
-        Input input1 = new Input.InputBuilder("input1", "val1", false)
+        Input input1 = new Input.InputBuilder("input1", "val1", false, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
-        Input input2 = new Input.InputBuilder("input2", "${ input1 }", false)
+        Input input2 = new Input.InputBuilder("input2", "${ input1 }", false, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -316,7 +316,7 @@ public class InputsBindingTest {
         Map<String, Value> context = new HashMap<>();
         context.put("input2", ValueFactory.create("3"));
         context.put("input1", ValueFactory.create("5"));
-        Input input = new Input.InputBuilder("input1", "${ input2 }", false)
+        Input input = new Input.InputBuilder("input1", "${ input2 }", false, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -335,7 +335,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom2() {
         Map<String, Value> context = new HashMap<>();
         context.put("input1", ValueFactory.create(5));
-        Input input = new Input.InputBuilder("input1", "3", false)
+        Input input = new Input.InputBuilder("input1", "3", false, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -352,7 +352,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom3() {
         Map<String, Value> context = new HashMap<>();
         context.put("input1", ValueFactory.create(5));
-        Input input = new Input.InputBuilder("input1", null, false)
+        Input input = new Input.InputBuilder("input1", null, false, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -384,7 +384,7 @@ public class InputsBindingTest {
     public void testExpressionWithWrongRef() {
         Map<String, Value> context = new HashMap<>();
 
-        Input input = new Input.InputBuilder("input1", "${ input2 }", false)
+        Input input = new Input.InputBuilder("input1", "${ input2 }", false, false)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();

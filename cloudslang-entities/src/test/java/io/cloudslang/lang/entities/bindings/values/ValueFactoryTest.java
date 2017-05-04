@@ -30,14 +30,14 @@ public class ValueFactoryTest {
 
     @Test
     public void testCreatePyObjectValueFromValue() {
-        Value value = ValueFactory.create("value1", false);
+        Value value = ValueFactory.create("value1", false, false);
         PyObjectValue pyObjectValue = ValueFactory.createPyObjectValue(value);
         Assert.assertEquals("value1", pyObjectValue.get());
     }
 
     @Test
     public void testCreatePyObjectValueFromValueSensitive() {
-        Value value = ValueFactory.create("value1", true);
+        Value value = ValueFactory.create("value1", true, false);
         PyObjectValue pyObjectValue = ValueFactory.createPyObjectValue(value);
         Assert.assertEquals("value1", pyObjectValue.get());
     }

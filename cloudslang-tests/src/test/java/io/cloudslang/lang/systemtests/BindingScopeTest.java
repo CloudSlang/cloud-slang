@@ -233,7 +233,7 @@ public class BindingScopeTest extends SystemsTestsParent {
                 .compile(SlangSource.fromFile(resource.toURI()), path);
 
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("flow_input_sensitive", ValueFactory.create("sensitiveValue2", true));
+        userInputs.put("flow_input_sensitive", ValueFactory.create("sensitiveValue2", true, false));
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();

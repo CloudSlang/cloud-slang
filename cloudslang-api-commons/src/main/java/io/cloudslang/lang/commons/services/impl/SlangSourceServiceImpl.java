@@ -13,12 +13,13 @@ import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import org.springframework.stereotype.Service;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
 
 /**
  * @author Bonczidai Levente
@@ -35,10 +36,10 @@ public class SlangSourceServiceImpl implements SlangSourceService {
                 validateKeys(valueMap, artifact);
                 result.put(
                         property.getKey(),
-                        ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY), isSensitiveValue(valueMap))
+                        ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY), isSensitiveValue(valueMap), false)
                 );
             } else {
-                result.put(property.getKey(), ValueFactory.create(property.getValue(), false));
+                result.put(property.getKey(), ValueFactory.create(property.getValue(), false, false));
             }
         }
         return result;

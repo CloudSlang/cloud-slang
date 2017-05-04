@@ -33,6 +33,15 @@ public interface Encryption {
     char[] decrypt(String cypherText);
 
     /**
+     * Obfuscated a String.
+     *
+     * @param cypherText
+     * @return The obfuscate string.
+     * @description
+     */
+    String obfuscate(String cypherText);
+
+    /**
      * Checks whether provided text char array is already encrypted
      *
      * @param text text to check whether it encrypted or not

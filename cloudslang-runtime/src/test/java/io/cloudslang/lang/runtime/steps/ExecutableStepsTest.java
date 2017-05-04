@@ -114,7 +114,7 @@ public class ExecutableStepsTest {
     public void testBoundInputEvent() {
         List<Input> inputs = Arrays.asList(
                 new Input.InputBuilder("input1", 5).build(),
-                new Input.InputBuilder("input2", 3, true)
+                new Input.InputBuilder("input2", 3, true, false)
                         .withRequired(true)
                         .withPrivateInput(false)
                         .build()
@@ -253,7 +253,8 @@ public class ExecutableStepsTest {
 
     @Test
     public void testFinishExecutableEvents() {
-        final List<Output> possibleOutputs = singletonList(new Output("name", ValueFactory.create("name", false)));
+        final List<Output> possibleOutputs = singletonList(new Output("name", ValueFactory.create("name",
+                false, false)));
         final List<Result> possibleResults = singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT,
                 ValueFactory.create("true")));
         RunEnvironment runEnv = new RunEnvironment();

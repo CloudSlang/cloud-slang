@@ -17,6 +17,9 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,8 +27,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -166,7 +167,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         Accumulator accumulator = extractFunctionData(entryValue);
         return new Argument(
                 entryName,
-                ValueFactory.create(entryValue, sensitive),
+                ValueFactory.create(entryValue, sensitive, false),
                 privateArgument,
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()

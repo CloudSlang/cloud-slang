@@ -15,11 +15,12 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import org.junit.Assert;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
 
 import static org.junit.Assert.assertEquals;
 
@@ -52,7 +53,8 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         userInputs.put("input_no_expression", ValueFactory.create("input_no_expression_value"));
         userInputs.put("input_private", ValueFactory.create("i_should_not_be_assigned"));
         userInputs.put("enable_option_for_action", ValueFactory.create("enable_option_for_action_value"));
-        userInputs.put("input_no_default_sensitive", ValueFactory.create("input_no_default_sensitive_value", false));
+        userInputs.put("input_no_default_sensitive", ValueFactory.create("input_no_default_sensitive_value",
+                false, false));
         return userInputs;
     }
 

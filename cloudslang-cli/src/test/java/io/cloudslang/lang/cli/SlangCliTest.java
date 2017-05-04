@@ -20,6 +20,13 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.shell.Bootstrap;
+import org.springframework.shell.core.CommandResult;
+import org.springframework.shell.core.JLineShellComponent;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,14 +36,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.shell.Bootstrap;
-import org.springframework.shell.core.CommandResult;
-import org.springframework.shell.core.JLineShellComponent;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyList;
@@ -467,7 +466,7 @@ public class SlangCliTest {
     public void testGetFlowInputsWithOverride() throws Exception {
         final List<Input> inputsList = Lists.newArrayList(
                 new Input.InputBuilder("input1", "expression1").build(),
-                new Input.InputBuilder("input_override", "expression_override", false)
+                new Input.InputBuilder("input_override", "expression_override", false, false)
                         .withRequired(true)
                         .withPrivateInput(true)
                         .build(),

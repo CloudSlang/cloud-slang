@@ -13,9 +13,6 @@ import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.spi.encryption.Encryption;
-
-import java.io.Serializable;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +21,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.Serializable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,13 +35,14 @@ import static org.junit.Assert.assertTrue;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class SensitiveValueTest {
     private static final String ENCRYPTED = "{Encrypted}";
+    private static final String OBFUSCATED = "{Obfuscated}";
 
     @Test
     public void testSensitiveValueEncryptDecrypt() {
         final String originalValue = "OriginalSensitiveValue";
         final String expectedEncryptedString = "{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=";
 
-        SensitiveValue value = (SensitiveValue) ValueFactory.create(originalValue, true);
+        SensitiveValue value = (SensitiveValue) ValueFactory.create(originalValue, true, false);
         verifyEncrypted(value, originalValue, expectedEncryptedString);
 
         value.encrypt();
@@ -146,6 +146,11 @@ public class SensitiveValueTest {
                 @Override
                 public char[] decrypt(String cypherText) {
                     return cypherText.substring(ENCRYPTED.length()).toCharArray();
+                }
+
+                @Override
+                public String obfuscate(String cypherText) {
+                    return OBFUSCATED + cypherText;
                 }
 
                 @Override

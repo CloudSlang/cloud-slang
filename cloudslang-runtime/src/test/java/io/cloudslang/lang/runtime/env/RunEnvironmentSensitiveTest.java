@@ -15,10 +15,6 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.spi.encryption.Encryption;
-
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Maps;
@@ -29,6 +25,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -43,6 +42,7 @@ import static org.junit.Assert.assertTrue;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RunEnvironmentSensitiveTest {
     private static final String ENCYPTED = "{Encrypted}";
+    private static final String OBFUSCATED = "{Obfuscated}";
 
     @Test
     public void testEmptyRunEnvironmentNotSensitive() {
@@ -96,7 +96,7 @@ public class RunEnvironmentSensitiveTest {
         assertFalse(runEnvironment.containsSensitiveData());
 
         Map<String, Value> callArguments = Maps.newHashMap();
-        callArguments.put("arg", ValueFactory.create("val", true));
+        callArguments.put("arg", ValueFactory.create("val", true, false));
 
         runEnvironment.putCallArguments(callArguments);
         assertTrue(runEnvironment.containsSensitiveData());
@@ -120,13 +120,13 @@ public class RunEnvironmentSensitiveTest {
         assertFalse(runEnvironment.containsSensitiveData());
 
         Map<String, Value> callArguments = Maps.newHashMap();
-        callArguments.put("arg", ValueFactory.create("val", false));
+        callArguments.put("arg", ValueFactory.create("val", false, false));
 
         runEnvironment.putCallArguments(callArguments);
         assertFalse(runEnvironment.containsSensitiveData());
 
         Map<String, Value> outputs = Maps.newHashMap();
-        outputs.put("output", ValueFactory.create("value", true));
+        outputs.put("output", ValueFactory.create("value", true, false));
 
         ReturnValues returnValues = new ReturnValues(outputs, "result");
         runEnvironment.putReturnValues(returnValues);
@@ -148,18 +148,18 @@ public class RunEnvironmentSensitiveTest {
         assertTrue(runEnvironment.containsSensitiveData());
 
         Map<String, Value> callArguments = Maps.newHashMap();
-        Value callValue1 = ValueFactory.create("callValue1", true);
+        Value callValue1 = ValueFactory.create("callValue1", true, false);
         callArguments.put("callValue1", callValue1);
-        Value callValue2 = ValueFactory.create("callValue2", true);
+        Value callValue2 = ValueFactory.create("callValue2", true, false);
         callArguments.put("callValue2", callValue2);
 
         runEnvironment.putCallArguments(callArguments);
         assertTrue(runEnvironment.containsSensitiveData());
 
         Map<String, Value> outputs = Maps.newHashMap();
-        Value output1 = ValueFactory.create("output1", true);
+        Value output1 = ValueFactory.create("output1", true, false);
         outputs.put("output1", output1);
-        Value output2 = ValueFactory.create("output2", true);
+        Value output2 = ValueFactory.create("output2", true, false);
         outputs.put("output2", output2);
 
         ReturnValues returnValues = new ReturnValues(outputs, "result");
@@ -238,6 +238,11 @@ public class RunEnvironmentSensitiveTest {
                 @Override
                 public char[] decrypt(String cypherText) {
                     return cypherText.substring(ENCYPTED.length()).toCharArray();
+                }
+
+                @Override
+                public String obfuscate(String cypherText) {
+                    return OBFUSCATED + cypherText;
                 }
 
                 @Override

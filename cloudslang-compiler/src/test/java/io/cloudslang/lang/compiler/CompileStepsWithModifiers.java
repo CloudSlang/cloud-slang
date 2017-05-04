@@ -18,17 +18,18 @@ import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
-import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -84,34 +85,34 @@ public class CompileStepsWithModifiers {
                 new Argument("input_04"),
                 new Argument(
                         "input_05",
-                        ValueFactory.create("input_05_value", false),
+                        ValueFactory.create("input_05_value", false, false),
                         true,
                         EMPTY_SCRIPT_FUNCTIONS,
                         EMPTY_SYSTEM_PROPERTY_DEPENDENCIES
                 ),
                 new Argument(
                         "input_06",
-                        ValueFactory.create(null, true),
+                        ValueFactory.create(null, true, false),
                         false,
                         EMPTY_SCRIPT_FUNCTIONS,
                         EMPTY_SYSTEM_PROPERTY_DEPENDENCIES
                 ),
                 new Argument(
                         "input_07",
-                        ValueFactory.create("input_07_value", true),
+                        ValueFactory.create("input_07_value", true, false),
                         true,
                         EMPTY_SCRIPT_FUNCTIONS,
                         EMPTY_SYSTEM_PROPERTY_DEPENDENCIES
                 ),
                 new Argument(
                         "input_08",
-                        ValueFactory.create("${get_sp('a.b.c.sp0')}", false),
+                        ValueFactory.create("${get_sp('a.b.c.sp0')}", false, false),
                         true,
                         SYSTEM_PROPERTY, SP_NAMES_01
                 ),
                 new Argument(
                         "input_09",
-                        ValueFactory.create("${get(get_sp('a.b.c.sp0'), 'default_value')}", true),
+                        ValueFactory.create("${get(get_sp('a.b.c.sp0'), 'default_value')}", true, false),
                         true,
                         SYSTEM_PROPERTY_GET,
                         SP_NAMES_01

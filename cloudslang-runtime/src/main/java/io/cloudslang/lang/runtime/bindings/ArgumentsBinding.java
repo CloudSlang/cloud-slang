@@ -14,12 +14,13 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
 
@@ -84,7 +85,7 @@ public class ArgumentsBinding extends AbstractBinding {
     }
 
     private Value handleSensitiveModifier(Value initialValue, boolean sensitive) {
-        return ValueFactory.create(initialValue, sensitive);
+        return ValueFactory.create(initialValue, sensitive, false);
     }
 
 }

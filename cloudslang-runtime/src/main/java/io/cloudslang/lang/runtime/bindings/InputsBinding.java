@@ -25,13 +25,14 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import org.apache.commons.lang.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component
 public class InputsBinding extends AbstractBinding {
@@ -94,7 +95,7 @@ public class InputsBinding extends AbstractBinding {
         boolean sensitive = input.getValue() != null && input.getValue().isSensitive() ||
                 valueFromContext != null && valueFromContext.isSensitive();
         if (!input.isPrivateInput()) {
-            value = ValueFactory.create(valueFromContext, sensitive);
+            value = ValueFactory.create(valueFromContext, sensitive, false);
         }
 
         if (isEmpty(value)) {
@@ -108,7 +109,7 @@ public class InputsBinding extends AbstractBinding {
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
                         input.getFunctionDependencies());
-                value = ValueFactory.create(value, sensitive);
+                value = ValueFactory.create(value, sensitive, false);
             } else if ((value == null && rawValue != null) ||
                     (containsEmptyStringOrNull(value) && doesNotContainNull(rawValue))) {
                 value = rawValue;
