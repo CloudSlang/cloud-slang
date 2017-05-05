@@ -21,6 +21,7 @@ import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
 import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import org.fusesource.jansi.Ansi;
@@ -295,10 +296,10 @@ public class CompilerHelperTest {
     @Test
     public void testLoadInputsFromFile() throws Exception {
         Map<String, Serializable> expected = new HashMap<>();
-        expected.put("host", ValueFactory.create("localhost", false, false));
-        expected.put("port", ValueFactory.create("22", false, false));
-        expected.put("username", ValueFactory.create("myusername", false, false));
-        expected.put("password", ValueFactory.create("mypassword", true, false));
+        expected.put("host", ValueFactory.create("localhost", SensitiveDataLevel.NONE));
+        expected.put("port", ValueFactory.create("22", SensitiveDataLevel.NONE));
+        expected.put("username", ValueFactory.create("myusername", SensitiveDataLevel.NONE));
+        expected.put("password", ValueFactory.create("mypassword", SensitiveDataLevel.ENCRYPTED));
         final URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
         Map<String, ? extends Serializable> result =
                 compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));

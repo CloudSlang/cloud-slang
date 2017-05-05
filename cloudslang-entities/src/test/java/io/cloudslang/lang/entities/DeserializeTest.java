@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeInput() throws IOException {
-        Input input = new Input.InputBuilder("new_input", "some_expression", true, false)
+        Input input = new Input.InputBuilder("new_input", "some_expression", SensitiveDataLevel.ENCRYPTED)
                 .withRequired(true)
                 .withPrivateInput(true)
                 .withFunctionDependencies(Sets.newHashSet(ScriptFunction.GET))

@@ -13,6 +13,7 @@ import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptExecutor;
@@ -139,7 +140,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = context.get(entry.getKey());
             Value value = ValueFactory.create(entry.getValue(),
-                    callArgumenet != null && callArgumenet.isSensitive(), false);
+                    SensitiveDataLevel.getSensitiveDataLevel(callArgumenet != null && callArgumenet.isSensitive()));
             result.put(entry.getKey(), value);
         }
         return result;

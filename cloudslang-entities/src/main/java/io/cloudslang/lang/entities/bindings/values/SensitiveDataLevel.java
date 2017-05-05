@@ -9,27 +9,10 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings.values;
 
-import java.io.Serializable;
+public enum SensitiveDataLevel {
+    NONE, OBFUSCATED, ENCRYPTED;
 
-/**
- * InOutParam value
- * <p>
- * Created by Ifat Gavish on 19/04/2016
- */
-public interface Value extends Serializable {
-
-    Serializable get();
-
-    boolean isSensitive();
-
-    SensitiveDataLevel getSensitiveDataLevel();
-
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
-
-    @Override
-    String toString();
+    public static SensitiveDataLevel getSensitiveDataLevel(boolean sensitive) {
+        return sensitive ? ENCRYPTED : NONE;
+    }
 }

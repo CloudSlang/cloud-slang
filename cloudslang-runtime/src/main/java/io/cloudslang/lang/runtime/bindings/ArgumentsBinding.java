@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -85,7 +86,7 @@ public class ArgumentsBinding extends AbstractBinding {
     }
 
     private Value handleSensitiveModifier(Value initialValue, boolean sensitive) {
-        return ValueFactory.create(initialValue, sensitive, false);
+        return ValueFactory.create(initialValue, SensitiveDataLevel.getSensitiveDataLevel(sensitive));
     }
 
 }

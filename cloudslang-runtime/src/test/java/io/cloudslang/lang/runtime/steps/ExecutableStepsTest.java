@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -114,7 +115,7 @@ public class ExecutableStepsTest {
     public void testBoundInputEvent() {
         List<Input> inputs = Arrays.asList(
                 new Input.InputBuilder("input1", 5).build(),
-                new Input.InputBuilder("input2", 3, true, false)
+                new Input.InputBuilder("input2", 3, SensitiveDataLevel.ENCRYPTED)
                         .withRequired(true)
                         .withPrivateInput(false)
                         .build()
@@ -254,7 +255,7 @@ public class ExecutableStepsTest {
     @Test
     public void testFinishExecutableEvents() {
         final List<Output> possibleOutputs = singletonList(new Output("name", ValueFactory.create("name",
-                false, false)));
+                SensitiveDataLevel.NONE)));
         final List<Result> possibleResults = singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT,
                 ValueFactory.create("true")));
         RunEnvironment runEnv = new RunEnvironment();

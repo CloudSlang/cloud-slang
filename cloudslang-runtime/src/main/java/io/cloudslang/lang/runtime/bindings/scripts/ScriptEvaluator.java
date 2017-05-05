@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.PyObjectValue;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
@@ -67,7 +68,8 @@ public class ScriptEvaluator extends ScriptProcessor {
             }
 
             return ValueFactory.create(result.getEvalResult(),
-                    getSensitive(result.getResultContext(), systemPropertiesDefined), false);
+                    SensitiveDataLevel.getSensitiveDataLevel(
+                            getSensitive(result.getResultContext(), systemPropertiesDefined)));
         } catch (Exception exception) {
             throw new RuntimeException("Error in running script expression: '" +
                             expr + "',\n\tException is: " +

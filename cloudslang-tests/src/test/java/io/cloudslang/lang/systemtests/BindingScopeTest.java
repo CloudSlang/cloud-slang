@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
@@ -233,7 +234,7 @@ public class BindingScopeTest extends SystemsTestsParent {
                 .compile(SlangSource.fromFile(resource.toURI()), path);
 
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("flow_input_sensitive", ValueFactory.create("sensitiveValue2", true, false));
+        userInputs.put("flow_input_sensitive", ValueFactory.create("sensitiveValue2", SensitiveDataLevel.ENCRYPTED));
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
         Map<String, StepData> steps = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();

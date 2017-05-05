@@ -21,6 +21,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
@@ -95,7 +96,7 @@ public class InputsBinding extends AbstractBinding {
         boolean sensitive = input.getValue() != null && input.getValue().isSensitive() ||
                 valueFromContext != null && valueFromContext.isSensitive();
         if (!input.isPrivateInput()) {
-            value = ValueFactory.create(valueFromContext, sensitive, false);
+            value = ValueFactory.create(valueFromContext, SensitiveDataLevel.getSensitiveDataLevel(sensitive));
         }
 
         if (isEmpty(value)) {
@@ -109,7 +110,7 @@ public class InputsBinding extends AbstractBinding {
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
                         input.getFunctionDependencies());
-                value = ValueFactory.create(value, sensitive, false);
+                value = ValueFactory.create(value, SensitiveDataLevel.getSensitiveDataLevel(sensitive));
             } else if ((value == null && rawValue != null) ||
                     (containsEmptyStringOrNull(value) && doesNotContainNull(rawValue))) {
                 value = rawValue;

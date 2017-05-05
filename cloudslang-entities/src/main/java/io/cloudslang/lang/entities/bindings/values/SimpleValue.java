@@ -10,6 +10,7 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 
 /**
@@ -46,6 +47,11 @@ public class SimpleValue implements Value {
     @Override
     public boolean isSensitive() {
         return false;
+    }
+
+    @Override
+    public SensitiveDataLevel getSensitiveDataLevel() {
+        return SensitiveDataLevel.NONE;
     }
 
     @Override

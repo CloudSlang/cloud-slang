@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.utils.ValidationUtils;
@@ -42,8 +43,10 @@ public class AbstractBinding {
 
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
                     entriesAsValues.add(ValueFactory.create(Pair.of(
-                            ValueFactory.create(entry.getKey(), evalResult.isSensitive(), false),
-                            ValueFactory.create(entry.getValue(), evalResult.isSensitive(), false))));
+                            ValueFactory.create(entry.getKey(),
+                                    SensitiveDataLevel.getSensitiveDataLevel(evalResult.isSensitive())),
+                            ValueFactory.create(entry.getValue(),
+                                    SensitiveDataLevel.getSensitiveDataLevel(evalResult.isSensitive())))));
                 }
                 evalResult = ValueFactory.create((Serializable) entriesAsValues);
             } else {
@@ -74,7 +77,7 @@ public class AbstractBinding {
     private Iterable<Value> convert(Iterable<? extends Serializable> iterable, boolean sensitive) {
         List<Value> values = new ArrayList<>();
         for (Serializable serializable : iterable) {
-            values.add(ValueFactory.create(serializable, sensitive, false));
+            values.add(ValueFactory.create(serializable, SensitiveDataLevel.getSensitiveDataLevel(sensitive)));
         }
         return values;
     }

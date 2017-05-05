@@ -33,6 +33,8 @@ public class SensitiveValue implements Value {
 
     private String content = null;
 
+    private SensitiveDataLevel sensitiveDataLevel;
+
     /**
      * This variable only used when passing sensitive data between application components which use
      * different encryption key
@@ -45,17 +47,20 @@ public class SensitiveValue implements Value {
     protected SensitiveValue() {
     }
 
-    protected SensitiveValue(Serializable content, boolean obfuscate) {
+    protected SensitiveValue(Serializable content, SensitiveDataLevel sensitiveDataLevel) {
         originalContent = content;
 
-        if (obfuscate) {
-            obfuscate();
-        } else {
-            encrypt();
+        switch (sensitiveDataLevel) {
+            case ENCRYPTED: encrypt();
+                            break;
+            case OBFUSCATED: obfuscate();
+                             break;
+            default: // no processing when level is NONE
         }
     }
 
     protected SensitiveValue(String content, boolean preEncrypted) {
+        sensitiveDataLevel = SensitiveDataLevel.ENCRYPTED;
         if (preEncrypted) {
             this.content = content;
         } else {
@@ -65,6 +70,7 @@ public class SensitiveValue implements Value {
     }
 
     public void encrypt() {
+        sensitiveDataLevel = SensitiveDataLevel.ENCRYPTED;
         if (originalContent != null) {
             content = encrypt(originalContent);
             originalContent = null;
@@ -78,6 +84,7 @@ public class SensitiveValue implements Value {
     }
 
     public void obfuscate() {
+        sensitiveDataLevel = SensitiveDataLevel.OBFUSCATED;
         if (originalContent != null) {
             content = obfuscate(originalContent);
             originalContent = null;
@@ -91,6 +98,7 @@ public class SensitiveValue implements Value {
     }
 
     public void decrypt() {
+        sensitiveDataLevel = SensitiveDataLevel.NONE;
         if (content != null) {
             originalContent = decrypt(content);
             content = null;
@@ -122,6 +130,11 @@ public class SensitiveValue implements Value {
     @Override
     public boolean isSensitive() {
         return true;
+    }
+
+    @Override
+    public SensitiveDataLevel getSensitiveDataLevel() {
+        return sensitiveDataLevel;
     }
 
     @Override

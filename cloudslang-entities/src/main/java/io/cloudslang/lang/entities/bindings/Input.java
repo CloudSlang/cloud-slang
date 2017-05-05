@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -102,12 +103,12 @@ public class Input extends InOutParam {
         private Set<String> systemPropertyDependencies;
 
         public InputBuilder(String name, Serializable serializable) {
-            this(name, serializable, false, false);
+            this(name, serializable, SensitiveDataLevel.NONE);
         }
 
-        public InputBuilder(String name, Serializable serializable, boolean sensitive, boolean obfuscate) {
+        public InputBuilder(String name, Serializable serializable, SensitiveDataLevel sensitiveDataLevel) {
             this.name = name;
-            this.value = ValueFactory.create(serializable, sensitive, obfuscate);
+            this.value = ValueFactory.create(serializable, sensitiveDataLevel);
             this.required = true;
             this.privateInput = false;
             this.functionDependencies = new HashSet<>();

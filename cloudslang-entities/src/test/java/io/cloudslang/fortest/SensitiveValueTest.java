@@ -10,6 +10,7 @@
 package io.cloudslang.fortest;
 
 import configuration.SlangEntitiesSpringConfig;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.spi.encryption.Encryption;
@@ -42,7 +43,7 @@ public class SensitiveValueTest {
         final String originalValue = "OriginalSensitiveValue";
         final String expectedEncryptedString = "{Encrypted}rO0ABXQAFk9yaWdpbmFsU2Vuc2l0aXZlVmFsdWU=";
 
-        SensitiveValue value = (SensitiveValue) ValueFactory.create(originalValue, true, false);
+        SensitiveValue value = (SensitiveValue) ValueFactory.create(originalValue, SensitiveDataLevel.ENCRYPTED);
         verifyEncrypted(value, originalValue, expectedEncryptedString);
 
         value.encrypt();

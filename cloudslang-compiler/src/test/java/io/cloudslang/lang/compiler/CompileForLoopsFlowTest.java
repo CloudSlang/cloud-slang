@@ -22,6 +22,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
 import org.junit.Assert;
@@ -143,7 +144,7 @@ public class CompileForLoopsFlowTest {
                 ),
                 new Argument(
                         "step_input_04",
-                        ValueFactory.create("${ step_input_04_value }", true, false),
+                        ValueFactory.create("${ step_input_04_value }", SensitiveDataLevel.ENCRYPTED),
                         true,
                         Collections.<ScriptFunction>emptySet(),
                         Collections.<String>emptySet()

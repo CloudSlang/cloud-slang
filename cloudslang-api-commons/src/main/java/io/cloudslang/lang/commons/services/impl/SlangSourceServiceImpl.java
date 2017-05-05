@@ -11,6 +11,7 @@ package io.cloudslang.lang.commons.services.impl;
 
 import io.cloudslang.lang.commons.services.api.SlangSourceService;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.springframework.stereotype.Service;
@@ -36,10 +37,11 @@ public class SlangSourceServiceImpl implements SlangSourceService {
                 validateKeys(valueMap, artifact);
                 result.put(
                         property.getKey(),
-                        ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY), isSensitiveValue(valueMap), false)
+                        ValueFactory.create(valueMap.get(SlangTextualKeys.VALUE_KEY),
+                                isSensitiveValue(valueMap) ? SensitiveDataLevel.ENCRYPTED : SensitiveDataLevel.NONE)
                 );
             } else {
-                result.put(property.getKey(), ValueFactory.create(property.getValue(), false, false));
+                result.put(property.getKey(), ValueFactory.create(property.getValue(), SensitiveDataLevel.NONE));
             }
         }
         return result;

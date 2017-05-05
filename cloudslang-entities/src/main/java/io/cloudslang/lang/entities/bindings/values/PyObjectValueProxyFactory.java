@@ -125,7 +125,7 @@ public class PyObjectValueProxyFactory {
         protected boolean accessed;
 
         public PyObjectValueMethodHandler(Serializable content, boolean sensitive, PyObject pyObject) {
-            this.value = ValueFactory.create(content, sensitive, false);
+            this.value = ValueFactory.create(content, SensitiveDataLevel.getSensitiveDataLevel(sensitive));
             this.pyObject = pyObject;
             this.accessed = false;
         }

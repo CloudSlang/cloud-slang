@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
@@ -41,7 +42,7 @@ public class ScriptExecutor extends ScriptProcessor {
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = callArguments.get(entry.getKey());
             Value value = ValueFactory.create(entry.getValue(),
-                    callArgumenet != null && callArgumenet.isSensitive(), false);
+                    SensitiveDataLevel.getSensitiveDataLevel(callArgumenet != null && callArgumenet.isSensitive()));
             result.put(entry.getKey(), value);
         }
         return result;

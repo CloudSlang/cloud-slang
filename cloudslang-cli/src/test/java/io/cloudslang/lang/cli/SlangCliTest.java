@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
@@ -466,7 +467,7 @@ public class SlangCliTest {
     public void testGetFlowInputsWithOverride() throws Exception {
         final List<Input> inputsList = Lists.newArrayList(
                 new Input.InputBuilder("input1", "expression1").build(),
-                new Input.InputBuilder("input_override", "expression_override", false, false)
+                new Input.InputBuilder("input_override", "expression_override", SensitiveDataLevel.NONE)
                         .withRequired(true)
                         .withPrivateInput(true)
                         .build(),

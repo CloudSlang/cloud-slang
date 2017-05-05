@@ -16,6 +16,7 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -167,7 +168,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         Accumulator accumulator = extractFunctionData(entryValue);
         return new Argument(
                 entryName,
-                ValueFactory.create(entryValue, sensitive, false),
+                ValueFactory.create(entryValue, SensitiveDataLevel.getSensitiveDataLevel(sensitive)),
                 privateArgument,
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()

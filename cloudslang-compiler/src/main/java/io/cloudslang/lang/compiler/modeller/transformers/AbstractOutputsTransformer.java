@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -98,7 +99,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         Accumulator accumulator = extractFunctionData(outputExpression);
         return new Output(
                 outputName,
-                ValueFactory.create(outputExpression, sensitive, false),
+                ValueFactory.create(outputExpression,
+                        SensitiveDataLevel.getSensitiveDataLevel(sensitive)),
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()
         );

@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,34 +86,35 @@ public class CompileStepsWithModifiers {
                 new Argument("input_04"),
                 new Argument(
                         "input_05",
-                        ValueFactory.create("input_05_value", false, false),
+                        ValueFactory.create("input_05_value", SensitiveDataLevel.NONE),
                         true,
                         EMPTY_SCRIPT_FUNCTIONS,
                         EMPTY_SYSTEM_PROPERTY_DEPENDENCIES
                 ),
                 new Argument(
                         "input_06",
-                        ValueFactory.create(null, true, false),
+                        ValueFactory.create(null, SensitiveDataLevel.ENCRYPTED),
                         false,
                         EMPTY_SCRIPT_FUNCTIONS,
                         EMPTY_SYSTEM_PROPERTY_DEPENDENCIES
                 ),
                 new Argument(
                         "input_07",
-                        ValueFactory.create("input_07_value", true, false),
+                        ValueFactory.create("input_07_value", SensitiveDataLevel.ENCRYPTED),
                         true,
                         EMPTY_SCRIPT_FUNCTIONS,
                         EMPTY_SYSTEM_PROPERTY_DEPENDENCIES
                 ),
                 new Argument(
                         "input_08",
-                        ValueFactory.create("${get_sp('a.b.c.sp0')}", false, false),
+                        ValueFactory.create("${get_sp('a.b.c.sp0')}", SensitiveDataLevel.NONE),
                         true,
                         SYSTEM_PROPERTY, SP_NAMES_01
                 ),
                 new Argument(
                         "input_09",
-                        ValueFactory.create("${get(get_sp('a.b.c.sp0'), 'default_value')}", true, false),
+                        ValueFactory.create("${get(get_sp('a.b.c.sp0'), 'default_value')}",
+                                SensitiveDataLevel.ENCRYPTED),
                         true,
                         SYSTEM_PROPERTY_GET,
                         SP_NAMES_01

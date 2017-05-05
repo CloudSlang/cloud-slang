@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.env;
 
 import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -96,7 +97,7 @@ public class RunEnvironmentSensitiveTest {
         assertFalse(runEnvironment.containsSensitiveData());
 
         Map<String, Value> callArguments = Maps.newHashMap();
-        callArguments.put("arg", ValueFactory.create("val", true, false));
+        callArguments.put("arg", ValueFactory.create("val", SensitiveDataLevel.ENCRYPTED));
 
         runEnvironment.putCallArguments(callArguments);
         assertTrue(runEnvironment.containsSensitiveData());
@@ -120,13 +121,13 @@ public class RunEnvironmentSensitiveTest {
         assertFalse(runEnvironment.containsSensitiveData());
 
         Map<String, Value> callArguments = Maps.newHashMap();
-        callArguments.put("arg", ValueFactory.create("val", false, false));
+        callArguments.put("arg", ValueFactory.create("val", SensitiveDataLevel.NONE));
 
         runEnvironment.putCallArguments(callArguments);
         assertFalse(runEnvironment.containsSensitiveData());
 
         Map<String, Value> outputs = Maps.newHashMap();
-        outputs.put("output", ValueFactory.create("value", true, false));
+        outputs.put("output", ValueFactory.create("value", SensitiveDataLevel.ENCRYPTED));
 
         ReturnValues returnValues = new ReturnValues(outputs, "result");
         runEnvironment.putReturnValues(returnValues);
@@ -148,18 +149,18 @@ public class RunEnvironmentSensitiveTest {
         assertTrue(runEnvironment.containsSensitiveData());
 
         Map<String, Value> callArguments = Maps.newHashMap();
-        Value callValue1 = ValueFactory.create("callValue1", true, false);
+        Value callValue1 = ValueFactory.create("callValue1", SensitiveDataLevel.ENCRYPTED);
         callArguments.put("callValue1", callValue1);
-        Value callValue2 = ValueFactory.create("callValue2", true, false);
+        Value callValue2 = ValueFactory.create("callValue2", SensitiveDataLevel.ENCRYPTED);
         callArguments.put("callValue2", callValue2);
 
         runEnvironment.putCallArguments(callArguments);
         assertTrue(runEnvironment.containsSensitiveData());
 
         Map<String, Value> outputs = Maps.newHashMap();
-        Value output1 = ValueFactory.create("output1", true, false);
+        Value output1 = ValueFactory.create("output1", SensitiveDataLevel.ENCRYPTED);
         outputs.put("output1", output1);
-        Value output2 = ValueFactory.create("output2", true, false);
+        Value output2 = ValueFactory.create("output2", SensitiveDataLevel.ENCRYPTED);
         outputs.put("output2", output2);
 
         ReturnValues returnValues = new ReturnValues(outputs, "result");

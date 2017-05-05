@@ -15,6 +15,7 @@ import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -112,11 +113,11 @@ public class InputsBindingTest {
 
     @Test
     public void testAssignFromInput() {
-        Input input1 = new Input.InputBuilder("input1", "val1", false, false)
+        Input input1 = new Input.InputBuilder("input1", "val1", SensitiveDataLevel.NONE)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
-        Input input2 = new Input.InputBuilder("input2", "${ input1 }", false, false)
+        Input input2 = new Input.InputBuilder("input2", "${ input1 }", SensitiveDataLevel.NONE)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -316,7 +317,7 @@ public class InputsBindingTest {
         Map<String, Value> context = new HashMap<>();
         context.put("input2", ValueFactory.create("3"));
         context.put("input1", ValueFactory.create("5"));
-        Input input = new Input.InputBuilder("input1", "${ input2 }", false, false)
+        Input input = new Input.InputBuilder("input1", "${ input2 }", SensitiveDataLevel.NONE)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -335,7 +336,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom2() {
         Map<String, Value> context = new HashMap<>();
         context.put("input1", ValueFactory.create(5));
-        Input input = new Input.InputBuilder("input1", "3", false, false)
+        Input input = new Input.InputBuilder("input1", "3", SensitiveDataLevel.NONE)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -352,7 +353,7 @@ public class InputsBindingTest {
     public void testOverrideAssignFrom3() {
         Map<String, Value> context = new HashMap<>();
         context.put("input1", ValueFactory.create(5));
-        Input input = new Input.InputBuilder("input1", null, false, false)
+        Input input = new Input.InputBuilder("input1", null, SensitiveDataLevel.NONE)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();
@@ -384,7 +385,7 @@ public class InputsBindingTest {
     public void testExpressionWithWrongRef() {
         Map<String, Value> context = new HashMap<>();
 
-        Input input = new Input.InputBuilder("input1", "${ input2 }", false, false)
+        Input input = new Input.InputBuilder("input1", "${ input2 }", SensitiveDataLevel.NONE)
                 .withRequired(false)
                 .withPrivateInput(true)
                 .build();

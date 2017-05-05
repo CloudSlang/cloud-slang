@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
@@ -143,7 +144,7 @@ public class NavigationTest extends SystemsTestsParent {
         assertEquals(true, ((ArrayList) compilationArtifact
                 .getExecutionPlan().getSteps().get(3L).getActionData().get("executableResults")).isEmpty());
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("input1", ValueFactory.create("value1", false, false));
+        userInputs.put("input1", ValueFactory.create("value1", SensitiveDataLevel.NONE));
 
         expectedEx.expect(RuntimeException.class);
         expectedEx.expectMessage("Error running: 'operation_results_empty_list'.\n" +

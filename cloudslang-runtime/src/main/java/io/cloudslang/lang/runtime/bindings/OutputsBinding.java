@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.MapUtils;
@@ -59,7 +60,8 @@ public class OutputsBinding extends AbstractBinding {
                         //evaluate expression
                         Value value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext,
                                 systemProperties, output.getFunctionDependencies());
-                        valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive(), false);
+                        valueToAssign = ValueFactory.create(value,
+                                SensitiveDataLevel.getSensitiveDataLevel(rawValue != null && rawValue.isSensitive()));
                     } catch (Throwable t) {
                         throw new RuntimeException(errorMessagePrefix + "',\n\tError is: " + t.getMessage(), t);
                     }

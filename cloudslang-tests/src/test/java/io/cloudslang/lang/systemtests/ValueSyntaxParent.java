@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.junit.Assert;
@@ -54,7 +55,7 @@ public abstract class ValueSyntaxParent extends SystemsTestsParent {
         userInputs.put("input_private", ValueFactory.create("i_should_not_be_assigned"));
         userInputs.put("enable_option_for_action", ValueFactory.create("enable_option_for_action_value"));
         userInputs.put("input_no_default_sensitive", ValueFactory.create("input_no_default_sensitive_value",
-                false, false));
+                SensitiveDataLevel.NONE));
         return userInputs;
     }
 
