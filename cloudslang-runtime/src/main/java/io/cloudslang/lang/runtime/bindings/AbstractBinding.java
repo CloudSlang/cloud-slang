@@ -11,9 +11,13 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.utils.ValidationUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.python.core.PyObject;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.tuple.Pair;
-import org.python.core.PyObject;
 
 public class AbstractBinding {
 
@@ -41,8 +43,10 @@ public class AbstractBinding {
 
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
                     entriesAsValues.add(ValueFactory.create(Pair.of(
-                            ValueFactory.create(entry.getKey(), evalResult.isSensitive()),
-                            ValueFactory.create(entry.getValue(), evalResult.isSensitive()))));
+                            ValueFactory.create(entry.getKey(),
+                                    SensitiveDataLevel.getSensitiveDataLevel(evalResult.isSensitive())),
+                            ValueFactory.create(entry.getValue(),
+                                    SensitiveDataLevel.getSensitiveDataLevel(evalResult.isSensitive())))));
                 }
                 evalResult = ValueFactory.create((Serializable) entriesAsValues);
             } else {
@@ -73,7 +77,7 @@ public class AbstractBinding {
     private Iterable<Value> convert(Iterable<? extends Serializable> iterable, boolean sensitive) {
         List<Value> values = new ArrayList<>();
         for (Serializable serializable : iterable) {
-            values.add(ValueFactory.create(serializable, sensitive));
+            values.add(ValueFactory.create(serializable, SensitiveDataLevel.getSensitiveDataLevel(sensitive)));
         }
         return values;
     }

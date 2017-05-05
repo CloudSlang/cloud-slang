@@ -12,20 +12,22 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.PyObjectValue;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author stoneo
@@ -66,7 +68,8 @@ public class ScriptEvaluator extends ScriptProcessor {
             }
 
             return ValueFactory.create(result.getEvalResult(),
-                    getSensitive(result.getResultContext(), systemPropertiesDefined));
+                    SensitiveDataLevel.getSensitiveDataLevel(
+                            getSensitive(result.getResultContext(), systemPropertiesDefined)));
         } catch (Exception exception) {
             throw new RuntimeException("Error in running script expression: '" +
                             expr + "',\n\tException is: " +

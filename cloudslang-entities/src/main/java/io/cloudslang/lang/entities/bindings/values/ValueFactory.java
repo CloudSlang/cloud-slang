@@ -19,14 +19,14 @@ import java.io.Serializable;
 public abstract class ValueFactory implements Serializable {
 
     public static Value create(Serializable content) {
-        return create(content, false);
+        return create(content, SensitiveDataLevel.NONE);
     }
 
-    public static Value create(Serializable serializable, boolean sensitive) {
+    public static Value create(Serializable serializable, SensitiveDataLevel sensitiveDataLevel) {
         return serializable != null && serializable instanceof Value ?
                 ValueFactory.createValue(((Value) serializable).get(),
-                        ((Value) serializable).isSensitive() || sensitive) :
-                ValueFactory.createValue(serializable, sensitive);
+                        ((Value) serializable).isSensitive() ? SensitiveDataLevel.ENCRYPTED : sensitiveDataLevel) :
+                ValueFactory.createValue(serializable, sensitiveDataLevel);
     }
 
     public static SensitiveStringValue createEncryptedString(String value) {
@@ -45,7 +45,8 @@ public abstract class ValueFactory implements Serializable {
         return createPyObjectValue(value == null ? null : value.get(), value != null && value.isSensitive());
     }
 
-    private static Value createValue(Serializable content, boolean sensitive) {
-        return sensitive ? new SensitiveValue(content) : new SimpleValue(content);
+    private static Value createValue(Serializable content, SensitiveDataLevel sensitiveDataLevel) {
+        return SensitiveDataLevel.NONE.equals(sensitiveDataLevel) ?
+                new SimpleValue(content) : new SensitiveValue(content, sensitiveDataLevel);
     }
 }

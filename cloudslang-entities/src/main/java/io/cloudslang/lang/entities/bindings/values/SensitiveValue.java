@@ -11,15 +11,16 @@ package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.cloudslang.lang.entities.encryption.EncryptionProvider;
+import javassist.util.proxy.ProxyObjectInputStream;
+import javassist.util.proxy.ProxyObjectOutputStream;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import javassist.util.proxy.ProxyObjectInputStream;
-import javassist.util.proxy.ProxyObjectOutputStream;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 
 /**
  * Sensitive InOutParam value
@@ -31,6 +32,8 @@ public class SensitiveValue implements Value {
     public static final String SENSITIVE_VALUE_MASK = "********";
 
     private String content = null;
+
+    private SensitiveDataLevel sensitiveDataLevel;
 
     /**
      * This variable only used when passing sensitive data between application components which use
@@ -44,12 +47,20 @@ public class SensitiveValue implements Value {
     protected SensitiveValue() {
     }
 
-    protected SensitiveValue(Serializable content) {
+    protected SensitiveValue(Serializable content, SensitiveDataLevel sensitiveDataLevel) {
         originalContent = content;
-        encrypt();
+
+        switch (sensitiveDataLevel) {
+            case ENCRYPTED: encrypt();
+                            break;
+            case OBFUSCATED: obfuscate();
+                             break;
+            default: // no processing when level is NONE
+        }
     }
 
     protected SensitiveValue(String content, boolean preEncrypted) {
+        sensitiveDataLevel = SensitiveDataLevel.ENCRYPTED;
         if (preEncrypted) {
             this.content = content;
         } else {
@@ -59,6 +70,7 @@ public class SensitiveValue implements Value {
     }
 
     public void encrypt() {
+        sensitiveDataLevel = SensitiveDataLevel.ENCRYPTED;
         if (originalContent != null) {
             content = encrypt(originalContent);
             originalContent = null;
@@ -71,7 +83,22 @@ public class SensitiveValue implements Value {
         return EncryptionProvider.get().encrypt(serializedAsString.toCharArray());
     }
 
+    public void obfuscate() {
+        sensitiveDataLevel = SensitiveDataLevel.OBFUSCATED;
+        if (originalContent != null) {
+            content = obfuscate(originalContent);
+            originalContent = null;
+        }
+    }
+
+    protected String obfuscate(Serializable originalContent) {
+        byte[] serialized = serialize(originalContent);
+        String serializedAsString = Base64.encodeBase64String(serialized);
+        return EncryptionProvider.get().obfuscate(serializedAsString);
+    }
+
     public void decrypt() {
+        sensitiveDataLevel = SensitiveDataLevel.NONE;
         if (content != null) {
             originalContent = decrypt(content);
             content = null;
@@ -103,6 +130,11 @@ public class SensitiveValue implements Value {
     @Override
     public boolean isSensitive() {
         return true;
+    }
+
+    @Override
+    public SensitiveDataLevel getSensitiveDataLevel() {
+        return sensitiveDataLevel;
     }
 
     @Override

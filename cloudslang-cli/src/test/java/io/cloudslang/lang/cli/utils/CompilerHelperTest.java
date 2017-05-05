@@ -21,18 +21,9 @@ import io.cloudslang.lang.commons.services.impl.SlangSourceServiceImpl;
 import io.cloudslang.lang.compiler.PrecompileStrategy;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.fusesource.jansi.Ansi;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -53,6 +44,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Matchers.any;
@@ -294,10 +296,10 @@ public class CompilerHelperTest {
     @Test
     public void testLoadInputsFromFile() throws Exception {
         Map<String, Serializable> expected = new HashMap<>();
-        expected.put("host", ValueFactory.create("localhost", false));
-        expected.put("port", ValueFactory.create("22", false));
-        expected.put("username", ValueFactory.create("myusername", false));
-        expected.put("password", ValueFactory.create("mypassword", true));
+        expected.put("host", ValueFactory.create("localhost", SensitiveDataLevel.NONE));
+        expected.put("port", ValueFactory.create("22", SensitiveDataLevel.NONE));
+        expected.put("username", ValueFactory.create("myusername", SensitiveDataLevel.NONE));
+        expected.put("password", ValueFactory.create("mypassword", SensitiveDataLevel.ENCRYPTED));
         final URI inputsFromFile = getClass().getResource("/inputs/inputs.yaml").toURI();
         Map<String, ? extends Serializable> result =
                 compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));

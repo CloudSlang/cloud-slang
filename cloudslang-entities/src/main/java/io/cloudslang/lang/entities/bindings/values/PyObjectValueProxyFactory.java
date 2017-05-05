@@ -9,15 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings.values;
 
-import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
@@ -27,6 +18,16 @@ import org.apache.commons.lang.ClassUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyType;
+
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * PyObjectValue proxy factory
@@ -124,7 +125,7 @@ public class PyObjectValueProxyFactory {
         protected boolean accessed;
 
         public PyObjectValueMethodHandler(Serializable content, boolean sensitive, PyObject pyObject) {
-            this.value = ValueFactory.create(content, sensitive);
+            this.value = ValueFactory.create(content, SensitiveDataLevel.getSensitiveDataLevel(sensitive));
             this.pyObject = pyObject;
             this.accessed = false;
         }

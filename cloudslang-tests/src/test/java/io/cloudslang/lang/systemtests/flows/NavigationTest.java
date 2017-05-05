@@ -9,16 +9,19 @@
  *******************************************************************************/
 package io.cloudslang.lang.systemtests.flows;
 
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.values.SensitiveDataLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -26,11 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangSource.fromFile;
@@ -146,7 +144,7 @@ public class NavigationTest extends SystemsTestsParent {
         assertEquals(true, ((ArrayList) compilationArtifact
                 .getExecutionPlan().getSteps().get(3L).getActionData().get("executableResults")).isEmpty());
         Map<String, Value> userInputs = new HashMap<>();
-        userInputs.put("input1", ValueFactory.create("value1", false));
+        userInputs.put("input1", ValueFactory.create("value1", SensitiveDataLevel.NONE));
 
         expectedEx.expect(RuntimeException.class);
         expectedEx.expectMessage("Error running: 'operation_results_empty_list'.\n" +
