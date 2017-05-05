@@ -11,12 +11,13 @@ package io.cloudslang.lang.entities.bindings;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author orius123
@@ -107,6 +108,15 @@ public class Input extends InOutParam {
         public InputBuilder(String name, Serializable serializable, boolean sensitive) {
             this.name = name;
             this.value = ValueFactory.create(serializable, sensitive);
+            this.required = true;
+            this.privateInput = false;
+            this.functionDependencies = new HashSet<>();
+            this.systemPropertyDependencies = new HashSet<>();
+        }
+
+        public InputBuilder(String name, Serializable serializable, boolean sensitive, boolean isExecutionPlan) {
+            this.name = name;
+            this.value = ValueFactory.create(serializable, sensitive, isExecutionPlan);
             this.required = true;
             this.privateInput = false;
             this.functionDependencies = new HashSet<>();
