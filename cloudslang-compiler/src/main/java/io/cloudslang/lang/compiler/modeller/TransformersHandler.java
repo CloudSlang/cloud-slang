@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.modeller;
 
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import org.apache.commons.lang3.StringUtils;
@@ -39,13 +40,15 @@ public class TransformersHandler {
     public Map<String, Serializable> runTransformers(Map<String, Object> rawData,
                                                      List<Transformer> scopeTransformers,
                                                      List<RuntimeException> errors) {
-        return runTransformers(rawData, scopeTransformers, errors, "");
+        return runTransformers(rawData, scopeTransformers, errors, "", SensitivityLevel.ENCRYPTED);
     }
 
     public Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers,
-                                                     List<RuntimeException> errors, String errorMessagePrefix) {
+                                                     List<RuntimeException> errors, String errorMessagePrefix,
+                                                     SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
+            transformer.setSensitivityLevel(sensitivityLevel);
             String key = keyToTransform(transformer);
             Object value = rawData.get(key);
             try {

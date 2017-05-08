@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.compiler.SensitivityLevel;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 

@@ -10,12 +10,15 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.encryption.EncryptionProvider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
+import io.cloudslang.lang.spi.encryption.Encryption;
 import javassist.util.proxy.ProxyObjectInputStream;
 import javassist.util.proxy.ProxyObjectOutputStream;
 import org.apache.commons.codec.binary.Base64;
@@ -40,11 +43,19 @@ public class SensitiveValue implements Value {
     @JsonIgnore
     private Serializable originalContent = null;
 
+    private SensitivityLevel sensitivityLevel = SensitivityLevel.ENCRYPTED;
+
     @SuppressWarnings("unused")
     protected SensitiveValue() {
     }
 
     protected SensitiveValue(Serializable content) {
+        originalContent = content;
+        encrypt();
+    }
+
+    protected SensitiveValue(Serializable content, SensitivityLevel sensitivityLevel) {
+        this.sensitivityLevel = sensitivityLevel;
         originalContent = content;
         encrypt();
     }
@@ -68,7 +79,12 @@ public class SensitiveValue implements Value {
     protected String encrypt(Serializable originalContent) {
         byte[] serialized = serialize(originalContent);
         String serializedAsString = Base64.encodeBase64String(serialized);
-        return EncryptionProvider.get().encrypt(serializedAsString.toCharArray());
+        Encryption encryption = EncryptionProvider.get();
+        if (SensitivityLevel.OBFUSCATED.equals(sensitivityLevel)) {
+            return encryption.obfuscate(serializedAsString);
+        } else {
+            return encryption.encrypt(serializedAsString.toCharArray());
+        }
     }
 
     public void decrypt() {

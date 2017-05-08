@@ -16,6 +16,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  */
 
 import com.google.common.collect.Sets;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
@@ -64,6 +65,11 @@ public class JavaActionTransformer extends AbstractTransformer
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.JAVA_ACTION_KEY;
+    }
+
+    @Override
+    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
+        //do nothing
     }
 
     private void transformKeys(Map<String, String> rawData) {

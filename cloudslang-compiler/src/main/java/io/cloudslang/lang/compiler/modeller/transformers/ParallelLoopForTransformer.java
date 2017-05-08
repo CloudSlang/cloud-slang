@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.LoopStatement;
@@ -35,6 +36,11 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.PARALLEL_LOOP_KEY;
+    }
+
+    @Override
+    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
+        //do nothing
     }
 
 }

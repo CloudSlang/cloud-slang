@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.compiler.SensitivityLevel;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -95,7 +95,7 @@ public class ExecutableBuilderTest {
         List<Result> results = new ArrayList<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
         postExecutableActionData.put(SlangTextualKeys.RESULTS_KEY, (Serializable) results);
-        when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString()))
+        when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString(), SensitivityLevel.ENCRYPTED))
                 .thenReturn(postExecutableActionData);
 
         return parsedSlang;

@@ -43,6 +43,7 @@ import static org.junit.Assert.assertTrue;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RunEnvironmentSensitiveTest {
     private static final String ENCYPTED = "{Encrypted}";
+    private static final String OBFUSCATED = "{Obfuscated}";
 
     @Test
     public void testEmptyRunEnvironmentNotSensitive() {
@@ -233,6 +234,11 @@ public class RunEnvironmentSensitiveTest {
                 @Override
                 public String encrypt(char[] clearText) {
                     return ENCYPTED + new String(clearText);
+                }
+
+                @Override
+                public String obfuscate(String cypherText) {
+                    return OBFUSCATED + cypherText;
                 }
 
                 @Override

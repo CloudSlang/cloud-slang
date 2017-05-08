@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
@@ -86,6 +87,11 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.DO_KEY;
+    }
+
+    @Override
+    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
+        //do nothing
     }
 
     @Override

@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.InOutParam;
@@ -31,9 +32,15 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
 
     private ExecutableValidator executableValidator;
 
+    private SensitivityLevel sensitivityLevel;
+
     @Override
     public Class<? extends InOutParam> getTransformedObjectsClass() {
         return Input.class;
+    }
+
+    public void setSensitivityLevel(SensitivityLevel level) {
+        sensitivityLevel = level;
     }
 
     protected Input transformSingleInput(Object rawInput) {
@@ -121,7 +128,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
         Accumulator dependencyAccumulator = extractFunctionData(value);
-        return new Input.InputBuilder(name, value, sensitive)
+        return new Input.InputBuilder(name, value, sensitive, sensitivityLevel)
                 .withRequired(required)
                 .withPrivateInput(privateInput)
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
