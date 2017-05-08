@@ -9,8 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
+import io.cloudslang.lang.compiler.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
@@ -280,7 +280,7 @@ public class ExecutableBuilderTest {
         String flowName = "flow1";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
-        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData).getExecutable();
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData, SensitivityLevel.ENCRYPTED).getExecutable();
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
         Deque<Step> steps = flow.getWorkflow().getSteps();
@@ -310,7 +310,7 @@ public class ExecutableBuilderTest {
         String flowName = "flow1";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
-        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData).getExecutable();
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData, SensitivityLevel.ENCRYPTED).getExecutable();
 
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
@@ -358,7 +358,7 @@ public class ExecutableBuilderTest {
 
     private Executable transformToExecutable(ParsedSlang mockParsedSlang, Map<String, Object> executableRawData) {
         ExecutableModellingResult modellingResult =
-                executableBuilder.transformToExecutable(mockParsedSlang, executableRawData);
+                executableBuilder.transformToExecutable(mockParsedSlang, executableRawData, SensitivityLevel.ENCRYPTED);
         if (modellingResult.getErrors().size() > 0) {
             throw modellingResult.getErrors().get(0);
         }

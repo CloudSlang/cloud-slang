@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
+import io.cloudslang.lang.compiler.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -24,7 +25,7 @@ public class SlangModellerImpl implements SlangModeller {
     private ExecutableBuilder executableBuilder;
 
     @Override
-    public ExecutableModellingResult createModel(ParseModellingResult parseModellingResult) {
+    public ExecutableModellingResult createModel(ParseModellingResult parseModellingResult, SensitivityLevel sensitivityLevel) {
         ParsedSlang parsedSlang = parseModellingResult.getParsedSlang();
         Validate.notNull(parsedSlang, "You must supply a parsed Slang source to compile");
 
@@ -32,17 +33,17 @@ public class SlangModellerImpl implements SlangModeller {
             switch (parsedSlang.getType()) {
                 case OPERATION:
                     return aggregateModellingWithParseResult(
-                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation()),
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation(), sensitivityLevel),
                             parseModellingResult
                     );
                 case FLOW:
                     return aggregateModellingWithParseResult(
-                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow()),
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow(), sensitivityLevel),
                             parseModellingResult
                     );
                 case DECISION:
                     return aggregateModellingWithParseResult(
-                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getDecision()),
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getDecision(), sensitivityLevel),
                             parseModellingResult
                     );
                 default:

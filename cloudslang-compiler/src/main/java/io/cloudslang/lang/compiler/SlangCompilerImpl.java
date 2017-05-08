@@ -83,6 +83,21 @@ public class SlangCompilerImpl implements SlangCompiler {
             Set<SlangSource> path,
             PrecompileStrategy precompileStrategy) {
         CompilationModellingResult result = compileSource(source, path, precompileStrategy);
+        return getCompilationArtifact(result);
+    }
+
+    @Override
+    public CompilationArtifact compile(
+            SlangSource source,
+            Set<SlangSource> path,
+            PrecompileStrategy precompileStrategy,
+            SensitivityLevel sensitivityLevel) {
+        CompilationModellingResult result = getCompilationModellingResult(source, path, precompileStrategy,
+                sensitivityLevel);
+        return getCompilationArtifact(result);
+    }
+
+    private CompilationArtifact getCompilationArtifact(CompilationModellingResult result) {
         if (result.getErrors().size() > 0) {
             throw result.getErrors().get(0);
         }
@@ -99,7 +114,13 @@ public class SlangCompilerImpl implements SlangCompiler {
             SlangSource source,
             Set<SlangSource> path,
             PrecompileStrategy precompileStrategy) {
-        ExecutableModellingResult executableModellingResult = preCompileSource(source, precompileStrategy);
+        return getCompilationModellingResult(source, path, precompileStrategy, SensitivityLevel.ENCRYPTED);
+    }
+
+    private CompilationModellingResult getCompilationModellingResult(SlangSource source, Set<SlangSource> path,
+                                                                     PrecompileStrategy precompileStrategy,
+                                                                     SensitivityLevel sensitivityLevel) {
+        ExecutableModellingResult executableModellingResult = preCompileSource(source, precompileStrategy, sensitivityLevel);
         List<RuntimeException> errors = executableModellingResult.getErrors();
 
         // we transform also all of the files in the given dependency sources to model objects
@@ -108,7 +129,7 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         if (CollectionUtils.isNotEmpty(path)) {
             for (SlangSource currentSource : path) {
-                ExecutableModellingResult result = preCompileSource(currentSource, precompileStrategy);
+                ExecutableModellingResult result = preCompileSource(currentSource, precompileStrategy, sensitivityLevel);
                 Executable preCompiledCurrentSource = result.getExecutable();
                 errors.addAll(result.getErrors());
 
@@ -149,6 +170,18 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy) {
+        return getExecutableModellingResult(source, precompileStrategy, SensitivityLevel.ENCRYPTED);
+    }
+
+    @Override
+    public ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy,
+                                                      SensitivityLevel sensitivityLevel) {
+        return getExecutableModellingResult(source, precompileStrategy, sensitivityLevel);
+    }
+
+    private ExecutableModellingResult getExecutableModellingResult(SlangSource source,
+                                                                   PrecompileStrategy precompileStrategy,
+                                                                   SensitivityLevel sensitivityLevel) {
         Validate.notNull(source, "You must supply a source to compile");
         Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
 
@@ -160,7 +193,7 @@ public class SlangCompilerImpl implements SlangCompiler {
             return cacheResult.getExecutableModellingResult();
         }
 
-        ExecutableModellingResult executableModellingResult = preCompileModel(source);
+        ExecutableModellingResult executableModellingResult = preCompileModel(source, sensitivityLevel);
 
         // handle caching
         precompileCachePostExecute(source, precompileStrategy, filePath, executableModellingResult);
@@ -231,13 +264,13 @@ public class SlangCompilerImpl implements SlangCompiler {
         return "Precompile type[" + precompileStrategy + "] not yet implemented";
     }
 
-    private ExecutableModellingResult preCompileModel(SlangSource source) {
+    private ExecutableModellingResult preCompileModel(SlangSource source, SensitivityLevel sensitivityLevel) {
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
         ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
 
         // Then we transform the parsed Slang source to a Slang model
-        return slangModeller.createModel(parseModellingResult);
+        return slangModeller.createModel(parseModellingResult, sensitivityLevel);
     }
 
     private boolean isValidCachedValue(CacheResult cacheResult) {

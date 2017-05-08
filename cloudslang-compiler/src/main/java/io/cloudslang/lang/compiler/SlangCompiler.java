@@ -41,6 +41,12 @@ public interface SlangCompiler {
      */
     CompilationArtifact compile(SlangSource source, Set<SlangSource> path, PrecompileStrategy precompileStrategy);
 
+    CompilationArtifact compile(
+            SlangSource source,
+            Set<SlangSource> path,
+            PrecompileStrategy precompileStrategy,
+            SensitivityLevel sensitivityLevel);
+
     /**
      * Compile a CloudSlang source and its dependencies to a
      *     {@link io.cloudslang.lang.entities.CompilationArtifact} object
@@ -107,6 +113,18 @@ public interface SlangCompiler {
      *     or an operations in the file, and a list of all the errors that were found (if any).
      */
     ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy);
+
+    /**
+     * Pre-compile a CloudSlang source into an {@link ExecutableModellingResult}.
+     * All errors that are found during pre-compilation are collected (an exception is not thrown)
+     *
+     * @param source             the {@link SlangSource}
+     * @param precompileStrategy whether to use caching in pre-compile.
+     * @param sensitivityLevel
+     * @return an {@link ExecutableModellingResult} object, containing an executable which is either a flow
+     *     or an operations in the file, and a list of all the errors that were found (if any).
+     */
+    ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy, SensitivityLevel sensitivityLevel);
 
     /**
      * Remove all elements in pre-compile cache. No-cached calls are not affected.

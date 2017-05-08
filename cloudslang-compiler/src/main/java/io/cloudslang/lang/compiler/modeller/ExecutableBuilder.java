@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
+import io.cloudslang.lang.compiler.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
@@ -126,7 +127,8 @@ public class ExecutableBuilder {
     }
 
     public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang,
-                                                           Map<String, Object> executableRawData) {
+                                                           Map<String, Object> executableRawData,
+                                                           SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
 
