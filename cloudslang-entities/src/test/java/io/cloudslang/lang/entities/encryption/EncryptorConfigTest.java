@@ -82,6 +82,11 @@ public class EncryptorConfigTest {
                 }
 
                 @Override
+                public String obfuscate(String cypherText) {
+                    return "Obfuscated";
+                }
+
+                @Override
                 public char[] decrypt(String cypherText) {
                     return "Decrypted".toCharArray();
                 }

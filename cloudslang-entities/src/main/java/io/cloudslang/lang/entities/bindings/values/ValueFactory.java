@@ -29,6 +29,13 @@ public abstract class ValueFactory implements Serializable {
                 ValueFactory.createValue(serializable, sensitive);
     }
 
+    public static Value create(Serializable serializable, boolean sensitive, boolean isExecutionPlan) {
+        return serializable != null && serializable instanceof Value ?
+                ValueFactory.createValue(((Value) serializable).get(),
+                        ((Value) serializable).isSensitive() || sensitive, isExecutionPlan) :
+                ValueFactory.createValue(serializable, sensitive, isExecutionPlan);
+    }
+
     public static SensitiveStringValue createEncryptedString(String value) {
         return new SensitiveStringValue(value, false);
     }
@@ -47,5 +54,9 @@ public abstract class ValueFactory implements Serializable {
 
     private static Value createValue(Serializable content, boolean sensitive) {
         return sensitive ? new SensitiveValue(content) : new SimpleValue(content);
+    }
+
+    private static Value createValue(Serializable content, boolean sensitive, boolean isExecutionPlan) {
+        return sensitive ? new SensitiveValue(content, isExecutionPlan) : new SimpleValue(content);
     }
 }

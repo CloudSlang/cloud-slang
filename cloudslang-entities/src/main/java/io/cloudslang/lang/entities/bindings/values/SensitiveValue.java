@@ -11,15 +11,17 @@ package io.cloudslang.lang.entities.bindings.values;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.cloudslang.lang.entities.encryption.EncryptionProvider;
+import io.cloudslang.lang.spi.encryption.Encryption;
+import javassist.util.proxy.ProxyObjectInputStream;
+import javassist.util.proxy.ProxyObjectOutputStream;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import javassist.util.proxy.ProxyObjectInputStream;
-import javassist.util.proxy.ProxyObjectOutputStream;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 
 /**
  * Sensitive InOutParam value
@@ -29,6 +31,7 @@ import org.apache.commons.io.IOUtils;
 public class SensitiveValue implements Value {
 
     public static final String SENSITIVE_VALUE_MASK = "********";
+    public static final String ENCRYPTOR_PACKAGE = "com.hp.onyx.commons.encryption";
 
     private String content = null;
 
@@ -40,11 +43,19 @@ public class SensitiveValue implements Value {
     @JsonIgnore
     private Serializable originalContent = null;
 
+    private boolean isExecutionPlan;
+
     @SuppressWarnings("unused")
     protected SensitiveValue() {
     }
 
     protected SensitiveValue(Serializable content) {
+        originalContent = content;
+        encrypt();
+    }
+
+    protected SensitiveValue(Serializable content, boolean isPlanBuilding) {
+        isExecutionPlan = isPlanBuilding;
         originalContent = content;
         encrypt();
     }
@@ -68,7 +79,16 @@ public class SensitiveValue implements Value {
     protected String encrypt(Serializable originalContent) {
         byte[] serialized = serialize(originalContent);
         String serializedAsString = Base64.encodeBase64String(serialized);
-        return EncryptionProvider.get().encrypt(serializedAsString.toCharArray());
+        Encryption encryption = EncryptionProvider.get();
+        if (isExecutionPlan) {
+            if (ENCRYPTOR_PACKAGE.equals(encryption.getClass().getPackage().getName())) {
+                return encryption.obfuscate(serializedAsString);
+            } else {
+                return encryption.encrypt(serializedAsString.toCharArray());
+            }
+        } else {
+            return encryption.encrypt(serializedAsString.toCharArray());
+        }
     }
 
     public void decrypt() {
