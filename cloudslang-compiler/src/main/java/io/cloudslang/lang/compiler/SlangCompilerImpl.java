@@ -121,7 +121,8 @@ public class SlangCompilerImpl implements SlangCompiler {
     private CompilationModellingResult getCompilationModellingResult(SlangSource source, Set<SlangSource> path,
                                                                      PrecompileStrategy precompileStrategy,
                                                                      SensitivityLevel sensitivityLevel) {
-        ExecutableModellingResult executableModellingResult = preCompileSource(source, precompileStrategy, sensitivityLevel);
+        ExecutableModellingResult executableModellingResult = preCompileSource(source, precompileStrategy,
+                sensitivityLevel);
         List<RuntimeException> errors = executableModellingResult.getErrors();
 
         // we transform also all of the files in the given dependency sources to model objects
@@ -130,7 +131,8 @@ public class SlangCompilerImpl implements SlangCompiler {
 
         if (CollectionUtils.isNotEmpty(path)) {
             for (SlangSource currentSource : path) {
-                ExecutableModellingResult result = preCompileSource(currentSource, precompileStrategy, sensitivityLevel);
+                ExecutableModellingResult result = preCompileSource(currentSource, precompileStrategy,
+                        sensitivityLevel);
                 Executable preCompiledCurrentSource = result.getExecutable();
                 errors.addAll(result.getErrors());
 

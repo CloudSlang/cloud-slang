@@ -25,7 +25,8 @@ public class SlangModellerImpl implements SlangModeller {
     private ExecutableBuilder executableBuilder;
 
     @Override
-    public ExecutableModellingResult createModel(ParseModellingResult parseModellingResult, SensitivityLevel sensitivityLevel) {
+    public ExecutableModellingResult createModel(ParseModellingResult parseModellingResult,
+                                                 SensitivityLevel sensitivityLevel) {
         ParsedSlang parsedSlang = parseModellingResult.getParsedSlang();
         Validate.notNull(parsedSlang, "You must supply a parsed Slang source to compile");
 
@@ -33,17 +34,20 @@ public class SlangModellerImpl implements SlangModeller {
             switch (parsedSlang.getType()) {
                 case OPERATION:
                     return aggregateModellingWithParseResult(
-                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation(), sensitivityLevel),
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getOperation(),
+                                    sensitivityLevel),
                             parseModellingResult
                     );
                 case FLOW:
                     return aggregateModellingWithParseResult(
-                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow(), sensitivityLevel),
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getFlow(),
+                                    sensitivityLevel),
                             parseModellingResult
                     );
                 case DECISION:
                     return aggregateModellingWithParseResult(
-                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getDecision(), sensitivityLevel),
+                            executableBuilder.transformToExecutable(parsedSlang, parsedSlang.getDecision(),
+                                    sensitivityLevel),
                             parseModellingResult
                     );
                 default:

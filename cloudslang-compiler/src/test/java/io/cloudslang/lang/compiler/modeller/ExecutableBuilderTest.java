@@ -95,7 +95,8 @@ public class ExecutableBuilderTest {
         List<Result> results = new ArrayList<>();
         Map<String, Serializable> postExecutableActionData = new HashMap<>();
         postExecutableActionData.put(SlangTextualKeys.RESULTS_KEY, (Serializable) results);
-        when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString(), SensitivityLevel.ENCRYPTED))
+        when(transformersHandler.runTransformers(anyMap(), anyList(), anyList(), anyString(),
+                any(SensitivityLevel.class)))
                 .thenReturn(postExecutableActionData);
 
         return parsedSlang;
@@ -280,7 +281,8 @@ public class ExecutableBuilderTest {
         String flowName = "flow1";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
-        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData, SensitivityLevel.ENCRYPTED).getExecutable();
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData,
+                SensitivityLevel.ENCRYPTED).getExecutable();
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
         Deque<Step> steps = flow.getWorkflow().getSteps();
@@ -310,7 +312,8 @@ public class ExecutableBuilderTest {
         String flowName = "flow1";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
-        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData, SensitivityLevel.ENCRYPTED).getExecutable();
+        Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData,
+                SensitivityLevel.ENCRYPTED).getExecutable();
 
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());

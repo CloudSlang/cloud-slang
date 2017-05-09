@@ -114,7 +114,8 @@ public class Input extends InOutParam {
             this.systemPropertyDependencies = new HashSet<>();
         }
 
-        public InputBuilder(String name, Serializable serializable, boolean sensitive, SensitivityLevel sensitivityLevel) {
+        public InputBuilder(String name, Serializable serializable, boolean sensitive,
+                            SensitivityLevel sensitivityLevel) {
             this.name = name;
             this.value = ValueFactory.create(serializable, sensitive, sensitivityLevel);
             this.required = true;

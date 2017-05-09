@@ -125,7 +125,8 @@ public interface SlangCompiler {
      * @return an {@link ExecutableModellingResult} object, containing an executable which is either a flow
      *     or an operations in the file, and a list of all the errors that were found (if any).
      */
-    ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy, SensitivityLevel sensitivityLevel);
+    ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy,
+                                               SensitivityLevel sensitivityLevel);
 
     /**
      * Remove all elements in pre-compile cache. No-cached calls are not affected.

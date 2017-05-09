@@ -150,10 +150,12 @@ public class ExecutableBuilder {
                 "' syntax is illegal.\n";
         preExecutableActionData.putAll(
                 transformersHandler
-                        .runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix, sensitivityLevel));
+                        .runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix,
+                                sensitivityLevel));
         postExecutableActionData.putAll(
                 transformersHandler
-                        .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix, sensitivityLevel));
+                        .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix,
+                                sensitivityLevel));
 
         @SuppressWarnings("unchecked") List<Input> inputs =
                 (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
@@ -368,7 +370,8 @@ public class ExecutableBuilder {
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
         actionData.putAll(
-                transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix, SensitivityLevel.ENCRYPTED));
+                transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix,
+                        SensitivityLevel.ENCRYPTED));
 
         Action action = new Action(actionData);
         return new ActionModellingResult(action, errors);
@@ -518,9 +521,11 @@ public class ExecutableBuilder {
 
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler
-                .runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix, SensitivityLevel.ENCRYPTED));
+                .runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix,
+                        SensitivityLevel.ENCRYPTED));
         postStepData.putAll(transformersHandler
-                .runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix, SensitivityLevel.ENCRYPTED));
+                .runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix,
+                        SensitivityLevel.ENCRYPTED));
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
