@@ -25,11 +25,10 @@ public interface Encryption {
     String encrypt(char[] clearText);
 
     /**
-     * Obfuscated a String.
+     * Obfuscate a String.
      *
      * @param cypherText
-     * @return The obfuscate string.
-     * @description
+     * @return The obfuscated string.
      */
     String obfuscate(String cypherText);
 
