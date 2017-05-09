@@ -32,7 +32,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
 
     private ExecutableValidator executableValidator;
 
-    private SensitivityLevel sensitivityLevel;
+    private SensitivityLevel sensitivityLevel = SensitivityLevel.ENCRYPTED;
 
     @Override
     public Class<? extends InOutParam> getTransformedObjectsClass() {
