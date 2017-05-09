@@ -52,12 +52,11 @@ public class TransformersHandler {
             String key = keyToTransform(transformer);
             Object value = rawData.get(key);
             try {
+                @SuppressWarnings("unchecked")
                 TransformModellingResult transformModellingResult;
                 if (transformer instanceof InputsTransformer) {
-                    @SuppressWarnings("unchecked")
                     transformModellingResult = transformer.transform(value, sensitivityLevel);
                 } else {
-                    @SuppressWarnings("unchecked")
                     transformModellingResult = transformer.transform(value);
                 }
                 Object data = transformModellingResult.getTransformedData();
