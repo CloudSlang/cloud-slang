@@ -103,6 +103,11 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     }
 
     @Override
+    public TransformModellingResult<List<Result>> transform(List rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.AFTER_EXECUTABLE);
     }
@@ -110,11 +115,6 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
     @Override
     public String keyToTransform() {
         return null;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
     @Override

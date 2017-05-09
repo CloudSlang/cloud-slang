@@ -29,6 +29,11 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
     }
 
     @Override
+    public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.BEFORE_STEP);
     }
@@ -36,11 +41,6 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.PARALLEL_LOOP_KEY;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
 }

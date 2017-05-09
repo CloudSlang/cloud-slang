@@ -80,6 +80,11 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     }
 
     @Override
+    public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.BEFORE_STEP);
     }
@@ -87,11 +92,6 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.DO_KEY;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
     @Override

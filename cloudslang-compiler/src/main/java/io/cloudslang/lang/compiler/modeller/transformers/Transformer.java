@@ -23,11 +23,11 @@ public interface Transformer<F, T> {
 
     TransformModellingResult<T> transform(F rawData);
 
+    TransformModellingResult<T> transform(F rawData, SensitivityLevel sensitivityLevel);
+
     List<Scope> getScopes();
 
     String keyToTransform();
-
-    void setSensitivityLevel(SensitivityLevel sensitivityLevel);
 
     enum Scope {
         BEFORE_STEP,

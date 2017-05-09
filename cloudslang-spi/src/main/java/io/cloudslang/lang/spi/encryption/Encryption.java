@@ -33,6 +33,14 @@ public interface Encryption {
     String obfuscate(String cypherText);
 
     /**
+     * Deobfuscates an obfuscated string to a clear text char array
+     *
+     * @param cypherText The obfuscated string
+     * @return The clear text char array
+     */
+    char [] deobfuscate(String cypherText);
+
+    /**
      * Decrypts an encrypted string to a clear text char array
      *
      * @param cypherText The encrypted string

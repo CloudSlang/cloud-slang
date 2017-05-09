@@ -31,6 +31,11 @@ public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map
     }
 
     @Override
+    public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.emptyList();
     }
@@ -39,11 +44,5 @@ public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map
     public String keyToTransform() {
         return null;
     }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
-    }
-
 
 }

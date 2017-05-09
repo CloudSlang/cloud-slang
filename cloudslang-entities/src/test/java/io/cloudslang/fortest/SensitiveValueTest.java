@@ -150,6 +150,11 @@ public class SensitiveValueTest {
                 }
 
                 @Override
+                public char[] deobfuscate(String cypherText) {
+                    return cypherText.toCharArray();
+                }
+
+                @Override
                 public char[] decrypt(String cypherText) {
                     return cypherText.substring(ENCRYPTED.length()).toCharArray();
                 }

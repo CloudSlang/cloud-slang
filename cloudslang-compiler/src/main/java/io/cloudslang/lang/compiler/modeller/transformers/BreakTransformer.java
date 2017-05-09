@@ -42,6 +42,11 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
     }
 
     @Override
+    public TransformModellingResult<List<String>> transform(List<String> rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.AFTER_STEP);
     }
@@ -49,11 +54,6 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
     @Override
     public String keyToTransform() {
         return null;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
     public void setExecutableValidator(ExecutableValidator executableValidator) {

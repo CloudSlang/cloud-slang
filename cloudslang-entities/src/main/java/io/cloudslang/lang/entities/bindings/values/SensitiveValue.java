@@ -80,7 +80,7 @@ public class SensitiveValue implements Value {
         byte[] serialized = serialize(originalContent);
         String serializedAsString = Base64.encodeBase64String(serialized);
         Encryption encryption = EncryptionProvider.get();
-        if (SensitivityLevel.OBFUSCATED.equals(sensitivityLevel)) {
+        if (SensitivityLevel.OBFUSCATED == sensitivityLevel) {
             return encryption.obfuscate(serializedAsString);
         } else {
             return encryption.encrypt(serializedAsString.toCharArray());
@@ -95,7 +95,13 @@ public class SensitiveValue implements Value {
     }
 
     protected Serializable decrypt(String content) {
-        char[] decrypted = EncryptionProvider.get().decrypt(content);
+        Encryption encryption = EncryptionProvider.get();
+        char[] decrypted;
+        if (SensitivityLevel.OBFUSCATED == sensitivityLevel) {
+            decrypted = encryption.deobfuscate(content);
+        } else {
+            decrypted = encryption.decrypt(content);
+        }
         String serializedAsString = new String(decrypted);
 
         byte[] serialized = Base64.decodeBase64(serializedAsString);

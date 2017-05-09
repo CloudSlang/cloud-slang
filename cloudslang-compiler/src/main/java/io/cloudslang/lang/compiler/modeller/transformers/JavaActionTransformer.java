@@ -58,6 +58,11 @@ public class JavaActionTransformer extends AbstractTransformer
     }
 
     @Override
+    public TransformModellingResult<Map<String, String>> transform(Map<String, String> rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.ACTION);
     }
@@ -65,11 +70,6 @@ public class JavaActionTransformer extends AbstractTransformer
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.JAVA_ACTION_KEY;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
     private void transformKeys(Map<String, String> rawData) {

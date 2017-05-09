@@ -65,6 +65,11 @@ public class PythonActionTransformer extends AbstractTransformer
     }
 
     @Override
+    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.ACTION);
     }
@@ -72,11 +77,6 @@ public class PythonActionTransformer extends AbstractTransformer
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.PYTHON_ACTION_KEY;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
     public void setDependencyFormatValidator(DependencyFormatValidator dependencyFormatValidator) {

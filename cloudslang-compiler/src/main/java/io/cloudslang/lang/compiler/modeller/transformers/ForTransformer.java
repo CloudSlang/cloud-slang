@@ -24,6 +24,11 @@ public class ForTransformer extends AbstractForTransformer implements Transforme
     }
 
     @Override
+    public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.BEFORE_STEP);
     }
@@ -31,11 +36,6 @@ public class ForTransformer extends AbstractForTransformer implements Transforme
     @Override
     public String keyToTransform() {
         return SlangTextualKeys.FOR_KEY;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
 }

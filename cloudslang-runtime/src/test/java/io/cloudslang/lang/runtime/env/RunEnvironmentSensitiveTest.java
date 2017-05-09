@@ -242,6 +242,11 @@ public class RunEnvironmentSensitiveTest {
                 }
 
                 @Override
+                public char[] deobfuscate(String cypherText) {
+                    return cypherText.toCharArray();
+                }
+
+                @Override
                 public char[] decrypt(String cypherText) {
                     return cypherText.substring(ENCYPTED.length()).toCharArray();
                 }

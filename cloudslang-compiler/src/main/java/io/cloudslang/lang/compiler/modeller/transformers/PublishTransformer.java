@@ -32,6 +32,11 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
     }
 
     @Override
+    public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.AFTER_STEP);
     }
@@ -39,11 +44,6 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
     @Override
     public String keyToTransform() {
         return null;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
     @Override

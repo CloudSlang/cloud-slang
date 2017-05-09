@@ -71,6 +71,11 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
     }
 
     @Override
+    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
+    @Override
     public List<Scope> getScopes() {
         return Collections.singletonList(Scope.AFTER_STEP);
     }
@@ -78,11 +83,6 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
     @Override
     public String keyToTransform() {
         return null;
-    }
-
-    @Override
-    public void setSensitivityLevel(SensitivityLevel sensitivityLevel) {
-        //do nothing
     }
 
 }
