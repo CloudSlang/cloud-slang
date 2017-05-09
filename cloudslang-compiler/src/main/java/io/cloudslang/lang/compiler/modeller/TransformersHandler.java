@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.modeller;
 
 
+import io.cloudslang.lang.compiler.modeller.transformers.InputsTransformer;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
@@ -48,12 +49,17 @@ public class TransformersHandler {
                                                      SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
-            transformer.setSensitivityLevel(sensitivityLevel);
             String key = keyToTransform(transformer);
             Object value = rawData.get(key);
             try {
-                @SuppressWarnings("unchecked")
-                TransformModellingResult transformModellingResult = transformer.transform(value);
+                TransformModellingResult transformModellingResult;
+                if (transformer instanceof InputsTransformer) {
+                    @SuppressWarnings("unchecked")
+                    transformModellingResult = transformer.transform(value, sensitivityLevel);
+                } else {
+                    @SuppressWarnings("unchecked")
+                    transformModellingResult = transformer.transform(value);
+                }
                 Object data = transformModellingResult.getTransformedData();
                 if (data != null) {
                     transformedData.put(key, (Serializable) data);

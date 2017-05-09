@@ -71,7 +71,8 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
     }
 
     @Override
-    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
+    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
         return null;
     }
 

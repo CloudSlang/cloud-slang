@@ -68,6 +68,11 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
         return postProcessResults(transformedData, errors);
     }
 
+    @Override
+    public TransformModellingResult<List<Result>> transform(List rawData, SensitivityLevel sensitivityLevel) {
+        return null;
+    }
+
     public void addDefaultResultsIfNeeded(List rawResults, ExecutableType executableType,
                                           List<Result> resolvedResults, List<RuntimeException> errors) {
         if (rawResults == null && CollectionUtils.isEmpty(resolvedResults)) {
@@ -100,11 +105,6 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
             List<Result> transformedData,
             List<RuntimeException> errors) {
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<List<Result>> transform(List rawData, SensitivityLevel sensitivityLevel) {
-        return null;
     }
 
     @Override

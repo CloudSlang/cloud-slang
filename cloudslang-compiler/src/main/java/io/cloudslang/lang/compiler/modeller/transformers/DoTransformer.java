@@ -80,7 +80,8 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     }
 
     @Override
-    public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData, SensitivityLevel sensitivityLevel) {
+    public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData,
+                                                              SensitivityLevel sensitivityLevel) {
         return null;
     }
 

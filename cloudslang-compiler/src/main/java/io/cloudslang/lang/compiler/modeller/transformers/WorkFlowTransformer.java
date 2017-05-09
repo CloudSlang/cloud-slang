@@ -31,7 +31,8 @@ public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map
     }
 
     @Override
-    public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData, SensitivityLevel sensitivityLevel) {
+    public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData,
+                                                                   SensitivityLevel sensitivityLevel) {
         return null;
     }
 

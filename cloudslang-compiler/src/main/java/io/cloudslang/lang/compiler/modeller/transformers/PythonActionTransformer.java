@@ -65,7 +65,8 @@ public class PythonActionTransformer extends AbstractTransformer
     }
 
     @Override
-    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData, SensitivityLevel sensitivityLevel) {
+    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
         return null;
     }
 
