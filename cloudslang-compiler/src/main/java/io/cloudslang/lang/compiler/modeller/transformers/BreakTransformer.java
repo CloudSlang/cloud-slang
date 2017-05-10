@@ -43,7 +43,7 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
 
     @Override
     public TransformModellingResult<List<String>> transform(List<String> rawData, SensitivityLevel sensitivityLevel) {
-        throw new IllegalStateException();
+        return transform(rawData);
     }
 
     @Override

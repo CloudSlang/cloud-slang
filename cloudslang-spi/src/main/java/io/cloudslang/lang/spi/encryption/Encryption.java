@@ -27,10 +27,10 @@ public interface Encryption {
     /**
      * Obfuscate a String.
      *
-     * @param cypherText
+     * @param clearText
      * @return The obfuscated string.
      */
-    String obfuscate(String cypherText);
+    String obfuscate(String clearText);
 
     /**
      * Deobfuscates an obfuscated string to a clear text char array

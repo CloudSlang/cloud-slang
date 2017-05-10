@@ -82,7 +82,7 @@ public class EncryptorConfigTest {
                 }
 
                 @Override
-                public String obfuscate(String cypherText) {
+                public String obfuscate(String clearText) {
                     return "Obfuscated";
                 }
 

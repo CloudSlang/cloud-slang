@@ -70,7 +70,7 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
 
     @Override
     public TransformModellingResult<List<Result>> transform(List rawData, SensitivityLevel sensitivityLevel) {
-        throw new IllegalStateException();
+        return transform(rawData);
     }
 
     public void addDefaultResultsIfNeeded(List rawResults, ExecutableType executableType,

@@ -82,7 +82,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     @Override
     public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData,
                                                               SensitivityLevel sensitivityLevel) {
-        throw new IllegalStateException();
+        return transform(rawData);
     }
 
     @Override

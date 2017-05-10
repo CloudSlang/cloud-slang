@@ -237,8 +237,8 @@ public class RunEnvironmentSensitiveTest {
                 }
 
                 @Override
-                public String obfuscate(String cypherText) {
-                    return OBFUSCATED + cypherText;
+                public String obfuscate(String clearText) {
+                    return OBFUSCATED + clearText;
                 }
 
                 @Override

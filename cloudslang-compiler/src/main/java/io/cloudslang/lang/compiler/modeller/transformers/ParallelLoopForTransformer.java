@@ -30,7 +30,7 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        throw new IllegalStateException();
+        return transform(rawData);
     }
 
     @Override

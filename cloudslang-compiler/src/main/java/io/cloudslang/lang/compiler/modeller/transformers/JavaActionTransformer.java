@@ -60,7 +60,7 @@ public class JavaActionTransformer extends AbstractTransformer
     @Override
     public TransformModellingResult<Map<String, String>> transform(Map<String, String> rawData,
                                                                    SensitivityLevel sensitivityLevel) {
-        throw new IllegalStateException();
+        return transform(rawData);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
-        throw new IllegalStateException();
+        return transform(rawData);
     }
 
     @Override

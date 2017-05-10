@@ -10,10 +10,9 @@
 package io.cloudslang.lang.compiler.modeller;
 
 
-import io.cloudslang.lang.compiler.modeller.transformers.InputsTransformer;
-import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -53,12 +52,7 @@ public class TransformersHandler {
             Object value = rawData.get(key);
             try {
                 @SuppressWarnings("unchecked")
-                TransformModellingResult transformModellingResult;
-                if (transformer instanceof InputsTransformer) {
-                    transformModellingResult = transformer.transform(value, sensitivityLevel);
-                } else {
-                    transformModellingResult = transformer.transform(value);
-                }
+                TransformModellingResult transformModellingResult = transformer.transform(value, sensitivityLevel);
                 Object data = transformModellingResult.getTransformedData();
                 if (data != null) {
                     transformedData.put(key, (Serializable) data);
