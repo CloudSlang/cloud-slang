@@ -33,7 +33,7 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
-        return null;
+        throw new IllegalStateException();
     }
 
     @Override

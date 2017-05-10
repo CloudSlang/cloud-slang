@@ -155,7 +155,7 @@ public class ExecutableBuilder {
         postExecutableActionData.putAll(
                 transformersHandler
                         .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix,
-                                sensitivityLevel));
+                                SensitivityLevel.ENCRYPTED));
 
         @SuppressWarnings("unchecked") List<Input> inputs =
                 (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);

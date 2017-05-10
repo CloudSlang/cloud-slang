@@ -25,7 +25,7 @@ public class ForTransformer extends AbstractForTransformer implements Transforme
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        return null;
+        throw new IllegalStateException();
     }
 
     @Override
