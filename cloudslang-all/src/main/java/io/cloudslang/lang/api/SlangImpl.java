@@ -17,6 +17,7 @@ import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -71,6 +72,25 @@ public class SlangImpl implements Slang {
 
         try {
             return compiler.compile(source, dependencySources, precompileStrategy);
+        } catch (Exception e) {
+            logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public CompilationArtifact compile(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            PrecompileStrategy precompileStrategy,
+            SensitivityLevel sensitivityLevel) {
+        Validate.notNull(source, "Source can not be null");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
+        Validate.notNull(sensitivityLevel, "Sensitivity level can not be null");
+        Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
+
+        try {
+            return compiler.compile(source, dependencySources, precompileStrategy, sensitivityLevel);
         } catch (Exception e) {
             logger.error("Failed compilation for source : " + source.getName() + " ,Exception is : " + e.getMessage());
             throw new RuntimeException(e);
