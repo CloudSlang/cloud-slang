@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.InOutParam;
@@ -36,12 +37,12 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         return Input.class;
     }
 
-    protected Input transformSingleInput(Object rawInput) {
+    protected Input transformSingleInput(Object rawInput, SensitivityLevel sensitivityLevel) {
         // - some_input
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawInput instanceof String) {
             String inputName = (String) rawInput;
-            return createInput(inputName, null);
+            return createInput(inputName, null, sensitivityLevel);
         } else if (rawInput instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, ?> map = (Map<String, ?>) rawInput;
@@ -64,16 +65,17 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                 //     property2: value2
                 // this is the verbose way of defining inputs with all of the properties available
                 //noinspection unchecked
-                return createPropInput((Map.Entry<String, Map<String, Serializable>>) entry);
+                return createPropInput((Map.Entry<String, Map<String, Serializable>>) entry, sensitivityLevel);
             }
             // - some_input: some_expression
             // the value of the input is an expression we need to evaluate at runtime
-            return createInput(entry.getKey(), entryValue);
+            return createInput(entry.getKey(), entryValue, sensitivityLevel);
         }
         throw new RuntimeException("Could not transform Input : " + rawInput);
     }
 
-    private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry) {
+    private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry,
+                                  SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> props = entry.getValue();
         List<String> knownKeys = Arrays.asList(REQUIRED_KEY, SENSITIVE_KEY, PRIVATE_INPUT_KEY, DEFAULT_KEY);
 
@@ -103,13 +105,13 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                     "Input: '" + inputName + "' is private and required but no default value was specified");
         }
 
-        return createInput(inputName, value, sensitive, required, privateInput);
+        return createInput(inputName, value, sensitive, required, privateInput, sensitivityLevel);
     }
 
     private Input createInput(
             String name,
-            Serializable value) {
-        return createInput(name, value, false, true, false);
+            Serializable value, SensitivityLevel sensitivityLevel) {
+        return createInput(name, value, false, true, false, sensitivityLevel);
     }
 
     private Input createInput(
@@ -117,11 +119,11 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             Serializable value,
             boolean sensitive,
             boolean required,
-            boolean privateInput) {
+            boolean privateInput, SensitivityLevel sensitivityLevel) {
         executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
         Accumulator dependencyAccumulator = extractFunctionData(value);
-        return new Input.InputBuilder(name, value, sensitive)
+        return new Input.InputBuilder(name, value, sensitive, sensitivityLevel)
                 .withRequired(required)
                 .withPrivateInput(privateInput)
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())

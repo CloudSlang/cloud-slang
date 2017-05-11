@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
@@ -107,6 +108,16 @@ public class Input extends InOutParam {
         public InputBuilder(String name, Serializable serializable, boolean sensitive) {
             this.name = name;
             this.value = ValueFactory.create(serializable, sensitive);
+            this.required = true;
+            this.privateInput = false;
+            this.functionDependencies = new HashSet<>();
+            this.systemPropertyDependencies = new HashSet<>();
+        }
+
+        public InputBuilder(String name, Serializable serializable, boolean sensitive,
+                            SensitivityLevel sensitivityLevel) {
+            this.name = name;
+            this.value = ValueFactory.create(serializable, sensitive, sensitivityLevel);
             this.required = true;
             this.privateInput = false;
             this.functionDependencies = new HashSet<>();

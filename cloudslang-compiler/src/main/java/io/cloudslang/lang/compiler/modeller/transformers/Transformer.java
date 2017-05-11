@@ -15,12 +15,15 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import java.util.List;
 
 public interface Transformer<F, T> {
 
     TransformModellingResult<T> transform(F rawData);
+
+    TransformModellingResult<T> transform(F rawData, SensitivityLevel sensitivityLevel);
 
     List<Scope> getScopes();
 

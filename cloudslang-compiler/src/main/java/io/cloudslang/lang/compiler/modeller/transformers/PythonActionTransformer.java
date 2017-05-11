@@ -14,6 +14,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  */
 
 import com.google.common.collect.Sets;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
@@ -61,6 +62,12 @@ public class PythonActionTransformer extends AbstractTransformer
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
+    }
+
+    @Override
+    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
+        return transform(rawData);
     }
 
     @Override

@@ -17,11 +17,13 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Input;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
 
 public class InputsTransformer extends AbstractInputsTransformer implements Transformer<List<Object>, List<Input>> {
 
@@ -33,6 +35,11 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
      */
     @Override
     public TransformModellingResult<List<Input>> transform(List<Object> rawData) {
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
+    }
+
+    @Override
+    public TransformModellingResult<List<Input>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
         List<Input> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
         if (CollectionUtils.isEmpty(rawData)) {
@@ -40,7 +47,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
         }
         for (Object rawInput : rawData) {
             try {
-                Input input = transformSingleInput(rawInput);
+                Input input = transformSingleInput(rawInput, sensitivityLevel);
                 List<RuntimeException> validationErrors = preCompileValidator
                         .validateNoDuplicateInOutParams(transformedData, input);
                 transformedData.add(input);

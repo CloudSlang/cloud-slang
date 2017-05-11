@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.events.ScoreEventListener;
@@ -80,6 +81,21 @@ public interface Slang {
             SlangSource source,
             Set<SlangSource> dependencies,
             PrecompileStrategy precompileStrategy);
+
+    /**
+     * Compile a flow or operation written in CloudSlang
+     *
+     * @param source             the CloudSlang source containing the flow
+     * @param dependencies       a set of CloudSlang sources of of all the flow or operation's dependencies
+     * @param precompileStrategy with / without cache
+     * @param sensitivityLevel with encryption / obfuscation
+     * @return
+     */
+    CompilationArtifact compile(
+            SlangSource source,
+            Set<SlangSource> dependencies,
+            PrecompileStrategy precompileStrategy,
+            SensitivityLevel sensitivityLevel);
 
     /**
      * Remove all elements in pre-compile cache. No-cached calls are not affected.

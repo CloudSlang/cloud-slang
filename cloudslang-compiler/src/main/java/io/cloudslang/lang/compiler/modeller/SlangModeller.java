@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
 
@@ -26,8 +27,9 @@ public interface SlangModeller {
      * Pre-compile a Slang source into an {@link ExecutableModellingResult}
      * @param parseModellingResult the {@link io.cloudslang.lang.compiler.parser.model.ParsedSlang} source
      *
+     * @param sensitivityLevel
      * @return an {@link ExecutableModellingResult} object, containing an executable
      *     which is either a flow or an operations in the file
      */
-    ExecutableModellingResult createModel(ParseModellingResult parseModellingResult);
+    ExecutableModellingResult createModel(ParseModellingResult parseModellingResult, SensitivityLevel sensitivityLevel);
 }

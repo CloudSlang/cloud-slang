@@ -36,6 +36,7 @@ import static org.junit.Assert.assertTrue;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class SensitiveValueTest {
     private static final String ENCRYPTED = "{Encrypted}";
+    private static final String OBFUSCATED = "{Obfuscated}";
 
     @Test
     public void testSensitiveValueEncryptDecrypt() {
@@ -141,6 +142,16 @@ public class SensitiveValueTest {
                 @Override
                 public String encrypt(char[] clearText) {
                     return ENCRYPTED + new String(clearText);
+                }
+
+                @Override
+                public String obfuscate(String clearText) {
+                    return OBFUSCATED + clearText;
+                }
+
+                @Override
+                public char[] deobfuscate(String cypherText) {
+                    return cypherText.toCharArray();
                 }
 
                 @Override

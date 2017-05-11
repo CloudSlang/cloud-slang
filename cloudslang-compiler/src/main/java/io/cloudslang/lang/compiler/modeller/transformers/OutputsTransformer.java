@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.bindings.Output;
 import java.io.Serializable;
@@ -32,6 +33,11 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
         return super.transform(rawData);
+    }
+
+    @Override
+    public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
+        return transform(rawData);
     }
 
     @Override

@@ -19,6 +19,16 @@ public class DummyEncryptor implements Encryption {
     }
 
     @Override
+    public String obfuscate(String clearText) {
+        return clearText;
+    }
+
+    @Override
+    public char[] deobfuscate(String cypherText) {
+        return cypherText.toCharArray();
+    }
+
+    @Override
     public char[] decrypt(String cypherText) {
         return cypherText.toCharArray();
     }

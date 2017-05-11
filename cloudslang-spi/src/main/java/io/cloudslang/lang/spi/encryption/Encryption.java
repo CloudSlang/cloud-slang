@@ -25,6 +25,22 @@ public interface Encryption {
     String encrypt(char[] clearText);
 
     /**
+     * Obfuscate a String.
+     *
+     * @param clearText
+     * @return The obfuscated string.
+     */
+    String obfuscate(String clearText);
+
+    /**
+     * Deobfuscates an obfuscated string to a clear text char array
+     *
+     * @param cypherText The obfuscated string
+     * @return The clear text char array
+     */
+    char [] deobfuscate(String cypherText);
+
+    /**
      * Decrypts an encrypted string to a clear text char array
      *
      * @param cypherText The encrypted string

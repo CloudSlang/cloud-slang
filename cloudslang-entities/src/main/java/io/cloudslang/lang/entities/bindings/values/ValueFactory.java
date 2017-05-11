@@ -9,6 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings.values;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
+
 import java.io.Serializable;
 
 /**
@@ -27,6 +29,13 @@ public abstract class ValueFactory implements Serializable {
                 ValueFactory.createValue(((Value) serializable).get(),
                         ((Value) serializable).isSensitive() || sensitive) :
                 ValueFactory.createValue(serializable, sensitive);
+    }
+
+    public static Value create(Serializable serializable, boolean sensitive, SensitivityLevel sensitivityLevel) {
+        return serializable != null && serializable instanceof Value ?
+                ValueFactory.createValue(((Value) serializable).get(),
+                        ((Value) serializable).isSensitive() || sensitive, sensitivityLevel) :
+                ValueFactory.createValue(serializable, sensitive, sensitivityLevel);
     }
 
     public static SensitiveStringValue createEncryptedString(String value) {
@@ -48,4 +57,9 @@ public abstract class ValueFactory implements Serializable {
     private static Value createValue(Serializable content, boolean sensitive) {
         return sensitive ? new SensitiveValue(content) : new SimpleValue(content);
     }
+
+    private static Value createValue(Serializable content, boolean sensitive, SensitivityLevel sensitivityLevel) {
+        return sensitive ? new SensitiveValue(content, sensitivityLevel) : new SimpleValue(content);
+    }
+
 }

@@ -15,6 +15,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import java.util.ArrayList;
@@ -67,6 +68,12 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
+    }
+
+    @Override
+    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
+        return transform(rawData);
     }
 
     @Override

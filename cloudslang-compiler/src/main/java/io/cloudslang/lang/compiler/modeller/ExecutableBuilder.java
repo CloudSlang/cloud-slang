@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
@@ -126,7 +127,8 @@ public class ExecutableBuilder {
     }
 
     public ExecutableModellingResult transformToExecutable(ParsedSlang parsedSlang,
-                                                           Map<String, Object> executableRawData) {
+                                                           Map<String, Object> executableRawData,
+                                                           SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
 
@@ -148,10 +150,12 @@ public class ExecutableBuilder {
                 "' syntax is illegal.\n";
         preExecutableActionData.putAll(
                 transformersHandler
-                        .runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix));
+                        .runTransformers(executableRawData, preExecTransformers, errors, errorMessagePrefix,
+                                sensitivityLevel));
         postExecutableActionData.putAll(
                 transformersHandler
-                        .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix));
+                        .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix,
+                                SensitivityLevel.ENCRYPTED));
 
         @SuppressWarnings("unchecked") List<Input> inputs =
                 (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
@@ -366,7 +370,8 @@ public class ExecutableBuilder {
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
         actionData.putAll(
-                transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix));
+                transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix,
+                        SensitivityLevel.ENCRYPTED));
 
         Action action = new Action(actionData);
         return new ActionModellingResult(action, errors);
@@ -516,9 +521,11 @@ public class ExecutableBuilder {
 
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler
-                .runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix));
+                .runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix,
+                        SensitivityLevel.ENCRYPTED));
         postStepData.putAll(transformersHandler
-                .runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix));
+                .runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix,
+                        SensitivityLevel.ENCRYPTED));
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
