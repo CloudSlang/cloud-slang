@@ -1,6 +1,8 @@
 CloudSlang
 ==============
 
+[![Join the chat at https://gitter.im/CloudSlang/cloud-slang](https://badges.gitter.im/CloudSlang/cloud-slang.svg)](https://gitter.im/CloudSlang/cloud-slang?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 CloudSlang is a YAML based language for writing human-readable workflows for the CloudSlang Orchestration Engine .
 This project includes the CLI to trigger flows.
 
