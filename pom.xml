@@ -412,11 +412,6 @@
                 <version>2.6.0</version>
             </dependency>
 
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.10</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -758,6 +753,7 @@
         </profile>
     </profiles>
     <modules>
+        <module>cloudslang-content-dependencies</module>
         <module>cloudslang-spi</module>
         <module>cloudslang-runtime</module>
         <module>cloudslang-compiler</module>
