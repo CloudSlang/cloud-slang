@@ -38,7 +38,7 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.ConfigurationAwareEventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
@@ -560,7 +560,7 @@ public class StepExecutionDataTest {
         }
 
         @Bean
-        public EventBus eventBus() {
+        public ConfigurationAwareEventBus eventBus() {
             return new EventBusImpl();
         }
     }

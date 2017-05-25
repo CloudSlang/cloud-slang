@@ -24,16 +24,10 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.api.TriggeringProperties;
-import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.ConfigurationAwareEventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +40,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
@@ -79,7 +81,7 @@ public class SlangImplTest {
     private Score score;
 
     @Autowired
-    private EventBus eventBus;
+    private ConfigurationAwareEventBus eventBus;
 
     @Before
     public void init() {
@@ -241,14 +243,14 @@ public class SlangImplTest {
         Set<String> eventTypes = new HashSet<>();
         eventTypes.add(EventConstants.SCORE_ERROR_EVENT);
         slang.subscribeOnEvents(eventListener, eventTypes);
-        Mockito.verify(eventBus).subscribe(eventListener, eventTypes);
+        Mockito.verify(eventBus).registerSubscriberForEvents(eventListener, eventTypes);
     }
 
     @Test
     public void testUnSubscribeOnEvents() {
         ScoreEventListener eventListener = new EventListener();
         slang.unSubscribeOnEvents(eventListener);
-        Mockito.verify(eventBus).unsubscribe(eventListener);
+        Mockito.verify(eventBus).unregisterSubscriberForEvents(eq(eventListener), eq(Collections.<String>emptySet()));
     }
 
     @SuppressWarnings("unchecked")
@@ -309,8 +311,8 @@ public class SlangImplTest {
         }
 
         @Bean
-        public EventBus eventBus() {
-            return Mockito.mock(EventBus.class);
+        public ConfigurationAwareEventBus eventBus() {
+            return Mockito.mock(ConfigurationAwareEventBus.class);
         }
     }
 

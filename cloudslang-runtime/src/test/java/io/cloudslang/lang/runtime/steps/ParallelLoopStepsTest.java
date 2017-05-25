@@ -35,7 +35,7 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.score.api.EndBranchDataContainer;
-import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.ConfigurationAwareEventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.junit.Assert;
@@ -588,7 +588,7 @@ public class ParallelLoopStepsTest {
         }
 
         @Bean
-        public EventBus eventBus() {
+        public ConfigurationAwareEventBus eventBus() {
             return new EventBusImpl();
         }
     }
