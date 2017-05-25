@@ -23,17 +23,19 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.api.Score;
 import io.cloudslang.score.api.TriggeringProperties;
-import io.cloudslang.score.events.EventBus;
+import io.cloudslang.score.events.ConfigurationAwareEventBus;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author stoneo
@@ -54,7 +56,7 @@ public class SlangImpl implements Slang {
     private Score score;
 
     @Autowired
-    private EventBus eventBus;
+    private ConfigurationAwareEventBus eventBus;
 
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencies) {
@@ -181,12 +183,12 @@ public class SlangImpl implements Slang {
 
     @Override
     public void subscribeOnEvents(ScoreEventListener eventListener, Set<String> eventTypes) {
-        eventBus.subscribe(eventListener, eventTypes);
+        eventBus.registerSubscriberForEvents(eventListener, eventTypes);
     }
 
     @Override
     public void unSubscribeOnEvents(ScoreEventListener eventListener) {
-        eventBus.unsubscribe(eventListener);
+        eventBus.unregisterSubscriberForEvents(eventListener, Collections.<String>emptySet());
     }
 
     @Override
