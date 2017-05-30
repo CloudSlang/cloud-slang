@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-        (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+        (c) Copyright 2014-2017 Hewlett-Packard Development Company, L.P.
         All rights reserved. This program and the accompanying materials
         are made available under the terms of the Apache License v2.0 which accompany this distribution.
 
         The Apache License is available at
         http://www.apache.org/licenses/LICENSE-2.0
     -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cloudslang-cli</artifactId>
 
     <parent>
         <artifactId>cloudslang</artifactId>
@@ -17,120 +19,109 @@
         <version>1.0.7-SNAPSHOT</version>
     </parent>
 
+    <artifactId>cloudslang-cli</artifactId>
+
     <dependencies>
+
+        <!-- Declare module dependencies  -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-api-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-entities</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-all</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-compiler</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Declare score dependency  -->
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>score-api</artifactId>
         </dependency>
 
+        <!-- Declare spring dependencies  -->
         <dependency>
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
 
+        <!-- Declare parent dependencies  -->
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
             <version>2.12</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-core</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.googlecode.lambdaj</groupId>
             <artifactId>lambdaj</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
@@ -141,7 +132,6 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.mattbertolini</groupId>
             <artifactId>liquibase-slf4j</artifactId>
@@ -190,6 +180,208 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>default-profile</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>2.8.1</version>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>cslang-cli-with-content</id>
+            <dependencies>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-http-client</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-ssh</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-amazon</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-json</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-mail</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-powershell</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-rft</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-database</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-azure</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-lists</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.cloudslang.content</groupId>
+                    <artifactId>cs-date-time</artifactId>
+                    <version>RELEASE</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <copyPom>true</copyPom>
+                                    <useRepositoryLayout>true</useRepositoryLayout>
+                                    <excludeTransitive>false</excludeTransitive>
+                                    <outputDirectory>${project.build.directory}/cslang-cli/maven/repo</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>analyze dependencies</id>
+                                <goals>
+                                    <goal>analyze-only</goal>
+                                </goals>
+                                <configuration>
+                                    <failOnWarning>true</failOnWarning>
+                                    <ignoredUnusedDeclaredDependencies>
+                                        <ignoredUnusedDeclaredDependency>org.springframework:spring-test:jar:4.2.5.RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>commons-collections:commons-collections:jar:3.2.2</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-http-client:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>org.powermock:powermock-module-junit4:jar:1.6.5</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-powershell:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-date-time:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-database:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>org.powermock:powermock-api-mockito:jar:1.6.5</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-amazon:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-azure:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-lists:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-json:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-mail:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-ssh:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>io.cloudslang.content:cs-rft:jar:RELEASE</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>org.powermock:powermock-core:jar:1.6.5</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>org.mockito:mockito-core:jar:1.10.19</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>org.hamcrest:hamcrest-all:jar:1.1</ignoredUnusedDeclaredDependency>
+                                        <ignoredUnusedDeclaredDependency>junit:junit:jar:4.10</ignoredUnusedDeclaredDependency>
+                                    </ignoredUnusedDeclaredDependencies>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <version>1.3.0</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                            <configuration>
+                                <url>https://github.com/CloudSlang/cloud-slang-content/archive/master.zip</url>
+                                <unpack>true</unpack>
+                            </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-content</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/cslang-cli/content/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}/cloud-slang-content-master/content</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-properties</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/cslang-cli/properties/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}/cloud-slang-content-master/configuration/properties</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>dist</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/resources/package.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+                <finalName>cslang-cli</finalName>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <resources>
@@ -243,7 +435,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>${plugins.maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>unpack</id>
@@ -315,29 +506,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <unzip src="${basedir}/../cloudslang-content-dependencies/target/dependency-base.zip" dest="${basedir}/target/cslang-cli/maven/repo">
-                                    <patternset>
-                                        <exclude name="**/*.path" />
-                                    </patternset>
-                                </unzip>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
@@ -360,6 +528,7 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
+                <version>1.4.5</version>
             </plugin>
 
         </plugins>

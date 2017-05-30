@@ -629,11 +629,11 @@
                     </dependencies>
                 </plugin>
                 <!--Check for org.springframework occurrences-->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>${maven.enforcer.plugin.version}</version>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-enforcer-plugin</artifactId>-->
+                    <!--<version>${maven.enforcer.plugin.version}</version>-->
+                <!--</plugin>-->
             </plugins>
         </pluginManagement>
         <plugins>
@@ -735,7 +735,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
-                        <version>1.4.3</version>
+                        <version>1.4.5</version>
                         <executions>
                             <execution>
                                 <id>scan-vulnerabilities-in-used-third-parties</id>
@@ -753,7 +753,6 @@
         </profile>
     </profiles>
     <modules>
-        <module>cloudslang-content-dependencies</module>
         <module>cloudslang-spi</module>
         <module>cloudslang-runtime</module>
         <module>cloudslang-compiler</module>
