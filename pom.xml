@@ -765,5 +765,6 @@
         <module>cloudslang-api-commons</module>
         <module>cloudslang-commons</module>
         <module>cloudslang-enforcer</module>
+        <module>cloudslang-cli-with-content</module>
     </modules>
 </project>

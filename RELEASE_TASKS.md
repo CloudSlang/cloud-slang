@@ -1,4 +1,4 @@
-##What
+## What
 When we want to release a new version that:
 
   - Will be marked as release in GitHub
@@ -6,7 +6,7 @@ When we want to release a new version that:
   - Will test that the content matches the language version (only the default content test suite)
   - Will run the CLI with a simple flow (sanity check)
   
-To do so we use [drone.io] (https://drone.io/). (Contact one of the cloudslang owners for credentials.)
+To do so we use [drone.io](https://drone.io/). (Contact one of the cloudslang owners for credentials.)
 
 It is also possible to build everything locally since all of the build scripts and flows are available under the [/build](/build) folder of this repo.
 
@@ -15,9 +15,9 @@ In the build folder we have:
 - An Ant file, that runs a CloudSlang flow, that builds and tests the CLI (we also use it in Travis, but without adding and testing the content).
 - A shell script that uploads the artifacts to GitHub, and runs sanity checks.
 
-##How
+## How
 
-###In GitHub:
+### In GitHub:
 
 - Choose a release tag you want to build. (Every release of Jenkins creates a tag.)
   ![1](https://cloud.githubusercontent.com/assets/4418018/9223232/ee3cc384-4100-11e5-9cb0-84612ebc8d70.png)
@@ -25,7 +25,7 @@ In the build folder we have:
 - Copy the tag name.
   ![2](https://cloud.githubusercontent.com/assets/4418018/9223234/ee405062-4100-11e5-92b6-1006057fbf41.png)
 
-###In drone.io:
+### In drone.io:
 
 After you created a user and was added to the project:
 

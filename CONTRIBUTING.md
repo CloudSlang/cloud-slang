@@ -32,7 +32,7 @@ Occasionally, a change will be very difficult to test. In those cases, please in
 
 Test coverage statistics are calculated using [Coveralls](coveralls.io). If test coverage falls below 80% or by more than 5% for a given pull request, the build will fail. 
 
-##Conduct
+## Conduct
 
 Whether you are a regular contributor or a newcomer, we care about making this community a safe place for you.
 
