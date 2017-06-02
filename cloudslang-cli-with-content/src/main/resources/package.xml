@@ -10,11 +10,11 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>/target/cslang-cli</directory>
+            <directory>./target./cslang-cli</directory>
             <includes>
                 <include>**/*</include>
             </includes>
-            <outputDirectory>/cslang-cli</outputDirectory>
+            <outputDirectory>./cslang-cli</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
