@@ -82,6 +82,7 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <skipCache>true</skipCache>
                             <url>https://github.com/CloudSlang/cloud-slang-content/archive/master.zip</url>
                             <unpack>true</unpack>
                         </configuration>
@@ -90,6 +91,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>copy-cslang-cli</id>
@@ -147,6 +149,30 @@
                             <resources>
                                 <resource>
                                     <directory>${project.build.directory}/cloud-slang-content-master/python-lib</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-docs-file</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/cslang-cli/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/cloud-slang-content-master/</directory>
+                                    <includes>
+                                        <include>DOCS.md</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/..</directory>
+                                    <includes>
+                                        <include>CHANGELOG.md</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>
