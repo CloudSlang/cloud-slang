@@ -100,10 +100,10 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/cslang-cli</outputDirectory>
+                            <outputDirectory>${project.build.directory}./cslang-cli</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/../cloudslang-cli/target/cslang-cli</directory>
+                                    <directory>${basedir}./../cloudslang-cli./target./cslang-cli</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -115,10 +115,10 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/cslang-cli/content</outputDirectory>
+                            <outputDirectory>${project.build.directory}./cslang-cli./content</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/cloud-slang-content-master/content</directory>
+                                    <directory>${project.build.directory}./cloud-slang-content-master./content</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -130,10 +130,10 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/cslang-cli/properties</outputDirectory>
+                            <outputDirectory>${project.build.directory}./cslang-cli./properties</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/cloud-slang-content-master/configuration/properties</directory>
+                                    <directory>${project.build.directory}./cloud-slang-content-master./configuration./properties</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -145,10 +145,10 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/cslang-cli/python-lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}./cslang-cli./python-lib</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/cloud-slang-content-master/python-lib</directory>
+                                    <directory>${project.build.directory}./cloud-slang-content-master./python-lib</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -160,16 +160,16 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/cslang-cli/</outputDirectory>
+                            <outputDirectory>${project.build.directory}./cslang-cli</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/cloud-slang-content-master/</directory>
+                                    <directory>${project.build.directory}./cloud-slang-content-master</directory>
                                     <includes>
                                         <include>DOCS.md</include>
                                     </includes>
                                 </resource>
                                 <resource>
-                                    <directory>${basedir}/..</directory>
+                                    <directory>${basedir}./..</directory>
                                     <includes>
                                         <include>CHANGELOG.md</include>
                                     </includes>
@@ -193,7 +193,7 @@
                             <copyPom>true</copyPom>
                             <useRepositoryLayout>true</useRepositoryLayout>
                             <excludeTransitive>false</excludeTransitive>
-                            <outputDirectory>${project.build.directory}/cslang-cli/maven/repo</outputDirectory>
+                            <outputDirectory>${project.build.directory}./cslang-cli./maven./repo</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
