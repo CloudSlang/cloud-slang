@@ -3,6 +3,7 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
     <localRepository>${cloudslang.maven.repo.local}</localRepository>
+
     <mirrors>
         <mirror>
             <id>io-cloudslang-mirror</id>
@@ -17,7 +18,6 @@
             <properties>
                 <maven.dev.monitoring.enableMonitoring>false</maven.dev.monitoring.enableMonitoring>
             </properties>
-
             <repositories>
                 <repository>
                     <id>io-cloudslang-repository-snapshots</id>
@@ -27,7 +27,6 @@
                     </snapshots>
                 </repository>
             </repositories>
-
             <pluginRepositories>
                 <pluginRepository>
                     <id>io-cloudslang-maven-plugins-repository</id>
@@ -37,11 +36,34 @@
                     </snapshots>
                 </pluginRepository>
             </pluginRepositories>
-
         </profile>
     </profiles>
+
     <activeProfiles>
         <activeProfile>default-settings</activeProfile>
     </activeProfiles>
+
+    <proxies>
+        <proxy>
+            <id>http-proxy</id>
+            <active>false</active> <!--set to active if behind a proxy-->
+            <protocol>http</protocol>
+            <host>proxy.example.com</host>
+            <port>8080</port>
+            <username/>
+            <password/>
+            <nonProxyHosts>www.google.com|*.example.com</nonProxyHosts>
+        </proxy>
+        <proxy>
+            <id>https-proxy</id>
+            <active>false</active> <!--set to active if behind a proxy-->
+            <protocol>https</protocol>
+            <host>proxy.example.com</host>
+            <port>8080</port>
+            <username/>
+            <password/>
+            <nonProxyHosts>www.google.com|*.example.com</nonProxyHosts>
+        </proxy>
+    </proxies>
 
 </settings>
