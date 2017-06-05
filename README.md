@@ -1,5 +1,5 @@
 CloudSlang
-==============
+==========
 
 [![Join the chat at https://gitter.im/CloudSlang/cloud-slang](https://badges.gitter.im/CloudSlang/cloud-slang.svg)](https://gitter.im/CloudSlang/cloud-slang?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -24,7 +24,7 @@ This project includes the CLI to trigger flows.
   - For Linux : bash cslang
 5. Run a simple example print text flow:  run --f ../content/io/cloudslang/base/print/print_text.sl --i text=first_flow
 
-#### Documentation :
+#### Documentation
 
 All documentation is available on the [CloudSlang website](http://www.cloudslang.io/#/docs).
 
