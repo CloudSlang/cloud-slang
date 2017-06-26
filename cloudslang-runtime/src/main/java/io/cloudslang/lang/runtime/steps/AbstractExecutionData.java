@@ -13,6 +13,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.utils.ValueUtils;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ContextStack;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
@@ -20,6 +21,7 @@ import io.cloudslang.lang.runtime.env.ParentFlowStack;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractExecutionData {
@@ -36,73 +39,94 @@ public abstract class AbstractExecutionData {
                                             ExecutionRuntimeServices executionRuntimeServices,
                                             String desc,
                                             LanguageEventData.StepType stepType,
-                                            String stepName) {
+                                            String stepName,
+                                            Map<String, Value> context) {
         ArrayList<String> inputNames = new ArrayList<>();
         for (Input input : inputs) {
             inputNames.add(input.getName());
         }
-        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_START, desc, stepType, stepName,
-                Pair.of(LanguageEventData.INPUTS, inputNames));
+        fireEvent(
+            executionRuntimeServices,
+            runEnv,
+            ScoreLangConstants.EVENT_INPUT_START,
+            desc,
+            stepType,
+            stepName,
+            context,
+            Pair.of(LanguageEventData.INPUTS, inputNames));
     }
 
     public void sendEndBindingInputsEvent(List<Input> inputs,
-                                          final Map<String, Value> context,
+                                          final Map<String, Value> boundInputValues,
                                           RunEnvironment runEnv,
                                           ExecutionRuntimeServices executionRuntimeServices,
                                           String desc,
                                           LanguageEventData.StepType stepType,
-                                          String stepName) {
+                                          String stepName,
+                                          Map<String, Value> context) {
         Map<String, Value> inputsForEvent = new LinkedHashMap<>();
         for (Input input : inputs) {
             String inputName = input.getName();
-            Value inputValue = context.get(inputName);
+            Value inputValue = boundInputValues.get(inputName);
             inputsForEvent.put(inputName, inputValue);
         }
-        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_INPUT_END, desc, stepType, stepName,
-                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent));
+        fireEvent(
+            executionRuntimeServices,
+            runEnv,
+            ScoreLangConstants.EVENT_INPUT_END,
+            desc,
+            stepType,
+            stepName,
+            context,
+            Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent)
+        );
     }
 
     public void sendStartBindingArgumentsEvent(
-            List<Argument> arguments,
-            RunEnvironment runEnv,
-            ExecutionRuntimeServices executionRuntimeServices,
-            String description,
-            String stepName) {
+        List<Argument> arguments,
+        RunEnvironment runEnv,
+        ExecutionRuntimeServices executionRuntimeServices,
+        String description,
+        String stepName,
+        Map<String, Value> context) {
         ArrayList<String> argumentNames = new ArrayList<>();
         for (Argument argument : arguments) {
             argumentNames.add(argument.getName());
         }
         fireEvent(
-                executionRuntimeServices,
-                runEnv,
-                ScoreLangConstants.EVENT_ARGUMENT_START,
-                description,
-                LanguageEventData.StepType.STEP,
-                stepName,
-                Pair.of(LanguageEventData.ARGUMENTS, argumentNames)
+            executionRuntimeServices,
+            runEnv,
+            ScoreLangConstants.EVENT_ARGUMENT_START,
+            description,
+            LanguageEventData.StepType.STEP,
+            stepName,
+            context,
+            Pair.of(LanguageEventData.ARGUMENTS, argumentNames)
         );
     }
 
     public void sendEndBindingArgumentsEvent(
-            List<Argument> arguments,
-            final Map<String, Value> context,
-            RunEnvironment runEnv,
-            ExecutionRuntimeServices executionRuntimeServices,
-            String description,
-            String stepName) {
+        List<Argument> arguments,
+        final Map<String, Value> boundInputs,
+        RunEnvironment runEnv,
+        ExecutionRuntimeServices executionRuntimeServices,
+        String description,
+        String stepName,
+        Map<String, Value> context) {
         Map<String, Value> argumentsForEvent = new LinkedHashMap<>();
         for (Argument argument : arguments) {
             String argumentName = argument.getName();
-            Value argumentValue = context.get(argumentName);
+            Value argumentValue = boundInputs.get(argumentName);
             argumentsForEvent.put(argumentName, argumentValue);
         }
         fireEvent(
-                executionRuntimeServices,
-                runEnv, ScoreLangConstants.EVENT_ARGUMENT_END,
-                description,
-                LanguageEventData.StepType.STEP,
-                stepName,
-                Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent)
+            executionRuntimeServices,
+            runEnv, ScoreLangConstants.EVENT_ARGUMENT_END,
+            description,
+            LanguageEventData.StepType.STEP,
+            stepName,
+            context,
+            Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent)
         );
     }
 
@@ -113,9 +137,10 @@ public abstract class AbstractExecutionData {
                                  String description,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
+                                 Map<String, Value> context,
                                  Map.Entry<String, ? extends Serializable>... fields) {
         fireEvent(runtimeServices, type, description,
-                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, fields);
+            runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, context, fields);
     }
 
     @SafeVarargs
@@ -125,6 +150,7 @@ public abstract class AbstractExecutionData {
                                  String path,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
+                                 Map<String, Value> context,
                                  Map.Entry<String, ? extends Serializable>... fields) {
         LanguageEventData eventData = new LanguageEventData();
         eventData.setStepType(stepType);
@@ -134,6 +160,12 @@ public abstract class AbstractExecutionData {
         eventData.setTimeStamp(new Date());
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
+
+        // TODO - levi - SP
+        if (context != null) {
+            eventData.setContext(ValueUtils.flatten(context));
+        }
+
         for (Entry<String, ? extends Serializable> field : fields) {
             //noinspection unchecked
             eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
