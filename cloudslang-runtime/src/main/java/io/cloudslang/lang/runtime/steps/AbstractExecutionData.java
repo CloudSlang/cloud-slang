@@ -10,6 +10,8 @@
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.properties.EventVerbosityLevel;
+import io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -31,6 +33,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.Pair;
+
+import static io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant.CSLANG_RUNTIME_EVENTS_VERBOSITY;
 
 public abstract class AbstractExecutionData {
 
@@ -161,10 +165,7 @@ public abstract class AbstractExecutionData {
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
 
-        // TODO - levi - SP
-        if (context != null) {
-            eventData.setContext(ValueUtils.flatten(context));
-        }
+        setContext(eventData, context);
 
         for (Entry<String, ? extends Serializable> field : fields) {
             //noinspection unchecked
@@ -186,6 +187,16 @@ public abstract class AbstractExecutionData {
         // and push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
         ParentFlowStack stack = runEnv.getParentFlowStack();
         stack.pushParentFlowData(new ParentFlowData(runningExecutionPlanId, nextStepId));
+    }
+
+    private static void setContext(LanguageEventData eventData, Map<String, Value> context) {
+        String verbosityLevel = System.getProperty(
+            CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(),
+            EventVerbosityLevel.DEFAULT.getValue()
+        );
+        if (EventVerbosityLevel.ALL.getValue().equals(verbosityLevel) && context != null) {
+            eventData.setContext(ValueUtils.flatten(context));
+        }
     }
 
 }

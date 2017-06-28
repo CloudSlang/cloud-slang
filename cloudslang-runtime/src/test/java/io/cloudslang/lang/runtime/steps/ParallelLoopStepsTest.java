@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 ///*******************************************************************************
 // * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
 // * All rights reserved. This program and the accompanying materials
@@ -348,9 +357,12 @@
 //        runtimeContext2.put("branch2Output", 2);
 //        runtimeContext3.put("branch3Output", 3);
 //
-//        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
-//        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.FAILURE_RESULT);
-//        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
+//        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Value>(),
+// ScoreLangConstants.SUCCESS_RESULT);
+//        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Value>(),
+// ScoreLangConstants.FAILURE_RESULT);
+//        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Value>(),
+// ScoreLangConstants.SUCCESS_RESULT);
 //        ExecutionRuntimeServices executionRuntimeServices = createAndConfigureExecutionRuntimeServicesMock(
 //                runtimeContext1,
 //                runtimeContext2,
@@ -463,9 +475,12 @@
 //            Map<String, Serializable> runtimeContext1,
 //            Map<String, Serializable> runtimeContext2,
 //            Map<String, Serializable> runtimeContext3) {
-//        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
-//        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
-//        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT);
+//        ReturnValues returnValues1 = new ReturnValues(new HashMap<String, Value>(),
+// ScoreLangConstants.SUCCESS_RESULT);
+//        ReturnValues returnValues2 = new ReturnValues(new HashMap<String, Value>(),
+// ScoreLangConstants.SUCCESS_RESULT);
+//        ReturnValues returnValues3 = new ReturnValues(new HashMap<String, Value>(),
+// ScoreLangConstants.SUCCESS_RESULT);
 //
 //        return createAndConfigureExecutionRuntimeServicesMock(
 //                runtimeContext1,

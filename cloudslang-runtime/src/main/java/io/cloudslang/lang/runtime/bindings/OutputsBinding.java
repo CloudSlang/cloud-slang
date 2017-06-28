@@ -16,6 +16,8 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +39,12 @@ public class OutputsBinding extends AbstractBinding {
     ScriptEvaluator scriptEvaluator;
 
     public Map<String, Value> bindOutputs(
-            Map<String, Value> context,
+            Map<String, Value> initialContext,
             Set<SystemProperty> systemProperties,
             List<Output> possibleOutputs) {
 
         Map<String, Value> outputs = new LinkedHashMap<>();
+        Map<String, Value> context = new HashMap<>(initialContext);
 
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {

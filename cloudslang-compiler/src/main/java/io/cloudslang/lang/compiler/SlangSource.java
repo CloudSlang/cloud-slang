@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+import io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;

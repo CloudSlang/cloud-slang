@@ -91,7 +91,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 runEnv.getExecutionPath().getCurrentPath(),
                 LanguageEventData.StepType.STEP,
                 nodeName,
-                flowContext.getImmutableViewOfLanguageVariables(),
+                flowContext.getImmutableViewOfVariables(),
                 Pair.of(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) splitData));
 
             runEnv.putNextStepPosition(nextStepId);
@@ -108,7 +108,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     runEnv.getExecutionPath().getCurrentPath(),
                     LanguageEventData.StepType.STEP,
                     nodeName,
-                    branchContext.getImmutableViewOfLanguageVariables(),
+                    branchContext.getImmutableViewOfVariables(),
                     Pair.of(ScoreLangConstants.REF_ID, refId),
                     Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
                 // take path down one level
@@ -163,7 +163,10 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext);
             Map<String, Value> outputBindingContext = new HashMap<>();
-            outputBindingContext.put(RuntimeConstants.BRANCHES_CONTEXT_KEY, ValueFactory.create((Serializable) branchesContext));
+            outputBindingContext.put(
+                RuntimeConstants.BRANCHES_CONTEXT_KEY,
+                ValueFactory.create((Serializable) branchesContext)
+            );
 
             Map<String, Value> publishValues =
                 bindPublishValues(
@@ -185,8 +188,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 stepNavigationValues,
                 nodeName,
                 publishValues,
-                parallelLoopResult,
-                outputBindingContext
+                parallelLoopResult
             );
 
             runEnv.getStack().pushContext(flowContext);
@@ -204,8 +206,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         Map<String, ResultNavigation> stepNavigationValues,
         String nodeName,
         Map<String, Value> publishValues,
-        String parallelLoopResult,
-        Map<String, Value> outputBindingContext) {
+        String parallelLoopResult) {
         // set the position of the next step - for the use of the navigation
         // find in the navigation values the correct next step position, according to the parallel loop result,
         // and set it
@@ -227,7 +228,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
             "Parallel loop output binding finished",
             LanguageEventData.StepType.STEP, nodeName,
-            outputBindingContext,
+            new HashMap<String, Value>(),
             Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
             Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
             Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition));
@@ -264,7 +265,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             "Parallel loop output binding started",
             LanguageEventData.StepType.STEP,
             nodeName,
-            publishContext,
+            new HashMap<String, Value>(),
             Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
             Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 

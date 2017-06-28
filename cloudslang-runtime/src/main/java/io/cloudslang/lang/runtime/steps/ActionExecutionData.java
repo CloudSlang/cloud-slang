@@ -86,7 +86,7 @@ public class ActionExecutionData extends AbstractExecutionData {
             runEnv.getExecutionPath().getParentPath(),
             LanguageEventData.StepType.ACTION,
             null,
-            null,
+            callArgumentsDeepCopy,
             Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
         try {
             switch (actionType) {

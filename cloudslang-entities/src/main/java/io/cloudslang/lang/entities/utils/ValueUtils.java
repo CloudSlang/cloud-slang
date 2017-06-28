@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.utils;
 
-import com.sun.xml.internal.ws.developer.Serialization;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.StringUtils;
 
