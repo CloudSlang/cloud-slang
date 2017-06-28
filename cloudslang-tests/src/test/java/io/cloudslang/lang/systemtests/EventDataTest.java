@@ -304,8 +304,13 @@ public class EventDataTest extends SystemsTestsParent {
         List<ScoreEvent> events = runAndCollectAllEvents(compilationArtifact, inputs, systemProperties);
 
         Assert.assertFalse(CollectionUtils.isEmpty(events));
-        Assert.assertEquals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, events.get(events.size() - 1).getEventType());
 
+        for (ScoreEvent scoreEvent : events) {
+            if (ScoreLangConstants.SLANG_EXECUTION_EXCEPTION.equals(scoreEvent.getEventType())) {
+                return events;
+            }
+        }
+        fail("Exception event not received.");
         return events;
     }
 
