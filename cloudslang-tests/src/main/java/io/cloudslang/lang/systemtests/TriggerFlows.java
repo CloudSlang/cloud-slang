@@ -151,7 +151,7 @@ public class TriggerFlows {
 
         ScoreEventListener allEventsListener = new ScoreEventListener() {
             @Override
-            public void onEvent(ScoreEvent event) throws InterruptedException {
+            public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
                 events.add(event);
             }
         };

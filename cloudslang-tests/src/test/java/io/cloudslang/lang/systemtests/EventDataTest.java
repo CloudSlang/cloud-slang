@@ -287,11 +287,15 @@ public class EventDataTest extends SystemsTestsParent {
         List<ScoreEvent> events = runAndCollectAllEvents(compilationArtifact, inputs, systemProperties);
 
         Assert.assertFalse(CollectionUtils.isEmpty(events));
-        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, events.get(events.size() - 1).getEventType());
+        for (ScoreEvent scoreEvent : events) {
+            if (ScoreLangConstants.EVENT_EXECUTION_FINISHED.equals(scoreEvent.getEventType())) {
+                return events;
+            }
+        }
+        fail("Finished event not received.");
 
         return events;
     }
-
 
     private List<ScoreEvent> compileAndRunExecutableWithException(
         Map<String, Value> inputs,
