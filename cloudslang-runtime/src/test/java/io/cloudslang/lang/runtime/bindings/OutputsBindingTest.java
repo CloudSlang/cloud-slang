@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * (c) Copyright 2016 Hewlett-Packard Development Company, L.P.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0 which accompany this distribution.
+ *
+ * The Apache License is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.dependency.api.services.DependencyService;
@@ -59,7 +68,7 @@ public class OutputsBindingTest {
         List<Output> outputs = new LinkedList<>();
 
         Map<String, Value> result = outputsBinding
-                .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
+            .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
 
         Assert.assertTrue("result cannot be null", result != null);
         Assert.assertTrue("result should be empty", result.isEmpty());
@@ -72,7 +81,7 @@ public class OutputsBindingTest {
         List<Output> outputs = singletonList(createNoExpressionOutput("host1"));
 
         Map<String, Value> result = outputsBinding
-                .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
+            .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
 
         Map<String, Value> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", ValueFactory.create("valueHost1"));
@@ -87,7 +96,7 @@ public class OutputsBindingTest {
         List<Output> outputs = Arrays.asList(createNoExpressionOutput("host1"), createNoExpressionOutput("host2"));
 
         Map<String, Value> result = outputsBinding
-                .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
+            .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
 
         Map<String, Value> expectedOutputs = new HashMap<>();
         expectedOutputs.put("host1", ValueFactory.create("valueHost1"));
@@ -103,7 +112,7 @@ public class OutputsBindingTest {
         List<Output> outputs = singletonList(createNoExpressionOutput("actionOutputKey1"));
 
         Map<String, Value> boundOutputs = outputsBinding
-                .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
+            .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
         Assert.assertTrue(boundOutputs.containsKey("actionOutputKey1"));
         Assert.assertEquals(null, boundOutputs.get("actionOutputKey1").get());
     }
@@ -122,10 +131,10 @@ public class OutputsBindingTest {
         Map<String, Value> operationContext = prepareOperationContext();
         Map<String, Value> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = singletonList(
-                createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
+            createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
 
         Map<String, Value> result = outputsBinding
-                .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
+            .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
 
         Map<String, Value> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", ValueFactory.create("http://hostExpr:9999"));
@@ -138,13 +147,13 @@ public class OutputsBindingTest {
         Map<String, Value> operationContext = prepareOperationContext();
         Map<String, Value> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Lists.newArrayList(
-                createExpressionOutput("output1", "1"),
-                createExpressionOutput("output2", "2"),
-                createExpressionOutput("output3", "3")
+            createExpressionOutput("output1", "1"),
+            createExpressionOutput("output2", "2"),
+            createExpressionOutput("output3", "3")
         );
 
         Map<String, Value> result = outputsBinding
-                .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
+            .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
 
         List<String> actualInputNames = Lists.newArrayList(result.keySet());
         List<String> expectedInputNames = Lists.newArrayList("output1", "output2", "output3");
@@ -157,8 +166,8 @@ public class OutputsBindingTest {
         Map<String, Value> operationContext = prepareOperationContext();
         Map<String, Value> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = singletonList(
-                createExpressionOutput("hostFromExpression",
-                        "${ 'http://' + hostExpr + ':' + str(self[SHOULD_BE_STRING]) }"));
+            createExpressionOutput("hostFromExpression",
+                "${ 'http://' + hostExpr + ':' + str(self[SHOULD_BE_STRING]) }"));
 
         outputsBinding.bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
     }
@@ -168,11 +177,11 @@ public class OutputsBindingTest {
         Map<String, Value> operationContext = prepareOperationContext();
         Map<String, Value> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(
-                createNoExpressionOutput("host1"),
-                createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
+            createNoExpressionOutput("host1"),
+            createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
 
         Map<String, Value> result = outputsBinding
-                .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
+            .bindOutputs(MapUtils.mergeMaps(operationContext, actionReturnValues), EMPTY_SET, outputs);
 
         Map<String, Value> expectedOutputs = new HashMap<>();
         expectedOutputs.put("hostFromExpression", ValueFactory.create("http://hostExpr:9999"));
