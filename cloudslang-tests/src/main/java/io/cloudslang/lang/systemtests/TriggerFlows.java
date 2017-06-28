@@ -157,8 +157,18 @@ public class TriggerFlows {
         };
 
         slang.subscribeOnEvents(allEventsListener, ALL_CLOUDSLANG_EVENTS);
-        runSync(compilationArtifact, userInputs, systemProperties, false);
+        ScoreEvent finishEvent = runSync(compilationArtifact, userInputs, systemProperties, false);
         slang.unSubscribeOnEvents(allEventsListener);
+
+        // make sure finish event is saved
+        for (ScoreEvent scoreEvent : events) {
+            String eventType = scoreEvent.getEventType();
+            if (ScoreLangConstants.SLANG_EXECUTION_EXCEPTION.equals(eventType) ||
+                ScoreLangConstants.EVENT_EXECUTION_FINISHED.equals(eventType)) {
+                return events;
+            }
+        }
+        events.add(finishEvent);
 
         return events;
     }
