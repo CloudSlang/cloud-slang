@@ -18,39 +18,72 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TriggerFlows {
 
     private static final HashSet<String> FINISHED_EVENTS =
-            Sets.newHashSet(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
+        Sets.newHashSet(ScoreLangConstants.EVENT_EXECUTION_FINISHED, ScoreLangConstants.SLANG_EXECUTION_EXCEPTION);
 
     private static final HashSet<String> STEP_EVENTS =
-            Sets.newHashSet(
-                    ScoreLangConstants.EVENT_INPUT_END,
-                    ScoreLangConstants.EVENT_OUTPUT_END,
-                    ScoreLangConstants.EVENT_ARGUMENT_START,
-                    ScoreLangConstants.EVENT_ARGUMENT_END
-            );
+        Sets.newHashSet(
+            ScoreLangConstants.EVENT_INPUT_END,
+            ScoreLangConstants.EVENT_OUTPUT_END,
+            ScoreLangConstants.EVENT_ARGUMENT_START,
+            ScoreLangConstants.EVENT_ARGUMENT_END
+        );
 
     private static final HashSet<String> BRANCH_EVENTS = Sets.newHashSet(ScoreLangConstants.EVENT_BRANCH_END);
 
     private static final HashSet<String> PARALLEL_LOOP_EVENTS =
-            Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
+        Sets.newHashSet(ScoreLangConstants.EVENT_JOIN_BRANCHES_END);
+
+    private static final HashSet<String> ALL_CLOUDSLANG_EVENTS =
+        Sets.newHashSet(
+            ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
+            ScoreLangConstants.EVENT_ACTION_START,
+            ScoreLangConstants.EVENT_ACTION_END,
+            ScoreLangConstants.EVENT_ACTION_ERROR,
+            ScoreLangConstants.EVENT_INPUT_START,
+            ScoreLangConstants.EVENT_INPUT_END,
+            ScoreLangConstants.EVENT_STEP_START,
+            ScoreLangConstants.EVENT_ARGUMENT_START,
+            ScoreLangConstants.EVENT_ARGUMENT_END,
+            ScoreLangConstants.EVENT_OUTPUT_START,
+            ScoreLangConstants.EVENT_OUTPUT_END,
+            ScoreLangConstants.EVENT_EXECUTION_FINISHED,
+            ScoreLangConstants.EVENT_BRANCH_START,
+            ScoreLangConstants.EVENT_BRANCH_END,
+            ScoreLangConstants.EVENT_SPLIT_BRANCHES,
+            ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
+            ScoreLangConstants.EVENT_JOIN_BRANCHES_END
+        );
 
     @Autowired
     private Slang slang;
 
     public ScoreEvent runSync(
-            CompilationArtifact compilationArtifact,
-            Map<String, Value> userInputs,
-            Set<SystemProperty> systemProperties) {
+        CompilationArtifact compilationArtifact,
+        Map<String, Value> userInputs,
+        Set<SystemProperty> systemProperties) {
+        return runSync(compilationArtifact, userInputs, systemProperties, true);
+    }
+
+    public ScoreEvent runSync(
+        CompilationArtifact compilationArtifact,
+        Map<String, Value> userInputs,
+        Set<SystemProperty> systemProperties,
+        boolean shouldFail) {
         final BlockingQueue<ScoreEvent> finishEvent = new LinkedBlockingQueue<>();
         ScoreEventListener finishListener = new ScoreEventListener() {
             @Override
@@ -70,7 +103,7 @@ public class TriggerFlows {
                 long executionIdFromEvent = (long) ((Map) event.getData()).get(LanguageEventData.EXECUTION_ID);
                 finishEventReceived = executionId == executionIdFromEvent;
             }
-            if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION)) {
+            if (event.getEventType().equals(ScoreLangConstants.SLANG_EXECUTION_EXCEPTION) && shouldFail) {
                 LanguageEventData languageEvent = (LanguageEventData) event.getData();
                 throw new RuntimeException(languageEvent.getException());
             }
@@ -81,8 +114,10 @@ public class TriggerFlows {
         }
     }
 
-    public RuntimeInformation runWithData(CompilationArtifact compilationArtifact,
-                                          Map<String, Value> userInputs, Set<SystemProperty> systemProperties) {
+    public RuntimeInformation runWithData(
+        CompilationArtifact compilationArtifact,
+        Map<String, Value> userInputs,
+        Set<SystemProperty> systemProperties) {
         RunDataAggregatorListener runDataAggregatorListener = new RunDataAggregatorListener();
         slang.subscribeOnEvents(runDataAggregatorListener, STEP_EVENTS);
 
@@ -107,4 +142,34 @@ public class TriggerFlows {
         return runtimeInformation;
     }
 
+
+    public List<ScoreEvent> runAndCollectAllEvents(
+        CompilationArtifact compilationArtifact,
+        Map<String, Value> userInputs,
+        Set<SystemProperty> systemProperties) {
+        final List<ScoreEvent> events = Collections.synchronizedList(new ArrayList<ScoreEvent>());
+
+        ScoreEventListener allEventsListener = new ScoreEventListener() {
+            @Override
+            public synchronized void onEvent(ScoreEvent event) throws InterruptedException {
+                events.add(event);
+            }
+        };
+
+        slang.subscribeOnEvents(allEventsListener, ALL_CLOUDSLANG_EVENTS);
+        ScoreEvent finishEvent = runSync(compilationArtifact, userInputs, systemProperties, false);
+        slang.unSubscribeOnEvents(allEventsListener);
+
+        // make sure finish event is saved
+        for (ScoreEvent scoreEvent : events) {
+            String eventType = scoreEvent.getEventType();
+            if (ScoreLangConstants.SLANG_EXECUTION_EXCEPTION.equals(eventType) ||
+                ScoreLangConstants.EVENT_EXECUTION_FINISHED.equals(eventType)) {
+                return events;
+            }
+        }
+        events.add(finishEvent);
+
+        return events;
+    }
 }

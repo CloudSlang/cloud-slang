@@ -10,7 +10,7 @@
 package io.cloudslang.lang.runtime.configuration;
 
 
-import io.cloudslang.lang.entities.SlangSystemPropertyConstant;
+import io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant;
 import io.cloudslang.runtime.impl.RuntimeManagementConfiguration;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;

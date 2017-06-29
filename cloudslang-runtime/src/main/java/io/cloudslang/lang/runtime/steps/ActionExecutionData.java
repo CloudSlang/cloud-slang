@@ -22,12 +22,14 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -59,7 +61,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     public void doAction(@Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA)
-                                 Map<String, Object> nonSerializableExecutionData,
+                             Map<String, Object> nonSerializableExecutionData,
                          @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
                          @Param(ScoreLangConstants.JAVA_ACTION_CLASS_KEY) String className,
@@ -77,15 +79,20 @@ public class ActionExecutionData extends AbstractExecutionData {
         }
 
         Map<String, SerializableSessionObject> serializableSessionData = runEnv.getSerializableDataMap();
-        fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_START, "Preparing to run action " +
-                        actionType,
-                runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
-                Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
+        fireEvent(
+            executionRuntimeServices,
+            ScoreLangConstants.EVENT_ACTION_START,
+            "Preparing to run action " + actionType,
+            runEnv.getExecutionPath().getParentPath(),
+            LanguageEventData.StepType.ACTION,
+            null,
+            callArgumentsDeepCopy,
+            Pair.of(LanguageEventData.CALL_ARGUMENTS, (Serializable) callArgumentsDeepCopy));
         try {
             switch (actionType) {
                 case JAVA:
                     returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
-                            gav, className, methodName);
+                        gav, className, methodName);
                     break;
                 case PYTHON:
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
@@ -94,17 +101,30 @@ public class ActionExecutionData extends AbstractExecutionData {
                     break;
             }
         } catch (RuntimeException ex) {
-            fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_ERROR, ex.getMessage(),
-                    runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null,
-                    Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
+            fireEvent(
+                executionRuntimeServices,
+                ScoreLangConstants.EVENT_ACTION_ERROR,
+                ex.getMessage(),
+                runEnv.getExecutionPath().getParentPath(),
+                LanguageEventData.StepType.ACTION,
+                null,
+                callArgumentsDeepCopy,
+                Pair.of(LanguageEventData.EXCEPTION, ex.getMessage()));
             logger.error(ex);
             throw (ex);
         }
 
         ReturnValues returnValues = new ReturnValues(returnValue, null);
         runEnv.putReturnValues(returnValues);
-        fireEvent(executionRuntimeServices, ScoreLangConstants.EVENT_ACTION_END, "Action performed",
-                runEnv.getExecutionPath().getParentPath(), LanguageEventData.StepType.ACTION, null);
+        fireEvent(
+            executionRuntimeServices,
+            ScoreLangConstants.EVENT_ACTION_END,
+            "Action performed",
+            runEnv.getExecutionPath().getParentPath(),
+            LanguageEventData.StepType.ACTION,
+            null,
+            callArgumentsDeepCopy
+        );
 
         runEnv.putNextStepPosition(nextStepId);
     }
@@ -115,9 +135,9 @@ public class ActionExecutionData extends AbstractExecutionData {
                                              Map<String, Object> nonSerializableExecutionData,
                                              String gav, String className, String methodName) {
         Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService
-                .execute(normalizeJavaGav(gav), className, methodName,
+            .execute(normalizeJavaGav(gav), className, methodName,
                 new CloudSlangJavaExecutionParameterProvider(serializableSessionData,
-                        createActionContext(currentContext), nonSerializableExecutionData));
+                    createActionContext(currentContext), nonSerializableExecutionData));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
@@ -162,7 +182,7 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     private Set<String> normalizePythonDependencies(Collection<String> dependencies) {
         Set<String> pythonDependencies = dependencies == null || dependencies.isEmpty() ?
-                Sets.<String>newHashSet() : new HashSet<>(dependencies);
+            Sets.<String>newHashSet() : new HashSet<>(dependencies);
         Set<String> normalizedDependencies = new HashSet<>(pythonDependencies.size());
         for (String dependency : pythonDependencies) {
             normalizedDependencies.add(normalizeGav(dependency, PACKAGING_TYPE_ZIP));
@@ -174,7 +194,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                                                          Map<String, Value> callArguments) {
         if (StringUtils.isNotBlank(pythonScript)) {
             return scriptExecutor.executeScript(
-                    normalizePythonDependencies(dependencies), pythonScript, callArguments);
+                normalizePythonDependencies(dependencies), pythonScript, callArguments);
         }
 
         throw new RuntimeException("Python script not found in action data");

@@ -7,15 +7,15 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.entities;
+package io.cloudslang.lang.entities.properties;
 
-public enum SlangSystemPropertyConstant {
-    CSLANG_ENCODING("cslang.encoding"),
-    LOG4J_CONFIGURATION("log4j.configuration");
+public enum EventVerbosityLevel {
+    ALL("all"),
+    DEFAULT("default");
 
     private final String value;
 
-    SlangSystemPropertyConstant(String value) {
+    EventVerbosityLevel(String value) {
         this.value = value;
     }
 

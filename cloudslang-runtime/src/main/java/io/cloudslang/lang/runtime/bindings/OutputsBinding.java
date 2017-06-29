@@ -16,6 +16,8 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +40,11 @@ public class OutputsBinding extends AbstractBinding {
 
     public Map<String, Value> bindOutputs(
             Map<String, Value> initialContext,
-            Map<String, Value> returnContext,
             Set<SystemProperty> systemProperties,
             List<Output> possibleOutputs) {
 
         Map<String, Value> outputs = new LinkedHashMap<>();
-        Map<String, Value> scriptContext = MapUtils.mergeMaps(initialContext, returnContext);
+        Map<String, Value> context = new HashMap<>(initialContext);
 
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
@@ -54,10 +55,10 @@ public class OutputsBinding extends AbstractBinding {
                 String expressionToEvaluate = extractExpression(rawValue == null ? null : rawValue.get());
                 if (expressionToEvaluate != null) {
                     // initialize with null value if key does not exist
-                    scriptContext.put(outputKey, scriptContext.get(outputKey));
+                    context.put(outputKey, context.get(outputKey));
                     try {
                         //evaluate expression
-                        Value value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext,
+                        Value value = scriptEvaluator.evalExpr(expressionToEvaluate, context,
                                 systemProperties, output.getFunctionDependencies());
                         valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive());
                     } catch (Throwable t) {
@@ -66,7 +67,7 @@ public class OutputsBinding extends AbstractBinding {
                 }
                 validateStringValue(errorMessagePrefix, valueToAssign);
                 outputs.put(outputKey, valueToAssign);
-                scriptContext.put(outputKey, valueToAssign);
+                context.put(outputKey, valueToAssign);
             }
         }
         return outputs;
