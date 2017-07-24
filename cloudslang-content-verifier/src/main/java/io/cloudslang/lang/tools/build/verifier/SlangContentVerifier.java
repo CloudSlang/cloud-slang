@@ -73,13 +73,12 @@ public class SlangContentVerifier {
         loggingService.logEvent(Level.INFO, "");
         Queue<RuntimeException> exceptions = new ArrayDeque<>();
         String errorMessagePrefixMetadata = "";
-        String errorMessagePrefixCompilation = "";
         for (File slangFile: slangFiles) {
             Executable sourceModel = null;
             try {
                 errorMessagePrefixMetadata = "Failed to extract metadata for file: \'" +
                     slangFile.getAbsoluteFile() + "\'.\n";
-                errorMessagePrefixCompilation = "Failed to compile file: \'" +
+                String errorMessagePrefixCompilation = "Failed to compile file: \'" +
                     slangFile.getAbsoluteFile() + "\'.\n";
 
                 Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() +
