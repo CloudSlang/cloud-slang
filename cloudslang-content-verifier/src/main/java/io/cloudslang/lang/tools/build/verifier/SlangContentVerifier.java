@@ -72,11 +72,14 @@ public class SlangContentVerifier {
         loggingService.logEvent(Level.INFO, slangFiles.size() + " .sl files were found");
         loggingService.logEvent(Level.INFO, "");
         Queue<RuntimeException> exceptions = new ArrayDeque<>();
-        String errorMessagePrefix = "";
+        String errorMessagePrefixMetadata = "";
+        String errorMessagePrefixCompilation = "";
         for (File slangFile: slangFiles) {
             Executable sourceModel = null;
             try {
-                errorMessagePrefix = "Failed to extract metadata for file: \'" +
+                errorMessagePrefixMetadata = "Failed to extract metadata for file: \'" +
+                    slangFile.getAbsoluteFile() + "\'.\n";
+                errorMessagePrefixCompilation = "Failed to compile file: \'" +
                     slangFile.getAbsoluteFile() + "\'.\n";
 
                 Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() +
@@ -85,12 +88,12 @@ public class SlangContentVerifier {
 
                 ExecutableModellingResult preCompileResult = slangCompiler.preCompileSource(slangSource);
                 sourceModel = preCompileResult.getExecutable();
-                exceptions.addAll(preCompileResult.getErrors());
+                exceptions.addAll(prependPrefix(preCompileResult.getErrors(), errorMessagePrefixCompilation));
 
                 MetadataModellingResult metadataResult = metadataExtractor
                         .extractMetadataModellingResult(slangSource, shouldValidateCheckstyle);
                 Metadata sourceMetadata = metadataResult.getMetadata();
-                exceptions.addAll(prependPrefix(metadataResult.getErrors(), errorMessagePrefix));
+                exceptions.addAll(prependPrefix(metadataResult.getErrors(), errorMessagePrefixMetadata));
 
                 if (sourceModel != null) {
                     int size = exceptions.size();
@@ -101,7 +104,7 @@ public class SlangContentVerifier {
                     }
                 }
             } catch (Exception e) {
-                String errorMessage = errorMessagePrefix + e.getMessage();
+                String errorMessage = errorMessagePrefixMetadata + e.getMessage();
                 loggingService.logEvent(Level.ERROR, errorMessage);
                 exceptions.add(new RuntimeException(errorMessage, e));
                 if (e instanceof MetadataMissingException && sourceModel != null) {
