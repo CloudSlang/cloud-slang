@@ -11,11 +11,18 @@ package io.cloudslang.lang.runtime.navigations;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.steps.AbstractExecutionData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -39,16 +46,33 @@ public class Navigations {
 
         // If we have an error key stored, we fire an error event and return null as the next position
         if (executionRuntimeServices.hasStepErrorKey()) {
-            AbstractExecutionData.fireEvent(executionRuntimeServices, runEnv,
-                    ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
-                    "Error detected during step", LanguageEventData.StepType.NAVIGATION, null,
-                    Pair.of(LanguageEventData.EXCEPTION, executionRuntimeServices.getStepErrorKey()));
+            AbstractExecutionData.fireEvent(
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.SLANG_EXECUTION_EXCEPTION,
+                "Error detected during step",
+                LanguageEventData.StepType.NAVIGATION,
+                null,
+                extractContext(runEnv),
+                Pair.of(LanguageEventData.EXCEPTION, executionRuntimeServices.getStepErrorKey()));
             throw new RuntimeException(executionRuntimeServices.getStepErrorKey());
         }
 
         // return the next step position from the run env
         return runEnv.removeNextStepPosition();
 
+    }
+
+    private Map<String, Value> extractContext(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv) {
+        Context context = runEnv.getStack().popContext();
+        Map<String, Value> contextMap;
+        if (context != null) {
+            runEnv.getStack().pushContext(context);
+            contextMap = context.getImmutableViewOfVariables();
+        } else {
+            contextMap = new HashMap<>();
+        }
+        return contextMap;
     }
 
 }

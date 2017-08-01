@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.properties.EventVerbosityLevel;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
 import java.io.File;
@@ -36,6 +37,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static ch.lambdaj.Lambda.select;
+import static io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant.CSLANG_RUNTIME_EVENTS_VERBOSITY;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -98,6 +100,8 @@ public abstract class SystemsTestsParent {
         String provideralAlreadyConfigured = System.setProperty("python.executor.engine",
                 PythonExecutionCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
+
+        System.setProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(), EventVerbosityLevel.DEFAULT.getValue());
     }
 
     @Autowired
@@ -111,6 +115,13 @@ public abstract class SystemsTestsParent {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
+
+    public List<ScoreEvent>  runAndCollectAllEvents(
+        CompilationArtifact compilationArtifact,
+        Map<String, Value> userInputs,
+        Set<SystemProperty> systemProperties) {
+        return triggerFlows.runAndCollectAllEvents(compilationArtifact, userInputs, systemProperties);
+    }
 
     protected ScoreEvent trigger(CompilationArtifact compilationArtifact, Map<String, Value> userInputs,
                                  Set<SystemProperty> systemProperties) {

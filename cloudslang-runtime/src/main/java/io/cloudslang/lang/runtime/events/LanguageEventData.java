@@ -46,6 +46,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String NEXT_STEP_POSITION = "nextPosition";
     public static final String STEP_TYPE = "STEP_TYPE";
     public static final String STEP_NAME = "STEP_NAME";
+    public static final String CONTEXT = "CONTEXT";
 
     public enum StepType {
         FLOW("flow"),
@@ -201,6 +202,14 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
     public void setParallelLoopBoundExpression(List<Serializable> parallelLoopBoundExpression) {
         put(BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) parallelLoopBoundExpression);
+    }
+
+    public Map<String, Serializable> getContext() {
+        return (Map<String, Serializable>) get(CONTEXT);
+    }
+
+    public void setContext(Map<String, Serializable> context) {
+        put(CONTEXT, (Serializable) context);
     }
 
     @SuppressWarnings("unchecked")
