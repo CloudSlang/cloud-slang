@@ -1,136 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-        (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
+        (c) Copyright 2014-2017 Hewlett-Packard Development Company, L.P.
         All rights reserved. This program and the accompanying materials
         are made available under the terms of the Apache License v2.0 which accompany this distribution.
 
         The Apache License is available at
         http://www.apache.org/licenses/LICENSE-2.0
     -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cloudslang-cli</artifactId>
 
     <parent>
-        <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
+        <artifactId>cloudslang</artifactId>
         <version>1.0.8-SNAPSHOT</version>
     </parent>
 
+    <artifactId>cloudslang-cli</artifactId>
+
     <dependencies>
+
+        <!-- Declare module dependencies  -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-api-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-entities</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-all</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-compiler</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Declare score dependency  -->
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>score-api</artifactId>
         </dependency>
 
+        <!-- Declare spring dependencies  -->
         <dependency>
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
 
+        <!-- Declare parent dependencies  -->
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
             <version>2.12</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-core</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.googlecode.lambdaj</groupId>
             <artifactId>lambdaj</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
@@ -141,7 +132,6 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.mattbertolini</groupId>
             <artifactId>liquibase-slf4j</artifactId>
@@ -243,7 +233,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>${plugins.maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>unpack</id>
@@ -257,7 +246,7 @@
                                     <artifactId>apache-maven</artifactId>
                                     <classifier>bin</classifier>
                                     <type>zip</type>
-                                    <version>3.3.9</version>
+                                    <version>3.5.0</version>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${basedir}/target/cslang-cli/maven</outputDirectory>
                                     <destFileName>maven</destFileName>
@@ -315,29 +304,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <unzip src="${basedir}/src/main/resources/dependency-base.zip" dest="${basedir}/target/cslang-cli/maven/repo">
-                                    <patternset>
-                                        <exclude name="**/*.path" />
-                                    </patternset>
-                                </unzip>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
@@ -360,8 +326,31 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
+                <version>1.4.5</version>
             </plugin>
 
+            <!--Package cloudslang-cli to Windows and Linux archives.-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>dist</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src${file.separator}main${file.separator}resources${file.separator}package.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+
+        <finalName>cslang</finalName>
+
     </build>
 </project>

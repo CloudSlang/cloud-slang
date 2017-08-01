@@ -4,23 +4,15 @@ jdk:
   - oraclejdk8
   - openjdk7
 
-before_deploy: >
-  ant -f build/ant.xml
-  
-deploy:
-  provider: releases
-  prerelease: true
-  api_key:
-    secure: "yJHXG2Cn0v4mofCEF58eAnmOM3CzewEa42YPormioOYq0iQHNoF7NdNN7xpItIVoxmp383WsYGDeYeCzFhd4K+4xVQt1n3/jG1E3AJbSGJ7IEWUygUNec7HWS+q+yR911rMIPo8MiIZMjZFxCd4f8zaTqO0WQUui1v+QWHF9rAo="
-  file:
-    - build/target/cli/cslang-cli.zip
-    - build/target/cli/cslang-cli.tar.gz
-    - build/target/builder/cslang-builder.zip
-  skip_cleanup: true
-  on:
-    repo: CloudSlang/cloud-slang
-    tags: true
-    jdk: openjdk7
+cache:
+  directories:
+    - "$HOME/.m2/repository"
+    - "$HOME/apache-maven-3.5.0"
+
+before_install:
+  - export M2_HOME=$HOME/apache-maven-3.5.0
+  - if [ ! -d $M2_HOME/bin ]; then curl https://archive.apache.org/dist/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz | tar zxf - -C $HOME; fi
+  - export PATH=$M2_HOME/bin:$PATH
 
 after_success:
   - mvn cobertura:cobertura coveralls:report
