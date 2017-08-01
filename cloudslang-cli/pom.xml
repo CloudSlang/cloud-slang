@@ -14,8 +14,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
+        <artifactId>cloudslang</artifactId>
         <version>1.0.8-SNAPSHOT</version>
     </parent>
 
@@ -246,7 +246,7 @@
                                     <artifactId>apache-maven</artifactId>
                                     <classifier>bin</classifier>
                                     <type>zip</type>
-                                    <version>3.3.9</version>
+                                    <version>3.5.0</version>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${basedir}/target/cslang-cli/maven</outputDirectory>
                                     <destFileName>maven</destFileName>
@@ -329,6 +329,28 @@
                 <version>1.4.5</version>
             </plugin>
 
+            <!--Package cloudslang-cli to Windows and Linux archives.-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>dist</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src${file.separator}main${file.separator}resources${file.separator}package.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+
+        <finalName>cslang</finalName>
+
     </build>
 </project>
