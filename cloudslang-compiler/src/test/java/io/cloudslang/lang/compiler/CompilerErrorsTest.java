@@ -12,13 +12,6 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.Set;
-
-import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,6 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -280,17 +278,6 @@ public class CompilerErrorsTest {
         exception.expectMessage("Cannot compile flow 'step_with_missing_navigation_from_operation_result_flow' " +
                 "since for step 'step1' the results [FAILURE] of its dependency 'user.ops.java_op' " +
                 "have no matching navigation.");
-        compiler.compile(SlangSource.fromFile(resource), path);
-    }
-
-    @Test
-    public void testFlowWithMissingImports() throws Exception {
-        final URI resource = getClass().getResource("/corrupted/missing_dependencies_imports_flow.sl").toURI();
-
-        final Set<SlangSource> path = new HashSet<>();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Source missing_dependencies_imports_flow has " +
-                "dependencies but no path was given to the compiler");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

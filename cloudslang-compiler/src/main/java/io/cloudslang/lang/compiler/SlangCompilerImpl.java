@@ -28,6 +28,10 @@ import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.NotImplementedException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +40,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.NotImplementedException;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -143,8 +144,6 @@ public class SlangCompilerImpl implements SlangCompiler {
                 executablePairs.put(preCompiledCurrentSource, currentSource);
             }
         }
-
-        executablePairs.remove(executableModellingResult.getExecutable());
 
         CompilationModellingResult result = scoreCompiler
                 .compileSource(executableModellingResult.getExecutable(), executablePairs.keySet());
