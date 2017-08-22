@@ -14,11 +14,6 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -29,6 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -54,12 +53,6 @@ public class CompileDependenciesTest {
         final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
         Set<SlangSource> path = new HashSet<>();
         compiler.compile(SlangSource.fromFile(flow), path);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullPathButThereAreImports() throws Exception {
-        final URI flow = getClass().getResource("/basic_flow.yaml").toURI();
-        compiler.compile(SlangSource.fromFile(flow), null);
     }
 
     @Test
@@ -173,6 +166,15 @@ public class CompileDependenciesTest {
 
         Assert.assertTrue(path.contains(flowSource));
         CompilationArtifact compilationArtifact = compiler.compile(flowSource, path);
+        Assert.assertNotNull(compilationArtifact);
+    }
+
+    @Test
+    public void testCompileWorksForSingleSelfReference() throws Exception {
+        final URI executable = getClass().getResource("/cornercases/selfreference.sl").toURI();
+        SlangSource executableSource = SlangSource.fromFile(executable);
+
+        CompilationArtifact compilationArtifact = compiler.compile(executableSource, new HashSet<SlangSource>());
         Assert.assertNotNull(compilationArtifact);
     }
 
