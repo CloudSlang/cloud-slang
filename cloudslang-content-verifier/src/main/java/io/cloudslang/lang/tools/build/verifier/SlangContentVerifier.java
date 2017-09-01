@@ -24,9 +24,11 @@ import io.cloudslang.lang.tools.build.validation.MetadataMissingException;
 import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -70,21 +72,27 @@ public class SlangContentVerifier {
         loggingService.logEvent(Level.INFO, slangFiles.size() + " .sl files were found");
         loggingService.logEvent(Level.INFO, "");
         Queue<RuntimeException> exceptions = new ArrayDeque<>();
+        String errorMessagePrefixMetadata = "";
         for (File slangFile: slangFiles) {
             Executable sourceModel = null;
             try {
+                errorMessagePrefixMetadata = "Failed to extract metadata for file: \'" +
+                    slangFile.getAbsoluteFile() + "\'.\n";
+                String errorMessagePrefixCompilation = "Failed to compile file: \'" +
+                    slangFile.getAbsoluteFile() + "\'.\n";
+
                 Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() +
                         "\' must lead to a file");
                 SlangSource slangSource = SlangSource.fromFile(slangFile);
 
                 ExecutableModellingResult preCompileResult = slangCompiler.preCompileSource(slangSource);
                 sourceModel = preCompileResult.getExecutable();
-                exceptions.addAll(preCompileResult.getErrors());
+                exceptions.addAll(prependPrefix(preCompileResult.getErrors(), errorMessagePrefixCompilation));
 
                 MetadataModellingResult metadataResult = metadataExtractor
                         .extractMetadataModellingResult(slangSource, shouldValidateCheckstyle);
                 Metadata sourceMetadata = metadataResult.getMetadata();
-                exceptions.addAll(metadataResult.getErrors());
+                exceptions.addAll(prependPrefix(metadataResult.getErrors(), errorMessagePrefixMetadata));
 
                 if (sourceModel != null) {
                     int size = exceptions.size();
@@ -95,8 +103,7 @@ public class SlangContentVerifier {
                     }
                 }
             } catch (Exception e) {
-                String errorMessage = "Failed to extract metadata for file: \'" +
-                        slangFile.getAbsoluteFile() + "\'.\n" + e.getMessage();
+                String errorMessage = errorMessagePrefixMetadata + e.getMessage();
                 loggingService.logEvent(Level.ERROR, errorMessage);
                 exceptions.add(new RuntimeException(errorMessage, e));
                 if (e instanceof MetadataMissingException && sourceModel != null) {
@@ -113,6 +120,18 @@ public class SlangContentVerifier {
         preCompileResult.addExceptions(exceptions);
         preCompileResult.addResults(slangModels);
         return preCompileResult;
+    }
+
+    private Collection<RuntimeException> prependPrefix(Collection<RuntimeException> errors, String prefix) {
+        List<RuntimeException> result = new ArrayList<>();
+        for (RuntimeException ex : errors) {
+            result.add(wrapWithPrefix(ex, prefix));
+        }
+        return result;
+    }
+
+    private RuntimeException wrapWithPrefix(RuntimeException rex, String prefix) {
+        return new RuntimeException(prefix + rex.getMessage(), rex);
     }
 
     public CompileResult compileSlangModels(Map<String, Executable> slangModels) {
