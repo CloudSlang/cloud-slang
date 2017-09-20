@@ -93,9 +93,9 @@ public class CompileDependenciesTest {
         path.add(SlangSource.fromFile(importedOperation2));
 
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
-        assertThat(compilationArtifact.getDependencies(), Matchers.<String, ExecutionPlan>hasKey("user.ops.test_op"));
+        assertThat(compilationArtifact.getDependencies(), Matchers.hasKey("user.ops.test_op"));
         assertThat(compilationArtifact.getDependencies(),
-                not(Matchers.<String, ExecutionPlan>hasKey("slang.sample.flows.SimpleFlow")));
+                not(Matchers.hasKey("slang.sample.flows.SimpleFlow")));
     }
 
     @Test
