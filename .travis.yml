@@ -2,7 +2,6 @@ language: java
 
 jdk:
   - oraclejdk8
-  - openjdk7
 
 before_deploy: >
   ant -f build/ant.xml
@@ -20,7 +19,7 @@ deploy:
   on:
     repo: CloudSlang/cloud-slang
     tags: true
-    jdk: openjdk7
+    jdk: oraclejdk8
 
 after_success:
   - mvn cobertura:cobertura coveralls:report
