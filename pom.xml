@@ -518,9 +518,6 @@
                                     <requireMavenVersion>
                                         <version>3.0.4</version>
                                     </requireMavenVersion>
-                                    <requireJavaVersion>
-                                        <version>1.7</version>
-                                    </requireJavaVersion>
                                 </rules>
                             </configuration>
                         </execution>
