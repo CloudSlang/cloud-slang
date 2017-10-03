@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
+import io.cloudslang.lang.compiler.modeller.model.External;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
@@ -19,12 +20,13 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -209,5 +211,10 @@ public class ExecutionPlanBuilder {
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {
         this.stepFactory = stepFactory;
+    }
+
+    public ExecutionPlan createExternalExecutionPlan(External executable) {
+        //TODO executionPlan
+        return new ExecutionPlan();
     }
 }

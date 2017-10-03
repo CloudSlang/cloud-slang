@@ -18,6 +18,7 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.InOutTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -25,6 +26,9 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,8 +38,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
@@ -115,7 +117,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         validateFileName(executableName, parsedSlang, result);
         validateInputNamesDifferentFromOutputNames(result);
 
-        if (SlangTextualKeys.FLOW_TYPE.equals(result.getExecutable().getType())) {
+        if (ExecutableType.FLOW.equals(result.getExecutable().getType())) {
             validateFlow((Flow) result.getExecutable(), result);
         }
 

@@ -13,19 +13,22 @@ package io.cloudslang.lang.compiler.modeller;
  * Created by orius123 on 05/11/14.
  */
 
-import ch.lambdaj.Lambda;
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.constants.Messages;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.Validate;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,9 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.Validate;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
@@ -53,12 +53,14 @@ public class DependenciesHelper {
         Validate.notNull(availableDependencies);
 
         switch (executable.getType()) {
-            case SlangTextualKeys.OPERATION_TYPE:
+            case OPERATION:
                 return new HashSet<>();
-            case SlangTextualKeys.DECISION_TYPE:
+            case DECISION:
                 return new HashSet<>();
-            case SlangTextualKeys.FLOW_TYPE:
+            case FLOW:
                 return processFlowForDependencies((Flow) executable, availableDependencies);
+            case EXTERNAL:
+                return new HashSet<>(); //TODO
             default:
                 throw new NotImplementedException(Messages.UNKNOWN_EXECUTABLE_TYPE);
         }
@@ -84,7 +86,7 @@ public class DependenciesHelper {
      */
     public Map<String, Executable> matchReferences(Executable executable,
                                                    Collection<Executable> availableDependencies) {
-        Validate.isTrue(executable.getType().equals(SlangTextualKeys.FLOW_TYPE),
+        Validate.isTrue(executable.getType().equals(ExecutableType.FLOW),
                 "Executable: \'" + executable.getId() + "\' is not a flow, therefore it has no references");
         Map<String, Executable> resolvedDependencies = new HashMap<>();
         return fetchFlowReferences(executable, availableDependencies, resolvedDependencies);
@@ -105,7 +107,7 @@ public class DependenciesHelper {
 
                 //first we put the reference on the map
                 resolvedDependencies.put(matchingRef.getId(), matchingRef);
-                if (matchingRef.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
+                if (matchingRef.getType().equals(ExecutableType.FLOW)) {
                     //if it is a flow  we recursively
                     resolvedDependencies
                             .putAll(fetchFlowReferences(matchingRef, availableDependencies, resolvedDependencies));

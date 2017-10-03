@@ -9,18 +9,18 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.model;
 
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.constants.Regex;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import io.cloudslang.lang.entities.constants.Regex;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -99,7 +99,7 @@ public abstract class Executable {
         return systemPropertyDependencies;
     }
 
-    public abstract String getType();
+    public abstract ExecutableType getType();
 
     @Override
     public boolean equals(Object o) {

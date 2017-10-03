@@ -10,12 +10,16 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import com.google.common.collect.Sets;
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
+import io.cloudslang.lang.entities.ExecutableType;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -23,11 +27,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -66,7 +65,7 @@ public class DependenciesHelperTest {
     @Test
     public void testFetchDependenciesOperation() throws Exception {
         Executable executable = mock(Executable.class);
-        when(executable.getType()).thenReturn(SlangTextualKeys.OPERATION_TYPE);
+        when(executable.getType()).thenReturn(ExecutableType.OPERATION);
 
         Set<String> result = dependenciesHelper.fetchDependencies(executable,
                 Collections.<String, Executable>emptyMap());
@@ -86,8 +85,8 @@ public class DependenciesHelperTest {
         Map<String, Executable> availableDependencies = new HashMap<>();
         availableDependencies.put(stepRefId, operation);
 
-        when(flow.getType()).thenReturn(SlangTextualKeys.FLOW_TYPE);
-        when(operation.getType()).thenReturn(SlangTextualKeys.OPERATION_TYPE);
+        when(flow.getType()).thenReturn(ExecutableType.FLOW);
+        when(operation.getType()).thenReturn(ExecutableType.OPERATION);
         when(flow.getWorkflow()).thenReturn(workflow);
         when(workflow.getSteps()).thenReturn(steps);
         when(step.getRefId()).thenReturn(stepRefId);

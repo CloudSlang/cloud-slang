@@ -11,7 +11,18 @@ package io.cloudslang.lang.entities;
 
 public enum ExecutableType {
 
-    OPERATION,
-    FLOW,
-    DECISION
+    OPERATION("operation"),
+    FLOW("flow"),
+    DECISION("decision"),
+    EXTERNAL("external");
+
+    private final String value;
+
+    ExecutableType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

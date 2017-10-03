@@ -14,6 +14,7 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -57,7 +58,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
             List<RuntimeException> errors,
             boolean recursive) {
         //validate that all required & non private parameters with no default value of a reference are provided
-        if (!SlangTextualKeys.FLOW_TYPE.equals(executable.getType()) || verifiedExecutables.contains(executable)) {
+        if (!ExecutableType.FLOW.equals(executable.getType()) || verifiedExecutables.contains(executable)) {
             return errors;
         }
         verifiedExecutables.add(executable);

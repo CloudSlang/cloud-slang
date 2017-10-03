@@ -9,14 +9,17 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.model;
 
-import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static io.cloudslang.lang.entities.ExecutableType.DECISION;
 
 /**
  * @author Bonczidai Levente
@@ -39,8 +42,8 @@ public class Decision extends Executable {
     }
 
     @Override
-    public String getType() {
-        return SlangTextualKeys.DECISION_TYPE;
+    public ExecutableType getType() {
+        return DECISION;
     }
 
 }

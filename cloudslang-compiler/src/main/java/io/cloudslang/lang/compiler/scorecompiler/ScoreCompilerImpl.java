@@ -10,19 +10,23 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.function.convert.Converter;
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.model.External;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -31,8 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -61,7 +63,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         Map<String, Executable> filteredDependencies = new HashMap<>();
         //we handle dependencies only if the file has imports
         boolean hasDependencies = CollectionUtils.isNotEmpty(executable.getExecutableDependencies()) &&
-                executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
+                executable.getType().equals(ExecutableType.FLOW);
         if (hasDependencies) {
             try {
                 Validate.notEmpty(path, "Source " + executable.getName() +
@@ -118,7 +120,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     private void handleOnFailureCustomResults(Executable executable, Map<String, Executable> filteredDependencies) {
         handleOnFailureStepCustomResults((Flow) executable, filteredDependencies);
         for (Executable dependency : filteredDependencies.values()) {
-            if (dependency.getType().equals(SlangTextualKeys.FLOW_TYPE)) {
+            if (dependency.getType().equals(ExecutableType.FLOW)) {
                 handleOnFailureStepCustomResults((Flow) dependency, filteredDependencies);
             }
         }
@@ -167,12 +169,14 @@ public class ScoreCompilerImpl implements ScoreCompiler {
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
 
         switch (executable.getType()) {
-            case SlangTextualKeys.OPERATION_TYPE:
+            case OPERATION:
                 return executionPlanBuilder.createOperationExecutionPlan((Operation) executable);
-            case SlangTextualKeys.FLOW_TYPE:
+            case FLOW:
                 return executionPlanBuilder.createFlowExecutionPlan((Flow) executable);
-            case SlangTextualKeys.DECISION_TYPE:
+            case DECISION:
                 return executionPlanBuilder.createDecisionExecutionPlan((Decision) executable);
+            case EXTERNAL:
+                return executionPlanBuilder.createExternalExecutionPlan((External) executable); //TODO
             default:
                 throw new RuntimeException("Executable: " + executable.getName() +
                         " cannot be compiled to an ExecutionPlan since it is not of type flow, operation or decision");
