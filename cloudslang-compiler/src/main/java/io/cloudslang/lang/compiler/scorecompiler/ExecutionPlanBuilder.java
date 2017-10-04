@@ -141,10 +141,18 @@ public class ExecutionPlanBuilder {
                     )
             );
         }
-        stepExecutionSteps.add(
-                stepFactory.createBeginStepStep(currentId++, step.getArguments(),
-                        step.getPreStepActionData(), step.getRefId(), stepName)
-        );
+
+        if (false) { // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
+            stepExecutionSteps.add(
+                    stepFactory.createBeginExternalStepStep(currentId++, step.getArguments(),
+                            step.getPreStepActionData(), step.getRefId(), stepName)
+            );
+        } else {
+            stepExecutionSteps.add(
+                    stepFactory.createBeginStepStep(currentId++, step.getArguments(),
+                            step.getPreStepActionData(), step.getRefId(), stepName)
+            );
+        }
 
         //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -164,19 +172,33 @@ public class ExecutionPlanBuilder {
             }
         }
         if (parallelLoop) {
-            stepExecutionSteps.add(
-                    stepFactory.createFinishStepStep(currentId++, step.getPostStepActionData(),
-                            new HashMap<String, ResultNavigation>(), stepName, true)
-            );
+            if (false) { // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
+                stepExecutionSteps.add(
+                        stepFactory.createFinishExternalStepStep(currentId++, step.getPostStepActionData(),
+                                new HashMap<String, ResultNavigation>(), stepName, true)
+                );
+            } else {
+                stepExecutionSteps.add(
+                        stepFactory.createFinishStepStep(currentId++, step.getPostStepActionData(),
+                                new HashMap<String, ResultNavigation>(), stepName, true)
+                );
+            }
             stepExecutionSteps.add(
                     stepFactory.createJoinBranchesStep(currentId, step.getPostStepActionData(),
                             navigationValues, stepName)
             );
         } else {
-            stepExecutionSteps.add(
-                    stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
-                            navigationValues, stepName, false)
-            );
+            if (false) { // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
+                stepExecutionSteps.add(
+                        stepFactory.createFinishExternalStepStep(currentId, step.getPostStepActionData(),
+                                navigationValues, stepName, false)
+                );
+            } else {
+                stepExecutionSteps.add(
+                        stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
+                                navigationValues, stepName, false)
+                );
+            }
         }
         return stepExecutionSteps;
     }
