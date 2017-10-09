@@ -46,8 +46,10 @@ import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidatorImpl;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.scorecompiler.DefaultExternalExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionPlanBuilder;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionStepFactory;
+import io.cloudslang.lang.compiler.scorecompiler.ExternalExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompilerImpl;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
@@ -125,6 +127,7 @@ public class SlangCompilerSpringConfig {
     public ExecutionPlanBuilder executionPlanBuilder() {
         ExecutionPlanBuilder executionPlanBuilder = new ExecutionPlanBuilder();
         executionPlanBuilder.setStepFactory(stepFactory());
+        executionPlanBuilder.setExternalStepFactory(externalStepFactory());
 
         return executionPlanBuilder;
     }
@@ -132,6 +135,14 @@ public class SlangCompilerSpringConfig {
     @Bean
     public ExecutionStepFactory stepFactory() {
         return new ExecutionStepFactory();
+    }
+
+    @Bean
+    public ExternalExecutionStepFactory externalStepFactory() {
+        DefaultExternalExecutionStepFactory defaultExternalStepFactory = new DefaultExternalExecutionStepFactory();
+        defaultExternalStepFactory.setExecutionStepFactory(stepFactory());
+
+        return defaultExternalStepFactory;
     }
 
     @Bean

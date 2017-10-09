@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
+import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
@@ -37,6 +38,8 @@ import static org.hamcrest.Matchers.equalTo;
 public class ExecutionPlanBuilder {
 
     private ExecutionStepFactory stepFactory;
+
+    private ExternalExecutionStepFactory externalStepFactory;
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
     private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 2;
@@ -142,10 +145,11 @@ public class ExecutionPlanBuilder {
             );
         }
 
-        if (false) { // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
+        if (step instanceof ExternalStep) {
+            // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
             stepExecutionSteps.add(
-                    stepFactory.createBeginExternalStepStep(currentId++, step.getArguments(),
-                            step.getPreStepActionData(), step.getRefId(), stepName)
+                    externalStepFactory.createBeginExternalFlowStep(currentId++, step.getArguments(),
+                            step.getPreStepActionData(), step.getRefId(), stepName, compiledFlow.getId())
             );
         } else {
             stepExecutionSteps.add(
@@ -172,10 +176,11 @@ public class ExecutionPlanBuilder {
             }
         }
         if (parallelLoop) {
-            if (false) { // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
+            if (step instanceof ExternalStep) {
+                // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
                 stepExecutionSteps.add(
-                        stepFactory.createFinishExternalStepStep(currentId++, step.getPostStepActionData(),
-                                new HashMap<String, ResultNavigation>(), stepName, true)
+                        externalStepFactory.createFinishExternalFlowStep(currentId++, step.getPostStepActionData(),
+                                new HashMap<String, ResultNavigation>(), stepName, true, compiledFlow.getId())
                 );
             } else {
                 stepExecutionSteps.add(
@@ -188,10 +193,11 @@ public class ExecutionPlanBuilder {
                             navigationValues, stepName)
             );
         } else {
-            if (false) { // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
+            if (step instanceof ExternalStep) {
+                // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
                 stepExecutionSteps.add(
-                        stepFactory.createFinishExternalStepStep(currentId, step.getPostStepActionData(),
-                                navigationValues, stepName, false)
+                        externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
+                                navigationValues, stepName, false, compiledFlow.getId())
                 );
             } else {
                 stepExecutionSteps.add(
@@ -231,5 +237,9 @@ public class ExecutionPlanBuilder {
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {
         this.stepFactory = stepFactory;
+    }
+
+    public void setExternalStepFactory(ExternalExecutionStepFactory externalStepFactory) {
+        this.externalStepFactory = externalStepFactory;
     }
 }
