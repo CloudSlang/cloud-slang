@@ -7,7 +7,25 @@ import java.util.List;
 import java.util.Map;
 
 public class ExternalStep extends Step {
-    public ExternalStep(String name, Map<String, Serializable> preStepActionData, Map<String, Serializable> postStepActionData, List<Argument> arguments, List<Map<String, String>> navigationStrings, String refId, boolean parallelLoop, boolean onFailureStep) {
-        super(name, preStepActionData, postStepActionData, arguments, navigationStrings, refId, parallelLoop, onFailureStep);
+    public ExternalStep(
+            String name,
+            Map<String, Serializable> preStepActionData,
+            Map<String, Serializable> postStepActionData,
+            List<Argument> arguments,
+            List<Map<String, String>> navigationStrings,
+            String refId,
+            boolean parallelLoop,
+            boolean onFailureStep
+    ) {
+        super(
+                name,
+                preStepActionData,
+                postStepActionData,
+                arguments,
+                navigationStrings,
+                refId,
+                parallelLoop,
+                onFailureStep
+        );
     }
 }

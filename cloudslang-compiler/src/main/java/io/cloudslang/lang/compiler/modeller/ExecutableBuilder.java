@@ -558,11 +558,14 @@ public class ExecutableBuilder {
         List<Map<String, String>> navigationStrings =
                 getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
-        Step step = createStep(stepName, onFailureSection, preStepData, postStepData, arguments, refId, navigationStrings);
+        Step step = createStep(stepName, onFailureSection, preStepData, postStepData,
+                arguments, refId, navigationStrings);
         return new StepModellingResult(step, errors);
     }
 
-    private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData, Map<String, Serializable> postStepData, List<Argument> arguments, String refId, List<Map<String, String>> navigationStrings) {
+    private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,
+                            Map<String, Serializable> postStepData, List<Argument> arguments,
+                            String refId, List<Map<String, String>> navigationStrings) {
         if (preStepData.containsKey(SlangTextualKeys.DO_EXTERNAL_KEY)) {
             return new ExternalStep(stepName,
                     preStepData,
@@ -703,14 +706,15 @@ public class ExecutableBuilder {
      * Fetch the first level of the dependencies of the executable (non recursively)
      *
      * @param workflow the workflow of the flow
-     * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies and the other one is for external dependencies.
+     * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies
+     * and the other one is for external dependencies.
      */
     private Pair<Set<String>, Set<String>> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();
         Set<String> externalDependencies = new HashSet<>();
         Deque<Step> steps = workflow.getSteps();
         for (Step step : steps) {
-            if(step instanceof ExternalStep) {
+            if (step instanceof ExternalStep) {
                 externalDependencies.add(step.getRefId());
             } else {
                 dependencies.add(step.getRefId());

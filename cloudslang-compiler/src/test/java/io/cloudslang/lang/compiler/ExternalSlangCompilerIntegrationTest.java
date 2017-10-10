@@ -25,7 +25,8 @@ public class ExternalSlangCompilerIntegrationTest {
         final SlangSource slangSource = SlangSource.fromFile(new File(resource.toURI()));
         final Flow slangExecutable = (Flow) slangCompiler.preCompile(slangSource);
 
-        assertTrue(slangExecutable.getExternalExecutableDependencies().contains("/Library/Utility Operations/Flow Variable Manipulation/Do Nothing"));
+        assertTrue(slangExecutable.getExternalExecutableDependencies()
+                .contains("/Library/Utility Operations/Flow Variable Manipulation/Do Nothing"));
         assertEquals(slangExecutable.getWorkflow().getSteps(), 4);
     }
 }

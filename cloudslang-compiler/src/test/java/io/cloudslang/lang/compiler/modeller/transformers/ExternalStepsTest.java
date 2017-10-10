@@ -16,7 +16,12 @@ import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-import io.cloudslang.lang.compiler.validator.*;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Output;
 import junit.framework.Assert;
 import org.junit.Before;
@@ -65,7 +70,7 @@ public class ExternalStepsTest extends TransformersTestParent {
     }
 
     @Test
-//    @Test(timeout = DEFAULT_TIMEOUT)
+    //@Test(timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
         @SuppressWarnings("unchecked")
         List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();
