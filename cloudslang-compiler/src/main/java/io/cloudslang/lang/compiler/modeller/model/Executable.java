@@ -35,6 +35,7 @@ public abstract class Executable {
     protected final List<Output> outputs;
     protected final List<Result> results;
     protected final Set<String> executableDependencies;
+    protected final Set<String> externalExecutableDependencies;
     protected final Set<String> systemPropertyDependencies;
     private transient String id;
 
@@ -46,6 +47,7 @@ public abstract class Executable {
                          List<Output> outputs,
                          List<Result> results,
                          Set<String> executableDependencies,
+                         Set<String> externalExecutableDependencies,
                          Set<String> systemPropertyDependencies) {
         this.preExecActionData = preExecActionData;
         this.postExecActionData = postExecActionData;
@@ -55,6 +57,7 @@ public abstract class Executable {
         this.outputs = outputs;
         this.results = results;
         this.executableDependencies = executableDependencies;
+        this.externalExecutableDependencies = externalExecutableDependencies;
         this.systemPropertyDependencies = systemPropertyDependencies;
         this.id = namespace + Regex.NAMESPACE_PROPERTY_DELIMITER + name;
     }
@@ -93,6 +96,10 @@ public abstract class Executable {
 
     public Set<String> getExecutableDependencies() {
         return executableDependencies;
+    }
+
+    public Set<String> getExternalExecutableDependencies() {
+        return externalExecutableDependencies;
     }
 
     public Set<String> getSystemPropertyDependencies() {

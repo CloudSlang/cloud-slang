@@ -36,7 +36,7 @@ public class Operation extends Executable {
                      Set<String> executableDependencies,
                      Set<String> systemPropertyDependencies) {
         super(preOpActionData, postOpActionData, namespace, name, inputs,
-                outputs, results, executableDependencies, systemPropertyDependencies);
+                outputs, results, executableDependencies, null, systemPropertyDependencies);
         this.action = action;
     }
 
