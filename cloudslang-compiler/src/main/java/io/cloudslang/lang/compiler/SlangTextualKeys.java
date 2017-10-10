@@ -50,6 +50,7 @@ public interface SlangTextualKeys {
 
     //step
     String DO_KEY = "do";
+    String DO_EXTERNAL_KEY = "do_external";
     String FOR_KEY = "for";
     String BREAK_KEY = "break";
     String PUBLISH_KEY = "publish";
