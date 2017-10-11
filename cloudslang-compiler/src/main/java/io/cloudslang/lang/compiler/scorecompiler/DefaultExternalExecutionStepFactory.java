@@ -19,8 +19,8 @@ import java.util.Map;
 public class DefaultExternalExecutionStepFactory implements ExternalExecutionStepFactory {
 
 
-    private static final String EXTERNAL_STEPS_NOT_SUPPORTED = "CloudSlang does not support compiling external steps. " +
-            "To provide this functionality, you must extend all necessary classes.";
+    private static final String EXTERNAL_STEPS_NOT_SUPPORTED = "CloudSlang does not support compiling external " +
+            "steps. To provide this functionality, you must extend all necessary classes.";
 
     @Override
     public ExecutionStep createBeginExternalFlowStep(Long index, List<Argument> stepInputs,
