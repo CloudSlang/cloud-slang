@@ -20,9 +20,9 @@ public interface ExternalExecutionStepFactory {
 
     ExecutionStep createBeginExternalFlowStep(Long index, List<Argument> stepInputs,
                                              Map<String, Serializable> preStepData,
-                                              String refId, String stepName, String parentId);
+                                              String refId, String stepName);
 
     ExecutionStep createFinishExternalFlowStep(Long index, Map<String, Serializable> postStepData,
                                        Map<String, ResultNavigation> navigationValues,
-                                       String stepName, boolean parallelLoop, String parentId);
+                                       String stepName, boolean parallelLoop);
 }

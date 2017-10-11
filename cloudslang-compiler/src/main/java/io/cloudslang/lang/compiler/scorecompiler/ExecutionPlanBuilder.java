@@ -146,10 +146,9 @@ public class ExecutionPlanBuilder {
         }
 
         if (step instanceof ExternalStep) {
-            // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
             stepExecutionSteps.add(
                     externalStepFactory.createBeginExternalFlowStep(currentId++, step.getArguments(),
-                            step.getPreStepActionData(), step.getRefId(), stepName, compiledFlow.getId())
+                            step.getPreStepActionData(), step.getRefId(), stepName)
             );
         } else {
             stepExecutionSteps.add(
@@ -177,10 +176,9 @@ public class ExecutionPlanBuilder {
         }
         if (parallelLoop) {
             if (step instanceof ExternalStep) {
-                // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
                 stepExecutionSteps.add(
                         externalStepFactory.createFinishExternalFlowStep(currentId++, step.getPostStepActionData(),
-                                new HashMap<String, ResultNavigation>(), stepName, true, compiledFlow.getId())
+                                new HashMap<String, ResultNavigation>(), stepName, true)
                 );
             } else {
                 stepExecutionSteps.add(
@@ -194,10 +192,9 @@ public class ExecutionPlanBuilder {
             );
         } else {
             if (step instanceof ExternalStep) {
-                // TODO: replace condition to check whether Step is external (Step instanceOf ExternalStep)
                 stepExecutionSteps.add(
                         externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
-                                navigationValues, stepName, false, compiledFlow.getId())
+                                navigationValues, stepName, false)
                 );
             } else {
                 stepExecutionSteps.add(

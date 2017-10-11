@@ -24,8 +24,7 @@ public class DefaultExternalExecutionStepFactory implements ExternalExecutionSte
     public ExecutionStep createBeginExternalFlowStep(Long index, List<Argument> stepInputs,
                                                      Map<String, Serializable> preStepData,
                                                      String refId,
-                                                     String stepName,
-                                                     String parentId) {
+                                                     String stepName) {
         return executionStepFactory.createBeginStepStep(index, stepInputs, preStepData, refId, stepName);
     }
 
@@ -34,8 +33,7 @@ public class DefaultExternalExecutionStepFactory implements ExternalExecutionSte
                                                       Map<String, Serializable> postStepData,
                                                       Map<String, ResultNavigation> navigationValues,
                                                       String stepName,
-                                                      boolean parallelLoop,
-                                                      String parentId) {
+                                                      boolean parallelLoop) {
         return executionStepFactory.createFinishStepStep(index, postStepData, navigationValues, stepName, parallelLoop);
     }
 
