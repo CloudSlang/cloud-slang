@@ -140,10 +140,7 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public ExternalExecutionStepFactory externalStepFactory() {
-        DefaultExternalExecutionStepFactory defaultExternalStepFactory = new DefaultExternalExecutionStepFactory();
-        defaultExternalStepFactory.setExecutionStepFactory(stepFactory());
-
-        return defaultExternalStepFactory;
+        return new DefaultExternalExecutionStepFactory();
     }
 
     @Bean
