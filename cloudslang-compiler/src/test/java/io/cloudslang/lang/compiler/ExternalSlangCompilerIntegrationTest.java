@@ -24,9 +24,6 @@ public class ExternalSlangCompilerIntegrationTest {
     @Autowired
     private SlangCompiler slangCompiler;
 
-    @Autowired
-    private ScoreCompiler scoreCompiler;
-
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
