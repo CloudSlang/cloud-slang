@@ -86,6 +86,14 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
     }
 
     @Override
+    public void validateExternalStepReferenceId(String referenceId) {
+        if (StringUtils.isEmpty(referenceId)) {
+            throw new RuntimeException("Reference ID cannot be empty");
+        }
+        validateExternalReferenceRules(referenceId);
+    }
+
+    @Override
     public void validateExecutableName(String executableName) {
         validateSimpleNameRules(executableName);
     }

@@ -25,6 +25,8 @@ public interface ExecutableValidator {
 
     void validateStepReferenceId(String referenceId);
 
+    void validateExternalStepReferenceId(String rawReferenceId);
+
     void validateExecutableName(String executableName);
 
     void validateStepName(String stepName);

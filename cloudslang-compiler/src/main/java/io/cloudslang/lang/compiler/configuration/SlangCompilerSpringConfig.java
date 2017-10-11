@@ -29,6 +29,7 @@ import io.cloudslang.lang.compiler.modeller.transformers.AbstractInputsTransform
 import io.cloudslang.lang.compiler.modeller.transformers.AbstractOutputsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.BreakTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.DependencyFormatValidator;
+import io.cloudslang.lang.compiler.modeller.transformers.DoExternalTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.DoTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ForTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.InputsTransformer;
@@ -279,6 +280,16 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public DoExternalTransformer doExternalTransformer() {
+        DoExternalTransformer doExternalTransformer = new DoExternalTransformer();
+        doExternalTransformer.setPreCompileValidator(precompileValidator());
+        doExternalTransformer.setExecutableValidator(executableValidator());
+
+        return doExternalTransformer;
+    }
+
+
+    @Bean
     public ResultsTransformer resultsTransformer() {
         ResultsTransformer resultsTransformer = new ResultsTransformer();
         resultsTransformer.setPreCompileValidator(precompileValidator());
@@ -359,6 +370,7 @@ public class SlangCompilerSpringConfig {
         transformers.add(workFlowTransformer());
         transformers.add(resultsTransformer());
         transformers.add(doTransformer());
+        transformers.add(doExternalTransformer());
         transformers.add(outputsTransformer());
         transformers.add(javaActionTransformer());
         transformers.add(forTransformer());
