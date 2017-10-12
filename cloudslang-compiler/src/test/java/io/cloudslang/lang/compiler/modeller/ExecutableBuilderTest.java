@@ -241,27 +241,6 @@ public class ExecutableBuilderTest {
     }
 
     @Test
-    public void stepWithEmptyDoEntranceThrowsException() throws Exception {
-        final ParsedSlang mockParsedSlang = mockFlowSlangFile();
-        final Map<String, Object> executableRawData = new HashMap<>();
-        List<Map<String, Object>> workFlowData = new ArrayList<>();
-        Map<String, Object> stepRawData = new HashMap<>();
-
-        stepRawData.put(SlangTextualKeys.DO_KEY, new HashMap<>());
-        String stepName = "step1";
-        Map<String, Object> step = new HashMap<>();
-        step.put(stepName, stepRawData);
-        workFlowData.add(step);
-        executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
-        executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, "flow1");
-
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(stepName);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
-    }
-
-    @Test
     public void simpleFlowDataIsValid() throws Exception {
         final ParsedSlang mockParsedSlang = mockFlowSlangFile();
 
