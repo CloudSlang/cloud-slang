@@ -69,8 +69,7 @@ public class ExternalStepsTest extends TransformersTestParent {
         }
     }
 
-    @Test
-    //@Test(timeout = DEFAULT_TIMEOUT)
+    @Test(timeout = DEFAULT_TIMEOUT)
     public void testTransform() throws Exception {
         @SuppressWarnings("unchecked")
         List<Output> publishValues = publishTransformer.transform(publishMap).getTransformedData();

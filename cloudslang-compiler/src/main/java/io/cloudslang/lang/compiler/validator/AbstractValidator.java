@@ -96,19 +96,6 @@ public abstract class AbstractValidator {
         }
     }
 
-    /**
-     * This method throws an exception if none of the pattern matchers match the input string.
-     *
-     * @param patternMatcher1
-     * @param patternMatcher2
-     * @param input
-     */
-    private void validateChars(PatternMatcher patternMatcher1, PatternMatcher patternMatcher2, String input) {
-        if (!(patternMatcher1.matchesEndToEnd(input) || patternMatcher2.matchesEndToEnd(input))) {
-            throw new RuntimeException("Argument[" + input + "] violates character rules.");
-        }
-    }
-
     private void validateDelimiter(String input) {
         if (input.startsWith(Regex.NAMESPACE_PROPERTY_DELIMITER)) {
             throw new RuntimeException(
