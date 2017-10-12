@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.validator;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -67,9 +68,12 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
         Set<Executable> flowReferences = new HashSet<>();
 
         for (Step step : steps) {
-            Executable reference = dependencies.get(step.getRefId());
-            errors.addAll(validateStepAgainstItsDependency(flow, step, dependencies));
-            flowReferences.add(reference);
+            // validate all steps, except external steps, that are not in the dependencies list
+            if (!(step instanceof ExternalStep)) {
+                Executable reference = dependencies.get(step.getRefId());
+                errors.addAll(validateStepAgainstItsDependency(flow, step, dependencies));
+                flowReferences.add(reference);
+            }
         }
 
         if (recursive) {
