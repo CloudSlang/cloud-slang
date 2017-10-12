@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +59,28 @@ public abstract class Executable {
         this.results = results;
         this.executableDependencies = executableDependencies;
         this.externalExecutableDependencies = externalExecutableDependencies;
+        this.systemPropertyDependencies = systemPropertyDependencies;
+        this.id = namespace + Regex.NAMESPACE_PROPERTY_DELIMITER + name;
+    }
+
+    protected Executable(Map<String, Serializable> preExecActionData,
+                         Map<String, Serializable> postExecActionData,
+                         String namespace,
+                         String name,
+                         List<Input> inputs,
+                         List<Output> outputs,
+                         List<Result> results,
+                         Set<String> executableDependencies,
+                         Set<String> systemPropertyDependencies) {
+        this.preExecActionData = preExecActionData;
+        this.postExecActionData = postExecActionData;
+        this.namespace = namespace;
+        this.name = name;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.results = results;
+        this.executableDependencies = executableDependencies;
+        this.externalExecutableDependencies = Collections.emptySet();
         this.systemPropertyDependencies = systemPropertyDependencies;
         this.id = namespace + Regex.NAMESPACE_PROPERTY_DELIMITER + name;
     }
