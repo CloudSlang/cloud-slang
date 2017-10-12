@@ -53,10 +53,6 @@ public class TransformersHandler {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
-            if ((rawData.containsKey(DO_EXTERNAL_KEY) && equalsIgnoreCase(DO_KEY, key)) ||
-                    equalsIgnoreCase(DO_EXTERNAL_KEY, key) && !rawData.containsKey(DO_EXTERNAL_KEY)) {
-                continue;
-            }
             Object value = rawData.get(key);
             try {
                 @SuppressWarnings("unchecked")

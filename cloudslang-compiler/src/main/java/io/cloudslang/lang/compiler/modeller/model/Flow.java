@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,21 @@ import java.util.Set;
 public class Flow extends Executable {
 
     private final Workflow workflow;
+
+    public Flow(Map<String, Serializable> preOpActionData,
+                Map<String, Serializable> postOpActionData,
+                Workflow workflow,
+                String namespace,
+                String name,
+                List<Input> inputs,
+                List<Output> outputs,
+                List<Result> results,
+                Set<String> executableDependencies,
+                Set<String> systemPropertyDependencies) {
+        super(preOpActionData, postOpActionData, namespace, name, inputs,
+                outputs, results, executableDependencies, Collections.emptySet(), systemPropertyDependencies);
+        this.workflow = workflow;
+    }
 
     public Flow(Map<String, Serializable> preOpActionData,
                 Map<String, Serializable> postOpActionData,

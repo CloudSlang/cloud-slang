@@ -18,6 +18,7 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
@@ -39,29 +42,39 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     private PreCompileValidator preCompileValidator;
     private ExecutableValidator executableValidator;
 
+    protected List<RuntimeException> validateRawData(Map<String, Object> rawData) {
+        if (MapUtils.isEmpty(rawData)) {
+            return Collections.singletonList(new RuntimeException("Step has no reference information."));
+        } else if (rawData.size() > 1) {
+            return Collections.singletonList(
+                    new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
+                            "May happen due to wrong indentation."));
+        }
+        return Collections.emptyList();
+    }
+
     @Override
     public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData) {
-        List<Argument> transformedData = new ArrayList<>();
-        List<RuntimeException> errors = new ArrayList<>();
-        if (MapUtils.isEmpty(rawData)) {
-            return new BasicTransformModellingResult<>(transformedData, errors);
-        } else if (rawData.size() > 1) {
-            errors.add(
-                    new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
-                            "May happen due to wrong indentation"
-                    )
-            );
-            return new BasicTransformModellingResult<>(transformedData, errors);
+        final List<RuntimeException> validateRawData = validateRawData(rawData);
+        if (!validateRawData.isEmpty()) {
+            return new BasicTransformModellingResult<>(null, validateRawData);
         }
-        Map.Entry<String, Object> argumentsEntry = rawData.entrySet().iterator().next();
-        Object rawArguments = argumentsEntry.getValue();
+
+        final Object rawArguments = rawData.entrySet().iterator().next().getValue();
+        if (rawArguments == null) {
+            return new BasicTransformModellingResult<>(Collections.emptyList(), Collections.emptyList());
+        }
+
         if (rawArguments instanceof List) {
+            final List rawArgumentsList = (List) rawArguments;
+
+            final List<Argument> transformedData = new ArrayList<>();
+            final List<RuntimeException> errors = new ArrayList<>();
             // list syntax
-            List rawArgumentsList = (List) rawArguments;
-            for (Object rawArgument : rawArgumentsList) {
+            for (final Object rawArgument : rawArgumentsList) {
                 try {
-                    Argument argument = transformListArgument(rawArgument);
-                    List<RuntimeException> validationErrors =
+                    final Argument argument = transformListArgument(rawArgument);
+                    final List<RuntimeException> validationErrors =
                             preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
                     if (CollectionUtils.isEmpty(validationErrors)) {
                         transformedData.add(argument);
@@ -72,11 +85,10 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
                     errors.add(rex);
                 }
             }
-        } else if (rawArguments != null) {
-            errors.add(new RuntimeException("Step arguments should be defined using a standard YAML list."));
+            return new BasicTransformModellingResult<>(transformedData, errors);
         }
-
-        return new BasicTransformModellingResult<>(transformedData, errors);
+        return new BasicTransformModellingResult<>(Collections.emptyList(), Collections.singletonList(
+                new RuntimeException("Step arguments should be defined using a standard YAML list.")));
     }
 
     @Override
