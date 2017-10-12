@@ -7,14 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.validator.matcher;
+package io.cloudslang.lang.compiler.validator;
 
-import io.cloudslang.lang.entities.constants.Regex;
+public interface ExternalReferenceValidator {
 
-import java.util.regex.Pattern;
+    // This method should be implemented by external executors
+    void validateExternalReference(final String reference);
 
-public class ExternalPathReferenceValidator extends PatternMatcher {
-    public ExternalPathReferenceValidator() {
-        super(Pattern.compile(Regex.EXTERNAL_PATH));
-    }
 }

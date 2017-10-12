@@ -11,8 +11,6 @@ package io.cloudslang.lang.compiler.validator;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
-import io.cloudslang.lang.compiler.validator.matcher.ExternalPathReferenceValidator;
-import io.cloudslang.lang.compiler.validator.matcher.UuidReferenceValidator;
 import io.cloudslang.lang.compiler.validator.matcher.NamespacePatternMatcher;
 import io.cloudslang.lang.compiler.validator.matcher.PatternMatcher;
 import io.cloudslang.lang.compiler.validator.matcher.ResultNamePatternMatcher;
@@ -36,30 +34,17 @@ public abstract class AbstractValidator {
     protected PatternMatcher simpleNamePatternMatcher;
     protected PatternMatcher resultNamePatternMatcher;
     protected PatternMatcher variableNamePatternMatcher;
-    protected PatternMatcher externalPathReferenceValidator;
-    protected PatternMatcher externalUuidReferenceValidator;
 
     public AbstractValidator() {
         namespacePatternMatcher = new NamespacePatternMatcher();
         simpleNamePatternMatcher = new SimpleNamePatternMatcher();
         resultNamePatternMatcher = new ResultNamePatternMatcher();
         variableNamePatternMatcher = new VariableNamePatternMatcher();
-        externalPathReferenceValidator = new ExternalPathReferenceValidator();
-        externalUuidReferenceValidator = new UuidReferenceValidator();
     }
 
     protected void validateNamespaceRules(String input) {
         validateChars(namespacePatternMatcher, input);
         validateDelimiter(input);
-    }
-
-    /**
-     * Validate external references(afl references).
-     * Afl references can be a path or a uuid value.
-     * @param input
-     */
-    protected void validateExternalReferenceRules(String input) {
-        validateChars(externalPathReferenceValidator, externalUuidReferenceValidator, input);
     }
 
     protected void validateSimpleNameRules(String input) {
@@ -113,6 +98,7 @@ public abstract class AbstractValidator {
 
     /**
      * This method throws an exception if none of the pattern matchers match the input string.
+     *
      * @param patternMatcher1
      * @param patternMatcher2
      * @param input

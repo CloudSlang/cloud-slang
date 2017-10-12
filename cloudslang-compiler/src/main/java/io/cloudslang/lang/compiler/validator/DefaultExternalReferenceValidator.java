@@ -7,14 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.validator.matcher;
+package io.cloudslang.lang.compiler.validator;
 
-import io.cloudslang.lang.entities.constants.Regex;
-
-import java.util.regex.Pattern;
-
-public class UuidReferenceValidator extends PatternMatcher {
-    public UuidReferenceValidator() {
-        super(Pattern.compile(Regex.UUID));
+public class DefaultExternalReferenceValidator implements ExternalReferenceValidator {
+    @Override
+    public void validateExternalReference(String reference) {
+        //default implementation
     }
 }

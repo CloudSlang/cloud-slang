@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ExecutableValidatorImpl extends AbstractValidator implements ExecutableValidator {
 
     private SystemPropertyValidator systemPropertyValidator;
+    private ExternalReferenceValidator externalReferenceValidator;
 
     @Override
     public void validateNamespace(ParsedSlang parsedSlang) {
@@ -90,7 +91,7 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
         if (StringUtils.isEmpty(referenceId)) {
             throw new RuntimeException("Reference ID cannot be empty");
         }
-        validateExternalReferenceRules(referenceId);
+        externalReferenceValidator.validateExternalReference(referenceId);
     }
 
     @Override
@@ -156,5 +157,9 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
 
     public void setSystemPropertyValidator(SystemPropertyValidator systemPropertyValidator) {
         this.systemPropertyValidator = systemPropertyValidator;
+    }
+
+    public void setExternalReferenceValidator(ExternalReferenceValidator externalReferenceValidator) {
+        this.externalReferenceValidator = externalReferenceValidator;
     }
 }
