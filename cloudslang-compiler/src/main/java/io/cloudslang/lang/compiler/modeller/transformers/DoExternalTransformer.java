@@ -10,26 +10,8 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.entities.bindings.Argument;
-import org.apache.commons.collections4.MapUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-public class DoExternalTransformer extends DoTransformer implements Transformer<Map<String, Object>, List<Argument>> {
-
-    @Override
-    protected List<RuntimeException> validateRawData(Map<String, Object> rawData) {
-        if (MapUtils.isEmpty(rawData)) {
-            return Collections.singletonList(new RuntimeException("Step has no reference information."));
-        } else if (rawData.size() > 1) {
-            return Collections.singletonList(
-                    new RuntimeException("Step has too many keys under the 'do_external' keyword,\n" +
-                            "May happen due to wrong indentation."));
-        }
-        return Collections.emptyList();
-    }
+public class DoExternalTransformer extends DoTransformer {
 
     @Override
     public String keyToTransform() {

@@ -22,10 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_EXTERNAL_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_KEY;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-
 public class TransformersHandler {
 
     public static final String CLASS = "class ";

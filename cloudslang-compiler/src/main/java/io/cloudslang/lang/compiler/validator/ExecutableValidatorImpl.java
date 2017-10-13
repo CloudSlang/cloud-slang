@@ -10,13 +10,12 @@
 package io.cloudslang.lang.compiler.validator;
 
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Bonczidai Levente

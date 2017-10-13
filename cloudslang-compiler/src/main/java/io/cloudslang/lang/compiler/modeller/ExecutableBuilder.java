@@ -584,11 +584,7 @@ public class ExecutableBuilder {
 
     @SuppressWarnings("unchecked")
     private List<Argument> getArgumentsFromDoStep(Map<String, Serializable> preStepData) {
-        try {
-            return (List<Argument>) preStepData.getOrDefault(DO_EXTERNAL_KEY, preStepData.get(DO_KEY));
-        } catch (ClassCastException ex) {
-            return Collections.emptyList();
-        }
+        return (List<Argument>) preStepData.getOrDefault(DO_EXTERNAL_KEY, preStepData.get(DO_KEY));
     }
 
     @SuppressWarnings("unchecked")
@@ -596,7 +592,7 @@ public class ExecutableBuilder {
         try {
             return (Map<String, Object>) stepRawData.getOrDefault(DO_EXTERNAL_KEY, stepRawData.get(DO_KEY));
         } catch (ClassCastException ex) {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
     }
 
@@ -698,7 +694,7 @@ public class ExecutableBuilder {
      *
      * @param workflow the workflow of the flow
      * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies
-     *     and the other one is for external dependencies.
+     * and the other one is for external dependencies.
      */
     private Pair<Set<String>, Set<String>> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();

@@ -9,15 +9,17 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,10 +28,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
@@ -41,17 +39,6 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     private PreCompileValidator preCompileValidator;
     private ExecutableValidator executableValidator;
-
-    protected List<RuntimeException> validateRawData(Map<String, Object> rawData) {
-        if (MapUtils.isEmpty(rawData)) {
-            return Collections.singletonList(new RuntimeException("Step has no reference information."));
-        } else if (rawData.size() > 1) {
-            return Collections.singletonList(
-                    new RuntimeException("Step has too many keys under the 'do' keyword,\n" +
-                            "May happen due to wrong indentation."));
-        }
-        return Collections.emptyList();
-    }
 
     @Override
     public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData) {
@@ -198,5 +185,16 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     public void setExecutableValidator(ExecutableValidator executableValidator) {
         this.executableValidator = executableValidator;
+    }
+
+    private List<RuntimeException> validateRawData(Map<String, Object> rawData) {
+        if (MapUtils.isEmpty(rawData)) {
+            return Collections.singletonList(new RuntimeException("Step has no reference information."));
+        } else if (rawData.size() > 1) {
+            return Collections.singletonList(
+                    new RuntimeException("Step has too many keys under the '" + keyToTransform() + "' keyword,\n" +
+                            "May happen due to wrong indentation."));
+        }
+        return Collections.emptyList();
     }
 }
