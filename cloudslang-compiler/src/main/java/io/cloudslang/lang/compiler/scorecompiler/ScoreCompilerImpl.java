@@ -105,11 +105,11 @@ public class ScoreCompilerImpl implements ScoreCompiler {
             Collection<Executable> executables = new ArrayList<>(filteredDependencies.values());
             executables.add(executable);
 
-            HashSet<String> subflowsUUIDs = new HashSet<>(dependencies.keySet());
+            HashSet<String> subflowsUuids = new HashSet<>(dependencies.keySet());
             if (executable.getExternalExecutableDependencies() != null) {
-                subflowsUUIDs.addAll(executable.getExternalExecutableDependencies());
+                subflowsUuids.addAll(executable.getExternalExecutableDependencies());
             }
-            executionPlan.setSubflowsUUIDs(subflowsUUIDs);
+            executionPlan.setSubflowsUUIDs(subflowsUuids);
             CompilationArtifact compilationArtifact = new CompilationArtifact(executionPlan, dependencies,
                     executable.getInputs(), getSystemPropertiesFromExecutables(executables));
             return new CompilationModellingResult(compilationArtifact, exceptions);
