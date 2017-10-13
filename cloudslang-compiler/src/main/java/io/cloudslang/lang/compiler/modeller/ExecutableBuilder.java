@@ -9,10 +9,10 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
+import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
@@ -28,10 +28,18 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.iterators.PeekingIterator;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,15 +50,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.collections4.iterators.PeekingIterator;
-import org.apache.commons.lang3.StringUtils;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_EXTERNAL_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
@@ -92,9 +97,8 @@ public class ExecutableBuilder {
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
-    private List<String> stepAdditionalKeyWords =
-            asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
-    private List<String> parallelLoopValidKeywords = asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.FOR_KEY);
+    private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY);
+    private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY);
 
     // @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -167,7 +171,6 @@ public class ExecutableBuilder {
         results = results == null ? new ArrayList<Result>() : results;
 
         String namespace = parsedSlang.getNamespace();
-        Set<String> executableDependencies;
         Set<String> systemPropertyDependencies = null;
         switch (parsedSlang.getType()) {
             case FLOW:
@@ -178,7 +181,7 @@ public class ExecutableBuilder {
 
                 List<Map<String, Map<String, Object>>> workFlowRawData =
                         preCompileValidator.validateWorkflowRawData(parsedSlang,
-                                        executableRawData.get(WORKFLOW_KEY), execName, errors);
+                                executableRawData.get(WORKFLOW_KEY), execName, errors);
 
                 Workflow onFailureWorkFlow =
                         getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
@@ -190,7 +193,9 @@ public class ExecutableBuilder {
 
                 preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
 
-                executableDependencies = fetchDirectStepsDependencies(workflow);
+                Pair<Set<String>, Set<String>> pair = fetchDirectStepsDependencies(workflow);
+                Set<String> executableDependencies = pair.getLeft();
+                Set<String> externalExecutableDependencies = pair.getRight();
                 try {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
@@ -207,6 +212,7 @@ public class ExecutableBuilder {
                         outputs,
                         results,
                         executableDependencies,
+                        externalExecutableDependencies,
                         systemPropertyDependencies
                 );
                 return preCompileValidator
@@ -436,7 +442,7 @@ public class ExecutableBuilder {
                                         stepName,
                                         SlangTextualKeys.PARALLEL_LOOP_KEY,
                                         parallelLoopRawData,
-                                        Collections.<Transformer>emptyList(),
+                                        Collections.emptyList(),
                                         parallelLoopValidKeywords,
                                         null
                                 )
@@ -529,23 +535,15 @@ public class ExecutableBuilder {
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
-        @SuppressWarnings("unchecked")
-        List<Argument> arguments = (List<Argument>) preStepData.get(SlangTextualKeys.DO_KEY);
 
         String refId = "";
-        Map<String, Object> doRawData;
-        try {
-            //noinspection unchecked
-            doRawData = (Map<String, Object>) stepRawData.get(SlangTextualKeys.DO_KEY);
-        } catch (ClassCastException ex) {
-            doRawData = new HashMap<>();
-        }
-        if (MapUtils.isEmpty(doRawData)) {
-            errors.add(new RuntimeException("Step: \'" + stepName + "\' has no reference information"));
-        } else {
+        final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
+        final Map<String, Object> doRawData = getRawDataFromDoStep(stepRawData);
+
+        if (MapUtils.isNotEmpty(doRawData)) {
             try {
                 String refString = doRawData.keySet().iterator().next();
-                refId = resolveReferenceId(refString, imports, namespace);
+                refId = resolveReferenceId(refString, imports, namespace, preStepData);
             } catch (RuntimeException rex) {
                 errors.add(rex);
             }
@@ -554,16 +552,48 @@ public class ExecutableBuilder {
         List<Map<String, String>> navigationStrings =
                 getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
-        Step step = new Step(
-                stepName,
-                preStepData,
-                postStepData,
-                arguments,
-                navigationStrings,
-                refId,
-                preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
-                onFailureSection);
+        Step step = createStep(stepName, onFailureSection, preStepData, postStepData,
+                arguments, refId, navigationStrings);
         return new StepModellingResult(step, errors);
+    }
+
+    private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,
+                            Map<String, Serializable> postStepData, List<Argument> arguments,
+                            String refId, List<Map<String, String>> navigationStrings) {
+        if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
+            return new ExternalStep(stepName,
+                    preStepData,
+                    postStepData,
+                    arguments,
+                    navigationStrings,
+                    refId,
+                    preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
+                    onFailureSection);
+        } else {
+            return new Step(
+                    stepName,
+                    preStepData,
+                    postStepData,
+                    arguments,
+                    navigationStrings,
+                    refId,
+                    preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
+                    onFailureSection);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Argument> getArgumentsFromDoStep(Map<String, Serializable> preStepData) {
+        return (List<Argument>) preStepData.getOrDefault(DO_EXTERNAL_KEY, preStepData.get(DO_KEY));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getRawDataFromDoStep(Map<String, Object> stepRawData) {
+        try {
+            return (Map<String, Object>) stepRawData.getOrDefault(DO_EXTERNAL_KEY, stepRawData.get(DO_KEY));
+        } catch (ClassCastException ex) {
+            return Collections.emptyMap();
+        }
     }
 
     private void replaceOnFailureReference(
@@ -599,7 +629,7 @@ public class ExecutableBuilder {
             String defaultFailure,
             List<RuntimeException> errors) {
         @SuppressWarnings("unchecked") List<Map<String, String>> navigationStrings =
-                (List<Map<String, String>>) postStepData.get(SlangTextualKeys.NAVIGATION_KEY);
+                (List<Map<String, String>>) postStepData.get(NAVIGATION_KEY);
 
         //default navigation
         if (CollectionUtils.isEmpty(navigationStrings)) {
@@ -622,7 +652,20 @@ public class ExecutableBuilder {
         }
     }
 
-    private String resolveReferenceId(String rawReferenceId, Map<String, String> imports, String namespace) {
+    private String resolveReferenceId(String rawReferenceId, Map<String, String> imports, String namespace,
+                                      Map<String, Serializable> preStepData) {
+        if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
+            return resolveDoExternalReferenceId(rawReferenceId);
+        }
+        return resolveDoReferenceId(rawReferenceId, imports, namespace);
+    }
+
+    private String resolveDoExternalReferenceId(String rawReferenceId) {
+        executableValidator.validateExternalStepReferenceId(rawReferenceId);
+        return rawReferenceId;
+    }
+
+    private String resolveDoReferenceId(String rawReferenceId, Map<String, String> imports, String namespace) {
         executableValidator.validateStepReferenceId(rawReferenceId);
 
         int numberOfDelimiters = StringUtils.countMatches(rawReferenceId, NAMESPACE_DELIMITER);
@@ -650,15 +693,21 @@ public class ExecutableBuilder {
      * Fetch the first level of the dependencies of the executable (non recursively)
      *
      * @param workflow the workflow of the flow
-     * @return a map of dependencies. Key - dependency full name, value - type
+     * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies
+     *     and the other one is for external dependencies.
      */
-    private Set<String> fetchDirectStepsDependencies(Workflow workflow) {
+    private Pair<Set<String>, Set<String>> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();
+        Set<String> externalDependencies = new HashSet<>();
         Deque<Step> steps = workflow.getSteps();
         for (Step step : steps) {
-            dependencies.add(step.getRefId());
+            if (step instanceof ExternalStep) {
+                externalDependencies.add(step.getRefId());
+            } else {
+                dependencies.add(step.getRefId());
+            }
         }
-        return dependencies;
+        return Pair.of(dependencies, externalDependencies);
     }
 
     private List<String> getStepNames(Deque<Step> steps) {

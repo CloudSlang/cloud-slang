@@ -12,15 +12,15 @@ package io.cloudslang.lang.compiler.modeller.model;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import io.cloudslang.lang.entities.constants.Regex;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -35,8 +35,32 @@ public abstract class Executable {
     protected final List<Output> outputs;
     protected final List<Result> results;
     protected final Set<String> executableDependencies;
+    protected final Set<String> externalExecutableDependencies;
     protected final Set<String> systemPropertyDependencies;
     private transient String id;
+
+    protected Executable(Map<String, Serializable> preExecActionData,
+                         Map<String, Serializable> postExecActionData,
+                         String namespace,
+                         String name,
+                         List<Input> inputs,
+                         List<Output> outputs,
+                         List<Result> results,
+                         Set<String> executableDependencies,
+                         Set<String> externalExecutableDependencies,
+                         Set<String> systemPropertyDependencies) {
+        this.preExecActionData = preExecActionData;
+        this.postExecActionData = postExecActionData;
+        this.namespace = namespace;
+        this.name = name;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.results = results;
+        this.executableDependencies = executableDependencies;
+        this.externalExecutableDependencies = externalExecutableDependencies;
+        this.systemPropertyDependencies = systemPropertyDependencies;
+        this.id = namespace + Regex.NAMESPACE_PROPERTY_DELIMITER + name;
+    }
 
     protected Executable(Map<String, Serializable> preExecActionData,
                          Map<String, Serializable> postExecActionData,
@@ -55,6 +79,7 @@ public abstract class Executable {
         this.outputs = outputs;
         this.results = results;
         this.executableDependencies = executableDependencies;
+        this.externalExecutableDependencies = Collections.emptySet();
         this.systemPropertyDependencies = systemPropertyDependencies;
         this.id = namespace + Regex.NAMESPACE_PROPERTY_DELIMITER + name;
     }
@@ -93,6 +118,10 @@ public abstract class Executable {
 
     public Set<String> getExecutableDependencies() {
         return executableDependencies;
+    }
+
+    public Set<String> getExternalExecutableDependencies() {
+        return externalExecutableDependencies;
     }
 
     public Set<String> getSystemPropertyDependencies() {

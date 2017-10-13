@@ -136,7 +136,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         if (additionalValidKeyWords != null) {
             validKeywords.addAll(additionalValidKeyWords);
         }
-
+        //todo this should be changed, we shouldn't rely on the names of the class
         for (Transformer transformer : allRelevantTransformers) {
             validKeywords.add(TransformersHandler.keyToTransform(transformer));
         }
