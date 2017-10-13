@@ -145,17 +145,7 @@ public class ExecutionPlanBuilder {
             );
         }
 
-        if (step instanceof ExternalStep) {
-            stepExecutionSteps.add(
-                    externalStepFactory.createBeginExternalFlowStep(currentId++, step.getArguments(),
-                            step.getPreStepActionData(), step.getRefId(), stepName)
-            );
-        } else {
-            stepExecutionSteps.add(
-                    stepFactory.createBeginStepStep(currentId++, step.getArguments(),
-                            step.getPreStepActionData(), step.getRefId(), stepName)
-            );
-        }
+        stepExecutionSteps.add(createBeginStep(currentId++, step));
 
         //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -175,33 +165,13 @@ public class ExecutionPlanBuilder {
             }
         }
         if (parallelLoop) {
-            if (step instanceof ExternalStep) {
-                stepExecutionSteps.add(
-                        externalStepFactory.createFinishExternalFlowStep(currentId++, step.getPostStepActionData(),
-                                new HashMap<String, ResultNavigation>(), stepName, true)
-                );
-            } else {
-                stepExecutionSteps.add(
-                        stepFactory.createFinishStepStep(currentId++, step.getPostStepActionData(),
-                                new HashMap<String, ResultNavigation>(), stepName, true)
-                );
-            }
+            stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(), true));
             stepExecutionSteps.add(
                     stepFactory.createJoinBranchesStep(currentId, step.getPostStepActionData(),
                             navigationValues, stepName)
             );
         } else {
-            if (step instanceof ExternalStep) {
-                stepExecutionSteps.add(
-                        externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
-                                navigationValues, stepName, false)
-                );
-            } else {
-                stepExecutionSteps.add(
-                        stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
-                                navigationValues, stepName, false)
-                );
-            }
+            stepExecutionSteps.add(createFinishStepStep(currentId, step, navigationValues, false));
         }
         return stepExecutionSteps;
     }
@@ -230,6 +200,26 @@ public class ExecutionPlanBuilder {
         }
 
         return currentId;
+    }
+
+    private ExecutionStep createFinishStepStep(long currentId, Step step, Map<String,
+            ResultNavigation> navigationValues, boolean parallelLoop) {
+        if (step instanceof ExternalStep) {
+            return externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
+                    navigationValues, step.getName(), parallelLoop);
+        }
+        return stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
+                navigationValues, step.getName(), parallelLoop);
+    }
+
+    private ExecutionStep createBeginStep(Long id, Step step) {
+        if (step instanceof ExternalStep) {
+            return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
+                    step.getPreStepActionData(), step.getRefId(), step.getName());
+        }
+        return stepFactory.createBeginStepStep(id, step.getArguments(),
+                    step.getPreStepActionData(), step.getRefId(), step.getName());
+
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {

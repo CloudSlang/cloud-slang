@@ -11,12 +11,10 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
-import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
-import java.util.ArrayList;
 import java.util.HashSet;
 import org.junit.Rule;
 import org.junit.Test;
