@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class Decision extends Executable {
             Set<String> executableDependencies,
             Set<String> systemPropertyDependencies) {
         super(preExecActionData, postExecActionData, namespace, name, inputs,
-                outputs, results, executableDependencies, null, systemPropertyDependencies);
+                outputs, results, executableDependencies, systemPropertyDependencies);
     }
 
     @Override

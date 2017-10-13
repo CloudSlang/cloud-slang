@@ -340,7 +340,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step: 'step1' has no reference information");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Step has no reference information.");
         throw result.getErrors().get(0);
     }
 

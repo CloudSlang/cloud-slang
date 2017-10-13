@@ -28,8 +28,6 @@ public class Regex {
     public static final String NAMESPACE_PROPERTY_DELIMITER = ".";
     public static final String NAMESPACE_DELIMITER_ESCAPED = "\\" + NAMESPACE_PROPERTY_DELIMITER;
     public static final String NAMESPACE_CHARS = "([\\w\\-" + NAMESPACE_PROPERTY_DELIMITER + "]+)";
-    public static final String EXTERNAL_PATH = "^(.*/)([^/]*)$"; //TODO
-    public static final String UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"; //TODO
     public static final String SIMPLE_NAME_CHARS = "([\\w]+)";
     public static final String RESULT_NAME_CHARS = "([\\w]+)";
     public static final String VARIABLE_NAME_CHARS = "(([A-Za-z][\\w]*)|([_][\\w]+))";

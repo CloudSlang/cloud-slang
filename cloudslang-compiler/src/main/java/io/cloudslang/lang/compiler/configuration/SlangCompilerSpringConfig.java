@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.configuration;
 
 
+import com.google.common.collect.Lists;
 import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.compiler.MetadataExtractor;
 import io.cloudslang.lang.compiler.MetadataExtractorImpl;
@@ -55,8 +56,10 @@ import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompilerImpl;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.compiler.validator.CompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.DefaultExternalReferenceValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.ExternalReferenceValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
@@ -71,6 +74,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+
+import java.util.List;
 
 @Configuration
 @ComponentScan("io.cloudslang.lang.compiler")
@@ -120,6 +125,7 @@ public class SlangCompilerSpringConfig {
     public ExecutableValidator executableValidator() {
         ExecutableValidatorImpl executableValidator = new ExecutableValidatorImpl();
         executableValidator.setSystemPropertyValidator(systemPropertyValidator());
+        executableValidator.setExternalReferenceValidator(externalReferenceValidator());
 
         return executableValidator;
     }
@@ -136,6 +142,11 @@ public class SlangCompilerSpringConfig {
     @Bean
     public ExecutionStepFactory stepFactory() {
         return new ExecutionStepFactory();
+    }
+
+    @Bean
+    public ExternalReferenceValidator externalReferenceValidator() {
+        return new DefaultExternalReferenceValidator();
     }
 
     @Bean
@@ -357,23 +368,20 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public List<Transformer> transformers() {
-        List<Transformer> transformers = new ArrayList<>();
-
-        transformers.add(pythonActionTransformer());
-        transformers.add(parallelLoopForTransformer());
-        transformers.add(publishTransformer());
-        transformers.add(navigateTransformer());
-        transformers.add(inputsTransformer());
-        transformers.add(workFlowTransformer());
-        transformers.add(resultsTransformer());
-        transformers.add(doTransformer());
-        transformers.add(doExternalTransformer());
-        transformers.add(outputsTransformer());
-        transformers.add(javaActionTransformer());
-        transformers.add(forTransformer());
-        transformers.add(breakTransformer());
-
-        return transformers;
+        return Lists.newArrayList(
+                pythonActionTransformer(),
+                parallelLoopForTransformer(),
+                publishTransformer(),
+                navigateTransformer(),
+                inputsTransformer(),
+                workFlowTransformer(),
+                resultsTransformer(),
+                doTransformer(),
+                doExternalTransformer(),
+                outputsTransformer(),
+                javaActionTransformer(),
+                forTransformer(),
+                breakTransformer());
     }
 
     private void setAbstractOutputTransformerDependencies(AbstractOutputsTransformer abstractOutputsTransformer) {

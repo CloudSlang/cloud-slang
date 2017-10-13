@@ -7,14 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.modeller.transformers;
+package io.cloudslang.lang.compiler.validator;
 
-import io.cloudslang.lang.compiler.SlangTextualKeys;
+public interface ExternalReferenceValidator {
 
-public class DoExternalTransformer extends DoTransformer {
+    // This method should be implemented by external executors
+    void validateExternalReference(final String reference);
 
-    @Override
-    public String keyToTransform() {
-        return SlangTextualKeys.DO_EXTERNAL_KEY;
-    }
 }

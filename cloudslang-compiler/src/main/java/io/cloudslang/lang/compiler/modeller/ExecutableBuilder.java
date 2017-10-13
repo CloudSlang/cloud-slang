@@ -9,11 +9,10 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
-import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
+import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
@@ -29,10 +28,17 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.iterators.PeekingIterator;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,16 +51,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.collections4.iterators.PeekingIterator;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_EXTERNAL_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
@@ -96,9 +97,8 @@ public class ExecutableBuilder {
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
-    private List<String> stepAdditionalKeyWords =
-            asList(ScoreLangConstants.LOOP_KEY, SlangTextualKeys.DO_KEY, SlangTextualKeys.NAVIGATION_KEY);
-    private List<String> parallelLoopValidKeywords = asList(SlangTextualKeys.DO_KEY, SlangTextualKeys.FOR_KEY);
+    private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY);
+    private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY);
 
     // @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -442,7 +442,7 @@ public class ExecutableBuilder {
                                         stepName,
                                         SlangTextualKeys.PARALLEL_LOOP_KEY,
                                         parallelLoopRawData,
-                                        Collections.<Transformer>emptyList(),
+                                        Collections.emptyList(),
                                         parallelLoopValidKeywords,
                                         null
                                 )
@@ -535,18 +535,12 @@ public class ExecutableBuilder {
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
-        List<Argument> arguments = getArgumentsFromDoStep(preStepData);
 
         String refId = "";
-        Map<String, Object> doRawData;
-        try {
-            doRawData = getRawDataFromDoStep(stepRawData);
-        } catch (ClassCastException ex) {
-            doRawData = new HashMap<>();
-        }
-        if (MapUtils.isEmpty(doRawData)) {
-            errors.add(new RuntimeException("Step: \'" + stepName + "\' has no reference information"));
-        } else {
+        final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
+        final Map<String, Object> doRawData = getRawDataFromDoStep(stepRawData);
+
+        if (MapUtils.isNotEmpty(doRawData)) {
             try {
                 String refString = doRawData.keySet().iterator().next();
                 refId = resolveReferenceId(refString, imports, namespace, preStepData);
@@ -566,7 +560,7 @@ public class ExecutableBuilder {
     private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,
                             Map<String, Serializable> postStepData, List<Argument> arguments,
                             String refId, List<Map<String, String>> navigationStrings) {
-        if (preStepData.containsKey(SlangTextualKeys.DO_EXTERNAL_KEY)) {
+        if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
             return new ExternalStep(stepName,
                     preStepData,
                     postStepData,
@@ -590,21 +584,15 @@ public class ExecutableBuilder {
 
     @SuppressWarnings("unchecked")
     private List<Argument> getArgumentsFromDoStep(Map<String, Serializable> preStepData) {
-        List<Argument> arguments = (List<Argument>) preStepData.get(SlangTextualKeys.DO_EXTERNAL_KEY);
-        if (arguments != null) {
-            return arguments;
-        } else {
-            return (List<Argument>) preStepData.get(SlangTextualKeys.DO_KEY);
-        }
+        return (List<Argument>) preStepData.getOrDefault(DO_EXTERNAL_KEY, preStepData.get(DO_KEY));
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> getRawDataFromDoStep(Map<String, Object> stepRawData) {
-        Map<String, Object> doRawData = (Map<String, Object>) stepRawData.get(SlangTextualKeys.DO_EXTERNAL_KEY);
-        if (doRawData != null) {
-            return doRawData;
-        } else {
-            return (Map<String, Object>) stepRawData.get(SlangTextualKeys.DO_KEY);
+        try {
+            return (Map<String, Object>) stepRawData.getOrDefault(DO_EXTERNAL_KEY, stepRawData.get(DO_KEY));
+        } catch (ClassCastException ex) {
+            return Collections.emptyMap();
         }
     }
 
@@ -641,7 +629,7 @@ public class ExecutableBuilder {
             String defaultFailure,
             List<RuntimeException> errors) {
         @SuppressWarnings("unchecked") List<Map<String, String>> navigationStrings =
-                (List<Map<String, String>>) postStepData.get(SlangTextualKeys.NAVIGATION_KEY);
+                (List<Map<String, String>>) postStepData.get(NAVIGATION_KEY);
 
         //default navigation
         if (CollectionUtils.isEmpty(navigationStrings)) {
@@ -666,11 +654,10 @@ public class ExecutableBuilder {
 
     private String resolveReferenceId(String rawReferenceId, Map<String, String> imports, String namespace,
                                       Map<String, Serializable> preStepData) {
-        if (preStepData.containsKey(SlangTextualKeys.DO_EXTERNAL_KEY)) {
+        if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
             return resolveDoExternalReferenceId(rawReferenceId);
-        } else {
-            return resolveDoReferenceId(rawReferenceId, imports, namespace);
         }
+        return resolveDoReferenceId(rawReferenceId, imports, namespace);
     }
 
     private String resolveDoExternalReferenceId(String rawReferenceId) {
@@ -707,7 +694,7 @@ public class ExecutableBuilder {
      *
      * @param workflow the workflow of the flow
      * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies
-     * and the other one is for external dependencies.
+     *     and the other one is for external dependencies.
      */
     private Pair<Set<String>, Set<String>> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();

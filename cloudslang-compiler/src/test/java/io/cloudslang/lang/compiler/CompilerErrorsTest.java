@@ -406,7 +406,8 @@ public class CompilerErrorsTest {
 
         final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Step: 'step1' has no reference information");
+        exception.expectMessage("For step 'step1' syntax is illegal.\n" +
+                "Step has no reference information.");
         compiler.compile(SlangSource.fromFile(resource), path);
     }
 

@@ -22,10 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_EXTERNAL_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_KEY;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-
 public class TransformersHandler {
 
     public static final String CLASS = "class ";
@@ -53,10 +49,6 @@ public class TransformersHandler {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
-            if ((rawData.containsKey(DO_EXTERNAL_KEY) && equalsIgnoreCase(DO_KEY, key)) ||
-                    equalsIgnoreCase(DO_EXTERNAL_KEY, key) && !rawData.containsKey(DO_EXTERNAL_KEY)) {
-                continue;
-            }
             Object value = rawData.get(key);
             try {
                 @SuppressWarnings("unchecked")
