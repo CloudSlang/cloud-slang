@@ -12,7 +12,7 @@ flow:
   workflow:
     - step1:
         do_external:
-          test/flow/Random Number Generator:
+          'test/flow/Random Number Generator':
             - min: '1'
             - max: '10'
 
