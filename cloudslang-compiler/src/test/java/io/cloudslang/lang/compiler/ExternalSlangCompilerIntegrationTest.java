@@ -11,11 +11,9 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
-
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
-import java.util.HashSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -24,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashSet;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
