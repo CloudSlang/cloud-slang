@@ -79,6 +79,7 @@ public class DependenciesHelper {
     /**
      * recursive matches executables with their references
      *
+     * @param executable the executables
      * @param availableDependencies the executables to match from
      * @return a map of a the executables that were successfully matched
      */
