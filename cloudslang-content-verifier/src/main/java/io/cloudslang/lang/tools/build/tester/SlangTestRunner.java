@@ -157,9 +157,9 @@ public class SlangTestRunner {
 
     /**
      *
-     * @param projectPath
-     * @param testCases
-     * @param compiledFlows
+     * @param projectPath the project path
+     * @param testCases the test cases
+     * @param compiledFlows the compiled flows
      * @param runTestsResults is updated to reflect skipped, failed passes test cases.
      */
     public void runTestsSequential(String projectPath, Map<String, SlangTestCase> testCases,
@@ -245,10 +245,12 @@ public class SlangTestRunner {
 
     /**
      * Processes skipped tests and also handles null testcase failures
-     * @param testCases
+     * @param bulkRunMode the bulk run mode
+     * @param testCases the test cases
      * @param testSuites active test suites
      * @param runTestsResults is updated to reflect skipped and fail fast scenarios
-     * @return
+     * @param buildModeConfig the build mode config
+     * @return a map with split test cases
      */
     public Map<TestCaseRunState, Map<String, SlangTestCase>> splitTestCasesByRunState(
             final BulkRunMode bulkRunMode,
@@ -441,8 +443,10 @@ public class SlangTestRunner {
     /**
      * This method will trigger the flow in a synchronize matter, meaning only one flow can run at a time.
      *
+     * @param testCase the test Case
      * @param compilationArtifact the artifact to trigger
-     * @param inputs              : flow inputs
+     * @param inputs flow inputs
+     * @param systemProperties the system properties
      * @return executionId
      */
     public Long runTestCaseSequentiallyToCompletion(SlangTestCase testCase, CompilationArtifact compilationArtifact,

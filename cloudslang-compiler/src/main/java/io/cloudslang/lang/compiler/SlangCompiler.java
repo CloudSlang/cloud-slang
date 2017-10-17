@@ -121,7 +121,7 @@ public interface SlangCompiler {
      *
      * @param source             the {@link SlangSource}
      * @param precompileStrategy whether to use caching in pre-compile.
-     * @param sensitivityLevel
+     * @param sensitivityLevel the sensitivity level.
      * @return an {@link ExecutableModellingResult} object, containing an executable which is either a flow
      *     or an operations in the file, and a list of all the errors that were found (if any).
      */
@@ -135,7 +135,7 @@ public interface SlangCompiler {
     void invalidateAllInPreCompileCache();
 
     /**
-     * Validate that the given {@Link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding
+     * Validate that the given {@link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding
      * its wiring to its dependencies
      * Current validations:
      * - Validates that (required, non private, non empty) inputs of the dependency have a matching input in the step

@@ -52,7 +52,7 @@ public interface ScoreCompiler {
     CompilationModellingResult compileSource(Executable source, Set<Executable> path);
 
     /**
-     * Validate that the given {@Link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding
+     * Validate that the given {@link io.cloudslang.lang.compiler.modeller.model.Executable} is valid regarding
      * its wiring to its dependencies
      * Current validations:
      * - Validates that required inputs of the dependency have a matching input in the step
