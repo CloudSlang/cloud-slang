@@ -79,4 +79,8 @@ public class Step {
         return onFailureStep;
     }
 
+    public boolean requiresValidation() {
+        return true;
+    }
+
 }

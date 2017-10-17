@@ -37,4 +37,9 @@ public class ExternalStep extends Step {
                 onFailureStep
         );
     }
+
+    @Override
+    public boolean requiresValidation() {
+        return false;
+    }
 }

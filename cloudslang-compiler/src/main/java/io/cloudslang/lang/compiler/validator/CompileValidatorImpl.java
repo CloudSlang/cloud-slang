@@ -69,7 +69,7 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
 
         for (Step step : steps) {
             // validate all steps, except external steps, that are not in the dependencies list
-            if (!(step instanceof ExternalStep)) {
+            if (step.requiresValidation()) {
                 Executable reference = dependencies.get(step.getRefId());
                 errors.addAll(validateStepAgainstItsDependency(flow, step, dependencies));
                 flowReferences.add(reference);
