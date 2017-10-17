@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.scorecompiler;
 
 import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
+import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
@@ -37,6 +38,8 @@ import static org.hamcrest.Matchers.equalTo;
 public class ExecutionPlanBuilder {
 
     private ExecutionStepFactory stepFactory;
+
+    private ExternalExecutionStepFactory externalStepFactory;
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
     private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 2;
@@ -141,10 +144,8 @@ public class ExecutionPlanBuilder {
                     )
             );
         }
-        stepExecutionSteps.add(
-                stepFactory.createBeginStepStep(currentId++, step.getArguments(),
-                        step.getPreStepActionData(), step.getRefId(), stepName)
-        );
+
+        stepExecutionSteps.add(createBeginStep(currentId++, step));
 
         //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -164,19 +165,13 @@ public class ExecutionPlanBuilder {
             }
         }
         if (parallelLoop) {
-            stepExecutionSteps.add(
-                    stepFactory.createFinishStepStep(currentId++, step.getPostStepActionData(),
-                            new HashMap<String, ResultNavigation>(), stepName, true)
-            );
+            stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(), true));
             stepExecutionSteps.add(
                     stepFactory.createJoinBranchesStep(currentId, step.getPostStepActionData(),
                             navigationValues, stepName)
             );
         } else {
-            stepExecutionSteps.add(
-                    stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
-                            navigationValues, stepName, false)
-            );
+            stepExecutionSteps.add(createFinishStepStep(currentId, step, navigationValues, false));
         }
         return stepExecutionSteps;
     }
@@ -207,7 +202,31 @@ public class ExecutionPlanBuilder {
         return currentId;
     }
 
+    private ExecutionStep createFinishStepStep(long currentId, Step step, Map<String,
+            ResultNavigation> navigationValues, boolean parallelLoop) {
+        if (step instanceof ExternalStep) {
+            return externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
+                    navigationValues, step.getName(), parallelLoop);
+        }
+        return stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
+                navigationValues, step.getName(), parallelLoop);
+    }
+
+    private ExecutionStep createBeginStep(Long id, Step step) {
+        if (step instanceof ExternalStep) {
+            return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
+                    step.getPreStepActionData(), step.getRefId(), step.getName());
+        }
+        return stepFactory.createBeginStepStep(id, step.getArguments(),
+                    step.getPreStepActionData(), step.getRefId(), step.getName());
+
+    }
+
     public void setStepFactory(ExecutionStepFactory stepFactory) {
         this.stepFactory = stepFactory;
+    }
+
+    public void setExternalStepFactory(ExternalExecutionStepFactory externalStepFactory) {
+        this.externalStepFactory = externalStepFactory;
     }
 }

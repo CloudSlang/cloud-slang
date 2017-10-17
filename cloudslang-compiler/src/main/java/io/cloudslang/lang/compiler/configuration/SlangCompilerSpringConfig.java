@@ -48,8 +48,10 @@ import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidatorImpl;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.scorecompiler.DefaultExternalExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionPlanBuilder;
 import io.cloudslang.lang.compiler.scorecompiler.ExecutionStepFactory;
+import io.cloudslang.lang.compiler.scorecompiler.ExternalExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompilerImpl;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
@@ -63,6 +65,8 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -130,6 +134,7 @@ public class SlangCompilerSpringConfig {
     public ExecutionPlanBuilder executionPlanBuilder() {
         ExecutionPlanBuilder executionPlanBuilder = new ExecutionPlanBuilder();
         executionPlanBuilder.setStepFactory(stepFactory());
+        executionPlanBuilder.setExternalStepFactory(externalStepFactory());
 
         return executionPlanBuilder;
     }
@@ -142,6 +147,11 @@ public class SlangCompilerSpringConfig {
     @Bean
     public ExternalReferenceValidator externalReferenceValidator() {
         return new DefaultExternalReferenceValidator();
+    }
+
+    @Bean
+    public ExternalExecutionStepFactory externalStepFactory() {
+        return new DefaultExternalExecutionStepFactory();
     }
 
     @Bean
