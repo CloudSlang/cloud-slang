@@ -12,7 +12,7 @@ flow:
   workflow:
     - step1:
         do_external:
-          2c22355a-9c26-4a9e-893c-01a35e4bb0e3:
+          '2c22355a-9c26-4a9e-893c-01a35e4bb0e3':
             - min: '1'
             - max: '10'
 
