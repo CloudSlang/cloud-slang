@@ -14,6 +14,12 @@
 
     <artifactId>cloudslang-cli</artifactId>
 
+    <properties>
+        <cs-content.revision>master</cs-content.revision>
+        <cs-content.type>branch</cs-content.type>
+        <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -332,8 +338,125 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
+                <version>3.0.0</version>
             </plugin>
 
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>assembly</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>dist</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>
+                                            src${file.separator}main${file.separator}resources${file.separator}cslang-cli.xml
+                                        </descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+                <finalName>cslang</finalName>
+            </build>
+        </profile>
+        <profile>
+            <id>content</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-scm-plugin</artifactId>
+                        <version>1.9.4</version>
+                        <executions>
+                            <execution>
+                                <id>download content sl</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <configuration>
+                                    <connectionUrl>scm:git:git@github.com:CloudSlang/cs-content.git</connectionUrl>
+                                    <checkoutDirectory>${project.build.directory}/cs-content</checkoutDirectory>
+                                    <scmVersion>${cs-content.revision}</scmVersion>
+                                    <scmVersionType>${cs-content.type}</scmVersionType>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.0.2</version>
+                        <executions>
+                            <execution>
+                                <id>copy-content</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/cslang-cli</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}/cs-content</directory>
+                                            <filtering>false</filtering>
+                                            <includes>
+                                                <include>**</include>
+                                            </includes>
+                                            <excludes>
+                                                <exclude>**/ci-env/**</exclude>
+                                                <exclude>**/test/**</exclude>
+                                                <exclude>*.yml</exclude>
+                                                <exclude>CONTRIBUTING.md</exclude>
+                                                <exclude>README.md</exclude>
+                                                <exclude>**/configuration/runconfig/**</exclude>
+                                            </excludes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>dist</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>
+                                            src${file.separator}main${file.separator}resources${file.separator}cslang-cli-with-content.xml
+                                        </descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+                <finalName>cslang</finalName>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

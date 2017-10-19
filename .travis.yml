@@ -3,18 +3,19 @@ language: java
 jdk:
   - oraclejdk8
 
-before_deploy: >
-  ant -f build/ant.xml
-  
+before_deploy:
+  - mvn clean -Passembly install -T 2.0C
+
 deploy:
   provider: releases
   prerelease: true
   api_key:
     secure: "yJHXG2Cn0v4mofCEF58eAnmOM3CzewEa42YPormioOYq0iQHNoF7NdNN7xpItIVoxmp383WsYGDeYeCzFhd4K+4xVQt1n3/jG1E3AJbSGJ7IEWUygUNec7HWS+q+yR911rMIPo8MiIZMjZFxCd4f8zaTqO0WQUui1v+QWHF9rAo="
   file:
-    - build/target/cli/cslang-cli.zip
-    - build/target/cli/cslang-cli.tar.gz
-    - build/target/builder/cslang-builder.zip
+    - target/cli/cslang-cli.zip
+    - target/cli/cslang-cli.tar.gz
+    - target/builder/cslang-builder.zip
+    - target/builder/cslang-builder.tar.gz
   skip_cleanup: true
   on:
     repo: CloudSlang/cloud-slang
