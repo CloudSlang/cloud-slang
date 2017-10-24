@@ -416,16 +416,11 @@
                                             <directory>${project.build.directory}/cs-content</directory>
                                             <filtering>false</filtering>
                                             <includes>
-                                                <include>**</include>
+                                                <include>**/content/**</include>
+                                                <include>**/configuration/properties/**</include>
+                                                <include>**/python-lib/**</include>
+                                                <include>DOCS.md</include>
                                             </includes>
-                                            <excludes>
-                                                <exclude>**/ci-env/**</exclude>
-                                                <exclude>**/test/**</exclude>
-                                                <exclude>*.yml</exclude>
-                                                <exclude>CONTRIBUTING.md</exclude>
-                                                <exclude>README.md</exclude>
-                                                <exclude>**/configuration/runconfig/**</exclude>
-                                            </excludes>
                                         </resource>
                                     </resources>
                                 </configuration>
@@ -438,8 +433,8 @@
                         <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <id>dist</id>
-                                <phase>package</phase>
+                                <id>cleandist</id>
+                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
