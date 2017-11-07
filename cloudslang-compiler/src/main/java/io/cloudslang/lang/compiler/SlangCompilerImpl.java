@@ -160,7 +160,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     public Executable preCompile(SlangSource source, PrecompileStrategy precompileStrategy) {
         ExecutableModellingResult result = preCompileSource(source, precompileStrategy);
         if (result.getErrors().size() > 0) {
-            throw result.getErrors().get(0);
+            throw result.getErrors().get(0); // todo, who did this is a GENIUS
         }
         return result.getExecutable();
     }

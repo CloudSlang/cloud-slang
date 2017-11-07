@@ -24,7 +24,14 @@ import java.util.Set;
 public class ExecutableValidatorImpl extends AbstractValidator implements ExecutableValidator {
 
     private SystemPropertyValidator systemPropertyValidator;
-    private ExternalReferenceValidator externalReferenceValidator;
+
+    public void setSystemPropertyValidator(SystemPropertyValidator systemPropertyValidator) {
+        this.systemPropertyValidator = systemPropertyValidator;
+    }
+
+    public SystemPropertyValidator getSystemPropertyValidator() {
+        return systemPropertyValidator;
+    }
 
     @Override
     public void validateNamespace(ParsedSlang parsedSlang) {
@@ -32,7 +39,7 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
         ParsedSlang.Type executableType = parsedSlang.getType();
         switch (executableType) {
             case SYSTEM_PROPERTY_FILE:
-                systemPropertyValidator.validateNamespace(namespace);
+                getSystemPropertyValidator().validateNamespace(namespace);
                 break;
             case FLOW:
             case OPERATION:
@@ -83,14 +90,6 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
             throw new RuntimeException("Reference ID cannot be empty");
         }
         validateNamespaceRules(referenceId);
-    }
-
-    @Override
-    public void validateExternalStepReferenceId(String referenceId) {
-        if (StringUtils.isEmpty(referenceId)) {
-            throw new RuntimeException("Reference ID cannot be empty");
-        }
-        externalReferenceValidator.validateExternalReference(referenceId);
     }
 
     @Override
@@ -154,11 +153,4 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
         }
     }
 
-    public void setSystemPropertyValidator(SystemPropertyValidator systemPropertyValidator) {
-        this.systemPropertyValidator = systemPropertyValidator;
-    }
-
-    public void setExternalReferenceValidator(ExternalReferenceValidator externalReferenceValidator) {
-        this.externalReferenceValidator = externalReferenceValidator;
-    }
 }

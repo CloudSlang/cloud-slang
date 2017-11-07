@@ -15,16 +15,24 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.entities.SensitivityLevel;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
+
+import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 
 public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>> {
+
+    private ExecutableValidator executableValidator;
+    private Type type = Type.INTERNAL;
+
 
     @Override
     public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData) {
@@ -67,6 +75,14 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
             }
         }
 
+        try {
+            List<Map<String, String>> navigationStrings = (List<Map<String, String>>) (List) rawData;
+            if (!navigationStrings.isEmpty() && errors.isEmpty()) {
+                executableValidator.validateNavigationStrings(navigationStrings);
+            }
+        } catch (RuntimeException e) {
+            errors.add(e);
+        }
         return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
@@ -86,4 +102,20 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
         return null;
     }
 
+    @Override
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public ExecutableValidator getExecutableValidator() {
+        return executableValidator;
+    }
+
+    public void setExecutableValidator(ExecutableValidator executableValidator) {
+        this.executableValidator = executableValidator;
+    }
 }

@@ -26,6 +26,8 @@ import java.util.Map;
 
 public class PublishTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
+    private Type type = Type.INTERNAL;
+
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
         return super.transform(rawData);
@@ -53,4 +55,12 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
                 "Please remove the properties for " + entry.getKey() + "."));
     }
 
+    @Override
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
 }

@@ -50,6 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
@@ -97,6 +98,10 @@ public class ExecutableBuilder {
 
     private List<Transformer> preStepTransformers;
     private List<Transformer> postStepTransformers;
+
+    private List<Transformer> externalPreStepTransformers;
+    private List<Transformer> externalPostStepTransformers;
+
     private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY);
     private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY);
 
@@ -124,6 +129,29 @@ public class ExecutableBuilder {
         //step transformers
         preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
         postStepTransformers = filterTransformers(Transformer.Scope.AFTER_STEP);
+
+        final List<Transformer> tempPreStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
+        final List<Transformer> tempPostStepTransformers = filterTransformers(Transformer.Scope.AFTER_STEP);
+
+        preStepTransformers = tempPreStepTransformers
+                .stream()
+                .filter(t -> t.getType() != Transformer.Type.EXTERNAL)
+                .collect(Collectors.toList());
+
+        postStepTransformers = tempPostStepTransformers
+                .stream().filter(t -> t.getType() != Transformer.Type.EXTERNAL)
+                .collect(Collectors.toList());
+
+        externalPreStepTransformers = tempPreStepTransformers
+                .stream()
+                .filter(t -> t.getType() != Transformer.Type.INTERNAL)
+                .collect(Collectors.toList());
+
+        externalPostStepTransformers = tempPostStepTransformers
+                .stream()
+                .filter(t -> t.getType() != Transformer.Type.INTERNAL)
+                .collect(Collectors.toList());
+
     }
 
     private List<Transformer> filterTransformers(Transformer.Scope scope) {
@@ -518,19 +546,26 @@ public class ExecutableBuilder {
             errors.add(new RuntimeException("Step: " + stepName + " has no data"));
         }
 
+        final boolean isExternal = stepRawData.containsKey(DO_EXTERNAL_KEY);
+        final List<Transformer> localPreStepTransformers =
+                isExternal ? externalPreStepTransformers : preStepTransformers;
+        final List<Transformer> localPostStepTransformers =
+                isExternal ? externalPostStepTransformers : postStepTransformers;
+
         Map<String, Serializable> preStepData = new HashMap<>();
         Map<String, Serializable> postStepData = new HashMap<>();
 
         errors.addAll(preCompileValidator
                 .checkKeyWords(stepName, "", stepRawData,
-                        ListUtils.union(preStepTransformers, postStepTransformers), stepAdditionalKeyWords, null));
+                        ListUtils.union(localPreStepTransformers, localPostStepTransformers), stepAdditionalKeyWords,
+                        null));
 
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler
-                .runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix,
+                .runTransformers(stepRawData, localPreStepTransformers, errors, errorMessagePrefix,
                         SensitivityLevel.ENCRYPTED));
         postStepData.putAll(transformersHandler
-                .runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix,
+                .runTransformers(stepRawData, localPostStepTransformers, errors, errorMessagePrefix,
                         SensitivityLevel.ENCRYPTED));
 
         replaceOnFailureReference(postStepData, onFailureStepName);
@@ -642,31 +677,19 @@ public class ExecutableBuilder {
             navigationStrings.add(failureMap);
             return navigationStrings;
         } else {
-            try {
-                executableValidator.validateNavigationStrings(navigationStrings);
-                return navigationStrings;
-            } catch (RuntimeException rex) {
-                errors.add(rex);
-                return new ArrayList<>();
-            }
+            return navigationStrings;
         }
     }
 
     private String resolveReferenceId(String rawReferenceId, Map<String, String> imports, String namespace,
                                       Map<String, Serializable> preStepData) {
         if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
-            return resolveDoExternalReferenceId(rawReferenceId);
+            return rawReferenceId;
         }
         return resolveDoReferenceId(rawReferenceId, imports, namespace);
     }
 
-    private String resolveDoExternalReferenceId(String rawReferenceId) {
-        executableValidator.validateExternalStepReferenceId(rawReferenceId);
-        return rawReferenceId;
-    }
-
     private String resolveDoReferenceId(String rawReferenceId, Map<String, String> imports, String namespace) {
-        executableValidator.validateStepReferenceId(rawReferenceId);
 
         int numberOfDelimiters = StringUtils.countMatches(rawReferenceId, NAMESPACE_DELIMITER);
         String resolvedReferenceId;
@@ -694,7 +717,7 @@ public class ExecutableBuilder {
      *
      * @param workflow the workflow of the flow
      * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies
-     *     and the other one is for external dependencies.
+     *         and the other one is for external dependencies.
      */
     private Pair<Set<String>, Set<String>> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();
