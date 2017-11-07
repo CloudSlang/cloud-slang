@@ -1,6 +1,6 @@
-#CHANGE LOG
+# CHANGELOG
 
-##Version 1.0
+## Version 1.0
 
 + DSL Changes
   + Added `decision` executable type. A `decision` is similar to an `operation`, but does not include an action section.
@@ -62,7 +62,7 @@
     + vmware
       + vcenter
 
-##Version 0.9.60
+## Version 0.9.60
 
 + DSL Changes
 	+ New or changed keywords and functions:
@@ -136,7 +136,7 @@
 	+ Removals - Content has been removed in the following areas:
 		+ Powershell
 
-##Version 0.9.50
+## Version 0.9.50
 
 + DSL Improvements
     + Improved Documentation Style - The infile documentation of flows and operations has been changed to be more structured.
@@ -160,7 +160,7 @@
 + Docker Image
 	  + A new CloudSlang dev image was added.
 
-##Version 0.9
+## Version 0.9
 
 + DSL Improvements
   	+ Simplified Value Syntax - The syntax of input and task argument default values, output values and result values has changed. We now distinguish between specifying literal values and expressions. This change alleviates the need for two sets of quotes surrounding literal strings.
@@ -189,7 +189,7 @@
     		+ JSON
     		+ Remote file transfer
 
-##Version 0.8
+## Version 0.8
 
 + General - project renamed to CloudSlang
 + Tools
@@ -217,7 +217,7 @@
 + Documentation
     + In depth tutorial which teaches many language features 	
 
-##Version 0.7
+## Version 0.7
 
 + Tools
     + Verifier - Verifies CloudSlang files are syntactically correct.
