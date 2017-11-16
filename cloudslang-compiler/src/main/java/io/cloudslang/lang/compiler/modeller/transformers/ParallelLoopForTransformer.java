@@ -9,10 +9,12 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.SensitivityLevel;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -25,12 +27,12 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData) {
-        return transformToLoopStatement(rawData, true);
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
+        return transformToLoopStatement(rawData, true);
     }
 
     @Override

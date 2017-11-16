@@ -9,11 +9,13 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SensitivityLevel;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,11 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
 
     @Override
     public TransformModellingResult<List<String>> transform(List<String> rawData) {
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
+    }
+
+    @Override
+    public TransformModellingResult<List<String>> transform(List<String> rawData, SensitivityLevel sensitivityLevel) {
         List<String> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -39,11 +46,6 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<List<String>> transform(List<String> rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override

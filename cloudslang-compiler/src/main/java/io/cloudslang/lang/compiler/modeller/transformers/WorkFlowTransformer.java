@@ -15,6 +15,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
@@ -27,13 +28,13 @@ public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map
 
     @Override
     public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData) {
-        return new BasicTransformModellingResult<>(rawData, new ArrayList<RuntimeException>());
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override
     public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData,
                                                                    SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
+        return new BasicTransformModellingResult<>(rawData, new ArrayList<RuntimeException>());
     }
 
     @Override

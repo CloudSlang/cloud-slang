@@ -14,10 +14,12 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  */
 
 import com.google.common.collect.Sets;
-import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.entities.SensitivityLevel;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +41,12 @@ public class PythonActionTransformer extends AbstractTransformer
 
     @Override
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData) {
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
+    }
+
+    @Override
+    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         Map<String, Serializable> transformedData = null;
 
@@ -62,12 +70,6 @@ public class PythonActionTransformer extends AbstractTransformer
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
-                                                                         SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override

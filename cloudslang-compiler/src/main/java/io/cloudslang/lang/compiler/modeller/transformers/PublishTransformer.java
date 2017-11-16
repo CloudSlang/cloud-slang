@@ -15,8 +15,9 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Output;
 
 import java.util.Collections;
@@ -28,12 +29,12 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
-        return super.transform(rawData);
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
+        return super.transform(rawData);
     }
 
     @Override
