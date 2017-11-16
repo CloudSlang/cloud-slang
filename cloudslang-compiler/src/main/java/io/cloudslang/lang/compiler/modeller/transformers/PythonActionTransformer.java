@@ -39,6 +39,12 @@ public class PythonActionTransformer extends AbstractTransformer
 
     @Override
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData) {
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
+    }
+
+    @Override
+    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         Map<String, Serializable> transformedData = null;
 
@@ -62,12 +68,6 @@ public class PythonActionTransformer extends AbstractTransformer
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
-                                                                         SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override

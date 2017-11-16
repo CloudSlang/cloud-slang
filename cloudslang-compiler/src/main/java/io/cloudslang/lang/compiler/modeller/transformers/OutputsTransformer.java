@@ -32,12 +32,12 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
-        return super.transform(rawData);
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
     }
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
+        return super.transform(rawData);
     }
 
     @Override

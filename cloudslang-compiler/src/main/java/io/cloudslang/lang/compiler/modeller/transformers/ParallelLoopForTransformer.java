@@ -25,12 +25,12 @@ public class ParallelLoopForTransformer extends AbstractForTransformer implement
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData) {
-        return transformToLoopStatement(rawData, true);
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
     }
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
+        return transformToLoopStatement(rawData, true);
     }
 
     @Override

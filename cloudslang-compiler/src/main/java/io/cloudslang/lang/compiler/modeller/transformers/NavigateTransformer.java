@@ -28,6 +28,12 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
 
     @Override
     public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData) {
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
+    }
+
+    @Override
+    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
         List<Map<String, String>> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -68,12 +74,6 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData,
-                                                                         SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override

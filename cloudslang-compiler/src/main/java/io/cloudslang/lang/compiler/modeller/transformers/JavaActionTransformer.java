@@ -41,6 +41,12 @@ public class JavaActionTransformer extends AbstractTransformer
 
     @Override
     public TransformModellingResult<Map<String, String>> transform(Map<String, String> rawData) {
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
+    }
+
+    @Override
+    public TransformModellingResult<Map<String, String>> transform(Map<String, String> rawData,
+                                                                   SensitivityLevel sensitivityLevel) {
         Map<String, String> transformedData = null;
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -55,12 +61,6 @@ public class JavaActionTransformer extends AbstractTransformer
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<Map<String, String>> transform(Map<String, String> rawData,
-                                                                   SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override

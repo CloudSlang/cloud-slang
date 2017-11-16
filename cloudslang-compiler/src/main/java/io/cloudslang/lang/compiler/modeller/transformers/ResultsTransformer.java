@@ -42,6 +42,11 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
 
     @Override
     public TransformModellingResult<List<Result>> transform(List rawData) {
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
+    }
+
+    @Override
+    public TransformModellingResult<List<Result>> transform(List rawData, SensitivityLevel sensitivityLevel) {
         List<Result> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -66,11 +71,6 @@ public class ResultsTransformer extends InOutTransformer implements Transformer<
             }
         }
         return postProcessResults(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<List<Result>> transform(List rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     public void addDefaultResultsIfNeeded(List rawResults, ExecutableType executableType,

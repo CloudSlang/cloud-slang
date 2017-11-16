@@ -24,6 +24,11 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
 
     @Override
     public TransformModellingResult<List<String>> transform(List<String> rawData) {
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
+    }
+
+    @Override
+    public TransformModellingResult<List<String>> transform(List<String> rawData, SensitivityLevel sensitivityLevel) {
         List<String> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -39,11 +44,6 @@ public class BreakTransformer implements Transformer<List<String>, List<String>>
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<List<String>> transform(List<String> rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override

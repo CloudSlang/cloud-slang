@@ -27,13 +27,13 @@ public class WorkFlowTransformer implements Transformer<Map<String, Object>, Map
 
     @Override
     public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData) {
-        return new BasicTransformModellingResult<>(rawData, new ArrayList<RuntimeException>());
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
     }
 
     @Override
     public TransformModellingResult<Map<String, Object>> transform(Map<String, Object> rawData,
                                                                    SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
+        return new BasicTransformModellingResult<>(rawData, new ArrayList<RuntimeException>());
     }
 
     @Override

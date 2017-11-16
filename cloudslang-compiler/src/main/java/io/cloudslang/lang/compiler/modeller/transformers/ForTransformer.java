@@ -20,12 +20,12 @@ public class ForTransformer extends AbstractForTransformer implements Transforme
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData) {
-        return transformToLoopStatement(rawData, false);
+        return transform(rawData, SensitivityLevel.ENCRYPTED);
     }
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
+        return transformToLoopStatement(rawData, false);
     }
 
     @Override
