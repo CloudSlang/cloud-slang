@@ -159,7 +159,7 @@ public class ExecutableBuilder {
         postExecutableActionData.putAll(
                 transformersHandler
                         .runTransformers(executableRawData, postExecTransformers, errors, errorMessagePrefix,
-                                SensitivityLevel.ENCRYPTED));
+                                sensitivityLevel));
 
         @SuppressWarnings("unchecked") List<Input> inputs =
                 (List<Input>) preExecutableActionData.remove(SlangTextualKeys.INPUTS_KEY);
@@ -184,10 +184,11 @@ public class ExecutableBuilder {
                                 executableRawData.get(WORKFLOW_KEY), execName, errors);
 
                 Workflow onFailureWorkFlow =
-                        getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName);
+                        getOnFailureWorkflow(workFlowRawData, imports, errors, namespace, execName, sensitivityLevel);
 
                 WorkflowModellingResult workflowModellingResult =
-                        compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow, false, namespace);
+                        compileWorkFlow(workFlowRawData, imports, onFailureWorkFlow,
+                                false, namespace, sensitivityLevel);
                 errors.addAll(workflowModellingResult.getErrors());
                 Workflow workflow = workflowModellingResult.getWorkflow();
 
@@ -223,7 +224,7 @@ public class ExecutableBuilder {
                         ExecutableType.OPERATION, results, errors);
 
                 Map<String, Object> actionRawData = getActionRawData(executableRawData, errors, parsedSlang, execName);
-                ActionModellingResult actionModellingResult = compileAction(actionRawData);
+                ActionModellingResult actionModellingResult = compileAction(actionRawData, sensitivityLevel);
                 errors.addAll(actionModellingResult.getErrors());
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
@@ -312,7 +313,7 @@ public class ExecutableBuilder {
 
     private Workflow getOnFailureWorkflow(List<Map<String, Map<String, Object>>> workFlowRawData,
                                           Map<String, String> imports, List<RuntimeException> errors,
-                                          String namespace, String execName) {
+                                          String namespace, String execName, SensitivityLevel sensitivityLevel) {
 
         Map<String, Map<String, Object>> onFailureStepData = preCompileValidator.validateOnFailurePosition(
                 workFlowRawData,
@@ -341,7 +342,8 @@ public class ExecutableBuilder {
                 handleOnFailureStepNavigationSection(onFailureData, execName, errors);
 
                 WorkflowModellingResult workflowModellingResult =
-                        compileWorkFlow(onFailureData, imports, null, true, namespace);
+                        compileWorkFlow(onFailureData, imports, null,
+                                true, namespace, sensitivityLevel);
                 errors.addAll(workflowModellingResult.getErrors());
                 onFailureWorkFlow = workflowModellingResult.getWorkflow();
             } else if (onFailureData == null) {
@@ -368,7 +370,7 @@ public class ExecutableBuilder {
         return onFailureStepMap.entrySet().iterator().next();
     }
 
-    private ActionModellingResult compileAction(Map<String, Object> actionRawData) {
+    private ActionModellingResult compileAction(Map<String, Object> actionRawData, SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> actionData = new HashMap<>();
 
         List<RuntimeException> errors = preCompileValidator
@@ -377,7 +379,7 @@ public class ExecutableBuilder {
         String errorMessagePrefix = "Action syntax is illegal.\n";
         actionData.putAll(
                 transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix,
-                        SensitivityLevel.ENCRYPTED));
+                        sensitivityLevel));
 
         Action action = new Action(actionData);
         return new ActionModellingResult(action, errors);
@@ -387,7 +389,8 @@ public class ExecutableBuilder {
                                                     Map<String, String> imports,
                                                     Workflow onFailureWorkFlow,
                                                     boolean onFailureSection,
-                                                    String namespace) {
+                                                    String namespace,
+                                                    SensitivityLevel sensitivityLevel) {
 
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -475,7 +478,8 @@ public class ExecutableBuilder {
                     defaultFailure,
                     namespace,
                     onFailureStepName,
-                    onFailureSection
+                    onFailureSection,
+                    sensitivityLevel
             );
 
             errors.addAll(stepModellingResult.getErrors());
@@ -510,7 +514,8 @@ public class ExecutableBuilder {
             String defaultFailure,
             String namespace,
             String onFailureStepName,
-            boolean onFailureSection) {
+            boolean onFailureSection,
+            SensitivityLevel sensitivityLevel) {
 
         List<RuntimeException> errors = new ArrayList<>();
         if (MapUtils.isEmpty(stepRawData)) {
@@ -528,10 +533,10 @@ public class ExecutableBuilder {
         String errorMessagePrefix = "For step '" + stepName + "' syntax is illegal.\n";
         preStepData.putAll(transformersHandler
                 .runTransformers(stepRawData, preStepTransformers, errors, errorMessagePrefix,
-                        SensitivityLevel.ENCRYPTED));
+                        sensitivityLevel));
         postStepData.putAll(transformersHandler
                 .runTransformers(stepRawData, postStepTransformers, errors, errorMessagePrefix,
-                        SensitivityLevel.ENCRYPTED));
+                        sensitivityLevel));
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
