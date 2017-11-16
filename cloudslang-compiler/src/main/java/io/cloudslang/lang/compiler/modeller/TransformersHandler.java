@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.modeller;
 
 
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.entities.SensitivityLevel;
@@ -40,7 +41,7 @@ public class TransformersHandler {
     public Map<String, Serializable> runTransformers(Map<String, Object> rawData,
                                                      List<Transformer> scopeTransformers,
                                                      List<RuntimeException> errors) {
-        return runTransformers(rawData, scopeTransformers, errors, "", SensitivityLevel.ENCRYPTED);
+        return runTransformers(rawData, scopeTransformers, errors, "", CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     public Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers,

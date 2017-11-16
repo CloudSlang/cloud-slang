@@ -15,20 +15,22 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.entities.SensitivityLevel;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
 
 public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>> {
 
     @Override
     public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData) {
-        return transform(rawData, SensitivityLevel.ENCRYPTED);
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override

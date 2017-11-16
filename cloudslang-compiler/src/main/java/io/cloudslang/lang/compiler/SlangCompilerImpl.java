@@ -116,7 +116,8 @@ public class SlangCompilerImpl implements SlangCompiler {
             SlangSource source,
             Set<SlangSource> path,
             PrecompileStrategy precompileStrategy) {
-        return getCompilationModellingResult(source, path, precompileStrategy, SensitivityLevel.ENCRYPTED);
+        return getCompilationModellingResult(source, path, precompileStrategy,
+                CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     private CompilationModellingResult getCompilationModellingResult(SlangSource source, Set<SlangSource> path,
@@ -172,7 +173,7 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     @Override
     public ExecutableModellingResult preCompileSource(SlangSource source, PrecompileStrategy precompileStrategy) {
-        return getExecutableModellingResult(source, precompileStrategy, SensitivityLevel.ENCRYPTED);
+        return getExecutableModellingResult(source, precompileStrategy, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override

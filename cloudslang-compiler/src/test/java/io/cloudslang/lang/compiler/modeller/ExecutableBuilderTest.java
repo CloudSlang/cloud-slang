@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
-import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -26,17 +26,8 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Result;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,6 +39,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
@@ -261,7 +261,7 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
         Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData,
-                SensitivityLevel.ENCRYPTED).getExecutable();
+                CompilerConstants.DEFAULT_SENSITIVITY_LEVEL).getExecutable();
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
         Deque<Step> steps = flow.getWorkflow().getSteps();
@@ -292,7 +292,7 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
         Flow flow = (Flow) executableBuilder.transformToExecutable(mockParsedSlang, executableRawData,
-                SensitivityLevel.ENCRYPTED).getExecutable();
+                CompilerConstants.DEFAULT_SENSITIVITY_LEVEL).getExecutable();
 
         Assert.assertEquals(SlangTextualKeys.FLOW_TYPE, flow.getType());
         Assert.assertEquals(flowName, flow.getName());
@@ -340,7 +340,8 @@ public class ExecutableBuilderTest {
 
     private Executable transformToExecutable(ParsedSlang mockParsedSlang, Map<String, Object> executableRawData) {
         ExecutableModellingResult modellingResult =
-                executableBuilder.transformToExecutable(mockParsedSlang, executableRawData, SensitivityLevel.ENCRYPTED);
+                executableBuilder.transformToExecutable(mockParsedSlang, executableRawData,
+                        CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
         if (modellingResult.getErrors().size() > 0) {
             throw modellingResult.getErrors().get(0);
         }
