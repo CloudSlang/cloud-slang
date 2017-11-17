@@ -12,10 +12,10 @@ deploy:
   api_key:
     secure: "yJHXG2Cn0v4mofCEF58eAnmOM3CzewEa42YPormioOYq0iQHNoF7NdNN7xpItIVoxmp383WsYGDeYeCzFhd4K+4xVQt1n3/jG1E3AJbSGJ7IEWUygUNec7HWS+q+yR911rMIPo8MiIZMjZFxCd4f8zaTqO0WQUui1v+QWHF9rAo="
   file:
-    - target/cli/cslang-cli.zip
-    - target/cli/cslang-cli.tar.gz
-    - target/builder/cslang-builder.zip
-    - target/builder/cslang-builder.tar.gz
+    - cloudslang-cli/target/cslang-cli.zip
+    - cloudslang-cli/target/cslang-cli.tar.gz
+    - cloudslang-content-verifier/target/cslang-builder.zip
+    - cloudslang-content-verifier/target/cslang-builder.tar.gz
   skip_cleanup: true
   on:
     repo: CloudSlang/cloud-slang
