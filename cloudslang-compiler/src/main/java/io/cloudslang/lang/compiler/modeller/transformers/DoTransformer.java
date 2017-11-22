@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
@@ -42,6 +43,12 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
     @Override
     public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData) {
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
+    }
+
+    @Override
+    public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData,
+                                                              SensitivityLevel sensitivityLevel) {
         final List<RuntimeException> validateRawData = validateRawData(rawData);
         if (!validateRawData.isEmpty()) {
             return new BasicTransformModellingResult<>(null, validateRawData);
@@ -60,7 +67,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             // list syntax
             for (final Object rawArgument : rawArgumentsList) {
                 try {
-                    final Argument argument = transformListArgument(rawArgument);
+                    final Argument argument = transformListArgument(rawArgument, sensitivityLevel);
                     final List<RuntimeException> validationErrors =
                             preCompileValidator.validateNoDuplicateInOutParams(transformedData, argument);
                     if (CollectionUtils.isEmpty(validationErrors)) {
@@ -76,12 +83,6 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         }
         return new BasicTransformModellingResult<>(Collections.emptyList(), Collections.singletonList(
                 new RuntimeException("Step arguments should be defined using a standard YAML list.")));
-    }
-
-    @Override
-    public TransformModellingResult<List<Argument>> transform(Map<String, Object> rawData,
-                                                              SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override
@@ -104,12 +105,12 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         return Type.INTERNAL;
     }
 
-    private Argument transformListArgument(Object rawArgument) {
+    private Argument transformListArgument(Object rawArgument, SensitivityLevel sensitivityLevel) {
         // - some_arg
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
         if (rawArgument instanceof String) {
             String argumentName = (String) rawArgument;
-            return createArgument(argumentName, null, false, false);
+            return createArgument(argumentName, null, false, false, sensitivityLevel);
         } else if (rawArgument instanceof Map) {
             // not so nice casts here - validation happens later on
             // noinspection unchecked
@@ -132,16 +133,18 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
                 //     property2: value2
                 // this is the verbose way of defining inputs with all of the properties available
                 // noinspection unchecked
-                return createArgumentWithProperties((Map.Entry<String, Map<String, Serializable>>) entry);
+                return createArgumentWithProperties((Map.Entry<String, Map<String, Serializable>>) entry,
+                        sensitivityLevel);
             } else {
                 // - some_input: some_expression
-                return createArgument(entryKey, entryValue);
+                return createArgument(entryKey, entryValue, sensitivityLevel);
             }
         }
         throw new RuntimeException("Could not transform step argument: " + rawArgument);
     }
 
-    private Argument createArgumentWithProperties(Map.Entry<String, Map<String, Serializable>> entry) {
+    private Argument createArgumentWithProperties(Map.Entry<String, Map<String, Serializable>> entry,
+                                                  SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> props = entry.getValue();
         List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
 
@@ -160,24 +163,25 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         boolean valueKeyFound = props.containsKey(VALUE_KEY);
         Serializable value = valueKeyFound ? props.get(VALUE_KEY) : null;
 
-        return createArgument(entryKey, value, sensitive, valueKeyFound);
+        return createArgument(entryKey, value, sensitive, valueKeyFound, sensitivityLevel);
     }
 
-    private Argument createArgument(String entryName, Serializable entryValue) {
-        return createArgument(entryName, entryValue, false, true);
+    private Argument createArgument(String entryName, Serializable entryValue, SensitivityLevel sensitivityLevel) {
+        return createArgument(entryName, entryValue, false, true, sensitivityLevel);
     }
 
     private Argument createArgument(
             String entryName,
             Serializable entryValue,
             boolean sensitive,
-            boolean privateArgument) {
+            boolean privateArgument,
+            SensitivityLevel sensitivityLevel) {
         executableValidator.validateInputName(entryName);
         preCompileValidator.validateStringValue(entryName, entryValue, this);
         Accumulator accumulator = extractFunctionData(entryValue);
         return new Argument(
                 entryName,
-                ValueFactory.create(entryValue, sensitive),
+                ValueFactory.create(entryValue, sensitive, sensitivityLevel),
                 privateArgument,
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()

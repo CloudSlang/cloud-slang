@@ -15,6 +15,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
+import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
@@ -26,8 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
-
 public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>> {
 
     private ExecutableValidator executableValidator;
@@ -36,6 +35,12 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
 
     @Override
     public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData) {
+        return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
+    }
+
+    @Override
+    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData,
+                                                                         SensitivityLevel sensitivityLevel) {
         List<Map<String, String>> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -84,12 +89,6 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
             errors.add(e);
         }
         return new BasicTransformModellingResult<>(transformedData, errors);
-    }
-
-    @Override
-    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData,
-                                                                         SensitivityLevel sensitivityLevel) {
-        return transform(rawData);
     }
 
     @Override
