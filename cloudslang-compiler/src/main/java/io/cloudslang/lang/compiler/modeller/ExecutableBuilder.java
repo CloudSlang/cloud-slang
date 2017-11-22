@@ -722,7 +722,7 @@ public class ExecutableBuilder {
      *
      * @param workflow the workflow of the flow
      * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies
-     * and the other one is for external dependencies.
+     *         and the other one is for external dependencies.
      */
     private Pair<Set<String>, Set<String>> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();
