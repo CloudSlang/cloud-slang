@@ -56,6 +56,7 @@ import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompilerImpl;
 import io.cloudslang.lang.compiler.validator.CompileValidator;
 import io.cloudslang.lang.compiler.validator.CompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.DefaultExternalExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
@@ -132,9 +133,7 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public ExecutableValidator externalExecutableValidator() {
-        ExecutableValidatorImpl executableValidator = new ExecutableValidatorImpl();
-        executableValidator.setSystemPropertyValidator(systemPropertyValidator());
-        return executableValidator;
+        return new DefaultExternalExecutableValidator();
     }
 
     @Bean
