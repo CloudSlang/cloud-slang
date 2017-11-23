@@ -15,8 +15,9 @@ package io.cloudslang.lang.compiler.modeller.transformers;
  * Created by orius123 on 05/11/14.
  */
 
-import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.entities.SensitivityLevel;
+
 import java.util.List;
 
 public interface Transformer<F, T> {
@@ -29,12 +30,32 @@ public interface Transformer<F, T> {
 
     String keyToTransform();
 
+    default Type getType() {
+        return Type.BOTH;
+    }
+
     enum Scope {
         BEFORE_STEP,
         AFTER_STEP,
         BEFORE_EXECUTABLE,
         AFTER_EXECUTABLE,
         ACTION
+    }
+
+    enum Type {
+        INTERNAL("internal"),
+        EXTERNAL("external"),
+        BOTH("both");
+
+        private String key;
+
+        Type(String key) {
+            this.key = key;
+        }
+
+        public String key() {
+            return key;
+        }
     }
 
 }

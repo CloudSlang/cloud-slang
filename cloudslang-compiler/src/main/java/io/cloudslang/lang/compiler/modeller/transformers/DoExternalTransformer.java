@@ -17,4 +17,9 @@ public class DoExternalTransformer extends DoTransformer {
     public String keyToTransform() {
         return SlangTextualKeys.DO_EXTERNAL_KEY;
     }
+
+    @Override
+    public Type getType() {
+        return Type.EXTERNAL;
+    }
 }

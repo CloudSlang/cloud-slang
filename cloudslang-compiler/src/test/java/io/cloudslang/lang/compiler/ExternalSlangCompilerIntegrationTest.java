@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.HashSet;
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,11 +35,10 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig.class})
 public class ExternalSlangCompilerIntegrationTest {
-    @Autowired
-    private SlangCompiler slangCompiler;
-
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    @Autowired
+    private SlangCompiler slangCompiler;
 
     @Test
     public void testFlowWithExternalStep() throws Exception {
@@ -48,12 +47,12 @@ public class ExternalSlangCompilerIntegrationTest {
         final Flow slangExecutable = (Flow) slangCompiler.preCompile(slangSource);
 
         assertTrue(slangExecutable.getExternalExecutableDependencies()
-                .contains("/Library/Utility Operations/Flow Variable Manipulation/Do Nothing"));
+                                  .contains("/Library/Utility Operations/Flow Variable Manipulation/Do Nothing"));
         assertEquals(4, slangExecutable.getWorkflow().getSteps().size());
         final List<Class<?>> classes = slangExecutable.getWorkflow().getSteps()
-                .stream()
-                .map(Object::getClass)
-                .collect(Collectors.toList());
+                                                      .stream()
+                                                      .map(Object::getClass)
+                                                      .collect(Collectors.toList());
         assertThat(classes, Matchers.hasItems(ExternalStep.class, Step.class, Step.class, Step.class));
     }
 
@@ -65,12 +64,12 @@ public class ExternalSlangCompilerIntegrationTest {
         final Flow slangExecutable = (Flow) slangCompiler.preCompile(slangSource);
 
         assertTrue(slangExecutable.getExternalExecutableDependencies()
-                .contains("/Library/Utility Operations/Flow Variable Manipulation/Do Nothing"));
+                                  .contains("/Library/Utility Operations/Flow Variable Manipulation/Do Nothing"));
         assertEquals(4, slangExecutable.getWorkflow().getSteps().size());
         final List<Class<?>> classes = slangExecutable.getWorkflow().getSteps()
-                .stream()
-                .map(Object::getClass)
-                .collect(Collectors.toList());
+                                                      .stream()
+                                                      .map(Object::getClass)
+                                                      .collect(Collectors.toList());
         assertThat(classes, Matchers.hasItems(ExternalStep.class, Step.class, Step.class, Step.class));
     }
 

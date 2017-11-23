@@ -100,6 +100,11 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         return Argument.class;
     }
 
+    @Override
+    public Type getType() {
+        return Type.INTERNAL;
+    }
+
     private Argument transformListArgument(Object rawArgument, SensitivityLevel sensitivityLevel) {
         // - some_arg
         // this is our default behaviour that if the user specifies only a key, the key is also the ref we look for
@@ -199,6 +204,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
                     new RuntimeException("Step has too many keys under the '" + keyToTransform() + "' keyword,\n" +
                             "May happen due to wrong indentation."));
         }
+        executableValidator.validateStepReferenceId(rawData.keySet().iterator().next());
         return Collections.emptyList();
     }
 }
