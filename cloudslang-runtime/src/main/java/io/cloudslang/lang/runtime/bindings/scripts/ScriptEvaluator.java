@@ -71,11 +71,14 @@ public class ScriptEvaluator extends ScriptProcessor {
             return ValueFactory.create(result.getEvalResult(),
                     getSensitive(result.getResultContext(), systemPropertiesDefined));
         } catch (Exception exception) {
-            final String exprSubstring = expr.length() > MAX_LENGTH ? expr.substring(0, MAX_LENGTH) + "..." : expr;
             throw new RuntimeException("Error in running script expression: '" +
-                    exprSubstring + "',\n\tException is: " +
+                    getTruncatedExpression(expr) + "',\n\tException is: " +
                     handleExceptionSpecialCases(exception.getMessage()), exception);
         }
+    }
+
+    private String getTruncatedExpression(String expr) {
+        return expr.length() > MAX_LENGTH ? expr.substring(0, MAX_LENGTH) + "..." : expr;
     }
 
     private String buildAddFunctionsScript(Set<ScriptFunction> functionDependencies) {
