@@ -16,16 +16,17 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author stoneo
@@ -48,6 +49,8 @@ public class ScriptEvaluator extends ScriptProcessor {
             "def check_empty(value_to_check, default_value=None):" + LINE_SEPARATOR +
                     "  return default_value if value_to_check is None else value_to_check";
 
+    public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
+
     @Autowired
     private PythonRuntimeService pythonRuntimeService;
 
@@ -69,9 +72,13 @@ public class ScriptEvaluator extends ScriptProcessor {
                     getSensitive(result.getResultContext(), systemPropertiesDefined));
         } catch (Exception exception) {
             throw new RuntimeException("Error in running script expression: '" +
-                            expr + "',\n\tException is: " +
+                    getTruncatedExpression(expr) + "',\n\tException is: " +
                     handleExceptionSpecialCases(exception.getMessage()), exception);
         }
+    }
+
+    private String getTruncatedExpression(String expr) {
+        return expr.length() > MAX_LENGTH ? expr.substring(0, MAX_LENGTH) + "..." : expr;
     }
 
     private String buildAddFunctionsScript(Set<ScriptFunction> functionDependencies) {
