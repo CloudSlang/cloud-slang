@@ -4,7 +4,7 @@ jdk:
   - openjdk8
 
 before_deploy:
-  - mvn clean -Passembly install -T 2.0C
+  - mvn clean -Passembly,content install -T 2.0C
 
 deploy:
   provider: releases
@@ -14,6 +14,8 @@ deploy:
   file:
     - cloudslang-cli/target/cslang-cli.zip
     - cloudslang-cli/target/cslang-cli.tar.gz
+    - cloudslang-cli/target/cslang-cli-with-content.zip
+    - cloudslang-cli/target/cslang-cli-with-content.tar.gz
     - cloudslang-content-verifier/target/cslang-builder.zip
     - cloudslang-content-verifier/target/cslang-builder.tar.gz
   skip_cleanup: true

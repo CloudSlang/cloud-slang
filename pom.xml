@@ -12,9 +12,11 @@
     <artifactId>cloudslang</artifactId>
     <version>1.0.17-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A DSL for writing flows</description>
     <url>https://github.com/CloudSlang/cloud-slang</url>
+
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
