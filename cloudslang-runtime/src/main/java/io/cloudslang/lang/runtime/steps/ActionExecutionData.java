@@ -61,7 +61,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     public void doAction(@Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA)
-                             Map<String, Object> nonSerializableExecutionData,
+                             Map<String, Map<String, Object>> nonSerializableExecutionData,
                          @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
                          @Param(ScoreLangConstants.JAVA_ACTION_CLASS_KEY) String className,
@@ -92,7 +92,8 @@ public class ActionExecutionData extends AbstractExecutionData {
             switch (actionType) {
                 case JAVA:
                     returnValue = runJavaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
-                        gav, className, methodName);
+                        gav, className, methodName, executionRuntimeServices.getNodeNameWithDepth(),
+                            runEnv.getParentFlowStack().size());
                     break;
                 case PYTHON:
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
@@ -132,12 +133,13 @@ public class ActionExecutionData extends AbstractExecutionData {
     @SuppressWarnings("unchecked")
     private Map<String, Value> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
                                              Map<String, Value> currentContext,
-                                             Map<String, Object> nonSerializableExecutionData,
-                                             String gav, String className, String methodName) {
+                                             Map<String, Map<String, Object>> nonSerializableExecutionData,
+                                             String gav, String className, String methodName,
+                                             String nodeNameWithDepth, int depth) {
         Map<String, Serializable> returnMap = (Map<String, Serializable>) javaExecutionService
             .execute(normalizeJavaGav(gav), className, methodName,
                 new CloudSlangJavaExecutionParameterProvider(serializableSessionData,
-                    createActionContext(currentContext), nonSerializableExecutionData));
+                    createActionContext(currentContext), nonSerializableExecutionData, nodeNameWithDepth, depth));
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }

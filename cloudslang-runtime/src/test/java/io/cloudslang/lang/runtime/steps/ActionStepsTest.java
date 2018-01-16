@@ -60,6 +60,7 @@ import java.util.Map;
 
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.GLOBAL_SESSION_OBJECT;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -78,18 +79,14 @@ public class ActionStepsTest {
     private static final String GAV_DEFAULT = "";
     //    private static final ArrayList<String> DEPENDENCIES_DEFAULT = Lists.newArrayList("dep1", "dep2");
     private static final List<String> DEPENDENCIES_DEFAULT = Collections.emptyList();
-    private Map<String, Object> nonSerializableExecutionData;
-
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
     @Rule
     public ExpectedException exception = ExpectedException.none();
-
+    ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
+    private Map<String, Map<String, Object>> nonSerializableExecutionData;
     @Autowired
     private ActionExecutionData actionSteps;
-
-    ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
 
     @Before
     public void setUp() {
@@ -559,14 +556,15 @@ public class ActionStepsTest {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void doJavaActionGetKeyFromNonSerializableSessionTest() {
         //prepare doAction arguments
-        RunEnvironment runEnv = new RunEnvironment();
-        HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
+        HashMap<String, Map<String, Object>> nonSerializableExecutionData = new HashMap<>();
+        HashMap<String, Object> globalSessionObject = new HashMap<>();
         GlobalSessionObject<NonSerializableObject> sessionObject = new GlobalSessionObject<>();
         NonSerializableObject employee = new NonSerializableObject("John");
         sessionObject.setResource(new ContentTestActions.NonSerializableSessionResource(employee));
-        nonSerializableExecutionData.put("name", sessionObject);
-
+        globalSessionObject.put("name", sessionObject);
+        nonSerializableExecutionData.put(GLOBAL_SESSION_OBJECT, globalSessionObject);
         //invoke doAction
+        RunEnvironment runEnv = new RunEnvironment();
         actionSteps.doAction(
                 executionRuntimeServicesMock,
                 runEnv,
@@ -589,11 +587,16 @@ public class ActionStepsTest {
     public void doJavaActionSetKeyOnNonSerializableSessionTest() {
         //prepare doAction arguments
         final RunEnvironment runEnv = new RunEnvironment();
-        HashMap<String, Object> nonSerializableExecutionData = new HashMap<>();
+        HashMap<String, Map<String, Object>> nonSerializableExecutionData = new HashMap<>();
+        HashMap<String, Object> globalSessionObjectData = new HashMap<>();
+
         GlobalSessionObject<NonSerializableObject> sessionObject = new GlobalSessionObject<>();
         NonSerializableObject employee = new NonSerializableObject("John");
         sessionObject.setResource(new ContentTestActions.NonSerializableSessionResource(employee));
-        nonSerializableExecutionData.put("name", sessionObject);
+
+        globalSessionObjectData.put("name", sessionObject);
+        nonSerializableExecutionData.put(ExecutionParametersConsts.GLOBAL_SESSION_OBJECT, globalSessionObjectData);
+
         Map<String, Value> initialCallArguments = new HashMap<>();
         initialCallArguments.put("value", ValueFactory.create("David"));
         runEnv.putCallArguments(initialCallArguments);
@@ -740,7 +743,7 @@ public class ActionStepsTest {
         initialCallArguments.put("port", ValueFactory.create("8080"));
         runEnv.putCallArguments(initialCallArguments);
 
-        Map<String, Object> nonSerializableExecutionData = new HashMap<>();
+        Map<String, Map<String, Object>> nonSerializableExecutionData = new HashMap<>();
 
         String userPythonScript = "import os\n" +
                 "print host\n" +

@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <score.group>io.cloudslang</score.group>
-        <score.version>0.3.46</score.version>
+        <score.version>0.3.46-SNAPSHOT</score.version>
         <spring.version>4.3.10.RELEASE</spring.version>
         <plugins.maven-dependency-plugin.version>2.10</plugins.maven-dependency-plugin.version>
         <plugins.maven-dependency-plugin.version.old>2.8</plugins.maven-dependency-plugin.version.old>
@@ -159,7 +159,7 @@
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
                 <artifactId>score-content-sdk</artifactId>
-                <version>1.10.6</version>
+                <version>1.10.7-SNAPSHOT</version>
             </dependency>
             <!--end of score dependencies-->
 

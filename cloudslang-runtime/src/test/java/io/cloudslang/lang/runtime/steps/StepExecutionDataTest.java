@@ -42,6 +42,7 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.lang.SystemContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -116,7 +117,8 @@ public class StepExecutionDataTest {
     public void testBeginStepEmptyInputs() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         stepExecutionData
-            .beginStep(new ArrayList<Argument>(), null, runEnv, createRuntimeServices(), "step1", 1L, 2L, "2");
+            .beginStep(new ArrayList<Argument>(), null, runEnv, createRuntimeServices(),
+                    "step1", 1L, 2L, "2");
         Map<String, Value> callArgs = runEnv.removeCallArguments();
         Assert.assertTrue(callArgs.isEmpty());
     }
@@ -160,7 +162,8 @@ public class StepExecutionDataTest {
         )).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        stepExecutionData.beginStep(arguments, null, runEnv, runtimeServices, "step1", 1L, 2L, "2");
+        stepExecutionData.beginStep(arguments, null, runEnv, runtimeServices, "step1",
+                1L, 2L, "2");
         Map<String, Value> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
         assertEquals(5, callArgs.get("input1").get());

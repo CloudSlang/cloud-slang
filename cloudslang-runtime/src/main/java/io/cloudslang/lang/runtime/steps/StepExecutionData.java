@@ -10,6 +10,7 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
+import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -70,6 +71,9 @@ public class StepExecutionData extends AbstractExecutionData {
         try {
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
+
+            final int flowDepth = runEnv.getParentFlowStack().size();
+            prepareNodeName(executionRuntimeServices, nodeName, flowDepth);
 
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
@@ -143,6 +147,23 @@ public class StepExecutionData extends AbstractExecutionData {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
+
+            final int flowDepth = runEnv.getParentFlowStack().size();
+            runEnv.getSerializableDataMap().entrySet().removeIf(
+                (Map.Entry<String, ?> entry) -> {
+                    try {
+                        final String key = entry.getKey();
+                        final String valueClassName = entry.getValue()
+                                                           .getClass()
+                                                           .getName();
+                        final int entryDepth = Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
+                        return (entryDepth > flowDepth) &&
+                                valueClassName.equals(StepSerializableSessionObject.class.getName());
+                    } catch (Exception ignore) {
+                        return false;
+                    }
+                }
+            );
 
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);

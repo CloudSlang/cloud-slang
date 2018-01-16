@@ -110,6 +110,12 @@ public abstract class AbstractExecutionData {
         }
     }
 
+    protected static void prepareNodeName(ExecutionRuntimeServices executionRuntimeServices, String nodeName,
+                                          int flowDepth) {
+        executionRuntimeServices.setNodeName(nodeName);
+        executionRuntimeServices.setNodeNameWithDepth(nodeName + "_" + flowDepth);
+    }
+
     protected static boolean handleLoopStatement(LoopStatement loop,
                                                  RunEnvironment runEnv,
                                                  String nodeName,

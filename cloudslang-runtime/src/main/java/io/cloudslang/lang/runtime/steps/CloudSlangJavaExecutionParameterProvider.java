@@ -12,13 +12,20 @@ package io.cloudslang.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.GlobalSessionObject;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+import com.hp.oo.sdk.content.plugin.SessionObject;
+import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.runtime.api.java.JavaExecutionParametersProvider;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.GLOBAL_SESSION_OBJECT;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SESSION_OBJECT;
 
 /**
  * Created by Genadi Rabinovich, genadi@hpe.com on 17/05/2016.
@@ -26,17 +33,28 @@ import java.util.Map;
 public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionParametersProvider {
     private static final String PARAM_CLASS_NAME = Param.class.getCanonicalName();
     private static final String GLOBAL_SESSION_OBJECT_CLASS_NAME = GlobalSessionObject.class.getCanonicalName();
+    private static final String SESSION_OBJECT_CLASS_NAME = SessionObject.class.getCanonicalName();
     private static final String SERIALIZABLE_SESSION_OBJECT = SerializableSessionObject.class.getCanonicalName();
+    private static final String STEP_SERIALIZABLE_SESSION_OBJECT =
+            StepSerializableSessionObject.class.getCanonicalName();
     private final Map<String, SerializableSessionObject> serializableSessionData;
     private final Map<String, Serializable> currentContext;
-    private final Map<String, Object> nonSerializableExecutionData;
+    private final Map<String, Object> globalSessionObjectData;
+    private final Map<String, Object> sessionObjectData;
+    private final String nodeNameWithDepth;
+    private final int depth;
 
     public CloudSlangJavaExecutionParameterProvider(Map<String, SerializableSessionObject> serializableSessionData,
                                                     Map<String, Serializable> currentContext,
-                                                    Map<String, Object> nonSerializableExecutionData) {
+                                                    Map<String, Map<String, Object>> nonSerializableExecutionData,
+                                                    String nodeNameWithDepth, int depth) {
         this.serializableSessionData = serializableSessionData;
         this.currentContext = currentContext;
-        this.nonSerializableExecutionData = nonSerializableExecutionData;
+        this.globalSessionObjectData = nonSerializableExecutionData
+                .getOrDefault(GLOBAL_SESSION_OBJECT, Collections.emptyMap());
+        this.sessionObjectData = nonSerializableExecutionData.getOrDefault(SESSION_OBJECT, Collections.emptyMap());
+        this.nodeNameWithDepth = nodeNameWithDepth;
+        this.depth = depth;
     }
 
     @Override
@@ -52,12 +70,19 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                 if (parameterName != null) {
                     String paramClassName = parameterTypes[index - 1].getCanonicalName();
                     if (paramClassName.equals(GLOBAL_SESSION_OBJECT_CLASS_NAME)) {
-                        handleSessionContextArgument(nonSerializableExecutionData,
-                                GLOBAL_SESSION_OBJECT_CLASS_NAME, args, parameterName,
+                        handleSessionContextArgument(globalSessionObjectData, GLOBAL_SESSION_OBJECT_CLASS_NAME,
+                                args, parameterName,
+                                annotation.getClass().getClassLoader());
+                    } else if (paramClassName.equals(SESSION_OBJECT_CLASS_NAME)) {
+                        handleSessionContextArgument(sessionObjectData, SESSION_OBJECT_CLASS_NAME,
+                                args, parameterName + "_" + depth,
                                 annotation.getClass().getClassLoader());
                     } else if (paramClassName.equals(SERIALIZABLE_SESSION_OBJECT)) {
                         handleSessionContextArgument(serializableSessionData, SERIALIZABLE_SESSION_OBJECT,
                                 args, parameterName,
+                                annotation.getClass().getClassLoader());
+                    } else if (paramClassName.equals(STEP_SERIALIZABLE_SESSION_OBJECT)) {
+                        handleStepSessionContextArgument(serializableSessionData, args, parameterName,
                                 annotation.getClass().getClassLoader());
                     } else {
                         Serializable value = currentContext.get(parameterName);
@@ -65,18 +90,17 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                         if (parameterClass.isInstance(value) || value == null) {
                             args.add(value);
                         } else {
-                            StringBuilder exceptionMessageBuilder = new StringBuilder();
-                            exceptionMessageBuilder.append("Parameter type mismatch for action ");
-                            exceptionMessageBuilder.append(executionMethod.getName());
-                            exceptionMessageBuilder.append(" of class ");
-                            exceptionMessageBuilder.append(executionMethod.getDeclaringClass().getName());
-                            exceptionMessageBuilder.append(". Parameter ");
-                            exceptionMessageBuilder.append(parameterName);
-                            exceptionMessageBuilder.append(" expects type ");
-                            exceptionMessageBuilder.append(parameterClass.getName());
-                            exceptionMessageBuilder.append(". Actual type is ");
-                            exceptionMessageBuilder.append(value.getClass().getName());
-                            throw new RuntimeException(exceptionMessageBuilder.toString());
+                            throw new RuntimeException(new StringBuilder("Parameter type mismatch for action ")
+                                    .append(executionMethod.getName())
+                                    .append(" of class ")
+                                    .append(executionMethod.getDeclaringClass().getName())
+                                    .append(". Parameter ")
+                                    .append(parameterName)
+                                    .append(" expects type ")
+                                    .append(parameterClass.getName())
+                                    .append(". Actual type is ")
+                                    .append(value.getClass().getName())
+                                    .toString());
                         }
                     }
                 }
@@ -99,6 +123,25 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             }
         }
         return null;
+    }
+
+    private void handleStepSessionContextArgument(Map sessionData, List<Object> args,
+                                                  String parameterName, ClassLoader classLoader) {
+        final String stepSessionKey = parameterName + "_" + nodeNameWithDepth;
+        Object sessionContextObject = sessionData.get(stepSessionKey);
+        if (sessionContextObject == null) {
+            try {
+                sessionContextObject = Class.forName(STEP_SERIALIZABLE_SESSION_OBJECT, true, classLoader)
+                                            .getConstructor(String.class)
+                                            .newInstance(stepSessionKey);
+            } catch (Exception e) {
+                throw new RuntimeException(
+                        "Failed to create instance of [" + STEP_SERIALIZABLE_SESSION_OBJECT + "] class", e);
+            }
+            //noinspection unchecked
+            sessionData.put(stepSessionKey, sessionContextObject);
+        }
+        args.add(sessionContextObject);
     }
 
     private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args,

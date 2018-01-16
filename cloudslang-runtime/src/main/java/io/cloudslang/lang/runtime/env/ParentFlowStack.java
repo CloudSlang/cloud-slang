@@ -35,4 +35,8 @@ public class ParentFlowStack implements Serializable {
     public boolean isEmpty() {
         return stack.isEmpty();
     }
+
+    public int size() {
+        return stack.size();
+    }
 }
