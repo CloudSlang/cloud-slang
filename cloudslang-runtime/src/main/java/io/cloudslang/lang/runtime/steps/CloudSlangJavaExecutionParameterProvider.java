@@ -75,7 +75,7 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                                 annotation.getClass().getClassLoader());
                     } else if (paramClassName.equals(SESSION_OBJECT_CLASS_NAME)) {
                         handleSessionContextArgument(sessionObjectData, SESSION_OBJECT_CLASS_NAME,
-                                args, parameterName + "_" + depth,
+                                args, parameterName + "_" + (depth - 1),
                                 annotation.getClass().getClassLoader());
                     } else if (paramClassName.equals(SERIALIZABLE_SESSION_OBJECT)) {
                         handleSessionContextArgument(serializableSessionData, SERIALIZABLE_SESSION_OBJECT,
