@@ -388,7 +388,7 @@
                                     <goal>checkout</goal>
                                 </goals>
                                 <configuration>
-                                    <connectionUrl>scm:git:git@github.com:CloudSlang/cs-content.git</connectionUrl>
+                                    <connectionUrl>scm:git:https://github.com/CloudSlang/cs-content.git</connectionUrl>
                                     <checkoutDirectory>${project.build.directory}/cs-content</checkoutDirectory>
                                     <scmVersion>${cs-content.revision}</scmVersion>
                                     <scmVersionType>${cs-content.type}</scmVersionType>
