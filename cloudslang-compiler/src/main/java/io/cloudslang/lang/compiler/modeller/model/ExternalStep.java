@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ExternalStep extends Step {
+    private boolean validation;
+
     public ExternalStep(
             String name,
             Map<String, Serializable> preStepActionData,
@@ -36,10 +38,15 @@ public class ExternalStep extends Step {
                 parallelLoop,
                 onFailureStep
         );
+        this.validation = false;
     }
 
     @Override
     public boolean requiresValidation() {
-        return false;
+        return validation;
+    }
+
+    public void setValidation(boolean validation) {
+        this.validation = validation;
     }
 }
