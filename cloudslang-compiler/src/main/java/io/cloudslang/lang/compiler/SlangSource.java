@@ -10,16 +10,17 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class SlangSource {
 
@@ -58,7 +59,9 @@ public class SlangSource {
         }
 
         String fileName = file.getName();
-        String filePath = file.getPath();
+
+        String filePath = getCanonicalFilePath(file);
+
         Extension extension = Extension.findExtension(fileName);
         return new SlangSource(content, fileName, filePath, extension);
     }
@@ -81,6 +84,16 @@ public class SlangSource {
     private static String readFileToString(File file) throws IOException {
         Charset charset = getCloudSlangCharset();
         return FileUtils.readFileToString(file, charset);
+    }
+
+    private static String getCanonicalFilePath(File file) {
+        String filePath;
+        try {
+            filePath = file.getCanonicalPath();
+        } catch (IOException e) {
+            throw new RuntimeException("There was a problem reading the file path for: " + file.getName(), e);
+        }
+        return filePath;
     }
 
     public String getContent() {
