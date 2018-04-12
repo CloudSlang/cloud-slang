@@ -7,7 +7,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>1.0.17-SNAPSHOT</version>
+        <version>1.0.20-SNAPSHOT</version>
     </parent>
 
     <artifactId>cloudslang-cli</artifactId>
@@ -388,7 +388,7 @@
                                     <goal>checkout</goal>
                                 </goals>
                                 <configuration>
-                                    <connectionUrl>scm:git:git@github.com:CloudSlang/cs-content.git</connectionUrl>
+                                    <connectionUrl>scm:git:https://github.com/CloudSlang/cs-content.git</connectionUrl>
                                     <checkoutDirectory>${project.build.directory}/cs-content</checkoutDirectory>
                                     <scmVersion>${cs-content.revision}</scmVersion>
                                     <scmVersionType>${cs-content.type}</scmVersionType>
@@ -432,7 +432,7 @@
                         <executions>
                             <execution>
                                 <id>cleandist</id>
-                                <phase>prepare-package</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
