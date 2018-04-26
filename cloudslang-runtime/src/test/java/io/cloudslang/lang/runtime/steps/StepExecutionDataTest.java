@@ -93,9 +93,6 @@ public class StepExecutionDataTest {
     @Autowired
     private LoopsBinding loopsBinding;
 
-    @Autowired
-    private SlangStepDataConsumer stepDataConsumer;
-
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -565,11 +562,6 @@ public class StepExecutionDataTest {
         @Bean
         public EventBus eventBus() {
             return new EventBusImpl();
-        }
-
-        @Bean
-        public SlangStepDataConsumer stepDataConsumer() {
-            return mock(SlangStepDataConsumer.class);
         }
     }
 }
