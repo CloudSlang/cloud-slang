@@ -53,8 +53,6 @@ public class StepExecutionData extends AbstractExecutionData {
     private OutputsBinding outputsBinding;
     @Autowired
     private LoopsBinding loopsBinding;
-    @Autowired(required = false)
-    private SlangStepDataConsumer stepDataConsumer;
 
     @SuppressWarnings("unused")
     public void beginStep(@Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
@@ -150,10 +148,6 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
             Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
-
-            if (stepDataConsumer != null) {
-                stepDataConsumer.consumeStepData(argumentsResultContext, executableOutputs);
-            }
 
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,

@@ -58,6 +58,9 @@ public class ActionExecutionData extends AbstractExecutionData {
     @Autowired
     private JavaRuntimeService javaExecutionService;
 
+    @Autowired(required = false)
+    private SlangStepDataConsumer stepDataConsumer;
+
     public void doAction(@Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA)
@@ -99,6 +102,9 @@ public class ActionExecutionData extends AbstractExecutionData {
                     break;
                 default:
                     break;
+            }
+            if (stepDataConsumer != null) {
+                stepDataConsumer.consumeStepData(callArguments, returnValue);
             }
         } catch (RuntimeException ex) {
             fireEvent(
