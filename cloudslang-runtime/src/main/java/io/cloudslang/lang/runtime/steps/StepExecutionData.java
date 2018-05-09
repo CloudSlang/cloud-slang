@@ -148,22 +148,7 @@ public class StepExecutionData extends AbstractExecutionData {
         try {
             Context flowContext = runEnv.getStack().popContext();
 
-            final int flowDepth = runEnv.getParentFlowStack().size();
-            runEnv.getSerializableDataMap().entrySet().removeIf(
-                (Map.Entry<String, ?> entry) -> {
-                    try {
-                        final String key = entry.getKey();
-                        final String valueClassName = entry.getValue()
-                                                           .getClass()
-                                                           .getName();
-                        final int entryDepth = Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
-                        return (entryDepth > flowDepth) &&
-                                valueClassName.equals(StepSerializableSessionObject.class.getName());
-                    } catch (Exception ignore) {
-                        return false;
-                    }
-                }
-            );
+            removeStepSerializableSessionObjects(runEnv);
 
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
@@ -234,6 +219,25 @@ public class StepExecutionData extends AbstractExecutionData {
                     "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
         }
+    }
+
+    private void removeStepSerializableSessionObjects(final RunEnvironment runEnv) {
+        final int flowDepth = runEnv.getParentFlowStack().size();
+        runEnv.getSerializableDataMap().entrySet().removeIf(
+            (Map.Entry<String, ?> entry) -> {
+                try {
+                    final String key = entry.getKey();
+                    final String valueClassName = entry.getValue()
+                                                       .getClass()
+                                                       .getName();
+                    final int entryDepth = Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
+                    return (entryDepth > flowDepth) &&
+                            valueClassName.equals(StepSerializableSessionObject.class.getName());
+                } catch (Exception ignore) {
+                    return false;
+                }
+            }
+        );
     }
 
 
