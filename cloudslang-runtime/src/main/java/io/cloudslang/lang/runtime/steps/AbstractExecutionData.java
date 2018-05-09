@@ -110,6 +110,12 @@ public abstract class AbstractExecutionData {
         }
     }
 
+    protected static void prepareNodeName(ExecutionRuntimeServices executionRuntimeServices, String nodeName,
+                                          int flowDepth) {
+        executionRuntimeServices.setNodeName(nodeName);
+        executionRuntimeServices.setNodeNameWithDepth(nodeName + "_" + flowDepth);
+    }
+
     protected static boolean handleLoopStatement(LoopStatement loop,
                                                  RunEnvironment runEnv,
                                                  String nodeName,
@@ -200,7 +206,7 @@ public abstract class AbstractExecutionData {
                                                                     String refId,
                                                                     Long nextStepId) {
         pushParentFlowDataOnStack(runEnv, runningExecutionPlanId, nextStepId);
-
+        executionRuntimeServices.setParentRunningId(runningExecutionPlanId);
         // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);
         executionRuntimeServices.requestToChangeExecutionPlan(subFlowRunningExecutionPlanId);
