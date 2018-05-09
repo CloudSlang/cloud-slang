@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +51,8 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
         this.serializableSessionData = serializableSessionData;
         this.currentContext = currentContext;
         this.globalSessionObjectData = nonSerializableExecutionData
-                .getOrDefault(GLOBAL_SESSION_OBJECT, Collections.emptyMap());
-        this.sessionObjectData = nonSerializableExecutionData.getOrDefault(SESSION_OBJECT, Collections.emptyMap());
+                .getOrDefault(GLOBAL_SESSION_OBJECT, new HashMap<>());
+        this.sessionObjectData = nonSerializableExecutionData.getOrDefault(SESSION_OBJECT, new HashMap<>());
         this.nodeNameWithDepth = nodeNameWithDepth;
         this.depth = depth;
     }
