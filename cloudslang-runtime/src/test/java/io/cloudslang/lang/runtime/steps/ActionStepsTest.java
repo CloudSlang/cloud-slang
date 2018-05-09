@@ -60,7 +60,6 @@ import java.util.Map;
 
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
-import static io.cloudslang.score.api.execution.ExecutionParametersConsts.GLOBAL_SESSION_OBJECT;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -79,6 +78,7 @@ public class ActionStepsTest {
     private static final String GAV_DEFAULT = "";
     //    private static final ArrayList<String> DEPENDENCIES_DEFAULT = Lists.newArrayList("dep1", "dep2");
     private static final List<String> DEPENDENCIES_DEFAULT = Collections.emptyList();
+    private static final String GLOBAL_SESSION_OBJECT = "globalSessionObject";
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     @Rule
@@ -615,11 +615,12 @@ public class ActionStepsTest {
                 DEPENDENCIES_DEFAULT
         );
 
-        Assert.assertTrue(nonSerializableExecutionData.containsKey("name"));
+        Map<String, Object> globalSessionObject = nonSerializableExecutionData.get(GLOBAL_SESSION_OBJECT);
+        Assert.assertTrue(globalSessionObject.containsKey("name"));
 
         @SuppressWarnings("unchecked")
         GlobalSessionObject<NonSerializableObject> updatedSessionObject =
-                (GlobalSessionObject<NonSerializableObject>) nonSerializableExecutionData.get("name");
+                (GlobalSessionObject<NonSerializableObject>) globalSessionObject.get("name");
         NonSerializableObject nonSerializableObject = updatedSessionObject.get();
         String actualName = nonSerializableObject.getName();
         assertEquals("David", actualName);
