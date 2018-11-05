@@ -12,13 +12,17 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Bonczidai Levente
@@ -39,7 +43,20 @@ public class ScriptExecutor extends ScriptProcessor {
         Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = callArguments.get(entry.getKey());
-            Value value = ValueFactory.create(entry.getValue(), callArgumenet != null && callArgumenet.isSensitive());
+            Serializable theValue;
+            if (entry.getValue() instanceof PyList) {
+                ArrayList<String> localList = new ArrayList<>();
+                PyList pyList = (PyList) entry.getValue();
+                for (Object next : pyList) {
+                    localList.add(next == null ? null : next.toString());
+                }
+                theValue = localList;
+            } else if (entry.getValue() instanceof PyObject) {
+                theValue = entry.getValue().toString();
+            } else {
+                theValue = entry.getValue();
+            }
+            Value value = ValueFactory.create(theValue, callArgumenet != null && callArgumenet.isSensitive());
             result.put(entry.getKey(), value);
         }
         return result;
