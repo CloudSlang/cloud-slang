@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -23,12 +24,12 @@ import java.util.Map;
 public class ValueUtils {
     public static boolean isEmpty(Value value) {
         return value == null || value.get() == null || StringUtils.EMPTY.equals(value.get());
-    }
+}
 
     public static Map<String, Serializable> flatten(Map<String, Value> valueMap) {
         Map<String, Serializable> result = null;
         if (valueMap != null) {
-            result = new HashMap<>();
+            result = new LinkedHashMap<>();
             for (Map.Entry<String, Value> entry : valueMap.entrySet()) {
                 result.put(entry.getKey(), entry.getValue().toString());
             }

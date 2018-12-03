@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.LinkedHashMap;
 import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,10 +49,10 @@ public class InputsBinding extends AbstractBinding {
      */
     public Map<String, Value> bindInputs(List<Input> inputs, Map<String, ? extends Value> context,
                                          Set<SystemProperty> systemProperties) {
-        Map<String, Value> resultContext = new HashMap<>();
+        Map<String, Value> resultContext = new LinkedHashMap<>();
 
         //we do not want to change original context map
-        Map<String, Value> srcContext = new HashMap<>(context);
+        Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
         for (Input input : inputs) {
             bindInput(input, srcContext, resultContext, systemProperties);
