@@ -24,7 +24,7 @@ import java.util.Map;
 public class ValueUtils {
     public static boolean isEmpty(Value value) {
         return value == null || value.get() == null || StringUtils.EMPTY.equals(value.get());
-}
+    }
 
     public static Map<String, Serializable> flatten(Map<String, Value> valueMap) {
         Map<String, Serializable> result = null;
