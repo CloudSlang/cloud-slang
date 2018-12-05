@@ -13,7 +13,6 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
