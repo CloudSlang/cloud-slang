@@ -41,6 +41,8 @@ import io.cloudslang.lang.compiler.modeller.transformers.ParallelLoopForTransfor
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PythonActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.RpaActionTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.RpaStepsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.modeller.transformers.WorkFlowTransformer;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
@@ -274,6 +276,16 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public RpaActionTransformer rpaActionTransformer() {
+        return new RpaActionTransformer(dependencyFormatValidator(), precompileValidator(), rpaStepsTransformer());
+    }
+
+    @Bean
+    public RpaStepsTransformer rpaStepsTransformer() {
+        return new RpaStepsTransformer();
+    }
+
+    @Bean
     public BreakTransformer breakTransformer() {
         BreakTransformer breakTransformer = new BreakTransformer();
         breakTransformer.setExecutableValidator(executableValidator());
@@ -401,7 +413,8 @@ public class SlangCompilerSpringConfig {
                 outputsTransformer(),
                 javaActionTransformer(),
                 forTransformer(),
-                breakTransformer());
+                breakTransformer(),
+                rpaActionTransformer());
     }
 
     private void setAbstractOutputTransformerDependencies(AbstractOutputsTransformer abstractOutputsTransformer) {

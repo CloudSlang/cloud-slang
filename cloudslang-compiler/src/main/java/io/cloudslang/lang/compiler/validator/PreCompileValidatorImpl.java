@@ -25,6 +25,9 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,11 +37,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.RPA_STEPS_KEY;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
@@ -50,6 +53,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             "'on_failure' should be last step in the workflow";
     public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
             "Explicit values are not allowed for flow results. Correct format is:";
+    public static final String FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE =
+            "Valid results are:";
 
     @Override
     public String validateExecutableRawData(ParsedSlang parsedSlang,
@@ -106,6 +111,36 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
 
         return workFlowRawData;
+    }
+
+    @Override
+    public List<Map<String, Map<String, String>>> validateRpaActionSteps(Object oRpaActionStepsRawData,
+                                                                         List<RuntimeException> errors) {
+        if (oRpaActionStepsRawData == null) {
+            oRpaActionStepsRawData = new ArrayList<>();
+            errors.add(new RuntimeException("Error compiling rpa operation: missing " + RPA_STEPS_KEY + " property"));
+        }
+        List<Map<String, Map<String, String>>> stepsRawData;
+        try {
+            //noinspection unchecked
+            stepsRawData = (List<Map<String, Map<String, String>>>) oRpaActionStepsRawData;
+        } catch (ClassCastException ex) {
+            stepsRawData = new ArrayList<>();
+            errors.add(new RuntimeException("Error compiling rpa operation: syntax is illegal.\n" +
+                    "Below '" + RPA_STEPS_KEY + "' property there should be a list of steps and not a map."));
+        }
+        if (CollectionUtils.isEmpty(stepsRawData)) {
+            errors.add(new RuntimeException("Error compiling rpa operation: missing '" + RPA_STEPS_KEY + "' data."));
+        }
+        for (Map<String, Map<String, String>> step : stepsRawData) {
+            if (step.size() > 1) {
+                errors.add(new RuntimeException("Error compiling rpa operation: syntax is illegal.\n" +
+                        "Found steps with keyword on the same indentation as the step name " +
+                        "or there is no space between step name and hyphen."));
+            }
+        }
+
+        return stepsRawData;
     }
 
     @Override
@@ -270,6 +305,20 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                 );
             }
         }
+    }
+
+    @Override
+    public void validateResultsWithWhitelist(List<Result> results,
+                                             List<String> allowedResults,
+                                             String artifactName,
+                                             List<RuntimeException> errors) {
+        errors.addAll(results.stream()
+                .filter(result -> !allowedResults.contains(result.getName()))
+                .map(result -> new RuntimeException(
+                        "Rpa operation: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
+                                result.getName() + "'. " + FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE +
+                                allowedResults.toString() + "."
+                )).collect(Collectors.toList()));
     }
 
     @Override
