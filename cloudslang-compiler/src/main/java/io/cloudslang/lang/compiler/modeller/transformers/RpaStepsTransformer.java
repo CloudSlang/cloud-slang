@@ -33,10 +33,10 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 public class RpaStepsTransformer extends AbstractTransformer
         implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<RpaStep>> {
     private static final String RPA_OPERATION_HAS_MISSING_TAGS = "Rpa operation step has the following missing tags:";
-    private final Pattern OUTPUT_ASSIGNMENT = Pattern.compile("Parameter\\(\"[^\"]+\"\\)");
-    private final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ID_KEY,
+    private static final Pattern OUTPUT_ASSIGNMENT = Pattern.compile("Parameter\\(\"[^\"]+\"\\)");
+    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ID_KEY,
             SlangTextualKeys.RPA_STEP_PATH_KEY, SlangTextualKeys.RPA_STEP_ACTION_KEY);
-    private final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ARGS_KEY);
+    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ARGS_KEY);
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for rpa operation step.";
     private static final String INVALID_ASSIGNMENT_OPERATION =
@@ -65,7 +65,7 @@ public class RpaStepsTransformer extends AbstractTransformer
                     validateNotEmptyValues(stepProps);
                     validateOnlySupportedKeys(stepProps);
 
-                    RpaStep rpaStep = transform(stepProps);
+                    RpaStep rpaStep = transformStep(stepProps);
 
                     validateUniqueIds(ids, rpaStep);
                     validateAssignmentAction(rpaStep);
@@ -94,7 +94,7 @@ public class RpaStepsTransformer extends AbstractTransformer
         }
     }
 
-    private RpaStep transform(Map<String, String> stepProps) {
+    private RpaStep transformStep(Map<String, String> stepProps) {
         RpaStep rpaStep = new RpaStep();
         rpaStep.setId(stepProps.get(SlangTextualKeys.RPA_STEP_ID_KEY));
         rpaStep.setObjectPath(stepProps.get(SlangTextualKeys.RPA_STEP_PATH_KEY));
