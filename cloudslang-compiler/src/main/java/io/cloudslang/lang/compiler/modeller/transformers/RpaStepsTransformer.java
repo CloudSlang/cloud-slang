@@ -135,8 +135,8 @@ public class RpaStepsTransformer extends AbstractTransformer
         invalidKeys.removeAll(MANDATORY_KEY_SET);
         invalidKeys.removeAll(OPTIONAL_KEY_SET);
         if (CollectionUtils.isNotEmpty(invalidKeys)) {
-            throw new RuntimeException(RPA_OPERATION_ILLEGAL_TAGS + invalidKeys.toString()
-                    + INVALID_KEYS_ERROR_MESSAGE_SUFFIX);
+            throw new RuntimeException(RPA_OPERATION_ILLEGAL_TAGS + invalidKeys.toString() +
+                    INVALID_KEYS_ERROR_MESSAGE_SUFFIX);
         }
     }
 
