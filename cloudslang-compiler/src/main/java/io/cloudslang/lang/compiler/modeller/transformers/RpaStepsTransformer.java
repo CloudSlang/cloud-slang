@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
+import static io.cloudslang.lang.entities.ScoreLangConstants.RPA_ASSIGNMENT_ACTION;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class RpaStepsTransformer extends AbstractTransformer
@@ -54,7 +55,7 @@ public class RpaStepsTransformer extends AbstractTransformer
 
     @Override
     public TransformModellingResult<ArrayList<RpaStep>> transform(List<Map<String, Map<String, String>>> rawData,
-                                                             SensitivityLevel sensitivityLevel) {
+                                                                  SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         ArrayList<RpaStep> transformedData = new ArrayList<>();
 
@@ -82,7 +83,7 @@ public class RpaStepsTransformer extends AbstractTransformer
     }
 
     private void validateAssignmentAction(RpaStep rpaStep) {
-        if (rpaStep.getAction().equals("=") &&
+        if (rpaStep.getAction().equals(RPA_ASSIGNMENT_ACTION) &&
                 OUTPUT_ASSIGNMENT.matcher(rpaStep.getObjectPath()).matches() &&
                 StringUtils.isEmpty(rpaStep.getArgs())) {
             throw new RuntimeException(String.format(INVALID_ASSIGNMENT_OPERATION, rpaStep.getId()));
@@ -121,14 +122,11 @@ public class RpaStepsTransformer extends AbstractTransformer
             }
         }
         if (CollectionUtils.isNotEmpty(missingKeys)) {
-            throw new RuntimeException(
-                    RPA_OPERATION_HAS_MISSING_TAGS + missingKeys.toString()
-            );
+            throw new RuntimeException(RPA_OPERATION_HAS_MISSING_TAGS + missingKeys.toString());
         }
 
         if (CollectionUtils.isNotEmpty(emptyValuesKeys)) {
-            throw new RuntimeException(
-                    RPA_OPERATION_HAS_EMPTY_TAGS + emptyValuesKeys.toString());
+            throw new RuntimeException(RPA_OPERATION_HAS_EMPTY_TAGS + emptyValuesKeys.toString());
         }
     }
 
@@ -137,10 +135,7 @@ public class RpaStepsTransformer extends AbstractTransformer
         invalidKeys.removeAll(MANDATORY_KEY_SET);
         invalidKeys.removeAll(OPTIONAL_KEY_SET);
         if (CollectionUtils.isNotEmpty(invalidKeys)) {
-            throw new RuntimeException(
-                    RPA_OPERATION_ILLEGAL_TAGS + invalidKeys.toString() +
-                            INVALID_KEYS_ERROR_MESSAGE_SUFFIX
-            );
+            throw new RuntimeException(RPA_OPERATION_ILLEGAL_TAGS + invalidKeys.toString() + INVALID_KEYS_ERROR_MESSAGE_SUFFIX);
         }
     }
 

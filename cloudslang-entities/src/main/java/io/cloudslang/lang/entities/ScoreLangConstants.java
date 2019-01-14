@@ -91,4 +91,6 @@ public interface ScoreLangConstants {
     String WARNING_RESULT = "WARNING";
     String FAILURE_RESULT = "FAILURE";
 
+    String RPA_ASSIGNMENT_ACTION = "=";
+
 }

@@ -185,7 +185,7 @@ public class SlangCompilerImpl implements SlangCompiler {
     private ExecutableModellingResult getExecutableModellingResult(SlangSource source,
                                                                    PrecompileStrategy precompileStrategy,
                                                                    SensitivityLevel sensitivityLevel) {
-        Validate.notNull(source, "YouAbstractTransformer must supply a source to compile");
+        Validate.notNull(source, "You must supply a source to compile");
         Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
 
         final String filePath = source.getFilePath();

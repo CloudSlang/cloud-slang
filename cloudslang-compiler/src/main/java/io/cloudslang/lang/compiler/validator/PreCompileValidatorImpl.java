@@ -317,8 +317,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                 .map(result -> new RuntimeException(
                         "Rpa operation: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
                                 result.getName() + "'. " + FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE +
-                                allowedResults.toString() + "."
-                )).collect(Collectors.toList()));
+                                allowedResults.toString() + "."))
+                .collect(Collectors.toList()));
     }
 
     @Override
