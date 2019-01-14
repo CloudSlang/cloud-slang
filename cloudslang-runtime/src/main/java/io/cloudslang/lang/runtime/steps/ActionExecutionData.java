@@ -20,8 +20,15 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
+import io.cloudslang.runtime.api.rpa.RpaExecutionService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+import org.python.google.common.collect.Sets;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -29,13 +36,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
-import org.python.google.common.collect.Sets;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
@@ -58,6 +58,9 @@ public class ActionExecutionData extends AbstractExecutionData {
     @Autowired
     private JavaRuntimeService javaExecutionService;
 
+    @Autowired
+    private RpaExecutionService rpaExecutionService;
+
     @Autowired(required = false)
     private SlangStepDataConsumer stepDataConsumer;
 
@@ -71,7 +74,8 @@ public class ActionExecutionData extends AbstractExecutionData {
                          @Param(ScoreLangConstants.JAVA_ACTION_METHOD_KEY) String methodName,
                          @Param(ScoreLangConstants.JAVA_ACTION_GAV_KEY) String gav,
                          @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
-                         @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies) {
+                         @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies,
+                         @Param(ScoreLangConstants.RPA_ACTION_STEPS) Map<String, Map<String, Object>> rpaSteps) {
 
         Map<String, Value> returnValue = new HashMap<>();
         Map<String, Value> callArguments = runEnv.removeCallArguments();
@@ -100,6 +104,11 @@ public class ActionExecutionData extends AbstractExecutionData {
                     break;
                 case PYTHON:
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
+                    break;
+                case RPA:
+                    returnValue = runRpaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
+                            gav, rpaSteps, executionRuntimeServices.getNodeNameWithDepth(),
+                            runEnv.getParentFlowStack().size());
                     break;
                 default:
                     break;
@@ -136,6 +145,31 @@ public class ActionExecutionData extends AbstractExecutionData {
         runEnv.putNextStepPosition(nextStepId);
     }
 
+    private Map<String, Value> runRpaAction(
+            Map<String, SerializableSessionObject> serializableSessionData,
+            Map<String, Value> currentContext,
+            Map<String, Map<String, Object>> nonSerializableExecutionData,
+            String gav,
+            Map<String, Map<String, Object>> rpaSteps, String nodeNameWithDepth,
+            int depth) {
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> returnMap =
+                (Map<String, Serializable>)
+                        rpaExecutionService.execute(
+                                gav,
+                                new RpaExecutionParametersProviderImpl(
+                                        serializableSessionData,
+                                        currentContext,
+                                        nonSerializableExecutionData,
+                                        rpaSteps,
+                                        nodeNameWithDepth,
+                                        depth));
+        if (returnMap == null) {
+            throw new RuntimeException("RPA Action did not return results data");
+        }
+        return handleSensitiveValues(returnMap, currentContext);
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, Value> runJavaAction(Map<String, SerializableSessionObject> serializableSessionData,
                                              Map<String, Value> currentContext,
@@ -149,7 +183,7 @@ public class ActionExecutionData extends AbstractExecutionData {
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
-        return createActionResult(returnMap, currentContext);
+        return handleSensitiveValues(returnMap, currentContext);
     }
 
     protected Map<String, Serializable> createActionContext(Map<String, Value> context) {
@@ -160,8 +194,8 @@ public class ActionExecutionData extends AbstractExecutionData {
         return result;
     }
 
-    protected Map<String, Value> createActionResult(Map<String, Serializable> executionResult,
-                                                    Map<String, Value> context) {
+    protected Map<String, Value> handleSensitiveValues(Map<String, Serializable> executionResult,
+                                                       Map<String, Value> context) {
         Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = context.get(entry.getKey());

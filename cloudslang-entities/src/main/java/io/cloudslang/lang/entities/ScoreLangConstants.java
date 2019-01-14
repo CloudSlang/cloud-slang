@@ -39,6 +39,8 @@ public interface ScoreLangConstants {
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
+    String RPA_ACTION_STEPS = "steps";
+
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
     String PREVIOUS_STEP_ID_KEY = "previousStepId";

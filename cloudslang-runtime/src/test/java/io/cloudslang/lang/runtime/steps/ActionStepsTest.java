@@ -85,12 +85,14 @@ public class ActionStepsTest {
     public ExpectedException exception = ExpectedException.none();
     ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
     private Map<String, Map<String, Object>> nonSerializableExecutionData;
+    private Map<String, Map<String, Object>> rpaSteps;
     @Autowired
     private ActionExecutionData actionSteps;
 
     @Before
     public void setUp() {
         nonSerializableExecutionData = new HashMap<>();
+        rpaSteps = new HashMap<>();
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -113,7 +115,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                rpaSteps
         );
 
         //construct expected outputs
@@ -151,7 +154,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                rpaSteps
         );
 
         //verify matching
@@ -175,7 +179,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                rpaSteps
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -217,7 +222,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                rpaSteps
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -262,7 +268,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                rpaSteps
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -303,7 +310,8 @@ public class ActionStepsTest {
                 "wrongMethodName",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                rpaSteps
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -341,7 +349,8 @@ public class ActionStepsTest {
                     "doJavaActionExceptionMethod",
                     GAV_DEFAULT,
                     null,
-                    DEPENDENCIES_DEFAULT
+                    DEPENDENCIES_DEFAULT,
+                    rpaSteps
             );
         } catch (RuntimeException ex) {
             exceptionThrown = true;
@@ -382,7 +391,7 @@ public class ActionStepsTest {
                 "doJavaActionWrongReturnType",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -421,7 +430,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         //construct expected outputs
@@ -456,7 +465,7 @@ public class ActionStepsTest {
                 "doJavaNumberAsString",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
     }
 
@@ -479,7 +488,7 @@ public class ActionStepsTest {
                 "doJavaNumbersAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
         ReturnValues returnValues = runEnv.removeReturnValues();
         assertEquals(5, returnValues.getOutputs().get("port").get());
@@ -505,7 +514,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction_NOT_FOUND",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         //construct expected outputs
@@ -539,7 +548,7 @@ public class ActionStepsTest {
                 "doJavaActionMissingAnnotation",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         //construct expected outputs
@@ -575,7 +584,7 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -612,7 +621,7 @@ public class ActionStepsTest {
                 "setNameOnNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         Map<String, Object> globalSessionObject = nonSerializableExecutionData.get(GLOBAL_SESSION_OBJECT);
@@ -642,7 +651,7 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -673,7 +682,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -702,7 +711,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -728,7 +737,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         Map<String, SerializableSessionObject> serializableSessionMap = runEnv.getSerializableDataMap();
@@ -769,7 +778,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         //construct expected outputs
@@ -817,7 +826,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
 
         //extract actual outputs
@@ -858,7 +867,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
     }
 
@@ -884,7 +893,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
     }
 
@@ -911,7 +920,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
     }
 
@@ -935,7 +944,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 "",
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                rpaSteps
         );
     }
 
@@ -959,7 +969,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
     }
 
@@ -985,7 +995,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, rpaSteps
         );
     }
 

@@ -17,12 +17,14 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.events.ScoreEvent;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -101,6 +103,25 @@ public class OperationSystemTest extends SystemsTestsParent {
         URI resource = getClass().getResource("/yaml/java_action_test.sl").toURI();
 
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("host", ValueFactory.create("localhost"));
+        userInputs.put("port", ValueFactory.create("8080"));
+        Map<String, StepData> stepsData =
+                triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()).getSteps();
+        StepData execStepData = stepsData.get(EXEC_START_PATH);
+        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, execStepData.getResult());
+        Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url"));
+    }
+
+    @Test
+    public void testOperationWithRpaAction() throws Exception {
+        URI resource = getClass().getResource("/yaml/java_action_test.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+        Map<String, Object> actionData = (Map<String, Object>) compilationArtifact.getExecutionPlan().getStep(2L).getActionData();
+        actionData.put("actionType", "rpa");
+        actionData.put("steps", new HashMap<String, Map<String, String>>());
 
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("host", ValueFactory.create("localhost"));

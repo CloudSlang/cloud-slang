@@ -16,6 +16,21 @@ package io.cloudslang.lang.entities;
  */
 public enum ActionType {
 
-    JAVA,
-    PYTHON
-}
+    JAVA("java"),
+    PYTHON("python"),
+    RPA("rpa");
+
+    private String value;
+
+    ActionType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return this.getValue();
+    }}
