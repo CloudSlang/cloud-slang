@@ -68,6 +68,8 @@ public interface SlangTextualKeys {
     String RPA_STEP_NAME_KEY = "name";
     String RPA_STEP_ACTION_KEY = "action";
     String RPA_STEP_ARGS_KEY = "args";
+    String RPA_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
+    String RPA_STEP_SNAPSHOT_KEY = "snapshot";
 
     //inputs
     String VALUE_KEY = "value";

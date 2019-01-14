@@ -36,7 +36,8 @@ public class RpaStepsTransformer extends AbstractTransformer
     private static final Pattern OUTPUT_ASSIGNMENT = Pattern.compile("Parameter\\(\"[^\"]+\"\\)");
     private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ID_KEY,
             SlangTextualKeys.RPA_STEP_PATH_KEY, SlangTextualKeys.RPA_STEP_ACTION_KEY);
-    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ARGS_KEY);
+    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ARGS_KEY,
+            SlangTextualKeys.RPA_STEP_HIGHLIGHT_ID_KEY, SlangTextualKeys.RPA_STEP_SNAPSHOT_KEY);
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for rpa operation step.";
     private static final String INVALID_ASSIGNMENT_OPERATION =
@@ -99,6 +100,7 @@ public class RpaStepsTransformer extends AbstractTransformer
         rpaStep.setId(stepProps.get(SlangTextualKeys.RPA_STEP_ID_KEY));
         rpaStep.setObjectPath(stepProps.get(SlangTextualKeys.RPA_STEP_PATH_KEY));
         rpaStep.setAction(stepProps.get(SlangTextualKeys.RPA_STEP_ACTION_KEY));
+        rpaStep.setArgs(stepProps.get(SlangTextualKeys.RPA_STEP_ARGS_KEY));
         rpaStep.setName(stepProps.get(SlangTextualKeys.RPA_STEP_NAME_KEY));
         return rpaStep;
     }
