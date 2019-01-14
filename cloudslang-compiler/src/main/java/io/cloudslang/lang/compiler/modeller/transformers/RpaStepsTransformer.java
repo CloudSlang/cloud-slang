@@ -103,6 +103,8 @@ public class RpaStepsTransformer extends AbstractTransformer
         rpaStep.setAction(stepProps.get(SlangTextualKeys.RPA_STEP_ACTION_KEY));
         rpaStep.setArgs(stepProps.get(SlangTextualKeys.RPA_STEP_ARGS_KEY));
         rpaStep.setName(stepProps.get(SlangTextualKeys.RPA_STEP_NAME_KEY));
+        rpaStep.setSnapshot(stepProps.get(SlangTextualKeys.RPA_STEP_SNAPSHOT_KEY));
+        rpaStep.setHighlightId(stepProps.get(SlangTextualKeys.RPA_STEP_HIGHLIGHT_ID_KEY));
         return rpaStep;
     }
 
