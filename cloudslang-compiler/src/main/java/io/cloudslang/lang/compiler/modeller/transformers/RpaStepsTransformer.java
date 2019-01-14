@@ -15,7 +15,6 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
 import static io.cloudslang.lang.entities.ScoreLangConstants.RPA_ASSIGNMENT_ACTION;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
 public class RpaStepsTransformer extends AbstractTransformer
         implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<RpaStep>> {
@@ -84,8 +84,8 @@ public class RpaStepsTransformer extends AbstractTransformer
 
     private void validateAssignmentAction(RpaStep rpaStep) {
         if (rpaStep.getAction().equals(RPA_ASSIGNMENT_ACTION) &&
-                OUTPUT_ASSIGNMENT.matcher(rpaStep.getObjectPath()).matches() &&
-                StringUtils.isEmpty(rpaStep.getArgs())) {
+                (!OUTPUT_ASSIGNMENT.matcher(rpaStep.getObjectPath()).matches() ||
+                isEmpty(rpaStep.getArgs()))) {
             throw new RuntimeException(String.format(INVALID_ASSIGNMENT_OPERATION, rpaStep.getId()));
         }
     }

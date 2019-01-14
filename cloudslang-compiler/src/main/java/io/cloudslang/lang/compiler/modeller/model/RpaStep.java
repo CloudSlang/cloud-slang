@@ -18,6 +18,8 @@ public class RpaStep implements Serializable {
     private String objectPath;
     private String action;
     private String args;
+    private String highlightId;
+    private String snapshot;
 
     public String getName() {
         return name;
@@ -57,5 +59,21 @@ public class RpaStep implements Serializable {
 
     public void setArgs(String args) {
         this.args = args;
+    }
+
+    public String getHighlightId() {
+        return highlightId;
+    }
+
+    public void setHighlightId(String highlightId) {
+        this.highlightId = highlightId;
+    }
+
+    public String getSnapshot() {
+        return snapshot;
+    }
+
+    public void setSnapshot(String snapshot) {
+        this.snapshot = snapshot;
     }
 }
