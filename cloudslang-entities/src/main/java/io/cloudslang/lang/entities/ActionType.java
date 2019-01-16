@@ -33,4 +33,5 @@ public enum ActionType {
     @Override
     public String toString() {
         return this.getValue();
-    }}
+    }
+}

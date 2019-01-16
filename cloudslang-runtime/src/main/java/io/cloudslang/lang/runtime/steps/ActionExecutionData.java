@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.ActionType;
+import io.cloudslang.lang.entities.RpaStep;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -34,6 +35,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,7 +77,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                          @Param(ScoreLangConstants.JAVA_ACTION_GAV_KEY) String gav,
                          @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
                          @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies,
-                         @Param(ScoreLangConstants.RPA_ACTION_STEPS) Map<String, Map<String, Object>> rpaSteps) {
+                         @Param(ScoreLangConstants.RPA_STEPS_KEY) List<RpaStep> steps) {
 
         Map<String, Value> returnValue = new HashMap<>();
         Map<String, Value> callArguments = runEnv.removeCallArguments();
@@ -107,7 +109,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                     break;
                 case RPA:
                     returnValue = runRpaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
-                            gav, rpaSteps, executionRuntimeServices.getNodeNameWithDepth(),
+                            gav, steps, executionRuntimeServices.getNodeNameWithDepth(),
                             runEnv.getParentFlowStack().size());
                     break;
                 default:
@@ -150,15 +152,14 @@ public class ActionExecutionData extends AbstractExecutionData {
             Map<String, Value> currentContext,
             Map<String, Map<String, Object>> nonSerializableExecutionData,
             String gav,
-            Map<String, Map<String, Object>> rpaSteps, String nodeNameWithDepth,
+           List<RpaStep> rpaSteps, String nodeNameWithDepth,
             int depth) {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> returnMap =
                 (Map<String, Serializable>)
                         rpaExecutionService.execute(
                                 gav,
-                                new RpaExecutionParametersProviderImpl(
-                                        serializableSessionData,
+                                new CloudSlangRpaExecutionParametersProviderImpl(serializableSessionData,
                                         currentContext,
                                         nonSerializableExecutionData,
                                         rpaSteps,

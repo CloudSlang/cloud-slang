@@ -49,7 +49,6 @@ public interface SlangTextualKeys {
     String RPA_ACTION_KEY = "rpa_action";
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
-    String RPA_ACTION_KEY = "rpa_action";
     String RPA_STEPS_KEY = "steps";
     String RPA_ACTION_GAV_KEY = "gav";
 

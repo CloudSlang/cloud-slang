@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.modeller.model;
+package io.cloudslang.lang.entities;
 
 import java.io.Serializable;
 

@@ -10,25 +10,32 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+import io.cloudslang.lang.entities.RpaStep;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.rpa.RpaExecutionParametersProvider;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class RpaExecutionParametersProviderImpl implements RpaExecutionParametersProvider {
+import static org.apache.commons.lang3.StringUtils.substring;
+
+public class CloudSlangRpaExecutionParametersProviderImpl implements RpaExecutionParametersProvider {
+    public static final String UFT_PARAMETER = "Parameter(";
     private final Map<String, SerializableSessionObject> serializableSessionData;
     private final Map<String, Value> currentContext;
     private final Map<String, Map<String, Object>> nonSerializableExecutionData;
     private final String nodeNameWithDepth;
     private final int depth;
-    private Map<String, Map<String, Object>> rpaSteps;
+    private final List<RpaStep> rpaSteps;
 
-    public RpaExecutionParametersProviderImpl(
+    public CloudSlangRpaExecutionParametersProviderImpl(
             Map<String, SerializableSessionObject> serializableSessionData,
             Map<String, Value> currentContext,
             Map<String, Map<String, Object>> nonSerializableExecutionData,
-            Map<String, Map<String, Object>> rpaSteps, String nodeNameWithDepth,
+            List<RpaStep> rpaSteps, String nodeNameWithDepth,
             int depth) {
         this.serializableSessionData = serializableSessionData;
         this.currentContext = currentContext;
@@ -39,7 +46,22 @@ public class RpaExecutionParametersProviderImpl implements RpaExecutionParameter
     }
 
     @Override
-    public Object[] getExecutionParameters(Method executionMethod) {
-        return new Object[0]; //TODO parameters binding
+    public Object[] getExecutionParameters() {
+        Map<String, Pair<String, String>> execParams = new HashMap<>();
+        for (RpaStep step : rpaSteps) {
+            String stepId = step.getId();
+            String args = step.getArgs();
+            if (StringUtils.startsWith(args, UFT_PARAMETER)) {
+                String paramName = substring(args, UFT_PARAMETER.length(), args.length() - 1);
+                Value value = currentContext.get(paramName);
+                if (value != null) {
+                    //TODO handle sensitive values
+                    execParams.put(stepId, Pair.of(paramName, value.get().toString()));
+                } else {
+                    throw new RuntimeException("Rpa parameter is missing from the inputs list.");
+                }
+            }
+        }
+        return new Object[]{execParams};
     }
 }

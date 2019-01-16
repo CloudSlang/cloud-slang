@@ -15,6 +15,7 @@ import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
+import io.cloudslang.lang.entities.RpaStep;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -52,6 +53,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,14 +87,14 @@ public class ActionStepsTest {
     public ExpectedException exception = ExpectedException.none();
     ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
     private Map<String, Map<String, Object>> nonSerializableExecutionData;
-    private Map<String, Map<String, Object>> rpaSteps;
+    private List<RpaStep> rpaSteps;
     @Autowired
     private ActionExecutionData actionSteps;
 
     @Before
     public void setUp() {
         nonSerializableExecutionData = new HashMap<>();
-        rpaSteps = new HashMap<>();
+        rpaSteps = new ArrayList<>();
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
