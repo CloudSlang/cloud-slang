@@ -39,7 +39,8 @@ public interface ScoreLangConstants {
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
-    String RPA_ACTION_STEPS = "steps";
+    String RPA_ACTION_GAV_KEY = "gav";
+    String RPA_STEPS_KEY = "steps";
 
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
@@ -87,6 +88,9 @@ public interface ScoreLangConstants {
 
     // results
     String SUCCESS_RESULT = "SUCCESS";
+    String WARNING_RESULT = "WARNING";
     String FAILURE_RESULT = "FAILURE";
+
+    String RPA_ASSIGNMENT_ACTION = "=";
 
 }

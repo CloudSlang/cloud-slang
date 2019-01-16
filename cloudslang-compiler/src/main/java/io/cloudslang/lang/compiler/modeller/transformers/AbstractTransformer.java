@@ -9,10 +9,11 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
