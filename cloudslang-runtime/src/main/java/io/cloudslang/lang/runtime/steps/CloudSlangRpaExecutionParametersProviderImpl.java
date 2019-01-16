@@ -47,19 +47,20 @@ public class CloudSlangRpaExecutionParametersProviderImpl implements RpaExecutio
 
     @Override
     public Object[] getExecutionParameters() {
-        Map<String, Pair<String, String>> execParams = new HashMap<>();
+        Map<String, String> execParams = new HashMap<>();
         for (RpaStep step : rpaSteps) {
-            String stepId = step.getId();
             String args = step.getArgs();
             if (StringUtils.startsWith(args, UFT_PARAMETER)) {
                 String paramName = substring(args, UFT_PARAMETER.length(), args.length() - 1);
                 Value value = currentContext.get(paramName);
                 if (value != null) {
                     //TODO handle sensitive values
-                    execParams.put(stepId, Pair.of(paramName, value.get().toString()));
+                    execParams.put(paramName, value.get().toString());
                 } else {
                     throw new RuntimeException("Rpa parameter is missing from the inputs list.");
                 }
+            } else {
+                throw new RuntimeException("args element should be of the following format: Parameter(\"inputName\")");
             }
         }
         return new Object[]{execParams};
