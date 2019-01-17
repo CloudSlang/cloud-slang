@@ -14,7 +14,6 @@ import io.cloudslang.lang.entities.RpaStep;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.rpa.RpaExecutionParametersProvider;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.List;
