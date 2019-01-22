@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.modeller.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class RpaStep implements Serializable {
     private static final long serialVersionUID = -7225034120015578511L;
@@ -75,5 +76,28 @@ public class RpaStep implements Serializable {
 
     public void setSnapshot(String snapshot) {
         this.snapshot = snapshot;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RpaStep rpaStep = (RpaStep) o;
+        return Objects.equals(id, rpaStep.id) &&
+                Objects.equals(name, rpaStep.name) &&
+                Objects.equals(objectPath, rpaStep.objectPath) &&
+                Objects.equals(action, rpaStep.action) &&
+                Objects.equals(args, rpaStep.args) &&
+                Objects.equals(highlightId, rpaStep.highlightId) &&
+                Objects.equals(snapshot, rpaStep.snapshot);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, objectPath, action, args, highlightId, snapshot);
     }
 }

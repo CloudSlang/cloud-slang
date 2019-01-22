@@ -33,7 +33,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 
 public class RpaStepsTransformer extends AbstractTransformer
         implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<RpaStep>> {
-    private static final String RPA_OPERATION_HAS_MISSING_TAGS = "Rpa operation step has the following missing tags:";
+    private static final String RPA_OPERATION_HAS_MISSING_TAGS = "Rpa operation step has the following missing tags: ";
     private static final Pattern OUTPUT_ASSIGNMENT = Pattern.compile("Parameter\\(\"[^\"]+\"\\)");
     private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ID_KEY,
             SlangTextualKeys.RPA_STEP_PATH_KEY, SlangTextualKeys.RPA_STEP_ACTION_KEY);
