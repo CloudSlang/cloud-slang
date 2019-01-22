@@ -25,6 +25,9 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.entities.utils.SetUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,11 +37,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
@@ -50,6 +53,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             "'on_failure' should be last step in the workflow";
     public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
             "Explicit values are not allowed for flow results. Correct format is:";
+    public static final String FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE =
+            "Valid results are:";
 
     @Override
     public String validateExecutableRawData(ParsedSlang parsedSlang,
@@ -106,6 +111,38 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         }
 
         return workFlowRawData;
+    }
+
+    @Override
+    public List<Map<String, Map<String, String>>> validateSeqActionSteps(Object oSeqActionStepsRawData,
+                                                                         List<RuntimeException> errors) {
+        if (oSeqActionStepsRawData == null) {
+            oSeqActionStepsRawData = new ArrayList<>();
+            errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
+                    SEQ_STEPS_KEY + "' property."));
+        }
+        List<Map<String, Map<String, String>>> stepsRawData;
+        try {
+            //noinspection unchecked
+            stepsRawData = (List<Map<String, Map<String, String>>>) oSeqActionStepsRawData;
+        } catch (ClassCastException ex) {
+            stepsRawData = new ArrayList<>();
+            errors.add(new RuntimeException("Error compiling sequential operation: syntax is illegal.\n" +
+                    "Below '" + SEQ_STEPS_KEY + "' property there should be a list of steps and not a map."));
+        }
+        if (CollectionUtils.isEmpty(stepsRawData)) {
+            errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
+                    SEQ_STEPS_KEY + "' data."));
+        }
+        for (Map<String, Map<String, String>> step : stepsRawData) {
+            if (step.size() > 1) {
+                errors.add(new RuntimeException("Error compiling sequential operation: syntax is illegal.\n" +
+                        "Found steps with keyword on the same indentation as the step name " +
+                        "or there is no space between step name and hyphen."));
+            }
+        }
+
+        return stepsRawData;
     }
 
     @Override
@@ -273,9 +310,23 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
+    public void validateResultsWithWhitelist(List<Result> results,
+                                             List<String> allowedResults,
+                                             String artifactName,
+                                             List<RuntimeException> errors) {
+
+        final Set<String> artifactResultNames = results.stream().map(Result::getName).collect(toSet());
+        if ((artifactResultNames.size() != results.size()) ||
+                !artifactResultNames.equals(new HashSet<>(allowedResults))) {
+            errors.add(new RuntimeException("Sequential operation: '" + artifactName + "' syntax is illegal. " +
+                             FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE + allowedResults.toString() + "."));
+        }
+    }
+
+    @Override
     public void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors) {
         for (Result result : results) {
-            if (!(result.getValue() == null) && !(result.getValue().get() == null)) {
+            if ((result.getValue() != null) && (result.getValue().get() != null)) {
                 Serializable value = result.getValue().get();
                 if (!(value instanceof String || Boolean.TRUE.equals(value))) {
                     errors.add(
@@ -375,7 +426,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                 reachableStepNames,
                 reachableResultNames,
                 errors,
-                new ArrayList<String>()
+                new ArrayList<>()
         );
     }
 

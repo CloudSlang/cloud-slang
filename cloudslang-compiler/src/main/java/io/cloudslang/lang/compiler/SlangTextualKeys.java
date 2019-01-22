@@ -26,6 +26,7 @@ package io.cloudslang.lang.compiler;
 public interface SlangTextualKeys {
 
     //executable
+    String NAMESPACE_KEY = "namespace";
     String RESULTS_KEY = "results";
     String INPUTS_KEY = "inputs";
     String OUTPUTS_KEY = "outputs";
@@ -47,6 +48,10 @@ public interface SlangTextualKeys {
     String PYTHON_ACTION_KEY = "python_action";
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
+    String SEQ_ACTION_KEY = "sequential_action";
+    String SEQ_STEPS_KEY = "steps";
+    String SEQ_ACTION_GAV_KEY = "gav";
+
 
     //step
     String DO_KEY = "do";
@@ -56,6 +61,15 @@ public interface SlangTextualKeys {
     String PUBLISH_KEY = "publish";
     String NAVIGATION_KEY = "navigate";
     String PARALLEL_LOOP_KEY = "parallel_loop";
+
+    //seq step
+    String SEQ_STEP_ID_KEY = "id";
+    String SEQ_STEP_PATH_KEY = "object_path";
+    String SEQ_STEP_NAME_KEY = "name";
+    String SEQ_STEP_ACTION_KEY = "action";
+    String SEQ_STEP_ARGS_KEY = "args";
+    String SEQ_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
+    String SEQ_STEP_SNAPSHOT_KEY = "snapshot";
 
     //inputs
     String VALUE_KEY = "value";

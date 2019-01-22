@@ -39,6 +39,9 @@ public interface ScoreLangConstants {
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
+    String SEQ_ACTION_GAV_KEY = "gav";
+    String SEQ_STEPS_KEY = "steps";
+
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
     String PREVIOUS_STEP_ID_KEY = "previousStepId";
@@ -85,6 +88,9 @@ public interface ScoreLangConstants {
 
     // results
     String SUCCESS_RESULT = "SUCCESS";
+    String WARNING_RESULT = "WARNING";
     String FAILURE_RESULT = "FAILURE";
+
+    String SEQ_ASSIGNMENT_ACTION = "=";
 
 }

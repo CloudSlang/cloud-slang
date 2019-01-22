@@ -31,6 +31,9 @@ public interface PreCompileValidator {
                                                                    String executableName,
                                                                    List<RuntimeException> errors);
 
+    List<Map<String, Map<String, String>>> validateSeqActionSteps(Object oSeqActionStepsRawData,
+                                                                  List<RuntimeException> errors);
+
     ExecutableModellingResult validateResult(ParsedSlang parsedSlang,
                                              String executableName,
                                              ExecutableModellingResult result);
@@ -55,6 +58,11 @@ public interface PreCompileValidator {
     List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs, InOutParam element);
 
     void validateResultsHaveNoExpression(List<Result> results, String artifactName, List<RuntimeException> errors);
+
+    void validateResultsWithWhitelist(List<Result> results,
+                                      List<String> allowedResults,
+                                      String artifactName,
+                                      List<RuntimeException> errors);
 
     void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors);
 

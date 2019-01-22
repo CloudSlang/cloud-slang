@@ -62,8 +62,11 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
+import static io.cloudslang.lang.entities.ScoreLangConstants.WARNING_RESULT;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -89,7 +92,8 @@ public class ExecutableBuilder {
 
     private List<String> executableAdditionalKeywords = singletonList(SlangTextualKeys.EXECUTABLE_NAME_KEY);
     private List<String> operationAdditionalKeywords =
-            asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY);
+            asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY,
+                    SlangTextualKeys.SEQ_ACTION_KEY);
     private List<String> flowAdditionalKeywords = singletonList(SlangTextualKeys.WORKFLOW_KEY);
     private List<String> allExecutableAdditionalKeywords;
 
@@ -104,6 +108,8 @@ public class ExecutableBuilder {
 
     private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY);
     private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY);
+
+    private List<String> seqSupportedResults = asList(SUCCESS_RESULT, WARNING_RESULT, FAILURE_RESULT);
 
     // @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -257,8 +263,13 @@ public class ExecutableBuilder {
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
 
-                preCompileValidator.validateResultTypes(results, execName, errors);
-                preCompileValidator.validateDefaultResult(results, execName, errors);
+                if (!actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY)) {
+                    preCompileValidator.validateResultTypes(results, execName, errors);
+                    preCompileValidator.validateDefaultResult(results, execName, errors);
+                } else {
+                    preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
+                    preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
+                }
 
                 try {
                     systemPropertyDependencies = dependenciesHelper
@@ -317,13 +328,13 @@ public class ExecutableBuilder {
         }
     }
 
-    private Map<String, Object> getActionRawData(
-            Map<String, Object> executableRawData,
-            List<RuntimeException> errors,
-            ParsedSlang parsedSlang, String execName) {
+    private Map<String, Object> getActionRawData(Map<String, Object> executableRawData,
+                                                 List<RuntimeException> errors,
+                                                 ParsedSlang parsedSlang, String execName) {
         Map<String, Object> actionRawData = new HashMap<>();
         Object javaActionRawData = executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
         Object pythonActionRawData = executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        Object seqActionRawData = executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
         if (javaActionRawData != null) {
             actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY,
                     executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
@@ -331,6 +342,10 @@ public class ExecutableBuilder {
         if (pythonActionRawData != null) {
             actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY,
                     executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
+        }
+        if (seqActionRawData != null) {
+            actionRawData.put(SlangTextualKeys.SEQ_ACTION_KEY,
+                    executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY));
         }
         if (MapUtils.isEmpty(actionRawData)) {
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() +
@@ -494,7 +509,7 @@ public class ExecutableBuilder {
                 defaultSuccess = nextStepData.keySet().iterator().next();
             } else {
                 defaultSuccess = onFailureSection ?
-                        ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
+                        ScoreLangConstants.FAILURE_RESULT : SUCCESS_RESULT;
             }
 
             String onFailureStepName = onFailureStepFound ? onFailureStepNames.get(0) : null;
@@ -675,7 +690,7 @@ public class ExecutableBuilder {
         if (CollectionUtils.isEmpty(navigationStrings)) {
             navigationStrings = new ArrayList<>();
             Map<String, String> successMap = new HashMap<>();
-            successMap.put(ScoreLangConstants.SUCCESS_RESULT, defaultSuccess);
+            successMap.put(SUCCESS_RESULT, defaultSuccess);
             Map<String, String> failureMap = new HashMap<>();
             failureMap.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
             navigationStrings.add(successMap);
