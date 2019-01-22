@@ -10,7 +10,7 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.modeller.model.RpaStep;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
@@ -26,40 +26,40 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
-import static io.cloudslang.lang.entities.ScoreLangConstants.RPA_ASSIGNMENT_ACTION;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ASSIGNMENT_ACTION;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
-public class RpaStepsTransformer extends AbstractTransformer
-        implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<RpaStep>> {
-
-    private static final String RPA_OPERATION_HAS_MISSING_TAGS = "Rpa operation step has the following missing tags: ";
+public class SeqStepsTransformer extends AbstractTransformer
+        implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<SeqStep>> {
+    private static final String SEQ_OPERATION_HAS_MISSING_TAGS =
+            "Sequential operation step has the following missing tags: ";
     private static final Pattern OUTPUT_ASSIGNMENT = compile("Parameter\\(\"[^\"]+\"\\)");
-    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ID_KEY,
-            SlangTextualKeys.RPA_STEP_PATH_KEY, SlangTextualKeys.RPA_STEP_ACTION_KEY);
-    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ARGS_KEY,
-            SlangTextualKeys.RPA_STEP_HIGHLIGHT_ID_KEY, SlangTextualKeys.RPA_STEP_SNAPSHOT_KEY,
-            SlangTextualKeys.RPA_STEP_NAME_KEY);
+    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEP_ID_KEY,
+            SlangTextualKeys.SEQ_STEP_PATH_KEY, SlangTextualKeys.SEQ_STEP_ACTION_KEY);
+    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEP_ARGS_KEY,
+            SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY, SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY,
+            SlangTextualKeys.SEQ_STEP_NAME_KEY);
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
-            "Found duplicate step with id '%s' for rpa operation step.";
+            "Found duplicate step with id '%s' for sequential operation step.";
     private static final String INVALID_ASSIGNMENT_OPERATION =
-            "Found invalid assignment operation for rpa operation step with id '%s'.";
-    private static final String RPA_OPERATION_HAS_EMPTY_TAGS =
-            "Rpa operation step has the following empty tags: ";
-    private static final String RPA_OPERATION_ILLEGAL_TAGS =
-            "Rpa operation step has the following illegal tags: ";
+            "Found invalid assignment operation for sequential operation step with id '%s'.";
+    private static final String SEQ_OPERATION_HAS_EMPTY_TAGS =
+            "Sequential operation step has the following empty tags: ";
+    private static final String SEQ_OPERATION_ILLEGAL_TAGS =
+            "Sequential operation step has the following illegal tags: ";
 
     @Override
-    public TransformModellingResult<ArrayList<RpaStep>> transform(List<Map<String, Map<String, String>>> rawData) {
+    public TransformModellingResult<ArrayList<SeqStep>> transform(List<Map<String, Map<String, String>>> rawData) {
         return transform(rawData, DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override
-    public TransformModellingResult<ArrayList<RpaStep>> transform(List<Map<String, Map<String, String>>> rawData,
+    public TransformModellingResult<ArrayList<SeqStep>> transform(List<Map<String, Map<String, String>>> rawData,
                                                                   SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
-        ArrayList<RpaStep> transformedData = new ArrayList<>();
+        ArrayList<SeqStep> transformedData = new ArrayList<>();
 
         if (isNotEmpty(rawData)) {
             Set<String> ids = new HashSet<>();
@@ -69,12 +69,12 @@ public class RpaStepsTransformer extends AbstractTransformer
                     validateNotEmptyValues(stepProps);
                     validateOnlySupportedKeys(stepProps);
 
-                    RpaStep rpaStep = transformStep(stepProps);
+                    SeqStep seqStep = transformStep(stepProps);
 
-                    validateUniqueIds(ids, rpaStep);
-                    validateAssignmentAction(rpaStep);
+                    validateUniqueIds(ids, seqStep);
+                    validateAssignmentAction(seqStep);
 
-                    transformedData.add(rpaStep);
+                    transformedData.add(seqStep);
                 } catch (RuntimeException rex) {
                     errors.add(rex);
                 }
@@ -84,30 +84,30 @@ public class RpaStepsTransformer extends AbstractTransformer
         return new BasicTransformModellingResult<>(transformedData, errors);
     }
 
-    private void validateAssignmentAction(RpaStep rpaStep) {
-        if (rpaStep.getAction().equals(RPA_ASSIGNMENT_ACTION) &&
-                (!OUTPUT_ASSIGNMENT.matcher(rpaStep.getObjectPath()).matches() ||
-                isEmpty(rpaStep.getArgs()))) {
-            throw new RuntimeException(String.format(INVALID_ASSIGNMENT_OPERATION, rpaStep.getId()));
+    private void validateAssignmentAction(SeqStep seqStep) {
+        if (seqStep.getAction().equals(SEQ_ASSIGNMENT_ACTION) &&
+                (!OUTPUT_ASSIGNMENT.matcher(seqStep.getObjectPath()).matches() ||
+                isEmpty(seqStep.getArgs()))) {
+            throw new RuntimeException(String.format(INVALID_ASSIGNMENT_OPERATION, seqStep.getId()));
         }
     }
 
-    private void validateUniqueIds(Set<String> ids, RpaStep rpaStep) {
-        if (!ids.add(rpaStep.getId())) {
-            throw new RuntimeException(String.format(FOUND_DUPLICATE_STEP_WITH_ID, rpaStep.getId()));
+    private void validateUniqueIds(Set<String> ids, SeqStep seqStep) {
+        if (!ids.add(seqStep.getId())) {
+            throw new RuntimeException(String.format(FOUND_DUPLICATE_STEP_WITH_ID, seqStep.getId()));
         }
     }
 
-    private RpaStep transformStep(Map<String, String> stepProps) {
-        RpaStep rpaStep = new RpaStep();
-        rpaStep.setId(stepProps.get(SlangTextualKeys.RPA_STEP_ID_KEY));
-        rpaStep.setObjectPath(stepProps.get(SlangTextualKeys.RPA_STEP_PATH_KEY));
-        rpaStep.setAction(stepProps.get(SlangTextualKeys.RPA_STEP_ACTION_KEY));
-        rpaStep.setArgs(stepProps.get(SlangTextualKeys.RPA_STEP_ARGS_KEY));
-        rpaStep.setName(stepProps.get(SlangTextualKeys.RPA_STEP_NAME_KEY));
-        rpaStep.setSnapshot(stepProps.get(SlangTextualKeys.RPA_STEP_SNAPSHOT_KEY));
-        rpaStep.setHighlightId(stepProps.get(SlangTextualKeys.RPA_STEP_HIGHLIGHT_ID_KEY));
-        return rpaStep;
+    private SeqStep transformStep(Map<String, String> stepProps) {
+        SeqStep seqStep = new SeqStep();
+        seqStep.setId(stepProps.get(SlangTextualKeys.SEQ_STEP_ID_KEY));
+        seqStep.setObjectPath(stepProps.get(SlangTextualKeys.SEQ_STEP_PATH_KEY));
+        seqStep.setAction(stepProps.get(SlangTextualKeys.SEQ_STEP_ACTION_KEY));
+        seqStep.setArgs(stepProps.get(SlangTextualKeys.SEQ_STEP_ARGS_KEY));
+        seqStep.setName(stepProps.get(SlangTextualKeys.SEQ_STEP_NAME_KEY));
+        seqStep.setSnapshot(stepProps.get(SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY));
+        seqStep.setHighlightId(stepProps.get(SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY));
+        return seqStep;
     }
 
     private void validateNotEmptyValues(Map<String, String> tMap) {
@@ -126,11 +126,11 @@ public class RpaStepsTransformer extends AbstractTransformer
             }
         }
         if (isNotEmpty(missingKeys)) {
-            throw new RuntimeException(RPA_OPERATION_HAS_MISSING_TAGS + missingKeys.toString());
+            throw new RuntimeException(SEQ_OPERATION_HAS_MISSING_TAGS + missingKeys.toString());
         }
 
         if (isNotEmpty(emptyValuesKeys)) {
-            throw new RuntimeException(RPA_OPERATION_HAS_EMPTY_TAGS + emptyValuesKeys.toString());
+            throw new RuntimeException(SEQ_OPERATION_HAS_EMPTY_TAGS + emptyValuesKeys.toString());
         }
     }
 
@@ -139,7 +139,7 @@ public class RpaStepsTransformer extends AbstractTransformer
         invalidKeys.removeAll(MANDATORY_KEY_SET);
         invalidKeys.removeAll(OPTIONAL_KEY_SET);
         if (isNotEmpty(invalidKeys)) {
-            throw new RuntimeException(RPA_OPERATION_ILLEGAL_TAGS + invalidKeys.toString() +
+            throw new RuntimeException(SEQ_OPERATION_ILLEGAL_TAGS + invalidKeys.toString() +
                     INVALID_KEYS_ERROR_MESSAGE_SUFFIX);
         }
     }

@@ -42,7 +42,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -94,7 +93,7 @@ public class ExecutableBuilder {
     private List<String> executableAdditionalKeywords = singletonList(SlangTextualKeys.EXECUTABLE_NAME_KEY);
     private List<String> operationAdditionalKeywords =
             asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY,
-                    SlangTextualKeys.RPA_ACTION_KEY);
+                    SlangTextualKeys.SEQ_ACTION_KEY);
     private List<String> flowAdditionalKeywords = singletonList(SlangTextualKeys.WORKFLOW_KEY);
     private List<String> allExecutableAdditionalKeywords;
 
@@ -110,7 +109,7 @@ public class ExecutableBuilder {
     private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY);
     private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY);
 
-    private List<String> rpaSupportedResults = asList(SUCCESS_RESULT, WARNING_RESULT, FAILURE_RESULT);
+    private List<String> seqSupportedResults = asList(SUCCESS_RESULT, WARNING_RESULT, FAILURE_RESULT);
 
     // @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -264,12 +263,12 @@ public class ExecutableBuilder {
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
 
-                if (!actionRawData.containsKey(SlangTextualKeys.RPA_ACTION_KEY)) {
+                if (!actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY)) {
                     preCompileValidator.validateResultTypes(results, execName, errors);
                     preCompileValidator.validateDefaultResult(results, execName, errors);
                 } else {
                     preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
-                    preCompileValidator.validateResultsWithWhitelist(results, rpaSupportedResults, execName, errors);
+                    preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
                 }
 
                 try {
@@ -335,7 +334,7 @@ public class ExecutableBuilder {
         Map<String, Object> actionRawData = new HashMap<>();
         Object javaActionRawData = executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
         Object pythonActionRawData = executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
-        Object rpaActionRawData = executableRawData.get(SlangTextualKeys.RPA_ACTION_KEY);
+        Object seqActionRawData = executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
         if (javaActionRawData != null) {
             actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY,
                     executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
@@ -344,9 +343,9 @@ public class ExecutableBuilder {
             actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY,
                     executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
         }
-        if (rpaActionRawData != null) {
-            actionRawData.put(SlangTextualKeys.RPA_ACTION_KEY,
-                    executableRawData.get(SlangTextualKeys.RPA_ACTION_KEY));
+        if (seqActionRawData != null) {
+            actionRawData.put(SlangTextualKeys.SEQ_ACTION_KEY,
+                    executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY));
         }
         if (MapUtils.isEmpty(actionRawData)) {
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() +

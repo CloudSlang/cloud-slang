@@ -1,8 +1,8 @@
-namespace: rpaf
+namespace: seqf
 operation:
-  name: simple_valid_rpa_op
-  rpa_action:
-    gav: rpa:rpaf.simple_valid_rpa_op:1.0.0
+  name: simple_valid_seq_op
+  sequential_action:
+    gav: seq:seqf.simple_valid_seq_op:1.0.0
     steps:
     - step:
         id: '1'

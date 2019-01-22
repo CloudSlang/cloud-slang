@@ -11,7 +11,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.compiler.modeller.model.RpaStep;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
@@ -44,8 +44,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.cloudslang.lang.entities.ScoreLangConstants.RPA_ACTION_GAV_KEY;
-import static io.cloudslang.lang.entities.ScoreLangConstants.RPA_STEPS_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ACTION_GAV_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_STEPS_KEY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -57,51 +57,51 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {RpaActionTransformerTest.Config.class})
-public class RpaActionTransformerTest extends TransformersTestParent {
+@ContextConfiguration(classes = {SeqActionTransformerTest.Config.class})
+public class SeqActionTransformerTest extends TransformersTestParent {
 
     @Autowired
-    private RpaActionTransformer rpaActionTransformer;
+    private SeqActionTransformer seqActionTransformer;
 
     @Autowired
     private YamlParser yamlParser;
 
     @Autowired
-    private RpaStepsTransformer rpaStepsTransformer;
+    private SeqStepsTransformer seqStepsTransformer;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
-    private Map<String, Serializable> initialRpaActionSimple;
+    private Map<String, Serializable> initialSeqActionSimple;
 
     @Before
     public void init() throws URISyntaxException {
-        initialRpaActionSimple = loadRpaActionData("/rpa-operation/simple_valid_rpa_op.sl");
+        initialSeqActionSimple = loadSeqActionData("/seq-operation/simple_valid_seq_op.sl");
     }
 
     @Test
     public void testTransformSimple() {
-        doReturn(new BasicTransformModellingResult<>(newArrayList(new RpaStep()), new ArrayList<>()))
-                .when(rpaStepsTransformer).transform(any(), any());
+        doReturn(new BasicTransformModellingResult<>(newArrayList(new SeqStep()), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
 
-        Map<String, Serializable> expectedRpaActionSimple = new LinkedHashMap<>();
-        expectedRpaActionSimple.put(RPA_ACTION_GAV_KEY, "rpa:rpaf.simple_valid_rpa_op:1.0.0");
-        expectedRpaActionSimple.put(RPA_STEPS_KEY, newArrayList(new RpaStep()));
+        Map<String, Serializable> expectedSeqActionSimple = new LinkedHashMap<>();
+        expectedSeqActionSimple.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_seq_op:1.0.0");
+        expectedSeqActionSimple.put(SEQ_STEPS_KEY, newArrayList(new SeqStep()));
 
-        TransformModellingResult<Map<String, Serializable>> transformedAction = rpaActionTransformer
-                .transform(new HashMap<>(initialRpaActionSimple));
-        assertEquals(expectedRpaActionSimple, transformedAction.getTransformedData());
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer
+                .transform(new HashMap<>(initialSeqActionSimple));
+        assertEquals(expectedSeqActionSimple, transformedAction.getTransformedData());
         assertThat(transformedAction.getErrors(), is(empty()));
     }
 
     @Test
     public void testTransformWithInvalidGav() {
-        doReturn(new BasicTransformModellingResult<>(newArrayList(new RpaStep()), new ArrayList<>()))
-                .when(rpaStepsTransformer).transform(any(), any());
+        doReturn(new BasicTransformModellingResult<>(newArrayList(new SeqStep()), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
 
-        HashMap<String, Serializable> rawData = new HashMap<>(initialRpaActionSimple);
-        rawData.put(RPA_ACTION_GAV_KEY, "invalid-format");
+        HashMap<String, Serializable> rawData = new HashMap<>(initialSeqActionSimple);
+        rawData.put(SEQ_ACTION_GAV_KEY, "invalid-format");
 
-        TransformModellingResult<Map<String, Serializable>> transformedAction = rpaActionTransformer
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer
                 .transform(rawData);
         assertNull(transformedAction.getTransformedData());
         assertThat(transformedAction.getErrors(), is(not(empty())));
@@ -111,13 +111,13 @@ public class RpaActionTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformWithIllegalKeys() {
-        doReturn(new BasicTransformModellingResult<>(newArrayList(new RpaStep()), new ArrayList<>()))
-                .when(rpaStepsTransformer).transform(any(), any());
+        doReturn(new BasicTransformModellingResult<>(newArrayList(new SeqStep()), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
 
-        HashMap<String, Serializable> rawData = new HashMap<>(initialRpaActionSimple);
+        HashMap<String, Serializable> rawData = new HashMap<>(initialSeqActionSimple);
         rawData.put("illegal-arg", "illegal-arg-value");
 
-        TransformModellingResult<Map<String, Serializable>> transformedAction = rpaActionTransformer
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer
                 .transform(rawData);
         assertNull(transformedAction.getTransformedData());
         assertThat(transformedAction.getErrors(), is(not(empty())));
@@ -128,14 +128,14 @@ public class RpaActionTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformWithMissingKeys() {
-        doReturn(new BasicTransformModellingResult<>(newArrayList(new RpaStep()), new ArrayList<>()))
-                .when(rpaStepsTransformer).transform(any(), any());
+        doReturn(new BasicTransformModellingResult<>(newArrayList(new SeqStep()), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
 
-        HashMap<String, Serializable> rawData = new HashMap<>(initialRpaActionSimple);
-        rawData.remove(RPA_ACTION_GAV_KEY);
-        rawData.remove(RPA_STEPS_KEY);
+        HashMap<String, Serializable> rawData = new HashMap<>(initialSeqActionSimple);
+        rawData.remove(SEQ_ACTION_GAV_KEY);
+        rawData.remove(SEQ_STEPS_KEY);
 
-        TransformModellingResult<Map<String, Serializable>> transformedAction = rpaActionTransformer
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer
                 .transform(rawData);
         assertNull(transformedAction.getTransformedData());
         assertThat(transformedAction.getErrors(), is(not(empty())));
@@ -146,38 +146,38 @@ public class RpaActionTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWithNoSteps() {
         doReturn(new BasicTransformModellingResult<>(newArrayList(), new ArrayList<>()))
-                .when(rpaStepsTransformer).transform(any(), any());
+                .when(seqStepsTransformer).transform(any(), any());
 
-        HashMap<String, Serializable> rawData = new HashMap<>(initialRpaActionSimple);
-        rawData.put(RPA_STEPS_KEY, new ArrayList<>());
-        Map<String, Serializable> expectedRpaActionSimple = new LinkedHashMap<>();
-        expectedRpaActionSimple.put(RPA_ACTION_GAV_KEY, "rpa:rpaf.simple_valid_rpa_op:1.0.0");
-        expectedRpaActionSimple.put(RPA_STEPS_KEY, newArrayList());
+        HashMap<String, Serializable> rawData = new HashMap<>(initialSeqActionSimple);
+        rawData.put(SEQ_STEPS_KEY, new ArrayList<>());
+        Map<String, Serializable> expectedSeqActionSimple = new LinkedHashMap<>();
+        expectedSeqActionSimple.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_seq_op:1.0.0");
+        expectedSeqActionSimple.put(SEQ_STEPS_KEY, newArrayList());
 
-        TransformModellingResult<Map<String, Serializable>> transformedAction = rpaActionTransformer
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer
                 .transform(rawData);
-        assertEquals(transformedAction.getTransformedData(), expectedRpaActionSimple);
+        assertEquals(transformedAction.getTransformedData(), expectedSeqActionSimple);
         assertThat(transformedAction.getErrors(), is(not(empty())));
         assertEquals(transformedAction.getErrors().get(0).getMessage(),
-                "Error compiling rpa operation: missing 'steps' data.");
+                "Error compiling sequential operation: missing 'steps' data.");
     }
 
     @Test
     public void testTransformWithNullMap() {
-        doReturn(new BasicTransformModellingResult<>(newArrayList(new RpaStep()), new ArrayList<>()))
-                .when(rpaStepsTransformer).transform(any(), any());
+        doReturn(new BasicTransformModellingResult<>(newArrayList(new SeqStep()), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
 
-        Map<String, Serializable> actualRpaActionSimple = rpaActionTransformer
+        Map<String, Serializable> actualSeqActionSimple = seqActionTransformer
                 .transform(null).getTransformedData();
-        assertNull(actualRpaActionSimple);
+        assertNull(actualSeqActionSimple);
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Serializable> loadRpaActionData(String filePath) throws URISyntaxException {
+    private Map<String, Serializable> loadSeqActionData(String filePath) throws URISyntaxException {
         URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperation();
-        return (Map<String, Serializable>) op.get(SlangTextualKeys.RPA_ACTION_KEY);
+        return (Map<String, Serializable>) op.get(SlangTextualKeys.SEQ_ACTION_KEY);
     }
 
     public static class Config {
@@ -205,10 +205,10 @@ public class RpaActionTransformerTest extends TransformersTestParent {
         }
 
         @Bean
-        public RpaActionTransformer rpaActionTransformer(RpaStepsTransformer rpaStepsTransformer) {
-            return new RpaActionTransformer(dependencyFormatValidator(),
+        public SeqActionTransformer seqActionTransformer(SeqStepsTransformer seqStepsTransformer) {
+            return new SeqActionTransformer(dependencyFormatValidator(),
                     preCompileValidatorImpl(),
-                    rpaStepsTransformer);
+                    seqStepsTransformer);
         }
 
         @Bean
@@ -224,8 +224,8 @@ public class RpaActionTransformerTest extends TransformersTestParent {
         }
 
         @Bean
-        public RpaStepsTransformer rpaStepsTransformer() {
-            return mock(RpaStepsTransformer.class);
+        public SeqStepsTransformer seqStepsTransformer() {
+            return mock(SeqStepsTransformer.class);
         }
 
         @Bean
