@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class RpaStep implements Serializable {
-    private static final long serialVersionUID = -7225034120015578511L;
+    private static final long serialVersionUID = -628265720682478108L;
     private String id;
     private String name;
     private String objectPath;

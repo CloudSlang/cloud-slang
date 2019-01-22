@@ -185,7 +185,7 @@ public class RpaStepsTransformerTest extends TransformersTestParent {
     }
 
     private void putIfValueNotNull(Map<String, String> stepDetails, String key, String value) {
-        if (key != null) {
+        if (value != null) {
             stepDetails.put(key, value);
         }
     }

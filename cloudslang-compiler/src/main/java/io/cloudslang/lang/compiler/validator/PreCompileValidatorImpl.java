@@ -37,11 +37,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.RPA_STEPS_KEY;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
@@ -312,19 +312,18 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                                              List<String> allowedResults,
                                              String artifactName,
                                              List<RuntimeException> errors) {
-        errors.addAll(results.stream()
-                .filter(result -> !allowedResults.contains(result.getName()))
-                .map(result -> new RuntimeException(
-                        "Rpa operation: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
-                                result.getName() + "'. " + FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE +
-                                allowedResults.toString() + "."))
-                .collect(Collectors.toList()));
+
+        final Set<String> artifactResultNames = results.stream().map(Result::getName).collect(toSet());
+        if ((artifactResultNames.size() != results.size()) || !artifactResultNames.equals(new HashSet<>(allowedResults))) {
+            errors.add(new RuntimeException("Rpa operation: '" + artifactName + "' syntax is illegal. " +
+                             FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE + allowedResults.toString() + "."));
+        }
     }
 
     @Override
     public void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors) {
         for (Result result : results) {
-            if (!(result.getValue() == null) && !(result.getValue().get() == null)) {
+            if ((result.getValue() != null) && (result.getValue().get() != null)) {
                 Serializable value = result.getValue().get();
                 if (!(value instanceof String || Boolean.TRUE.equals(value))) {
                     errors.add(
@@ -424,7 +423,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                 reachableStepNames,
                 reachableResultNames,
                 errors,
-                new ArrayList<String>()
+                new ArrayList<>()
         );
     }
 

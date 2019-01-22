@@ -76,7 +76,6 @@ public class RpaActionTransformerTest extends TransformersTestParent {
     @Before
     public void init() throws URISyntaxException {
         initialRpaActionSimple = loadRpaActionData("/rpa-operation/simple_valid_rpa_op.sl");
-
     }
 
     @Test

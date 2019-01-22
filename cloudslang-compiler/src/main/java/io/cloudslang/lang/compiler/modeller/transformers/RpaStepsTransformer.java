@@ -14,7 +14,6 @@ import io.cloudslang.lang.compiler.modeller.model.RpaStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.Validate;
 
 import java.util.ArrayList;
@@ -28,17 +27,20 @@ import java.util.regex.Pattern;
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
 import static io.cloudslang.lang.entities.ScoreLangConstants.RPA_ASSIGNMENT_ACTION;
+import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 public class RpaStepsTransformer extends AbstractTransformer
         implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<RpaStep>> {
+
     private static final String RPA_OPERATION_HAS_MISSING_TAGS = "Rpa operation step has the following missing tags: ";
-    private static final Pattern OUTPUT_ASSIGNMENT = Pattern.compile("Parameter\\(\"[^\"]+\"\\)");
+    private static final Pattern OUTPUT_ASSIGNMENT = compile("Parameter\\(\"[^\"]+\"\\)");
     private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ID_KEY,
             SlangTextualKeys.RPA_STEP_PATH_KEY, SlangTextualKeys.RPA_STEP_ACTION_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.RPA_STEP_ARGS_KEY,
-            SlangTextualKeys.RPA_STEP_HIGHLIGHT_ID_KEY, SlangTextualKeys.RPA_STEP_SNAPSHOT_KEY);
+            SlangTextualKeys.RPA_STEP_HIGHLIGHT_ID_KEY, SlangTextualKeys.RPA_STEP_SNAPSHOT_KEY,
+            SlangTextualKeys.RPA_STEP_NAME_KEY);
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for rpa operation step.";
     private static final String INVALID_ASSIGNMENT_OPERATION =
@@ -123,11 +125,11 @@ public class RpaStepsTransformer extends AbstractTransformer
                 emptyValuesKeys.add(reqKey);
             }
         }
-        if (CollectionUtils.isNotEmpty(missingKeys)) {
+        if (isNotEmpty(missingKeys)) {
             throw new RuntimeException(RPA_OPERATION_HAS_MISSING_TAGS + missingKeys.toString());
         }
 
-        if (CollectionUtils.isNotEmpty(emptyValuesKeys)) {
+        if (isNotEmpty(emptyValuesKeys)) {
             throw new RuntimeException(RPA_OPERATION_HAS_EMPTY_TAGS + emptyValuesKeys.toString());
         }
     }
@@ -136,7 +138,7 @@ public class RpaStepsTransformer extends AbstractTransformer
         Set<String> invalidKeys = new HashSet<>(tMap.keySet());
         invalidKeys.removeAll(MANDATORY_KEY_SET);
         invalidKeys.removeAll(OPTIONAL_KEY_SET);
-        if (CollectionUtils.isNotEmpty(invalidKeys)) {
+        if (isNotEmpty(invalidKeys)) {
             throw new RuntimeException(RPA_OPERATION_ILLEGAL_TAGS + invalidKeys.toString() +
                     INVALID_KEYS_ERROR_MESSAGE_SUFFIX);
         }
@@ -151,4 +153,5 @@ public class RpaStepsTransformer extends AbstractTransformer
     public String keyToTransform() {
         return null;
     }
+
 }
