@@ -165,10 +165,10 @@ public class ActionExecutionData extends AbstractExecutionData {
                                         rpaSteps,
                                         nodeNameWithDepth,
                                         depth));
-        if (returnMap == null) {
-            throw new RuntimeException("RPA Action did not return results data");
+        if (returnMap != null) {
+            return handleSensitiveValues(returnMap, currentContext);
         }
-        return handleSensitiveValues(returnMap, currentContext);
+        return new HashMap<>();
     }
 
     @SuppressWarnings("unchecked")

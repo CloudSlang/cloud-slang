@@ -55,13 +55,10 @@ public class CloudSlangRpaExecutionParametersProviderImpl implements RpaExecutio
                 if (value != null) {
                     //TODO handle sensitive values
                     execParams.put(paramName, value.get().toString());
-                } else {
-                    throw new RuntimeException("Rpa parameter is missing from the inputs list.");
                 }
-            } else {
-                throw new RuntimeException("args element should be of the following format: Parameter(\"inputName\")");
             }
         }
-        return new Object[]{execParams};
+        // TODO fix get execution from map
+        return new Object[]{execParams, nonSerializableExecutionData.get("execution").get("execution")};
     }
 }
