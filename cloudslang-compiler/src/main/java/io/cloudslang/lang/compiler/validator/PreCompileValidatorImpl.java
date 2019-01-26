@@ -37,11 +37,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.exists;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.RPA_STEPS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
@@ -114,27 +114,29 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     }
 
     @Override
-    public List<Map<String, Map<String, String>>> validateRpaActionSteps(Object oRpaActionStepsRawData,
+    public List<Map<String, Map<String, String>>> validateSeqActionSteps(Object oSeqActionStepsRawData,
                                                                          List<RuntimeException> errors) {
-        if (oRpaActionStepsRawData == null) {
-            oRpaActionStepsRawData = new ArrayList<>();
-            errors.add(new RuntimeException("Error compiling rpa operation: missing " + RPA_STEPS_KEY + " property"));
+        if (oSeqActionStepsRawData == null) {
+            oSeqActionStepsRawData = new ArrayList<>();
+            errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
+                    SEQ_STEPS_KEY + "' property."));
         }
         List<Map<String, Map<String, String>>> stepsRawData;
         try {
             //noinspection unchecked
-            stepsRawData = (List<Map<String, Map<String, String>>>) oRpaActionStepsRawData;
+            stepsRawData = (List<Map<String, Map<String, String>>>) oSeqActionStepsRawData;
         } catch (ClassCastException ex) {
             stepsRawData = new ArrayList<>();
-            errors.add(new RuntimeException("Error compiling rpa operation: syntax is illegal.\n" +
-                    "Below '" + RPA_STEPS_KEY + "' property there should be a list of steps and not a map."));
+            errors.add(new RuntimeException("Error compiling sequential operation: syntax is illegal.\n" +
+                    "Below '" + SEQ_STEPS_KEY + "' property there should be a list of steps and not a map."));
         }
         if (CollectionUtils.isEmpty(stepsRawData)) {
-            errors.add(new RuntimeException("Error compiling rpa operation: missing '" + RPA_STEPS_KEY + "' data."));
+            errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
+                    SEQ_STEPS_KEY + "' data."));
         }
         for (Map<String, Map<String, String>> step : stepsRawData) {
             if (step.size() > 1) {
-                errors.add(new RuntimeException("Error compiling rpa operation: syntax is illegal.\n" +
+                errors.add(new RuntimeException("Error compiling sequential operation: syntax is illegal.\n" +
                         "Found steps with keyword on the same indentation as the step name " +
                         "or there is no space between step name and hyphen."));
             }
@@ -312,19 +314,19 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                                              List<String> allowedResults,
                                              String artifactName,
                                              List<RuntimeException> errors) {
-        errors.addAll(results.stream()
-                .filter(result -> !allowedResults.contains(result.getName()))
-                .map(result -> new RuntimeException(
-                        "Rpa operation: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
-                                result.getName() + "'. " + FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE +
-                                allowedResults.toString() + "."))
-                .collect(Collectors.toList()));
+
+        final Set<String> artifactResultNames = results.stream().map(Result::getName).collect(toSet());
+        if ((artifactResultNames.size() != results.size()) ||
+                !artifactResultNames.equals(new HashSet<>(allowedResults))) {
+            errors.add(new RuntimeException("Sequential operation: '" + artifactName + "' syntax is illegal. " +
+                             FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE + allowedResults.toString() + "."));
+        }
     }
 
     @Override
     public void validateResultTypes(List<Result> results, String artifactName, List<RuntimeException> errors) {
         for (Result result : results) {
-            if (!(result.getValue() == null) && !(result.getValue().get() == null)) {
+            if ((result.getValue() != null) && (result.getValue().get() != null)) {
                 Serializable value = result.getValue().get();
                 if (!(value instanceof String || Boolean.TRUE.equals(value))) {
                     errors.add(
@@ -424,7 +426,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                 reachableStepNames,
                 reachableResultNames,
                 errors,
-                new ArrayList<String>()
+                new ArrayList<>()
         );
     }
 

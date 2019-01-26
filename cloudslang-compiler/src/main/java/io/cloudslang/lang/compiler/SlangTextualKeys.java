@@ -46,11 +46,11 @@ public interface SlangTextualKeys {
     String JAVA_ACTION_METHOD_NAME_KEY = "method_name";
     String JAVA_ACTION_GAV_KEY = "gav";
     String PYTHON_ACTION_KEY = "python_action";
-    String RPA_ACTION_KEY = "rpa_action";
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
-    String RPA_STEPS_KEY = "steps";
-    String RPA_ACTION_GAV_KEY = "gav";
+    String SEQ_ACTION_KEY = "sequential_action";
+    String SEQ_STEPS_KEY = "steps";
+    String SEQ_ACTION_GAV_KEY = "gav";
 
 
     //step
@@ -62,14 +62,14 @@ public interface SlangTextualKeys {
     String NAVIGATION_KEY = "navigate";
     String PARALLEL_LOOP_KEY = "parallel_loop";
 
-    //rpa step
-    String RPA_STEP_ID_KEY = "id";
-    String RPA_STEP_PATH_KEY = "object_path";
-    String RPA_STEP_NAME_KEY = "name";
-    String RPA_STEP_ACTION_KEY = "action";
-    String RPA_STEP_ARGS_KEY = "args";
-    String RPA_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
-    String RPA_STEP_SNAPSHOT_KEY = "snapshot";
+    //seq step
+    String SEQ_STEP_ID_KEY = "id";
+    String SEQ_STEP_PATH_KEY = "object_path";
+    String SEQ_STEP_NAME_KEY = "name";
+    String SEQ_STEP_ACTION_KEY = "action";
+    String SEQ_STEP_ARGS_KEY = "args";
+    String SEQ_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
+    String SEQ_STEP_SNAPSHOT_KEY = "snapshot";
 
     //inputs
     String VALUE_KEY = "value";

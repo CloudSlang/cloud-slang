@@ -10,7 +10,7 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
-import io.cloudslang.lang.entities.RpaStep;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
@@ -25,27 +25,27 @@ import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.RPA_ACTION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_ACTION_KEY;
 import static io.cloudslang.lang.compiler.modeller.transformers.Transformer.Scope.ACTION;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 
-public class RpaActionTransformer extends AbstractTransformer
+public class SeqActionTransformer extends AbstractTransformer
         implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
     private final DependencyFormatValidator dependencyFormatValidator;
     private final PreCompileValidator preCompileValidator;
-    private final RpaStepsTransformer rpaStepsTransformer;
+    private final SeqStepsTransformer seqStepsTransformer;
 
-    public RpaActionTransformer(DependencyFormatValidator dependencyFormatValidator,
+    public SeqActionTransformer(DependencyFormatValidator dependencyFormatValidator,
                                 PreCompileValidator preCompileValidator,
-                                RpaStepsTransformer rpaStepsTransformer) {
+                                SeqStepsTransformer seqStepsTransformer) {
         this.dependencyFormatValidator = dependencyFormatValidator;
         this.preCompileValidator = preCompileValidator;
-        this.rpaStepsTransformer = rpaStepsTransformer;
+        this.seqStepsTransformer = seqStepsTransformer;
     }
 
-    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.RPA_ACTION_GAV_KEY,
-            SlangTextualKeys.RPA_STEPS_KEY);
+    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_ACTION_GAV_KEY,
+            SlangTextualKeys.SEQ_STEPS_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = emptySet();
 
     @Override
@@ -74,24 +74,24 @@ public class RpaActionTransformer extends AbstractTransformer
     }
 
     private void transformGav(Map<String, Serializable> rawData) {
-        String gav = (String) rawData.remove(SlangTextualKeys.RPA_ACTION_GAV_KEY);
+        String gav = (String) rawData.remove(SlangTextualKeys.SEQ_ACTION_GAV_KEY);
         dependencyFormatValidator.validateDependency(gav);
-        rawData.put(ScoreLangConstants.RPA_ACTION_GAV_KEY, gav);
+        rawData.put(ScoreLangConstants.SEQ_ACTION_GAV_KEY, gav);
     }
 
     private void transformSteps(Map<String, Serializable> rawData,
                                 List<RuntimeException> errors,
                                 SensitivityLevel sensitivityLevel) {
         List<Map<String, Map<String, String>>> steps = preCompileValidator
-                .validateRpaActionSteps(rawData.remove(SlangTextualKeys.RPA_STEPS_KEY), errors);
-        TransformModellingResult<ArrayList<RpaStep>> transformedSteps = rpaStepsTransformer
+                .validateSeqActionSteps(rawData.remove(SlangTextualKeys.SEQ_STEPS_KEY), errors);
+        TransformModellingResult<ArrayList<SeqStep>> transformedSteps = seqStepsTransformer
                 .transform(steps, sensitivityLevel);
         errors.addAll(transformedSteps.getErrors());
-        ArrayList<RpaStep> transformedData = transformedSteps.getTransformedData();
+        ArrayList<SeqStep> transformedData = transformedSteps.getTransformedData();
         if (transformedData.isEmpty()) {
-            errors.add(new RuntimeException("Missing rpa operation steps."));
+            errors.add(new RuntimeException("Missing sequential operation steps."));
         }
-        rawData.put(ScoreLangConstants.RPA_STEPS_KEY, transformedData);
+        rawData.put(ScoreLangConstants.SEQ_STEPS_KEY, transformedData);
     }
 
     @Override
@@ -101,6 +101,6 @@ public class RpaActionTransformer extends AbstractTransformer
 
     @Override
     public String keyToTransform() {
-        return RPA_ACTION_KEY;
+        return SEQ_ACTION_KEY;
     }
 }
