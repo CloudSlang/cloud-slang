@@ -77,7 +77,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                          @Param(ScoreLangConstants.JAVA_ACTION_GAV_KEY) String gav,
                          @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
                          @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies,
-                         @Param(ScoreLangConstants.RPA_STEPS_KEY) List<RpaStep> steps) {
+                         @Param(ScoreLangConstants.SEQ_STEPS_KEY) List<RpaStep> steps) {
 
         Map<String, Value> returnValue = new HashMap<>();
         Map<String, Value> callArguments = runEnv.removeCallArguments();

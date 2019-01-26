@@ -101,7 +101,7 @@ public class ExecutionStepFactory {
                 (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         @SuppressWarnings("unchecked")
         Map<String, String> rpaActionData =
-                (Map<String, String>) actionRawData.get(SlangTextualKeys.RPA_ACTION_KEY);
+                (Map<String, String>) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
 
         boolean javaActionFound = isNotEmpty(javaActionData);
         boolean pythonActionFound = isNotEmpty(pythonActionData);
