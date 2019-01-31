@@ -113,8 +113,8 @@ public class OperationSystemTest extends SystemsTestsParent {
     }
 
     @Test
-    public void testOperationWithRpaAction() throws Exception {
-        URI resource = getClass().getResource("/yaml/rpa_action_test.sl").toURI();
+    public void testOperationWithSeqAction() throws Exception {
+        URI resource = getClass().getResource("/yaml/seq_action_test.sl").toURI();
 
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
 

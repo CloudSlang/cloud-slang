@@ -12,7 +12,7 @@ package io.cloudslang.lang.runtime.steps;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.runtime.api.rpa.RpaExecutionParametersProvider;
+import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -21,25 +21,25 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.substring;
 
-public class CloudSlangRpaExecutionParametersProviderImpl implements RpaExecutionParametersProvider {
+public class CloudSlangSequentialExecutionParametersProviderImpl implements SequentialExecutionParametersProvider {
     public static final String UFT_PARAMETER = "Parameter(";
     private final Map<String, SerializableSessionObject> serializableSessionData;
     private final Map<String, Value> currentContext;
     private final Map<String, Map<String, Object>> nonSerializableExecutionData;
     private final String nodeNameWithDepth;
     private final int depth;
-    private final List<SeqStep> rpaSteps;
+    private final List<SeqStep> seqSteps;
 
-    public CloudSlangRpaExecutionParametersProviderImpl(
+    public CloudSlangSequentialExecutionParametersProviderImpl(
             Map<String, SerializableSessionObject> serializableSessionData,
             Map<String, Value> currentContext,
             Map<String, Map<String, Object>> nonSerializableExecutionData,
-            List<SeqStep> rpaSteps, String nodeNameWithDepth,
+            List<SeqStep> seqSteps, String nodeNameWithDepth,
             int depth) {
         this.serializableSessionData = serializableSessionData;
         this.currentContext = currentContext;
         this.nonSerializableExecutionData = nonSerializableExecutionData;
-        this.rpaSteps = rpaSteps;
+        this.seqSteps = seqSteps;
         this.nodeNameWithDepth = nodeNameWithDepth;
         this.depth = depth;
     }
@@ -47,7 +47,7 @@ public class CloudSlangRpaExecutionParametersProviderImpl implements RpaExecutio
     @Override
     public Object[] getExecutionParameters() {
         Map<String, String> execParams = new HashMap<>();
-        for (SeqStep step : rpaSteps) {
+        for (SeqStep step : seqSteps) {
             String args = step.getArgs();
             if (StringUtils.startsWith(args, UFT_PARAMETER)) {
                 String paramName = substring(args, UFT_PARAMETER.length(), args.length() - 1);

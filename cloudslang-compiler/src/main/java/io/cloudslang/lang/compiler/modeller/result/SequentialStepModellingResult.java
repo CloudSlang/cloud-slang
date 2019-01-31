@@ -13,12 +13,12 @@ import io.cloudslang.lang.compiler.modeller.model.Step;
 
 import java.util.List;
 
-public class RpaStepModellingResult implements ModellingResult {
+public class SequentialStepModellingResult implements ModellingResult {
 
     private final Step step;
     private final List<RuntimeException> errors;
 
-    public RpaStepModellingResult(Step step, List<RuntimeException> errors) {
+    public SequentialStepModellingResult(Step step, List<RuntimeException> errors) {
         this.step = step;
         this.errors = errors;
     }

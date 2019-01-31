@@ -21,7 +21,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
-import io.cloudslang.runtime.api.rpa.RpaExecutionService;
+import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.lang.StringUtils;
@@ -61,7 +61,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     private JavaRuntimeService javaExecutionService;
 
     @Autowired
-    private RpaExecutionService rpaExecutionService;
+    private SequentialExecutionService seqExecutionService;
 
     @Autowired(required = false)
     private SlangStepDataConsumer stepDataConsumer;
@@ -107,8 +107,9 @@ public class ActionExecutionData extends AbstractExecutionData {
                 case PYTHON:
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
                     break;
-                case RPA:
-                    returnValue = runRpaAction(serializableSessionData, callArguments, nonSerializableExecutionData,
+                case SEQUENTIAL:
+                    returnValue = runSequentialAction(serializableSessionData,
+                            callArguments, nonSerializableExecutionData,
                             gav, steps, executionRuntimeServices.getNodeNameWithDepth(),
                             runEnv.getParentFlowStack().size());
                     break;
@@ -147,22 +148,22 @@ public class ActionExecutionData extends AbstractExecutionData {
         runEnv.putNextStepPosition(nextStepId);
     }
 
-    private Map<String, Value> runRpaAction(
+    private Map<String, Value> runSequentialAction(
             Map<String, SerializableSessionObject> serializableSessionData,
             Map<String, Value> currentContext,
             Map<String, Map<String, Object>> nonSerializableExecutionData,
             String gav,
-           List<SeqStep> rpaSteps, String nodeNameWithDepth,
+           List<SeqStep> seqSteps, String nodeNameWithDepth,
             int depth) {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> returnMap =
                 (Map<String, Serializable>)
-                        rpaExecutionService.execute(
+                        seqExecutionService.execute(
                                 gav,
-                                new CloudSlangRpaExecutionParametersProviderImpl(serializableSessionData,
+                                new CloudSlangSequentialExecutionParametersProviderImpl(serializableSessionData,
                                         currentContext,
                                         nonSerializableExecutionData,
-                                        rpaSteps,
+                                        seqSteps,
                                         nodeNameWithDepth,
                                         depth));
         if (returnMap != null) {

@@ -100,12 +100,12 @@ public class ExecutionStepFactory {
         Map<String, Serializable> pythonActionData =
                 (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         @SuppressWarnings("unchecked")
-        Map<String, String> rpaActionData =
+        Map<String, String> seqActionData =
                 (Map<String, String>) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
 
         boolean javaActionFound = isNotEmpty(javaActionData);
         boolean pythonActionFound = isNotEmpty(pythonActionData);
-        boolean rpaActionFound = isNotEmpty(rpaActionData);
+        boolean seqActionFound = isNotEmpty(seqActionData);
 
         if (javaActionFound) {
             actionType = ActionType.JAVA;
@@ -113,9 +113,9 @@ public class ExecutionStepFactory {
         } else if (pythonActionFound) {
             actionType = ActionType.PYTHON;
             actionData.putAll(pythonActionData);
-        } else if (rpaActionFound) {
-            actionType = ActionType.RPA;
-            actionData.putAll(rpaActionData);
+        } else if (seqActionFound) {
+            actionType = ActionType.SEQUENTIAL;
+            actionData.putAll(seqActionData);
         } else {
             // action data is missing
             throw new RuntimeException("Invalid action data");

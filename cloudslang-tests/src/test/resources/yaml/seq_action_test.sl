@@ -8,14 +8,14 @@
 namespace: user.ops
 
 operation:
-  name: rpa_action_test
+  name: seq_action_test
   inputs:
     - host
     - port
     - param1:
         default: "le_def_val"
-  rpa_action:
-    gav: 'cloudslang.rpa.recordings:register_user:1.0'
+  sequential_action:
+    gav: 'cloudslang.seq.recordings:register_user:1.0'
     steps:
             - step:
                 id: '1'
@@ -26,4 +26,5 @@ operation:
                 highlight_id: '198258'
   results:
     - SUCCESS
+    - WARNING
     - FAILURE

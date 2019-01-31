@@ -18,7 +18,7 @@ public enum ActionType {
 
     JAVA("java"),
     PYTHON("python"),
-    RPA("rpa");
+    SEQUENTIAL("sequential");
 
     private String value;
 
