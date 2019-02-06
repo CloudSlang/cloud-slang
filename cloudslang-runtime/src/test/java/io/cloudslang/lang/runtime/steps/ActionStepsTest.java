@@ -27,6 +27,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.steps.ContentTestActions.NonSerializableObject;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.runtime.impl.java.JavaExecutionCachedEngine;
 import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
@@ -118,7 +119,8 @@ public class ActionStepsTest {
                 GAV_DEFAULT,
                 null,
                 DEPENDENCIES_DEFAULT,
-                seqSteps
+                seqSteps,
+                null
         );
 
         //construct expected outputs
@@ -157,7 +159,8 @@ public class ActionStepsTest {
                 GAV_DEFAULT,
                 null,
                 DEPENDENCIES_DEFAULT,
-                seqSteps
+                seqSteps,
+                null
         );
 
         //verify matching
@@ -182,7 +185,8 @@ public class ActionStepsTest {
                 GAV_DEFAULT,
                 null,
                 DEPENDENCIES_DEFAULT,
-                seqSteps
+                seqSteps,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -225,7 +229,8 @@ public class ActionStepsTest {
                 GAV_DEFAULT,
                 userPythonScript,
                 DEPENDENCIES_DEFAULT,
-                seqSteps
+                seqSteps,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -271,7 +276,8 @@ public class ActionStepsTest {
                 GAV_DEFAULT,
                 null,
                 DEPENDENCIES_DEFAULT,
-                seqSteps
+                seqSteps,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -313,7 +319,8 @@ public class ActionStepsTest {
                 GAV_DEFAULT,
                 null,
                 DEPENDENCIES_DEFAULT,
-                seqSteps
+                seqSteps,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -352,7 +359,8 @@ public class ActionStepsTest {
                     GAV_DEFAULT,
                     null,
                     DEPENDENCIES_DEFAULT,
-                    seqSteps
+                    seqSteps,
+                    null
             );
         } catch (RuntimeException ex) {
             exceptionThrown = true;
@@ -393,7 +401,8 @@ public class ActionStepsTest {
                 "doJavaActionWrongReturnType",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -432,7 +441,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         //construct expected outputs
@@ -467,7 +477,8 @@ public class ActionStepsTest {
                 "doJavaNumberAsString",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
     }
 
@@ -490,7 +501,8 @@ public class ActionStepsTest {
                 "doJavaNumbersAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
         ReturnValues returnValues = runEnv.removeReturnValues();
         assertEquals(5, returnValues.getOutputs().get("port").get());
@@ -516,7 +528,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction_NOT_FOUND",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         //construct expected outputs
@@ -550,7 +563,8 @@ public class ActionStepsTest {
                 "doJavaActionMissingAnnotation",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         //construct expected outputs
@@ -586,7 +600,8 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -623,7 +638,8 @@ public class ActionStepsTest {
                 "setNameOnNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         Map<String, Object> globalSessionObject = nonSerializableExecutionData.get(GLOBAL_SESSION_OBJECT);
@@ -653,7 +669,8 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -684,7 +701,8 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -713,7 +731,8 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -739,7 +758,8 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         Map<String, SerializableSessionObject> serializableSessionMap = runEnv.getSerializableDataMap();
@@ -780,7 +800,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         //construct expected outputs
@@ -828,7 +849,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
 
         //extract actual outputs
@@ -869,7 +891,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
     }
 
@@ -895,7 +918,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
     }
 
@@ -922,7 +946,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
     }
 
@@ -947,7 +972,8 @@ public class ActionStepsTest {
                 GAV_DEFAULT,
                 "",
                 DEPENDENCIES_DEFAULT,
-                seqSteps
+                seqSteps,
+                null
         );
     }
 
@@ -971,7 +997,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
     }
 
@@ -997,7 +1024,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps
+                DEPENDENCIES_DEFAULT, seqSteps,
+                null
         );
     }
 
@@ -1053,5 +1081,11 @@ public class ActionStepsTest {
         public EventBus eventBus() {
             return new EventBusImpl();
         }
+
+        @Bean
+        public SequentialExecutionService seqExecutionService() {
+            return mock(SequentialExecutionService.class);
+        }
+
     }
 }

@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
-import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
@@ -22,26 +21,15 @@ import java.util.Map;
 import static org.apache.commons.lang3.StringUtils.substring;
 
 public class CloudSlangSequentialExecutionParametersProviderImpl implements SequentialExecutionParametersProvider {
-    public static final String UFT_PARAMETER = "Parameter(";
-    private final Map<String, SerializableSessionObject> serializableSessionData;
+    public static final String SEQUENTIAL_PARAMETER = "Parameter(";
     private final Map<String, Value> currentContext;
-    private final Map<String, Map<String, Object>> nonSerializableExecutionData;
-    private final String nodeNameWithDepth;
-    private final int depth;
     private final List<SeqStep> seqSteps;
 
     public CloudSlangSequentialExecutionParametersProviderImpl(
-            Map<String, SerializableSessionObject> serializableSessionData,
             Map<String, Value> currentContext,
-            Map<String, Map<String, Object>> nonSerializableExecutionData,
-            List<SeqStep> seqSteps, String nodeNameWithDepth,
-            int depth) {
-        this.serializableSessionData = serializableSessionData;
+            List<SeqStep> seqSteps) {
         this.currentContext = currentContext;
-        this.nonSerializableExecutionData = nonSerializableExecutionData;
         this.seqSteps = seqSteps;
-        this.nodeNameWithDepth = nodeNameWithDepth;
-        this.depth = depth;
     }
 
     @Override
@@ -49,8 +37,8 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
         Map<String, String> execParams = new HashMap<>();
         for (SeqStep step : seqSteps) {
             String args = step.getArgs();
-            if (StringUtils.startsWith(args, UFT_PARAMETER)) {
-                String paramName = substring(args, UFT_PARAMETER.length(), args.length() - 1);
+            if (StringUtils.startsWith(args, SEQUENTIAL_PARAMETER)) {
+                String paramName = substring(args, SEQUENTIAL_PARAMETER.length(), args.length() - 1);
                 Value value = currentContext.get(paramName);
                 if (value != null) {
                     //TODO handle sensitive values
@@ -59,6 +47,6 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
             }
         }
         // TODO fix get execution from map
-        return new Object[]{execParams, nonSerializableExecutionData.get("execution").get("execution")};
+        return new Object[]{execParams};
     }
 }

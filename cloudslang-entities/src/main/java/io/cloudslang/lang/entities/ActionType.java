@@ -20,7 +20,7 @@ public enum ActionType {
     PYTHON("python"),
     SEQUENTIAL("sequential");
 
-    private String value;
+    private final String value;
 
     ActionType(String value) {
         this.value = value;

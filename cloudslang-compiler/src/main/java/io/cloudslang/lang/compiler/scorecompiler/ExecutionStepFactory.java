@@ -181,7 +181,7 @@ public class ExecutionStepFactory {
         step.setActionData(actionData);
 
         step.setNavigation(new ControlActionMetadata(NAVIGATION_ACTIONS_CLASS, SIMPLE_NAVIGATION_METHOD));
-        step.setNavigationData(new HashMap<String, Object>());
+        step.setNavigationData(new HashMap<>());
 
         return step;
     }

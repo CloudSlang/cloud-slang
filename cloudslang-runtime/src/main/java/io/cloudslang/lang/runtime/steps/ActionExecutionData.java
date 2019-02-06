@@ -77,7 +77,8 @@ public class ActionExecutionData extends AbstractExecutionData {
                          @Param(ScoreLangConstants.JAVA_ACTION_GAV_KEY) String gav,
                          @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
                          @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies,
-                         @Param(ScoreLangConstants.SEQ_STEPS_KEY) List<SeqStep> steps) {
+                         @Param(ScoreLangConstants.SEQ_STEPS_KEY) List<SeqStep> steps,
+                         @Param(ExecutionParametersConsts.EXECUTION) Serializable execution) {
 
         Map<String, Value> returnValue = new HashMap<>();
         Map<String, Value> callArguments = runEnv.removeCallArguments();
@@ -108,10 +109,11 @@ public class ActionExecutionData extends AbstractExecutionData {
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
                     break;
                 case SEQUENTIAL:
-                    returnValue = runSequentialAction(serializableSessionData,
-                            callArguments, nonSerializableExecutionData,
-                            gav, steps, executionRuntimeServices.getNodeNameWithDepth(),
-                            runEnv.getParentFlowStack().size());
+                    returnValue = runSequentialAction(
+                            callArguments,
+                            gav,
+                            steps,
+                            execution);
                     break;
                 default:
                     break;
@@ -149,27 +151,20 @@ public class ActionExecutionData extends AbstractExecutionData {
     }
 
     private Map<String, Value> runSequentialAction(
-            Map<String, SerializableSessionObject> serializableSessionData,
             Map<String, Value> currentContext,
-            Map<String, Map<String, Object>> nonSerializableExecutionData,
             String gav,
-           List<SeqStep> seqSteps, String nodeNameWithDepth,
-            int depth) {
+            List<SeqStep> seqSteps,
+            Serializable execution) {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> returnMap =
                 (Map<String, Serializable>)
                         seqExecutionService.execute(
                                 gav,
-                                new CloudSlangSequentialExecutionParametersProviderImpl(serializableSessionData,
+                                new CloudSlangSequentialExecutionParametersProviderImpl(
                                         currentContext,
-                                        nonSerializableExecutionData,
-                                        seqSteps,
-                                        nodeNameWithDepth,
-                                        depth));
-        if (returnMap != null) {
-            return handleSensitiveValues(returnMap, currentContext);
-        }
-        return new HashMap<>();
+                                        seqSteps), execution);
+        return (returnMap != null) ? handleSensitiveValues(returnMap, currentContext) :
+                new HashMap<>();
     }
 
     @SuppressWarnings("unchecked")
