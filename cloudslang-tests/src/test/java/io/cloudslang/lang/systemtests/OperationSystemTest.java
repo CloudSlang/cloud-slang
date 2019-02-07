@@ -16,6 +16,8 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
+import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;

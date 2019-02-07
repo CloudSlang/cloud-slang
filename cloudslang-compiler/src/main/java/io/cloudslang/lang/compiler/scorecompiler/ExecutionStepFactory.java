@@ -20,12 +20,14 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
+import org.apache.commons.lang.Validate;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.Validate;
+
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 public class ExecutionStepFactory {
 
@@ -97,8 +99,13 @@ public class ExecutionStepFactory {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> pythonActionData =
                 (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
-        boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
-        boolean pythonActionFound = MapUtils.isNotEmpty(pythonActionData);
+        @SuppressWarnings("unchecked")
+        Map<String, String> seqActionData =
+                (Map<String, String>) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
+
+        boolean javaActionFound = isNotEmpty(javaActionData);
+        boolean pythonActionFound = isNotEmpty(pythonActionData);
+        boolean seqActionFound = isNotEmpty(seqActionData);
 
         if (javaActionFound) {
             actionType = ActionType.JAVA;
@@ -106,8 +113,11 @@ public class ExecutionStepFactory {
         } else if (pythonActionFound) {
             actionType = ActionType.PYTHON;
             actionData.putAll(pythonActionData);
+        } else if (seqActionFound) {
+            actionType = ActionType.SEQUENTIAL;
+            actionData.putAll(seqActionData);
         } else {
-            // java action or python script data is missing
+            // action data is missing
             throw new RuntimeException("Invalid action data");
         }
 
@@ -171,7 +181,7 @@ public class ExecutionStepFactory {
         step.setActionData(actionData);
 
         step.setNavigation(new ControlActionMetadata(NAVIGATION_ACTIONS_CLASS, SIMPLE_NAVIGATION_METHOD));
-        step.setNavigationData(new HashMap<String, Object>());
+        step.setNavigationData(new HashMap<>());
 
         return step;
     }
