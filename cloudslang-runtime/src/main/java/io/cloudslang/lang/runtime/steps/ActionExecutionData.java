@@ -78,7 +78,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                          @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
                          @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies,
                          @Param(ScoreLangConstants.SEQ_STEPS_KEY) List<SeqStep> steps,
-                         @Param(ExecutionParametersConsts.EXECUTION) Serializable execution) {
+                         @Param(ExecutionParametersConsts.SEQ_EXECUTION_MARKER) Serializable seqExecObj) {
 
         Map<String, Value> returnValue = new HashMap<>();
         Map<String, Value> callArguments = runEnv.removeCallArguments();
@@ -113,7 +113,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                             callArguments,
                             gav,
                             steps,
-                            execution);
+                            seqExecObj);
                     break;
                 default:
                     break;
