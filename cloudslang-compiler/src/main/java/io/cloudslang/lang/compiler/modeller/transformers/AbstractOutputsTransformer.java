@@ -20,9 +20,13 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
+
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 
 
 public abstract class AbstractOutputsTransformer extends InOutTransformer {
@@ -30,6 +34,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
     private PreCompileValidator preCompileValidator;
 
     private ExecutableValidator executableValidator;
+
+    private static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
 
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
         List<Output> transformedData = new ArrayList<>();
@@ -117,5 +123,28 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
 
     public void setExecutableValidator(ExecutableValidator executableValidator) {
         this.executableValidator = executableValidator;
+    }
+
+    protected Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
+        Map<String, Serializable> props = entry.getValue();
+        validateKeys(entry, props);
+        // default is sensitive=false
+        String outputName = entry.getKey();
+        boolean sensitive = props.containsKey(SENSITIVE_KEY) && (boolean) props.get(SENSITIVE_KEY);
+        Serializable value = props.get(VALUE_KEY);
+        if (value == null) {
+            return createRefOutput(outputName, sensitive);
+        }
+
+        return createOutput(outputName, value, sensitive);
+    }
+
+    private void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
+        for (String key : props.keySet()) {
+            if (!KNOWN_KEYS.contains(key)) {
+                throw new RuntimeException("Key: " + key + " in output: " +
+                        entry.getKey() + " is not a known property");
+            }
+        }
     }
 }
