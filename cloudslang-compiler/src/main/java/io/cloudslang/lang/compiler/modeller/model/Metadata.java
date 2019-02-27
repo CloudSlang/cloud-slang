@@ -28,6 +28,7 @@ public class Metadata {
     private Map<String, String> inputs;
     private Map<String, String> outputs;
     private Map<String, String> results;
+    private Map<String, String> systemProperties;
 
     public Metadata() {
         description = "";
@@ -35,6 +36,7 @@ public class Metadata {
         inputs = new HashMap<>();
         outputs = new HashMap<>();
         results = new HashMap<>();
+        systemProperties = new HashMap<>();
     }
 
     public Metadata(
@@ -42,12 +44,14 @@ public class Metadata {
             String prerequisites,
             Map<String, String> inputs,
             Map<String, String> outputs,
-            Map<String, String> results) {
+            Map<String, String> results,
+            Map<String, String> systemProperties) {
         this.description = description;
         this.prerequisites = prerequisites;
         this.inputs = inputs;
         this.outputs = outputs;
         this.results = results;
+        this.systemProperties = systemProperties;
     }
 
     public Map<String, String> getInputs() {
@@ -88,6 +92,14 @@ public class Metadata {
 
     public void setPrerequisites(String prerequisites) {
         this.prerequisites = prerequisites;
+    }
+
+    public Map<String, String> getSystemProperties() {
+        return systemProperties;
+    }
+
+    public void setSystemProperties(Map<String, String> systemProperties) {
+        this.systemProperties = systemProperties;
     }
 
     public String prettyPrint() {
@@ -171,6 +183,7 @@ public class Metadata {
                 .append(inputs, that.inputs)
                 .append(outputs, that.outputs)
                 .append(results, that.results)
+                .append(systemProperties, that.systemProperties)
                 .isEquals();
     }
 
@@ -182,6 +195,7 @@ public class Metadata {
                 .append(inputs)
                 .append(outputs)
                 .append(results)
+                .append(systemProperties)
                 .toHashCode();
     }
 
@@ -193,6 +207,7 @@ public class Metadata {
                 ", inputs=" + inputs +
                 ", outputs=" + outputs +
                 ", results=" + results +
+                ", systemProperties=" + systemProperties +
                 '}';
     }
 }

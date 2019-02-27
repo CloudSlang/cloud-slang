@@ -83,6 +83,7 @@ public class MetadataModellerImpl implements MetadataModeller {
         Map<String, String> inputs = new LinkedHashMap<>();
         Map<String, String> outputs = new LinkedHashMap<>();
         Map<String, String> results = new LinkedHashMap<>();
+        Map<String, String> systemProperties = new LinkedHashMap<>();
         List<RuntimeException> errors = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : parsedData.entrySet()) {
@@ -109,6 +110,9 @@ public class MetadataModellerImpl implements MetadataModeller {
                         case RESULT:
                             processExecutableDeclaration(declarationElements, errors, tag, results, content);
                             break;
+                        case SYSTEM_PROPERTY:
+                            processExecutableDeclaration(declarationElements, errors, tag, systemProperties, content);
+                            break;
                         default:
                             // shouldn't get here
                             errors.add(new NotImplementedException("Unrecognized tag: " + descriptionTag));
@@ -127,7 +131,8 @@ public class MetadataModellerImpl implements MetadataModeller {
                 prerequisites,
                 inputs,
                 outputs,
-                results
+                results,
+                systemProperties
         );
         return new ImmutablePair<>(executableMetadata, errors);
     }
