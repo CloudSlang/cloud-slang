@@ -20,6 +20,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Output;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +53,7 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
     @Override
     void handleOutputProperties(List<Output> transformedData,
                                 Map.Entry<String, ?> entry, List<RuntimeException> errors) {
-        errors.add(new RuntimeException("It is illegal to specify properties for step publish outputs. " +
-                "Please remove the properties for " + entry.getKey() + "."));
+        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry), errors);
     }
 
     @Override
