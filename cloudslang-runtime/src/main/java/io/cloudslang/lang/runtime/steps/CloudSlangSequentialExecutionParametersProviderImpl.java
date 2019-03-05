@@ -14,13 +14,17 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.substring;
 
-public class CloudSlangSequentialExecutionParametersProviderImpl implements SequentialExecutionParametersProvider {
+public class CloudSlangSequentialExecutionParametersProviderImpl implements SequentialExecutionParametersProvider,
+        Serializable {
+    private static final long serialVersionUID = -6086097846840796564L;
+
     public static final String SEQUENTIAL_PARAMETER = "Parameter(";
     private final Map<String, Value> currentContext;
     private final List<SeqStep> seqSteps;

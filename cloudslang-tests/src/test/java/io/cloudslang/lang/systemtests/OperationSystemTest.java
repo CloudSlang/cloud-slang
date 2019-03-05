@@ -114,6 +114,28 @@ public class OperationSystemTest extends SystemsTestsParent {
         Assert.assertEquals("http://localhost:8080", execStepData.getOutputs().get("url"));
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testOperationWithJavaActionException() throws Exception {
+        URI resource = getClass().getResource("/yaml/java_action_exception.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        triggerWithData(compilationArtifact, userInputs, new HashSet<>()).getSteps();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testOperationWithSeqAction() throws Exception {
+        URI resource = getClass().getResource("/yaml/seq_action_test.sl").toURI();
+
+        CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource), null);
+
+        Map<String, Value> userInputs = new HashMap<>();
+        userInputs.put("host", ValueFactory.create("localhost"));
+        userInputs.put("port", ValueFactory.create("8080"));
+        triggerWithData(compilationArtifact, userInputs, new HashSet<>()).getSteps();
+    }
+
     @Test
     public void testOperationWithJavaActionSensitive() throws Exception {
         URI resource = getClass().getResource("/yaml/java_action_sensitive_input_test.sl").toURI();
