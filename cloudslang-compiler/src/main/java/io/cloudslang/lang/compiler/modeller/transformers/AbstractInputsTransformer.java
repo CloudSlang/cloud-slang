@@ -25,6 +25,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
+import static java.lang.String.format;
 
 public abstract class AbstractInputsTransformer extends InOutTransformer {
 
@@ -81,8 +82,8 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
 
         for (String key : props.keySet()) {
             if (!knownKeys.contains(key)) {
-                throw new RuntimeException("key: " + key + " in input: " + entry.getKey() +
-                        " is not a known property");
+                throw new RuntimeException(format("key: %s in input: %s is not a known property",
+                        key, entry.getKey()));
             }
         }
 
