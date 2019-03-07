@@ -13,6 +13,8 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.caching.CachedPrecompileService;
 import io.cloudslang.lang.compiler.caching.CachedPrecompileServiceImpl;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
+import io.cloudslang.lang.compiler.modeller.model.Metadata;
+import io.cloudslang.lang.compiler.modeller.result.MetadataModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -38,6 +40,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -53,10 +57,16 @@ import static org.mockito.Mockito.when;
 public class SlangCompilerImplTest {
 
     private SlangSource slangSource;
+
     @Autowired
     private SlangCompiler slangCompiler;
+
     @Autowired
     private YamlParser yamlParserMock;
+
+    @Autowired
+    private MetadataExtractor metadataExtractor;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -103,9 +113,18 @@ public class SlangCompilerImplTest {
         when(parsedSlangMock.getNamespace()).thenReturn(namespace);
         when(parsedSlangMock.getProperties()).thenReturn(properties);
 
+        Metadata metadata = new Metadata();
+        Map<String, String> sysProps = new HashMap<>();
+        sysProps.put("c.key1", "");
+        sysProps.put("c.key2", "");
+        metadata.setSystemProperties(sysProps);
+        MetadataModellingResult result = new MetadataModellingResult(metadata, newArrayList(), newArrayList());
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class)))
+                .thenReturn(result);
+
         Set<SystemProperty> expectedSystemProperties = Sets.newHashSet(
-                new SystemProperty(namespace, key1, value1),
-                new SystemProperty(namespace, key2, value2)
+                new SystemProperty(namespace, key1, value1, ""),
+                new SystemProperty(namespace, key2, value2, "")
         );
 
         Set<SystemProperty> actualSystemProperties = slangCompiler.loadSystemProperties(slangSource);
@@ -145,7 +164,7 @@ public class SlangCompilerImplTest {
         }
 
         @Bean
-        public SlangCompiler slangCompiler() {
+        public SlangCompiler slangCompiler(MetadataExtractor metadataExtractor) {
             SlangCompilerImpl slangCompiler = new SlangCompilerImpl();
 
             slangCompiler.setCachedPrecompileService(cachePrecompileService());
@@ -154,6 +173,7 @@ public class SlangCompilerImplTest {
             slangCompiler.setSlangModeller(slangModeller());
             slangCompiler.setSystemPropertyValidator(systemPropertyValidator());
             slangCompiler.setYamlParser(yamlParser());
+            slangCompiler.setMetadataExtractor(metadataExtractor);
 
             return slangCompiler;
         }
@@ -176,6 +196,11 @@ public class SlangCompilerImplTest {
         @Bean
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();
+        }
+
+        @Bean
+        public MetadataExtractor metadataExtractor() {
+            return mock(MetadataExtractorImpl.class);
         }
 
     }

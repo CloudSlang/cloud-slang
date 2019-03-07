@@ -148,10 +148,10 @@ public class DecisionsTest extends SystemsTestsParent {
 
     private Set<SystemProperty> getSystemProperties() {
         return Sets.newHashSet(
-                new SystemProperty("user.sys", "prop1", "2"),
-                new SystemProperty("user.sys", "prop2", "3"),
-                new SystemProperty("user.sys", "prop3", "5"),
-                new SystemProperty("user.sys", "prop4", "6")
+                new SystemProperty("user.sys", "prop1", "2", ""),
+                new SystemProperty("user.sys", "prop2", "3", ""),
+                new SystemProperty("user.sys", "prop3", "5", ""),
+                new SystemProperty("user.sys", "prop4", "6", "")
         );
     }
 

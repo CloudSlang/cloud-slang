@@ -111,7 +111,7 @@ public class ScriptEvaluatorTest {
     public void testEvalFunctions() throws Exception {
         reset(pythonRuntimeService);
         Set<SystemProperty> props = new HashSet<>();
-        SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value");
+        SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value", "");
         props.add(systemProperty);
         Set<ScriptFunction> functionDependencies = newHashSet(ScriptFunction.GET,
                 ScriptFunction.GET_SYSTEM_PROPERTY, ScriptFunction.CHECK_EMPTY);

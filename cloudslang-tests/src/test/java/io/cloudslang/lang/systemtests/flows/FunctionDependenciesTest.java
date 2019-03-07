@@ -266,16 +266,16 @@ public class FunctionDependenciesTest extends ValueSyntaxParent {
 
     private Set<SystemProperty> prepareSystemProperties() {
         return Sets.newHashSet(
-                new SystemProperty("a.b", "c.host", "localhost"),
-                new SystemProperty("cloudslang", "lang.key", "language"),
-                new SystemProperty("", "a.b.c.null_value", (String) null),
-                new SystemProperty("propagate", "flow.input", "flowInput_"),
-                new SystemProperty("propagate", "step.argument", "stepArg_"),
-                new SystemProperty("propagate", "op.input", "opInput_"),
-                new SystemProperty("propagate", "op.output", "opOutput_"),
-                new SystemProperty("propagate", "step.publish", "stepPublish_"),
-                new SystemProperty("propagate", "flow.output", "flowOutput_"),
-                new SystemProperty("chars-b", "c-hyphen", "hyphen_value")
+                new SystemProperty("a.b", "c.host", "localhost", ""),
+                new SystemProperty("cloudslang", "lang.key", "language", ""),
+                new SystemProperty("", "a.b.c.null_value", (String) null, ""),
+                new SystemProperty("propagate", "flow.input", "flowInput_", ""),
+                new SystemProperty("propagate", "step.argument", "stepArg_", ""),
+                new SystemProperty("propagate", "op.input", "opInput_", ""),
+                new SystemProperty("propagate", "op.output", "opOutput_", ""),
+                new SystemProperty("propagate", "step.publish", "stepPublish_", ""),
+                new SystemProperty("propagate", "flow.output", "flowOutput_", ""),
+                new SystemProperty("chars-b", "c-hyphen", "hyphen_value", "")
         );
     }
 

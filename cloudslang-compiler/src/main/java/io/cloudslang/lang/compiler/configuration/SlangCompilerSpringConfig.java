@@ -231,6 +231,7 @@ public class SlangCompilerSpringConfig {
         slangCompiler.setSlangModeller(slangModeller());
         slangCompiler.setSystemPropertyValidator(systemPropertyValidator());
         slangCompiler.setYamlParser(yamlParser());
+        slangCompiler.setMetadataExtractor(metadataExtractor());
 
         return slangCompiler;
     }
