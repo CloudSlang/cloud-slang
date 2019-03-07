@@ -164,6 +164,11 @@ public class SlangCompilerImplTest {
         }
 
         @Bean
+        public MetadataExtractor metadataExtractor() {
+            return mock(MetadataExtractorImpl.class);
+        }
+
+        @Bean
         public SlangCompiler slangCompiler(MetadataExtractor metadataExtractor) {
             SlangCompilerImpl slangCompiler = new SlangCompilerImpl();
 
@@ -197,11 +202,5 @@ public class SlangCompilerImplTest {
         public ExecutableValidator executableValidator() {
             return new ExecutableValidatorImpl();
         }
-
-        @Bean
-        public MetadataExtractor metadataExtractor() {
-            return mock(MetadataExtractorImpl.class);
-        }
-
     }
 }
