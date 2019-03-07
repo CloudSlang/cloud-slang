@@ -32,6 +32,7 @@ import java.util.Map;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
+import static java.lang.String.format;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -152,8 +153,8 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
 
         for (String key : props.keySet()) {
             if (!knownKeys.contains(key)) {
-                throw new RuntimeException("key: " + key + " in step input: " + entryKey +
-                        " is not a known property");
+                throw new RuntimeException(format("key: %s in step input: %s is not a known property",
+                        key, entry.getKey()));
             }
         }
 
