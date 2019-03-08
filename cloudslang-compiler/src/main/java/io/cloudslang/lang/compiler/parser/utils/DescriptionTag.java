@@ -18,7 +18,8 @@ public enum DescriptionTag {
     PREREQUISITES("@prerequisites"),
     INPUT("@input"),
     OUTPUT("@output"),
-    RESULT("@result");
+    RESULT("@result"),
+    SYSTEM_PROPERTY("@system_property");
 
     private static final List<DescriptionTag> DESCRIPTION_TAGS_LIST =
             Collections.unmodifiableList(Arrays.asList(DescriptionTag.values()));

@@ -51,11 +51,11 @@ public class SetUtilsTest {
                 "last"
         );
         EMPTY_SET_SP = Collections.emptySet();
-        SystemProperty sp2 = new SystemProperty("a.b", "host", "value");
-        SystemProperty sp3 = new SystemProperty("a.b", "KEY.subKey", "value");
-        SystemProperty sp4 = new SystemProperty("a.b", "port", "value");
+        SystemProperty sp2 = new SystemProperty("a.b", "host", "value", "");
+        SystemProperty sp3 = new SystemProperty("a.b", "KEY.subKey", "value", "");
+        SystemProperty sp4 = new SystemProperty("a.b", "port", "value", "");
         SET_SP_1 = Sets.newHashSet(sp2, sp3, sp4);
-        SP_1 = new SystemProperty("a.b", "key.subkey", "value");
+        SP_1 = new SystemProperty("a.b", "key.subkey", "value", "");
         Set<String> set2 = Sets.newHashSet(
                 "2",
                 "ElemeNT",

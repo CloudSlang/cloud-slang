@@ -48,7 +48,7 @@ public class LoopFlowsTest extends SystemsTestsParent {
         Map<String, Value> userInputs = new HashMap<>();
         Set<SystemProperty> systemProperties = new HashSet<>();
         systemProperties.add(
-                new SystemProperty("loop", "for.prop1", "for_value")
+                new SystemProperty("loop", "for.prop1", "for_value", "")
         );
 
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();
@@ -98,7 +98,7 @@ public class LoopFlowsTest extends SystemsTestsParent {
         Map<String, Value> userInputs = new HashMap<>();
         Set<SystemProperty> systemProperties = new HashSet<>();
         systemProperties.add(
-                new SystemProperty("loop", "for.prop1", "for_value")
+                new SystemProperty("loop", "for.prop1", "for_value", "")
         );
 
         Map<String, StepData> stepsData = triggerWithData(compilationArtifact, userInputs, systemProperties).getSteps();

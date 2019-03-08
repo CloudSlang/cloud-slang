@@ -235,9 +235,9 @@ public class CompilerHelperTest {
     @Test
     public void testLoadSystemProperties() throws Exception {
         final Set<SystemProperty> systemProperties =
-                newHashSet(new SystemProperty("user.sys", "props.host", "localhost"),
-                new SystemProperty("user.sys", "props.port", "22"),
-                new SystemProperty("user.sys", "props.alla", "balla"));
+                newHashSet(new SystemProperty("user.sys", "props.host", "localhost", ""),
+                new SystemProperty("user.sys", "props.port", "22", ""),
+                new SystemProperty("user.sys", "props.alla", "balla", ""));
         final URI systemPropertyUri = getClass().getResource("/properties/system_properties.prop.sl").toURI();
         final SlangSource source = SlangSource.fromFile(systemPropertyUri);
         when(slang.loadSystemProperties(eq(source))).thenReturn(systemProperties);
@@ -252,9 +252,9 @@ public class CompilerHelperTest {
         final URI props1 = getClass().getResource("/properties/duplicate/props1.prop.sl").toURI();
         final URI props2 = getClass().getResource("/properties/duplicate/props2.prop.sl").toURI();
         Set<SystemProperty> systemProperties1 =
-                newHashSet(new SystemProperty("user.sys", "props.host", "localhost"));
+                newHashSet(new SystemProperty("user.sys", "props.host", "localhost", ""));
         Set<SystemProperty> systemProperties2 =
-                newHashSet(new SystemProperty("user.SYS", "props.host", "localhost"));
+                newHashSet(new SystemProperty("user.SYS", "props.host", "localhost", ""));
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props1)))).thenReturn(systemProperties1);
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props2)))).thenReturn(systemProperties2);
 

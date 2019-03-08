@@ -74,6 +74,8 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     private CachedPrecompileService cachedPrecompileService;
 
+    private MetadataExtractor metadataExtractor;
+
     @Override
     public CompilationArtifact compile(SlangSource source, Set<SlangSource> dependencySources) {
         return compile(source, dependencySources, PrecompileStrategy.WITHOUT_CACHE);
@@ -337,8 +339,13 @@ public class SlangCompilerImpl implements SlangCompiler {
                 }
 
                 Object propertyValue = propertyAsEntry.getValue();
+                String propDesc = metadataExtractor
+                        .extractMetadataModellingResult(source)
+                        .getMetadata()
+                        .getSystemProperties()
+                        .get(propertyKey);
                 SystemProperty property =
-                        transformSystemProperty(parsedSlang.getNamespace(), propertyKey, propertyValue);
+                        transformSystemProperty(parsedSlang.getNamespace(), propertyKey, propertyValue, propDesc);
                 modelledSystemProperties.add(property);
             }
         }
@@ -413,10 +420,11 @@ public class SlangCompilerImpl implements SlangCompiler {
     private SystemProperty transformSystemProperty(
             String rawNamespace,
             String key,
-            Object rawValue) {
+            Object rawValue,
+            String description) {
         String namespace = rawNamespace == null ? "" : rawNamespace;
         if (rawValue == null) {
-            return new SystemProperty(namespace, key, (String) null);
+            return new SystemProperty(namespace, key, (String) null, description);
         }
         if (rawValue instanceof Map) {
             Map rawModifiers = (Map) rawValue;
@@ -436,12 +444,12 @@ public class SlangCompilerImpl implements SlangCompiler {
             boolean sensitive = modifiers.containsKey(SENSITIVE_KEY) && (boolean) modifiers.get(SENSITIVE_KEY);
 
             if (sensitive) {
-                return new SystemProperty(namespace, key, ValueFactory.createEncryptedString(value));
+                return new SystemProperty(namespace, key, ValueFactory.createEncryptedString(value), description);
             } else {
-                return new SystemProperty(namespace, key, value);
+                return new SystemProperty(namespace, key, value, description);
             }
         } else {
-            return new SystemProperty(namespace, key, rawValue.toString());
+            return new SystemProperty(namespace, key, rawValue.toString(), description);
         }
     }
 
@@ -491,5 +499,9 @@ public class SlangCompilerImpl implements SlangCompiler {
 
     public void setCachedPrecompileService(CachedPrecompileService cachedPrecompileService) {
         this.cachedPrecompileService = cachedPrecompileService;
+    }
+
+    public void setMetadataExtractor(MetadataExtractor metadataExtractor) {
+        this.metadataExtractor = metadataExtractor;
     }
 }
