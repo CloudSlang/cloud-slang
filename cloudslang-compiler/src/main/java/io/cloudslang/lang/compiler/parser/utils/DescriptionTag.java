@@ -19,7 +19,7 @@ public enum DescriptionTag {
     INPUT("@input"),
     OUTPUT("@output"),
     RESULT("@result"),
-    SYSTEM_PROPERTY("@systemProperty");
+    SYSTEM_PROPERTY("@system_property");
 
     private static final List<DescriptionTag> DESCRIPTION_TAGS_LIST =
             Collections.unmodifiableList(Arrays.asList(DescriptionTag.values()));
