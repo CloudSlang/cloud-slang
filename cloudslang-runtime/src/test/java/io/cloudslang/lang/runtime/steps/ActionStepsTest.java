@@ -63,8 +63,12 @@ import java.util.Map;
 
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
+import static io.cloudslang.lang.entities.ActionType.SEQUENTIAL;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Date: 10/31/2014
@@ -91,6 +95,9 @@ public class ActionStepsTest {
     private List<SeqStep> seqSteps;
     @Autowired
     private ActionExecutionData actionSteps;
+
+    @Autowired
+    private SequentialExecutionService seqExecutionService;
 
     @Before
     public void setUp() {
@@ -1027,6 +1034,36 @@ public class ActionStepsTest {
                 DEPENDENCIES_DEFAULT, seqSteps,
                 null
         );
+    }
+
+    @Test
+    public void doActionSeqType() {
+        RunEnvironment runEnv = new RunEnvironment();
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("name", ValueFactory.create("nameTest"));
+        initialCallArguments.put("role", ValueFactory.create("roleTest"));
+        runEnv.putCallArguments(initialCallArguments);
+
+        //invoke doAction
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null
+        );
+
+        verify(seqExecutionService).execute(
+                eq(GAV_DEFAULT),
+                any(CloudSlangSequentialExecutionParametersProviderImpl.class),
+                eq(null));
     }
 
     @Configuration
