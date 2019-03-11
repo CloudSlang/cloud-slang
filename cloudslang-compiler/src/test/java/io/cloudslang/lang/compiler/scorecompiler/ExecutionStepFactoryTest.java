@@ -254,9 +254,9 @@ public class ExecutionStepFactoryTest {
         ExecutionStep result;
         result = factory.createActionStep(1L, actionData);
 
-        assertEquals(result.getActionData().get(ScoreLangConstants.ACTION_TYPE), ActionType.SEQUENTIAL);
-        assertEquals(result.getActionData().get(ScoreLangConstants.NEXT_STEP_ID_KEY), 2L);
-        assertEquals(result.getActionData().get("key"), "value");
+        assertEquals(ActionType.SEQUENTIAL, result.getActionData().get(ScoreLangConstants.ACTION_TYPE));
+        assertEquals(2L, result.getActionData().get(ScoreLangConstants.NEXT_STEP_ID_KEY));
+        assertEquals("value", result.getActionData().get("key"));
     }
 
 }
