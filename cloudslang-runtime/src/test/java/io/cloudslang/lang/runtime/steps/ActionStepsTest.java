@@ -1063,7 +1063,7 @@ public class ActionStepsTest {
         verify(seqExecutionService).execute(
                 eq(GAV_DEFAULT),
                 any(CloudSlangSequentialExecutionParametersProviderImpl.class),
-                eq(null));
+                eq(null))
     }
 
     @Configuration
