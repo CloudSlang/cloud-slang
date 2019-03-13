@@ -69,7 +69,7 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentOnlySpSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        sp.add(new SystemProperty("a.b", "key", ValueFactory.createEncryptedString("value")));
+        sp.add(new SystemProperty("a.b", "key", ValueFactory.createEncryptedString("value"), ""));
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
         assertTrue(runEnvironment.containsSensitiveData());
@@ -91,7 +91,7 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentOnlyCallArgsSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        sp.add(new SystemProperty("a.b", "key", "value"));
+        sp.add(new SystemProperty("a.b", "key", "value", ""));
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
         assertFalse(runEnvironment.containsSensitiveData());
@@ -115,7 +115,7 @@ public class RunEnvironmentSensitiveTest {
     public void testRunEnvironmentOnlyReturnValueSensitive() {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
-        sp.add(new SystemProperty("a.b", "key", "value"));
+        sp.add(new SystemProperty("a.b", "key", "value", ""));
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);
         assertFalse(runEnvironment.containsSensitiveData());
@@ -139,10 +139,10 @@ public class RunEnvironmentSensitiveTest {
         //everything is empty
         Set<SystemProperty> sp = Sets.newHashSet();
         SystemProperty systemProperty1 = new SystemProperty("a.b", "sp1",
-                ValueFactory.createEncryptedString("systemProperty1"));
+                ValueFactory.createEncryptedString("systemProperty1"), "");
         sp.add(systemProperty1);
         SystemProperty systemProperty2 = new SystemProperty("a.b", "sp2",
-                ValueFactory.createEncryptedString("systemProperty2"));
+                ValueFactory.createEncryptedString("systemProperty2"), "");
         sp.add(systemProperty2);
 
         RunEnvironment runEnvironment = new RunEnvironment(sp);

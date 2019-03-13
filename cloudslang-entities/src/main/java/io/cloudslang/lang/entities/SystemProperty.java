@@ -28,8 +28,9 @@ public class SystemProperty implements Serializable {
     private final String namespace;
     private final String fullyQualifiedName;
     private final Value value;
+    private final String description;
 
-    private SystemProperty(String namespace, String key, Value value) {
+    private SystemProperty(String namespace, String key, Value value, String description) {
         Validate.notNull(namespace, "System property namespace cannot be null");
         Validate.notEmpty(key, "System property key cannot be empty");
 
@@ -47,18 +48,27 @@ public class SystemProperty implements Serializable {
         this.namespace = namespace;
         this.fullyQualifiedName = fullyQualifiedName;
         this.value = value;
+        this.description = description;
+    }
+
+    public SystemProperty(String namespace, String key, SensitiveStringValue value, String description) {
+        this(namespace, key, (Value) value, description);
     }
 
     public SystemProperty(String namespace, String key, SensitiveStringValue value) {
-        this(namespace, key, (Value) value);
+        this(namespace, key, (Value) value, "");
+    }
+
+    public SystemProperty(String namespace, String key, String value, String description) {
+        this(namespace, key, ValueFactory.create(value), description);
     }
 
     public SystemProperty(String namespace, String key, String value) {
-        this(namespace, key, ValueFactory.create(value));
+        this(namespace, key, ValueFactory.create(value), "");
     }
 
     public SystemProperty(String key, String value) {
-        this("", key, value);
+        this("", key, value, "");
     }
 
     /**
@@ -69,6 +79,7 @@ public class SystemProperty implements Serializable {
         namespace = null;
         fullyQualifiedName = null;
         value = null;
+        description = null;
     }
 
     public String getNamespace() {
@@ -83,12 +94,17 @@ public class SystemProperty implements Serializable {
         return value;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("namespace", namespace)
                 .append("fullyQualifiedName", fullyQualifiedName)
                 .append("value", value)
+                .append("description", description)
                 .toString();
     }
 
@@ -108,6 +124,7 @@ public class SystemProperty implements Serializable {
                 .append(namespace, that.namespace)
                 .append(fullyQualifiedName, that.fullyQualifiedName)
                 .append(value, that.value)
+                .append(description, that.description)
                 .isEquals();
     }
 
@@ -117,6 +134,7 @@ public class SystemProperty implements Serializable {
                 .append(namespace)
                 .append(fullyQualifiedName)
                 .append(value)
+                .append(description)
                 .toHashCode();
     }
 }

@@ -231,7 +231,7 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
     }
 
     private Set<SystemProperty> getSystemProperties() {
-        return newHashSet(new SystemProperty("loop", "parallel.prop1", "publish_value"));
+        return newHashSet(new SystemProperty("loop", "parallel.prop1", "publish_value", ""));
     }
 
     private RuntimeInformation triggerWithData(

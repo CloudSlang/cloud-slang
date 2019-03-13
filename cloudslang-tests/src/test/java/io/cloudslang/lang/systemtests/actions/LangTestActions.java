@@ -26,6 +26,11 @@ import java.util.Map;
 public class LangTestActions {
 
     @SuppressWarnings("unused")
+    public Map<String, String> throwException() {
+        throw new UnsupportedOperationException("Unsuported operation exception.");
+    }
+
+    @SuppressWarnings("unused")
     public Map<String, String> parseUrl(@Param("host") String host, @Param("port") String novaPort) {
         String url = "http://" + host + ":" + novaPort;
         System.out.println(url);

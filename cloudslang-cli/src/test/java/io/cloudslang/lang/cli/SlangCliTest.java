@@ -500,9 +500,10 @@ public class SlangCliTest {
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testListSystemProperties() throws Exception {
         when(compilerHelperMock.loadSystemProperties(Lists.newArrayList("system_properties.prop.sl")))
-                .thenReturn(Sets.newLinkedHashSet(Lists.newArrayList(new SystemProperty("namespace1", "key1", "value1"),
-                        new SystemProperty("namespace2", "key2", "value2"),
-                        new SystemProperty("namespace3", "key3", "value3"))));
+                .thenReturn(Sets.newLinkedHashSet(Lists.newArrayList(
+                        new SystemProperty("namespace1", "key1", "value1", ""),
+                        new SystemProperty("namespace2", "key2", "value2", ""),
+                        new SystemProperty("namespace3", "key3", "value3", ""))));
 
         final CommandResult cr = shell.executeCommand("list --f system_properties.prop.sl");
 
