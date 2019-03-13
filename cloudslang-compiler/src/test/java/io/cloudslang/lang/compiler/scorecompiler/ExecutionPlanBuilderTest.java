@@ -106,6 +106,7 @@ public class ExecutionPlanBuilderTest {
                 null,
                 navigationStrings,
                 refId,
+                null,
                 isParallelLoop,
                 false);
     }
@@ -146,9 +147,10 @@ public class ExecutionPlanBuilderTest {
     private void mockFinishStep(Long stepId, Step step, boolean isParallelLoop) {
         Map<String, Serializable> postStepActionData = step.getPostStepActionData();
         String stepName = step.getName();
+        String group = step.getWorkerGroup();
         when(stepFactory
                 .createFinishStepStep(eq(stepId), eq(postStepActionData),
-                        anyMapOf(String.class, ResultNavigation.class), eq(stepName),
+                        anyMapOf(String.class, ResultNavigation.class), eq(stepName), eq(group),
                         eq(isParallelLoop))).thenReturn(new ExecutionStep(stepId));
     }
 
@@ -160,9 +162,10 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preStepActionData = step.getPreStepActionData();
         String refId = step.getRefId();
         String name = step.getName();
+        String group = step.getWorkerGroup();
         when(stepFactory
                 .createBeginStepStep(eq(stepId), anyListOf(Argument.class),
-                        eq(preStepActionData), eq(refId), eq(name))).thenReturn(new ExecutionStep(stepId));
+                        eq(preStepActionData), eq(refId), eq(name), eq(group))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepId, Long branchBeginStepId, Step step, Flow flow) {
@@ -274,11 +277,12 @@ public class ExecutionPlanBuilderTest {
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
         verify(stepFactory)
-                .createBeginStepStep(eq(3L), anyListOf(Argument.class),
-                        eq(step.getPreStepActionData()), eq(step.getRefId()), eq(step.getName()));
+                .createBeginStepStep(eq(3L), anyListOf(Argument.class), eq(step.getPreStepActionData()),
+                        eq(step.getRefId()), eq(step.getName()), eq(step.getWorkerGroup()));
         verify(stepFactory)
                 .createFinishStepStep(eq(4L), eq(step.getPostStepActionData()),
-                        anyMapOf(String.class, ResultNavigation.class), eq(step.getName()), eq(step.isParallelLoop()));
+                        anyMapOf(String.class, ResultNavigation.class), eq(step.getName()),
+                        eq(step.getWorkerGroup()), eq(step.isParallelLoop()));
         verify(stepFactory)
                 .createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()),
                         anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));

@@ -209,7 +209,7 @@ public class ExecutionPlanBuilder {
                     navigationValues, step.getName(), parallelLoop);
         }
         return stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
-                navigationValues, step.getName(), parallelLoop);
+                navigationValues, step.getName(), step.getWorkerGroup(), parallelLoop);
     }
 
     private ExecutionStep createBeginStep(Long id, Step step) {
@@ -218,8 +218,7 @@ public class ExecutionPlanBuilder {
                     step.getPreStepActionData(), step.getRefId(), step.getName());
         }
         return stepFactory.createBeginStepStep(id, step.getArguments(),
-                    step.getPreStepActionData(), step.getRefId(), step.getName());
-
+                step.getPreStepActionData(), step.getRefId(), step.getName(), step.getWorkerGroup());
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {

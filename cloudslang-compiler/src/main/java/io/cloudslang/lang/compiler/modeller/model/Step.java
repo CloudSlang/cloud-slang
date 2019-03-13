@@ -25,6 +25,7 @@ public class Step {
     private final List<Argument> arguments;
     private final List<Map<String, String>> navigationStrings;
     private final String refId;
+    private final String workerGroup;
     private final boolean parallelLoop;
     private final boolean onFailureStep;
 
@@ -35,6 +36,7 @@ public class Step {
             List<Argument> arguments,
             List<Map<String, String>> navigationStrings,
             String refId,
+            String workerGroup,
             boolean parallelLoop,
             boolean onFailureStep) {
         this.name = name;
@@ -43,6 +45,7 @@ public class Step {
         this.arguments = arguments;
         this.navigationStrings = navigationStrings;
         this.refId = refId;
+        this.workerGroup = workerGroup;
         this.parallelLoop = parallelLoop;
         this.onFailureStep = onFailureStep;
     }
@@ -83,4 +86,7 @@ public class Step {
         return true;
     }
 
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
 }

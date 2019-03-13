@@ -66,7 +66,7 @@ public class ExecutionStepFactoryTest {
                 new HashSet<String>(), false);
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.FOR_KEY, statement);
-        ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
+        ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "", null);
         LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
@@ -80,6 +80,7 @@ public class ExecutionStepFactoryTest {
                 new HashMap<String, Serializable>(),
                 new HashMap<String, ResultNavigation>(),
                 "stepName",
+                null,
                 false);
         Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
         Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));

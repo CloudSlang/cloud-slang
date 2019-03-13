@@ -41,7 +41,8 @@ public class ExecutionStepFactory {
 
 
     public ExecutionStep createBeginStepStep(Long index, List<Argument> stepInputs,
-                                             Map<String, Serializable> preStepData, String refId, String stepName) {
+                                             Map<String, Serializable> preStepData, String refId, String stepName,
+                                             String workerGroup) {
         Validate.notNull(preStepData, "preStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.STEP_INPUTS_KEY, (Serializable) stepInputs);
@@ -50,18 +51,18 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+
+        if (workerGroup != null) {
+            actionData.put("workerGroup", workerGroup);
+        }
         return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "beginStep", actionData);
     }
 
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
                                               Map<String, ResultNavigation> navigationValues,
-                                              String stepName, boolean parallelLoop) {
+                                              String stepName, String workerGroup, boolean parallelLoop) {
         Validate.notNull(postStepData, "postStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-
-        if (!parallelLoop) {
-            actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
-        }
 
         actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
         actionData.put(ScoreLangConstants.BREAK_LOOP_KEY, postStepData.get(SlangTextualKeys.BREAK_KEY));
@@ -69,6 +70,13 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.HOOKS, "TBD");
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, parallelLoop);
+
+        if (workerGroup != null) {
+            actionData.put("workerGroup", workerGroup);
+        }
+        if (!parallelLoop) {
+            actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
+        }
 
         ExecutionStep finishStep = createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "endStep", actionData);
         finishStep.setNavigationData(null);
