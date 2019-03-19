@@ -61,6 +61,7 @@ public interface SlangTextualKeys {
     String PUBLISH_KEY = "publish";
     String NAVIGATION_KEY = "navigate";
     String PARALLEL_LOOP_KEY = "parallel_loop";
+    String WORKER_GROUP = "worker_group";
 
     //seq step
     String SEQ_STEP_ID_KEY = "id";

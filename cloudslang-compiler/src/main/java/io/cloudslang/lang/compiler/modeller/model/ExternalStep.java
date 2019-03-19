@@ -25,6 +25,7 @@ public class ExternalStep extends Step {
             List<Argument> arguments,
             List<Map<String, String>> navigationStrings,
             String refId,
+            String workerGroup,
             boolean parallelLoop,
             boolean onFailureStep
     ) {
@@ -35,6 +36,7 @@ public class ExternalStep extends Step {
                 arguments,
                 navigationStrings,
                 refId,
+                workerGroup,
                 parallelLoop,
                 onFailureStep
         );
