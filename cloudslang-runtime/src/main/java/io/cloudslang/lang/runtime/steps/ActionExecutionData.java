@@ -11,7 +11,6 @@ package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
-import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -77,7 +76,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                          @Param(ScoreLangConstants.JAVA_ACTION_GAV_KEY) String gav,
                          @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
                          @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies,
-                         @Param(ScoreLangConstants.SEQ_STEPS_KEY) List<SeqStep> steps,
+                         @Param(ScoreLangConstants.SEQ_STEPS_KEY) List<String> steps,
                          @Param(ExecutionParametersConsts.EXECUTION) Serializable execution) {
 
         Map<String, Value> returnValue = new HashMap<>();
@@ -153,7 +152,7 @@ public class ActionExecutionData extends AbstractExecutionData {
     private Map<String, Value> runSequentialAction(
             Map<String, Value> currentContext,
             String gav,
-            List<SeqStep> seqSteps,
+            List<String> seqSteps,
             Serializable execution) {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> returnMap =

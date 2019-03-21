@@ -129,12 +129,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>io.cloudslang.lang</groupId>
-            <artifactId>cloudslang-compiler</artifactId>
-            <version>${parent.version}</version>
-        </dependency>
-
     </dependencies>
 
     <build>

@@ -10,28 +10,28 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
+import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.score.api.ExecutionStep;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import junit.framework.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -246,10 +246,26 @@ public class ExecutionStepFactoryTest {
 
     @Test
     public void testCreateActionStepWithSeqAction() {
-        Map<String, Serializable> actionData = new HashMap<>();
-        HashMap<String, String> seqActionData = new HashMap<>();
+
+        SeqStep seqStep1 = new SeqStep();
+        SeqStep seqStep2 = new SeqStep();
+        SeqStep seqStep3 = new SeqStep();
+
+        seqStep1.setArgs("Parameter(param1)");
+        seqStep2.setArgs("Parameter(param2)");
+        seqStep3.setArgs("Parameter(param3)");
+
+        ArrayList<SeqStep> seqParamNames = new ArrayList<>();
+        seqParamNames.add(seqStep1);
+        seqParamNames.add(seqStep2);
+        seqParamNames.add(seqStep3);
+
+        HashMap<String, Serializable> seqActionData = new HashMap<>();
 
         seqActionData.put("key", "value");
+        seqActionData.put("steps", seqParamNames);
+
+        Map<String, Serializable> actionData = new HashMap<>();
         actionData.put("sequential_action", seqActionData);
 
         ExecutionStep result;

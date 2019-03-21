@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.scorecompiler;
 
 import io.cloudslang.lang.compiler.SlangTextualKeys;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ResultNavigation;
@@ -21,13 +22,16 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.substring;
 
 public class ExecutionStepFactory {
 
@@ -38,6 +42,7 @@ public class ExecutionStepFactory {
     private static final String PARALLEL_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".ParallelLoopExecutionData";
     private static final String NAVIGATION_ACTIONS_CLASS = "io.cloudslang.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
+    public static final String SEQUENTIAL_PARAMETER = "Parameter(";
 
 
     public ExecutionStep createBeginStepStep(Long index, List<Argument> stepInputs,
@@ -108,8 +113,8 @@ public class ExecutionStepFactory {
         Map<String, Serializable> pythonActionData =
                 (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         @SuppressWarnings("unchecked")
-        Map<String, String> seqActionData =
-                (Map<String, String>) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
+        Map<String, Serializable> seqActionData =
+                (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
 
         boolean javaActionFound = isNotEmpty(javaActionData);
         boolean pythonActionFound = isNotEmpty(pythonActionData);
@@ -123,6 +128,7 @@ public class ExecutionStepFactory {
             actionData.putAll(pythonActionData);
         } else if (seqActionFound) {
             actionType = ActionType.SEQUENTIAL;
+            seqActionData = updateSeqActionData(seqActionData);
             actionData.putAll(seqActionData);
         } else {
             // action data is missing
@@ -132,6 +138,23 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.ACTION_TYPE, actionType);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
         return createGeneralStep(index, ACTION_STEPS_CLASS, "doAction", actionData);
+    }
+
+    private Map<String, Serializable> updateSeqActionData(Map<String, Serializable> seqActionData) {
+        List<SeqStep> steps = (List<SeqStep>) seqActionData.get("steps");
+        if (steps != null) {
+            ArrayList<String> stepParamNames = new ArrayList<>();
+            for (SeqStep step : steps) {
+                String args = step.getArgs();
+                if (StringUtils.startsWith(args, SEQUENTIAL_PARAMETER)) {
+                    String paramName = substring(args, SEQUENTIAL_PARAMETER.length(), args.length() - 1)
+                            .replaceAll("^\"|\"$", "");
+                    stepParamNames.add(paramName);
+                }
+            }
+            seqActionData.put("steps", stepParamNames);
+        }
+        return seqActionData;
     }
 
     public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
