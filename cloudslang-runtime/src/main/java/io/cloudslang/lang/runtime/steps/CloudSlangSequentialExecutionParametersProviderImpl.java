@@ -42,7 +42,8 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
         for (SeqStep step : seqSteps) {
             String args = step.getArgs();
             if (StringUtils.startsWith(args, SEQUENTIAL_PARAMETER)) {
-                String paramName = substring(args, SEQUENTIAL_PARAMETER.length() + 1 , args.length() - 2);
+                String paramName = substring(args, SEQUENTIAL_PARAMETER.length(), args.length() - 1)
+                        .replaceAll("^\"|\"$", "");
                 Value value = currentContext.get(paramName);
                 if (value != null) {
                     //TODO handle sensitive values
