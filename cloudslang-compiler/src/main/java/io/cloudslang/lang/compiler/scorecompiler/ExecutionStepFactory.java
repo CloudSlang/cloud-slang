@@ -42,7 +42,7 @@ public class ExecutionStepFactory {
     private static final String PARALLEL_LOOP_STEPS_CLASS = STEPS_PACKAGE + ".ParallelLoopExecutionData";
     private static final String NAVIGATION_ACTIONS_CLASS = "io.cloudslang.lang.runtime.navigations.Navigations";
     private static final String SIMPLE_NAVIGATION_METHOD = "navigate";
-    public static final String SEQUENTIAL_PARAMETER = "Parameter(";
+    private static final String SEQUENTIAL_PARAMETER = "Parameter(";
 
 
     public ExecutionStep createBeginStepStep(Long index, List<Argument> stepInputs,
