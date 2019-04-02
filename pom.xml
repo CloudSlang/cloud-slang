@@ -28,7 +28,7 @@
         <connection>scm:git:https://github.com/CloudSlang/cloud-slang.git</connection>
         <developerConnection>scm:git:git@github.com:CloudSlang/cloud-slang.git</developerConnection>
         <url>https://github.com/CloudSlang/cloud-slang.git</url>
-        <tag>master</tag>
+        <tag>cloudslang-1.0.41</tag>
     </scm>
 
     <properties>
