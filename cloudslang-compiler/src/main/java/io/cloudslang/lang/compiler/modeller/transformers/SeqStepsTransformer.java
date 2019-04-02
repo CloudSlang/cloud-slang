@@ -39,8 +39,8 @@ public class SeqStepsTransformer extends AbstractTransformer
     private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEP_ID_KEY,
             SlangTextualKeys.SEQ_STEP_PATH_KEY, SlangTextualKeys.SEQ_STEP_ACTION_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEP_ARGS_KEY,
-            SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY, SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY,
-            SlangTextualKeys.SEQ_STEP_NAME_KEY);
+            SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY,SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY,
+            SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY, SlangTextualKeys.SEQ_STEP_NAME_KEY);
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for sequential operation step.";
     private static final String INVALID_ASSIGNMENT_OPERATION =
@@ -104,6 +104,7 @@ public class SeqStepsTransformer extends AbstractTransformer
         seqStep.setObjectPath(stepProps.get(SlangTextualKeys.SEQ_STEP_PATH_KEY));
         seqStep.setAction(stepProps.get(SlangTextualKeys.SEQ_STEP_ACTION_KEY));
         seqStep.setArgs(stepProps.get(SlangTextualKeys.SEQ_STEP_ARGS_KEY));
+        seqStep.setDefaultArgs(stepProps.get(SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY));
         seqStep.setName(stepProps.get(SlangTextualKeys.SEQ_STEP_NAME_KEY));
         seqStep.setSnapshot(stepProps.get(SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY));
         seqStep.setHighlightId(stepProps.get(SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY));

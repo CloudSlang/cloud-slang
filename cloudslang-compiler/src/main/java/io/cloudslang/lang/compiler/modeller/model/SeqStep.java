@@ -19,6 +19,7 @@ public class SeqStep implements Serializable {
     private String objectPath;
     private String action;
     private String args;
+    private String defaultArgs;
     private String highlightId;
     private String snapshot;
 
@@ -78,6 +79,14 @@ public class SeqStep implements Serializable {
         this.snapshot = snapshot;
     }
 
+    public String getDefaultArgs() {
+        return this.defaultArgs;
+    }
+
+    public void setDefaultArgs(String defaultArgs) {
+        this.defaultArgs = defaultArgs;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -92,12 +101,13 @@ public class SeqStep implements Serializable {
                 Objects.equals(objectPath, seqStep.objectPath) &&
                 Objects.equals(action, seqStep.action) &&
                 Objects.equals(args, seqStep.args) &&
+                Objects.equals(defaultArgs, seqStep.defaultArgs) &&
                 Objects.equals(highlightId, seqStep.highlightId) &&
                 Objects.equals(snapshot, seqStep.snapshot);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, objectPath, action, args, highlightId, snapshot);
+        return Objects.hash(id, name, objectPath, action, args, defaultArgs, highlightId, snapshot);
     }
 }
