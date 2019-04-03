@@ -10,6 +10,7 @@
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.compiler.modeller.model.SeqStep;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
 import org.apache.commons.lang3.StringUtils;
@@ -46,8 +47,11 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
                         .replaceAll("^\"|\"$", "");
                 Value value = currentContext.get(paramName);
                 if (value != null) {
-                    //TODO handle sensitive values
-                    execParams.put(paramName, value.get().toString());
+                    if (value.isSensitive()) {
+                        execParams.put(paramName, ((SensitiveValue)value).getContent());
+                    } else {
+                        execParams.put(paramName, value.get().toString());
+                    }
                 }
             }
         }
