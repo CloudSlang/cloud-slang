@@ -27,6 +27,7 @@ import java.util.Map;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ACTION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ARGS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ID_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_PATH_KEY;
@@ -51,15 +52,15 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformSimple() {
         List<Map<String, Map<String, String>>> steps = asList(
-                newStep("1", "Browser", "Open", "www.google.com", null, null),
-                newStep("2", "Browser", "Open", "www.google.com", "snapshot", "1234"),
-                newStep("3", "AnotherBrowser", "Open", "www..com", "snapshot", null),
-                newStep("4", "Browser", "Close", "www.google.com", null, "1234"));
+                newStep("1", "Browser", "Open", "www.google.com", "www.google.com", null, null),
+                newStep("2", "Browser", "Open", "www.google.com", "www.google.com", "snapshot", "1234"),
+                newStep("3", "AnotherBrowser", "Open", "www..com", "www..com", "snapshot", null),
+                newStep("4", "Browser", "Close", "www.google.com", "www.google.com", null, "1234"));
         List<SeqStep> expectedSteps = asList(
-                newSeqStep("1", "Browser", "Open", "www.google.com", null, null),
-                newSeqStep("2", "Browser", "Open", "www.google.com", "snapshot", "1234"),
-                newSeqStep("3", "AnotherBrowser", "Open", "www..com", "snapshot", null),
-                newSeqStep("4", "Browser", "Close", "www.google.com", null, "1234"));
+                newSeqStep("1", "Browser", "Open", "www.google.com", "www.google.com", null, null),
+                newSeqStep("2", "Browser", "Open", "www.google.com", "www.google.com", "snapshot", "1234"),
+                newSeqStep("3", "AnotherBrowser", "Open", "www..com", "www..com", "snapshot", null),
+                newSeqStep("4", "Browser", "Close", "www.google.com", "www.google.com", null, "1234"));
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), is(empty()));
@@ -68,7 +69,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformStepWithMissingReqKeys() {
-        List<Map<String, Map<String, String>>> steps = singletonList(newStep(null, null, null, null, "a", "b"));
+        List<Map<String, Map<String, String>>> steps = singletonList(newStep(null, null, null, null, null, "a", "b"));
         List<SeqStep> expectedSteps = new ArrayList<>();
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -80,7 +81,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformStepWithEmptyReqKeys() {
-        List<Map<String, Map<String, String>>> steps = singletonList(newStep("", "", "", "", "a", "b"));
+        List<Map<String, Map<String, String>>> steps = singletonList(newStep("", "", "", "", "", "a", "b"));
         List<SeqStep> expectedSteps = new ArrayList<>();
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -93,7 +94,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformStepWithIllegalKeys() {
         List<Map<String, Map<String, String>>> steps =
-                singletonList(newStep("1", "Browser", "Open", "www.google.com", null, null));
+                singletonList(newStep("1", "Browser", "Open", "www.google.com", "www.google.com", null, null));
         steps.get(0).get("step").put("illegal-key", "value-for-illegal-key");
         List<SeqStep> expectedSteps = new ArrayList<>();
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
@@ -108,10 +109,10 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformStepWithDuplicateIds() {
         List<Map<String, Map<String, String>>> steps =
-                asList(newStep("1", "Browser", "Open", "www.google.com", null, null),
-                newStep("1", "Tab", "Close", null, null, null));
+                asList(newStep("1", "Browser", "Open", "www.google.com", "www.google.com", null, null),
+                newStep("1", "Tab", "Close", null, null, null, null));
         List<SeqStep> expectedSteps =
-                singletonList(newSeqStep("1", "Browser", "Open", "www.google.com", null, null));
+                singletonList(newSeqStep("1", "Browser", "Open", "www.google.com", "www.google.com", null, null));
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), hasSize(1));
@@ -123,9 +124,9 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformStepWithAssignmentAction() {
         List<Map<String, Map<String, String>>> steps =
-                singletonList(newStep("1", "Parameter(\"param1\")", "=", "12", null, null));
+                singletonList(newStep("1", "Parameter(\"param1\")", "=", "12", "12", null, null));
         List<SeqStep> expectedSteps =
-                singletonList(newSeqStep("1", "Parameter(\"param1\")", "=", "12", null, null));
+                singletonList(newSeqStep("1", "Parameter(\"param1\")", "=", "12", "12", null, null));
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), is(empty()));
@@ -135,7 +136,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformStepWithAssignmentActionMissingArg() {
         List<Map<String, Map<String, String>>> steps =
-                singletonList(newStep("1", "Parameter(\"param1\")", "=", null, null, null));
+                singletonList(newStep("1", "Parameter(\"param1\")", "=", null, null, null, null));
         List<SeqStep> expectedSteps = new ArrayList<>();
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -149,6 +150,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
                                                      String objPath,
                                                      String action,
                                                      String args,
+                                                     String defaultArgs,
                                                      String snapshot,
                                                      String highlightId) {
         Map<String, String> stepDetails = new HashMap<>();
@@ -157,6 +159,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
         putIfValueNotNull(stepDetails, SEQ_STEP_PATH_KEY, objPath);
         putIfValueNotNull(stepDetails, SEQ_STEP_ACTION_KEY, action);
         putIfValueNotNull(stepDetails, SEQ_STEP_ARGS_KEY, args);
+        putIfValueNotNull(stepDetails, SEQ_STEP_DEFAULT_ARGS_KEY, defaultArgs);
         putIfValueNotNull(stepDetails, SEQ_STEP_SNAPSHOT_KEY, snapshot);
         putIfValueNotNull(stepDetails, SEQ_STEP_HIGHLIGHT_ID_KEY, highlightId);
 
@@ -170,6 +173,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
                                String objPath,
                                String action,
                                String args,
+                               String defaultArgs,
                                String snapshot,
                                String highlightId) {
         SeqStep seqStep = new SeqStep();
@@ -178,6 +182,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
         seqStep.setObjectPath(objPath);
         seqStep.setAction(action);
         seqStep.setArgs(args);
+        seqStep.setDefaultArgs(defaultArgs);
         seqStep.setSnapshot(snapshot);
         seqStep.setHighlightId(highlightId);
 
