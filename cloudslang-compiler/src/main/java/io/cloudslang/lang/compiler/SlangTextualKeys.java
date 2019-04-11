@@ -52,7 +52,6 @@ public interface SlangTextualKeys {
     String SEQ_STEPS_KEY = "steps";
     String SEQ_ACTION_GAV_KEY = "gav";
 
-
     //step
     String DO_KEY = "do";
     String DO_EXTERNAL_KEY = "do_external";
@@ -61,7 +60,7 @@ public interface SlangTextualKeys {
     String PUBLISH_KEY = "publish";
     String NAVIGATION_KEY = "navigate";
     String PARALLEL_LOOP_KEY = "parallel_loop";
-    String WORKER_GROUP = "worker_group";
+    String WORKER_GROUP = "worker_group"; //&& flow
 
     //seq step
     String SEQ_STEP_ID_KEY = "id";

@@ -95,7 +95,7 @@ public class ExecutableBuilder {
     private List<String> operationAdditionalKeywords =
             asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY,
                     SlangTextualKeys.SEQ_ACTION_KEY);
-    private List<String> flowAdditionalKeywords = singletonList(SlangTextualKeys.WORKFLOW_KEY);
+    private List<String> flowAdditionalKeywords = asList(WORKFLOW_KEY, WORKER_GROUP);
     private List<String> allExecutableAdditionalKeywords;
 
     private List<Transformer> actionTransformers;
@@ -132,7 +132,7 @@ public class ExecutableBuilder {
 
         // keys excluding each other
         executableConstraintGroups = new ArrayList<>();
-        executableConstraintGroups.add(ListUtils.union(flowAdditionalKeywords, operationAdditionalKeywords));
+        executableConstraintGroups.add(ListUtils.union(singletonList(WORKFLOW_KEY), operationAdditionalKeywords));
 
         //step transformers
         preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
@@ -171,6 +171,7 @@ public class ExecutableBuilder {
                                                            SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
+        String workerGroup = (String)executableRawData.get(SlangTextualKeys.WORKER_GROUP);
 
         errors.addAll(preCompileValidator.checkKeyWords(
                 execName,
@@ -245,6 +246,7 @@ public class ExecutableBuilder {
                         workflow,
                         namespace,
                         execName,
+                        workerGroup,
                         inputs,
                         outputs,
                         results,
@@ -592,7 +594,7 @@ public class ExecutableBuilder {
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
-        String workerGroup = (String)stepRawData.get("worker_group");
+        String workerGroup = (String)stepRawData.get(SlangTextualKeys.WORKER_GROUP);
 
         String refId = "";
         final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
