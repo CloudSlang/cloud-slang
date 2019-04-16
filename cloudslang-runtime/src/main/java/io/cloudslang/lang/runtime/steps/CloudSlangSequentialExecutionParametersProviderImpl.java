@@ -39,7 +39,7 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
 
     @Override
     public Object[] getExecutionParameters() {
-        Map<String, String> execParams = new HashMap<>();
+        Map<String, Value> execParams = new HashMap<>();
         for (SeqStep step : seqSteps) {
             String args = step.getArgs();
             if (StringUtils.startsWith(args, SEQUENTIAL_PARAMETER)) {
@@ -47,11 +47,7 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
                         .replaceAll("^\"|\"$", "");
                 Value value = currentContext.get(paramName);
                 if (value != null) {
-                    if (value.isSensitive()) {
-                        execParams.put(paramName, ((SensitiveValue)value).getContent());
-                    } else {
-                        execParams.put(paramName, value.get().toString());
-                    }
+                    execParams.put(paramName, value);
                 }
             }
         }
