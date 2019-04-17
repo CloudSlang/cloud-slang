@@ -172,9 +172,9 @@ public class TestCasesYamlParserTest {
                         " \"result\"])"
         );
         exception.expectMessage(
-                " at [Source: {\"inputs\":[{\"text\":\"text to print\"}],\"description\":" +
+                " at [Source: (String)\"{\"inputs\":[{\"text\":\"text to print\"}],\"description\":" +
                         "\"Tests that print_text operation finishes with SUCCESS\",\"testFlowPath\":" +
-                        "\"base.print_property\",\"result\":\"SUCCESS\",\"invalid_field\":\"value\"};" +
+                        "\"base.print_property\",\"result\":\"SUCCESS\",\"invalid_field\":\"value\"}\";" +
                         " line: 1, column: 181] (through reference chain:" +
                         " io.cloudslang.lang.tools.build.tester.parse.SlangTestCase[\"invalid_field\"])"
         );
