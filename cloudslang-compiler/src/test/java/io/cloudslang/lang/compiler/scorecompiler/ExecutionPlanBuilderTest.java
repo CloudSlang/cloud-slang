@@ -229,7 +229,7 @@ public class ExecutionPlanBuilderTest {
 
         Flow compiledFlow =
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
-                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                        flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -259,7 +259,7 @@ public class ExecutionPlanBuilderTest {
 
         Flow compiledFlow =
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
-                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                        flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -321,7 +321,7 @@ public class ExecutionPlanBuilderTest {
 
         Flow compiledFlow =
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
-                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                        flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
@@ -352,7 +352,7 @@ public class ExecutionPlanBuilderTest {
 
         Flow compiledFlow =
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
-                        flowName, inputs, outputs, results, null, systemPropertyDependencies);
+                        flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);

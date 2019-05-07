@@ -26,12 +26,14 @@ import java.util.Set;
 public class Flow extends Executable {
 
     private final Workflow workflow;
+    private final String workerGroup;
 
     public Flow(Map<String, Serializable> preOpActionData,
                 Map<String, Serializable> postOpActionData,
                 Workflow workflow,
                 String namespace,
                 String name,
+                String workerGroup,
                 List<Input> inputs,
                 List<Output> outputs,
                 List<Result> results,
@@ -40,6 +42,7 @@ public class Flow extends Executable {
         super(preOpActionData, postOpActionData, namespace, name, inputs,
                 outputs, results, executableDependencies, Collections.emptySet(), systemPropertyDependencies);
         this.workflow = workflow;
+        this.workerGroup = workerGroup;
     }
 
     public Flow(Map<String, Serializable> preOpActionData,
@@ -47,6 +50,7 @@ public class Flow extends Executable {
                 Workflow workflow,
                 String namespace,
                 String name,
+                String workerGroup,
                 List<Input> inputs,
                 List<Output> outputs,
                 List<Result> results,
@@ -56,10 +60,15 @@ public class Flow extends Executable {
         super(preOpActionData, postOpActionData, namespace, name, inputs,
                 outputs, results, executableDependencies, externalExecutableDependencies, systemPropertyDependencies);
         this.workflow = workflow;
+        this.workerGroup = workerGroup;
     }
 
     public Workflow getWorkflow() {
         return workflow;
+    }
+
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
     @Override

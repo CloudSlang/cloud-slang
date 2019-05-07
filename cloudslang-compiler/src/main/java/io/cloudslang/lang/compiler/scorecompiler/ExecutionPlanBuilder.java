@@ -91,6 +91,7 @@ public class ExecutionPlanBuilder {
         executionPlan.setName(compiledFlow.getName());
         executionPlan.setLanguage(CLOUDSLANG_NAME);
         executionPlan.setFlowUuid(compiledFlow.getId());
+        executionPlan.setWorkerGroup(compiledFlow.getWorkerGroup());
 
         executionPlan.setBeginStep(FLOW_START_STEP_ID);
         //flow start step
@@ -145,7 +146,7 @@ public class ExecutionPlanBuilder {
             );
         }
 
-        stepExecutionSteps.add(createBeginStep(currentId++, step));
+        stepExecutionSteps.add(createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(step, compiledFlow)));
 
         //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -165,15 +166,27 @@ public class ExecutionPlanBuilder {
             }
         }
         if (parallelLoop) {
-            stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(), true));
+            stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(),
+                    inheritWorkerGroupFromFlow(step, compiledFlow), true));
             stepExecutionSteps.add(
                     stepFactory.createJoinBranchesStep(currentId, step.getPostStepActionData(),
                             navigationValues, stepName)
             );
         } else {
-            stepExecutionSteps.add(createFinishStepStep(currentId, step, navigationValues, false));
+            stepExecutionSteps.add(createFinishStepStep(currentId, step, navigationValues,
+                    inheritWorkerGroupFromFlow(step, compiledFlow), false));
         }
         return stepExecutionSteps;
+    }
+
+    private String inheritWorkerGroupFromFlow(Step step, Flow flow) {
+        if (step.getWorkerGroup() != null) {
+            return step.getWorkerGroup();
+        } else if (flow.getWorkerGroup() != null) {
+            return flow.getWorkerGroup();
+        } else {
+            return null;
+        }
     }
 
     private long getCurrentId(Map<String, Long> stepReferences, Deque<Step> steps) {
@@ -203,22 +216,22 @@ public class ExecutionPlanBuilder {
     }
 
     private ExecutionStep createFinishStepStep(long currentId, Step step, Map<String,
-            ResultNavigation> navigationValues, boolean parallelLoop) {
+            ResultNavigation> navigationValues, String workerGroup, boolean parallelLoop) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
                     navigationValues, step.getName(), parallelLoop);
         }
         return stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
-                navigationValues, step.getName(), step.getWorkerGroup(), parallelLoop);
+                navigationValues, step.getName(), workerGroup, parallelLoop);
     }
 
-    private ExecutionStep createBeginStep(Long id, Step step) {
+    private ExecutionStep createBeginStep(Long id, Step step, String workerGroup) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
                     step.getPreStepActionData(), step.getRefId(), step.getName());
         }
         return stepFactory.createBeginStepStep(id, step.getArguments(),
-                step.getPreStepActionData(), step.getRefId(), step.getName(), step.getWorkerGroup());
+                step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {
