@@ -237,6 +237,8 @@ public class ExecutableBuilder {
                 try {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
+
+                    validateOutputs(outputs);
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
@@ -267,7 +269,8 @@ public class ExecutableBuilder {
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
 
-                if (!actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY)) {
+                boolean isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
+                if (!isSeqAction) {
                     preCompileValidator.validateResultTypes(results, execName, errors);
                     preCompileValidator.validateDefaultResult(results, execName, errors);
                 } else {
@@ -278,6 +281,11 @@ public class ExecutableBuilder {
                 try {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForOperation(inputs, outputs, results);
+
+                    if (!isSeqAction) {
+                        validateOutputs(outputs);
+                    }
+
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
@@ -307,6 +315,7 @@ public class ExecutableBuilder {
                 try {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForDecision(inputs, outputs, results);
+                    validateOutputs(outputs);
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
@@ -329,6 +338,15 @@ public class ExecutableBuilder {
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() +
                         ". It is not of flow, operations or decision type");
+        }
+    }
+
+    private void validateOutputs(List<Output> outputs) {
+        for (Output output: outputs) {
+            if (output.hasRobotProperty()) {
+                throw new RuntimeException("'robot' property allowed only for outputs of sequential_action. " +
+                        "Encountered at output " + output.getName());
+            }
         }
     }
 
