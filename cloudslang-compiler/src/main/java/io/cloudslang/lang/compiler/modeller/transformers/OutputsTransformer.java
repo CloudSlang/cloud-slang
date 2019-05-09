@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_OUTPUT_ROBOT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 
 /**
@@ -30,6 +31,13 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
  */
 public class OutputsTransformer extends AbstractOutputsTransformer implements Transformer<List<Object>, List<Output>> {
 
+    private static final List<String> ACTIVITY_OUTPUTS_KNOWN_KEYS =
+            Arrays.asList(SENSITIVE_KEY, VALUE_KEY, SEQ_OUTPUT_ROBOT_KEY);
+
+    @Override
+    protected List<String> getKnownKeys() {
+        return ACTIVITY_OUTPUTS_KNOWN_KEYS;
+    }
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData) {

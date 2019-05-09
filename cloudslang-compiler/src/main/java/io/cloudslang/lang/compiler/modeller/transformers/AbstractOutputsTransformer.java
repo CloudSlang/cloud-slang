@@ -27,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_OUTPUT_ROBOT_KEY;
 import static java.lang.String.format;
 
 
@@ -133,12 +134,25 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         String outputName = entry.getKey();
         boolean sensitive = props.containsKey(SENSITIVE_KEY) && (boolean) props.get(SENSITIVE_KEY);
         Serializable value = props.get(VALUE_KEY);
-        return value == null ? createRefOutput(outputName, sensitive) : createOutput(outputName, value, sensitive);
+
+        Output output = value == null ?
+                createRefOutput(outputName, sensitive) :
+                createOutput(outputName, value, sensitive);
+
+        if (props.containsKey(SEQ_OUTPUT_ROBOT_KEY)) {
+            output.setRobot((boolean) props.get(SEQ_OUTPUT_ROBOT_KEY));
+        }
+
+        return output;
+    }
+
+    protected List<String> getKnownKeys() {
+        return KNOWN_KEYS;
     }
 
     private void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
         for (String key : props.keySet()) {
-            if (!KNOWN_KEYS.contains(key)) {
+            if (!getKnownKeys().contains(key)) {
                 throw new RuntimeException(format("Key: %s in output: %s is not a known property",
                         key, entry.getKey()));
             }

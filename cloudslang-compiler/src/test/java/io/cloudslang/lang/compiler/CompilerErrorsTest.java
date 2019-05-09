@@ -643,4 +643,27 @@ public class CompilerErrorsTest {
                 result.getErrors().get(1).getMessage());
     }
 
+    @Test
+    public void testFlowOutputsContainRobotProperty() throws URISyntaxException {
+        final URI flow = getClass().getResource("/compile_errors/outputs_robot_prop.sl").toURI();
+        final URI operation = getClass().getResource("/compile_errors/print.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationModellingResult result = compiler.compileSource(SlangSource.fromFile(flow), path);
+        assertEquals(1, result.getErrors().size());
+        assertEquals("'robot' property allowed only for outputs of sequential_action. " +
+                "Encountered at output output1", result.getErrors().get(0).getMessage());
+    }
+
+    @Test
+    public void testFlowStepOutputsContainRobotProperty() throws URISyntaxException {
+        final URI flow = getClass().getResource("/compile_errors/step_outputs_robot_prop.sl").toURI();
+        final URI operation = getClass().getResource("/compile_errors/print.sl").toURI();
+        final Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+        CompilationModellingResult result = compiler.compileSource(SlangSource.fromFile(flow), path);
+        assertEquals(1, result.getErrors().size());
+        assertEquals("For step 'step1' syntax is illegal.\n" +
+                "Key: robot in output: output_0 is not a known property", result.getErrors().get(0).getMessage());
+    }
 }
