@@ -150,7 +150,7 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         return KNOWN_KEYS;
     }
 
-    protected void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
+    private void validateKeys(Map.Entry<String, Map<String, Serializable>> entry, Map<String, Serializable> props) {
         for (String key : props.keySet()) {
             if (!getKnownKeys().contains(key)) {
                 throw new RuntimeException(format("Key: %s in output: %s is not a known property",

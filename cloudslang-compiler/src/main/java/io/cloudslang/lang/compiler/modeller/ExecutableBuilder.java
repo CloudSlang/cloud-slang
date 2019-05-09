@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
@@ -50,6 +51,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.filter;
@@ -209,6 +211,10 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Set<String> systemPropertyDependencies = null;
+
+        Executable executable;
+        boolean isSeqAction = false;
+
         switch (parsedSlang.getType()) {
             case FLOW:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData
@@ -238,11 +244,10 @@ public class ExecutableBuilder {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
 
-                    validateOutputs(outputs);
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
-                Flow flow = new Flow(
+                executable = new Flow(
                         preExecutableActionData,
                         postExecutableActionData,
                         workflow,
@@ -256,8 +261,8 @@ public class ExecutableBuilder {
                         externalExecutableDependencies,
                         systemPropertyDependencies
                 );
-                return preCompileValidator
-                        .validateResult(parsedSlang, execName, new ExecutableModellingResult(flow, errors));
+
+                break;
 
             case OPERATION:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY),
@@ -269,7 +274,7 @@ public class ExecutableBuilder {
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
 
-                boolean isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
+                isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
                 if (!isSeqAction) {
                     preCompileValidator.validateResultTypes(results, execName, errors);
                     preCompileValidator.validateDefaultResult(results, execName, errors);
@@ -282,14 +287,10 @@ public class ExecutableBuilder {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForOperation(inputs, outputs, results);
 
-                    if (!isSeqAction) {
-                        validateOutputs(outputs);
-                    }
-
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
-                Operation operation = new Operation(
+                executable = new Operation(
                         preExecutableActionData,
                         postExecutableActionData,
                         action,
@@ -302,8 +303,8 @@ public class ExecutableBuilder {
                         systemPropertyDependencies
                 );
 
-                return preCompileValidator
-                        .validateResult(parsedSlang, execName, new ExecutableModellingResult(operation, errors));
+                break;
+
             case DECISION:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY),
                         ExecutableType.DECISION, results, errors);
@@ -315,11 +316,10 @@ public class ExecutableBuilder {
                 try {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForDecision(inputs, outputs, results);
-                    validateOutputs(outputs);
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
-                Decision decision = new Decision(
+                executable = new Decision(
                         preExecutableActionData,
                         postExecutableActionData,
                         namespace,
@@ -330,24 +330,29 @@ public class ExecutableBuilder {
                         Collections.<String>emptySet(),
                         systemPropertyDependencies
                 );
-                return preCompileValidator.validateResult(
-                        parsedSlang,
-                        execName,
-                        new ExecutableModellingResult(decision, errors)
-                );
+
+                break;
+
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() +
                         ". It is not of flow, operations or decision type");
         }
+
+        if (!isSeqAction && outputs != null) {
+            errors.addAll(validateOutputs(outputs));
+        }
+
+        return preCompileValidator
+                .validateResult(parsedSlang, execName, new ExecutableModellingResult(executable, errors));
     }
 
-    private void validateOutputs(List<Output> outputs) {
-        for (Output output: outputs) {
-            if (output.hasRobotProperty()) {
-                throw new RuntimeException("'robot' property allowed only for outputs of sequential_action. " +
-                        "Encountered at output " + output.getName());
-            }
-        }
+    private List<RuntimeException> validateOutputs(List<Output> outputs) {
+
+        Function<Output, RuntimeException> map = output -> new RuntimeException("'" +
+                SlangTextualKeys.SEQ_OUTPUT_ROBOT_KEY + "' property allowed only for outputs of " +
+                SlangTextualKeys.SEQ_ACTION_KEY + ". Encountered at output " + output.getName());
+
+        return outputs.stream().filter(output -> output.hasRobotProperty()).map(map).collect(Collectors.toList());
     }
 
     private Map<String, Object> getActionRawData(Map<String, Object> executableRawData,
