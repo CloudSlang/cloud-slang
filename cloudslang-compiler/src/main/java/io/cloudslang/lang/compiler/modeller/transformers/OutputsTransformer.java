@@ -34,6 +34,7 @@ public class OutputsTransformer extends AbstractOutputsTransformer implements Tr
     private static final List<String> ACTIVITY_OUTPUTS_KNOWN_KEYS =
             Arrays.asList(SENSITIVE_KEY, VALUE_KEY, SEQ_OUTPUT_ROBOT_KEY);
 
+    @Override
     protected List<String> getKnownKeys() {
         return ACTIVITY_OUTPUTS_KNOWN_KEYS;
     }
