@@ -193,7 +193,8 @@ public abstract class AbstractExecutionData {
                 context,
                 Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition));
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition),
+                Pair.of(LanguageEventData.WORKER_GROUP_NAME, executionRuntimeServices.getWorkerGroupName()));
     }
 
     private static boolean shouldBreakLoop(List<String> breakOn, ReturnValues executableReturnValues) {
