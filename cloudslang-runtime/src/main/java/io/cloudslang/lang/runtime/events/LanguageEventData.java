@@ -48,6 +48,10 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String STEP_TYPE = "STEP_TYPE";
     public static final String STEP_NAME = "STEP_NAME";
     public static final String CONTEXT = "CONTEXT";
+    public static final String CONSUMER_WORKER_UUID = "CONSUMER_WORKER_UUID";
+    public static final String PRODUCER_WORKER_UUID = "PRODUCER_WORKER_UUID";
+    public static final String ROBOT_UUID = "ROBOT_UUID";
+    public static final String ACTIVITY_GROUP = "ACTIVITY_GROUP";
 
     public enum StepType {
         FLOW("flow"),
