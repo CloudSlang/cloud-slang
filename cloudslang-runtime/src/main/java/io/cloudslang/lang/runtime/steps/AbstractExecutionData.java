@@ -198,7 +198,7 @@ public abstract class AbstractExecutionData {
                 Pair.of(LanguageEventData.CONSUMER_WORKER_UUID, executionRuntimeServices.removeConsumerWorkerId()),
                 Pair.of(LanguageEventData.PRODUCER_WORKER_UUID, executionRuntimeServices.removeProducerWorkerId()),
                 Pair.of(LanguageEventData.ROBOT_UUID, executionRuntimeServices.removeRobotId()),
-                Pair.of(LanguageEventData.ACTIVITY_GROUP, executionRuntimeServices.removeActivityGroup()));
+                Pair.of(LanguageEventData.ROBOT_GROUP_NAME, executionRuntimeServices.removeRobotGroupName()));
     }
 
     private static boolean shouldBreakLoop(List<String> breakOn, ReturnValues executableReturnValues) {
