@@ -44,9 +44,14 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String BOUND_ARGUMENTS = "BOUND_ARGUMENTS";
     public static final String BOUND_PARALLEL_LOOP_EXPRESSION = "BOUND_PARALLEL_LOOP_EXPRESSION";
     public static final String NEXT_STEP_POSITION = "nextPosition";
+    public static final String WORKER_GROUP_NAME = "WORKER_GROUP_NAME";
     public static final String STEP_TYPE = "STEP_TYPE";
     public static final String STEP_NAME = "STEP_NAME";
     public static final String CONTEXT = "CONTEXT";
+    public static final String CONSUMER_WORKER_UUID = "CONSUMER_WORKER_UUID";
+    public static final String PRODUCER_WORKER_UUID = "PRODUCER_WORKER_UUID";
+    public static final String ROBOT_UUID = "ROBOT_UUID";
+    public static final String ROBOT_GROUP_NAME = "ROBOT_GROUP_NAME";
 
     public enum StepType {
         FLOW("flow"),
