@@ -49,6 +49,7 @@ public class SeqStepsTransformer extends AbstractTransformer
             SEQ_STEP_PATH_KEY, SEQ_STEP_ACTION_KEY);
     private static final Set<String> WAIT_MANDATORY_KEYS = newHashSet(SEQ_STEP_ID_KEY, SEQ_STEP_ACTION_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY);
+    private static final Set<String> WAIT_OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY, SEQ_STEP_HIGHLIGHT_ID_KEY,
             SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY);
@@ -63,10 +64,10 @@ public class SeqStepsTransformer extends AbstractTransformer
             "Sequential operation step has the following illegal tags: ";
 
     private static final String WAIT = "Wait";
-    private static final String WAIT_INVALID_ARG = "Invalid argument for 'Wait'.";
+    private static final String WAIT_INVALID_ARG = "Invalid argument for 'Wait': %s.";
     private static final String WAIT_PARAM_REQUIRED = "Parameter required for 'Wait'.";
 
-    private static final Pattern WAIT_ARGS = compile("\\d+[ \\t]*(,[ \\t]*\\d+)?");
+    private static final Pattern WAIT_ARGS = compile("\"\\d+[ \\t]*(,[ \\t]*\\d+)?\"");
 
     @Override
     public TransformModellingResult<ArrayList<SeqStep>> transform(List<Map<String, Map<String, String>>> rawData) {
@@ -91,7 +92,7 @@ public class SeqStepsTransformer extends AbstractTransformer
                     }
 
                     Set<String> mandatoryKeySet = isWaitStep ? WAIT_MANDATORY_KEYS : MANDATORY_KEY_SET;
-                    Set<String> optionalKeySet = isWaitStep ? Collections.EMPTY_SET : OPTIONAL_KEY_SET;
+                    Set<String> optionalKeySet = isWaitStep ? WAIT_OPTIONAL_KEY_SET : OPTIONAL_KEY_SET;
 
                     validateNotEmptyValues(stepProps, mandatoryKeySet, optionalKeySet);
                     validateOnlySupportedKeys(stepProps, mandatoryKeySet, optionalKeySet);
@@ -116,12 +117,13 @@ public class SeqStepsTransformer extends AbstractTransformer
     }
 
     private void validateWaitStep(Map<String, String> stepProps) {
-        if (StringUtils.isEmpty(stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY))) {
+        String args = stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY);
+        if (StringUtils.isEmpty(args)) {
             throw new RuntimeException(WAIT_PARAM_REQUIRED);
         }
 
-        if (!WAIT_ARGS.matcher(stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY)).matches()) {
-            throw new RuntimeException(WAIT_INVALID_ARG);
+        if (!WAIT_ARGS.matcher(args).matches()) {
+            throw new RuntimeException(String.format(WAIT_INVALID_ARG, args));
         }
     }
 

@@ -149,12 +149,12 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitSteps() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null,"Wait", null, "2",null, null));
-        steps.add(newStep("2", null,"Wait", null, "2 , 5",null, null));
+        steps.add(newStep("1", null,"Wait", null, "\"2\"",null, null));
+        steps.add(newStep("2", null,"Wait", null, "\"2 , 5\"",null, null));
 
         List<SeqStep> expectedSteps = new ArrayList<>();
-        expectedSteps.add(newSeqStep("1", null,"Wait", null, "2",null, null));
-        expectedSteps.add(newSeqStep("2", null,"Wait", null, "2 , 5",null, null));
+        expectedSteps.add(newSeqStep("1", null,"Wait", null, "\"2\"",null, null));
+        expectedSteps.add(newSeqStep("2", null,"Wait", null, "\"2 , 5\"",null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -184,7 +184,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
-                "Invalid argument for 'Wait'.");
+                "Invalid argument for 'Wait': abc.");
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
@@ -197,7 +197,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
-                "Invalid argument for 'Wait'.");
+                "Invalid argument for 'Wait': 12,sdfsdf.");
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
