@@ -13,6 +13,7 @@ import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 import java.util.ArrayList;
@@ -46,7 +47,8 @@ public class SeqStepsTransformer extends AbstractTransformer
 
     private static final Set<String> MANDATORY_KEY_SET = newHashSet(SEQ_STEP_ID_KEY,
             SEQ_STEP_PATH_KEY, SEQ_STEP_ACTION_KEY);
-    private static final Set<String> WAIT_MANDATORY_KEYS = newHashSet(SEQ_STEP_ID_KEY, SEQ_STEP_PATH_KEY);
+    private static final Set<String> WAIT_MANDATORY_KEYS = newHashSet(SEQ_STEP_ID_KEY, SEQ_STEP_ACTION_KEY,
+            SEQ_STEP_DEFAULT_ARGS_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY, SEQ_STEP_HIGHLIGHT_ID_KEY,
             SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY);
@@ -61,17 +63,10 @@ public class SeqStepsTransformer extends AbstractTransformer
             "Sequential operation step has the following illegal tags: ";
 
     private static final String WAIT = "Wait";
-    private static final String INVALID_WAIT_SYNTAX = "Syntax for 'Wait' command is not valid.";
+    private static final String WAIT_INVALID_ARG = "Invalid argument for 'Wait'.";
+    private static final String WAIT_PARAM_REQUIRED = "Parameter required for 'Wait'.";
 
-    /**
-     * Regex for UFT Wait command. It has two forms:
-     * 1) Wait seconds[,millis]
-     * 2) Wait(seconds[,millis])
-     */
-    private static final Pattern WAIT_REGEX = compile(
-            "Wait[ \\t]+\\d+[ \\t]*(,[ \\t]*\\d+)?[ \\t]*" +
-            "|" +
-            "Wait[ \\t]*\\([ \\t]*\\d+[ \\t]*(,[ \\t]*\\d+[ \\t]*)?\\)[ \\t]*");
+    private static final Pattern WAIT_ARGS = compile("\\d+[ \\t]*(,[ \\t]*\\d+)?");
 
     @Override
     public TransformModellingResult<ArrayList<SeqStep>> transform(List<Map<String, Map<String, String>>> rawData) {
@@ -121,14 +116,17 @@ public class SeqStepsTransformer extends AbstractTransformer
     }
 
     private void validateWaitStep(Map<String, String> stepProps) {
-        if (!WAIT_REGEX.matcher(stepProps.get(SEQ_STEP_PATH_KEY)).matches()) {
-            throw new RuntimeException(INVALID_WAIT_SYNTAX);
+        if (StringUtils.isEmpty(stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY))) {
+            throw new RuntimeException(WAIT_PARAM_REQUIRED);
+        }
+
+        if (!WAIT_ARGS.matcher(stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY)).matches()) {
+            throw new RuntimeException(WAIT_INVALID_ARG);
         }
     }
 
     private boolean isWaitStep(Map<String, String> stepProps) {
-        String objectPath = stepProps.get(SEQ_STEP_PATH_KEY);
-        return objectPath != null && objectPath.startsWith(WAIT);
+        return StringUtils.equals(WAIT, stepProps.get(SEQ_STEP_ACTION_KEY));
     }
 
     private void validateAssignmentAction(SeqStep seqStep) {

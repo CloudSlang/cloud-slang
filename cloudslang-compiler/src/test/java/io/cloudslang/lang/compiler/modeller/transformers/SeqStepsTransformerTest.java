@@ -149,17 +149,12 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitSteps() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", "Wait(2)", null, null, null,null, null));
-        steps.add(newStep("2", "Wait ( 2 , 5 ) ", null, null, null,null, null));
-        steps.add(newStep("3", "Wait 22  ", null, null, null,null, null));
-        steps.add(newStep("4", "Wait 22 , 232   ", null, null, null,null, null));
-
+        steps.add(newStep("1", null,"Wait", null, "2",null, null));
+        steps.add(newStep("2", null,"Wait", null, "2 , 5",null, null));
 
         List<SeqStep> expectedSteps = new ArrayList<>();
-        expectedSteps.add(newSeqStep("1", "Wait(2)", null, null, null,null, null));
-        expectedSteps.add(newSeqStep("2", "Wait ( 2 , 5 ) ", null, null, null,null, null));
-        expectedSteps.add(newSeqStep("3", "Wait 22  ", null, null, null,null, null));
-        expectedSteps.add(newSeqStep("4", "Wait 22 , 232   ", null, null, null,null, null));
+        expectedSteps.add(newSeqStep("1", null,"Wait", null, "2",null, null));
+        expectedSteps.add(newSeqStep("2", null,"Wait", null, "2 , 5",null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -170,39 +165,39 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitStepInvalidSyntaxNoParam() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", "Wait ", null, null, null,null, null));
+        steps.add(newStep("1", null, "Wait", null, null,null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
-                "Syntax for 'Wait' command is not valid.");
+                "Parameter required for 'Wait'.");
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
     @Test
     public void testTransformWaitStepInvalidSyntax1() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", "Wait(2", null, null, null,null, null));
+        steps.add(newStep("1", null, "Wait", null, "abc",null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
-                "Syntax for 'Wait' command is not valid.");
+                "Invalid argument for 'Wait'.");
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
     @Test
     public void testTransformWaitStepInvalidSyntax2() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", "Wait 2,", null, null, null,null, null));
+        steps.add(newStep("1", null, "Wait", null, "12,sdfsdf",null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
-                "Syntax for 'Wait' command is not valid.");
+                "Invalid argument for 'Wait'.");
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
