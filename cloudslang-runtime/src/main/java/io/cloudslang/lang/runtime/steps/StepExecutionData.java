@@ -14,6 +14,7 @@ import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -21,6 +22,7 @@ import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -54,9 +56,13 @@ public class StepExecutionData extends AbstractExecutionData {
     private OutputsBinding outputsBinding;
     @Autowired
     private LoopsBinding loopsBinding;
+    @Autowired
+    private ScriptEvaluator scriptEvaluator;
 
     @SuppressWarnings("unused")
-    public void beginStep(@Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
+    public void beginStep(
+                          @Param("worker_group") WorkerGroupStatement workerGroup,
+                          @Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -106,6 +112,12 @@ public class StepExecutionData extends AbstractExecutionData {
                     .bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 
+            Value workerGroupValue = scriptEvaluator.evalExpr("get_sp('wgsysprop1')",
+                    flowContext.getImmutableViewOfVariables(),
+                    runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
+            executionRuntimeServices.setWorkerGroupName(workerGroupValue.toString());
+            executionRuntimeServices.setShouldCheckGroup(true);
+
             sendEndBindingArgumentsEvent(
                     stepInputs,
                     boundInputs,
@@ -146,6 +158,8 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallelLoop) {
 
         try {
+            executionRuntimeServices.setWorkerGroupName(null);
+
             Context flowContext = runEnv.getStack().popContext();
 
             removeStepSerializableSessionObjects(runEnv);

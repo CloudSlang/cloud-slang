@@ -45,6 +45,7 @@ import io.cloudslang.lang.compiler.modeller.transformers.SeqActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.SeqStepsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.modeller.transformers.WorkFlowTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.WorkerGroupTransformer;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
@@ -374,6 +375,12 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public WorkerGroupTransformer workerGroupTransformer() {
+        WorkerGroupTransformer workerGroupTransformer = new WorkerGroupTransformer();
+        return workerGroupTransformer;
+    }
+
+    @Bean
     public ExecutableBuilder executableBuilder() {
         ExecutableBuilder executableBuilder = new ExecutableBuilder();
         executableBuilder.setTransformers(transformers());
@@ -415,7 +422,8 @@ public class SlangCompilerSpringConfig {
                 javaActionTransformer(),
                 forTransformer(),
                 breakTransformer(),
-                seqActionTransformer());
+                seqActionTransformer(),
+                workerGroupTransformer());
     }
 
     private void setAbstractOutputTransformerDependencies(AbstractOutputsTransformer abstractOutputsTransformer) {
