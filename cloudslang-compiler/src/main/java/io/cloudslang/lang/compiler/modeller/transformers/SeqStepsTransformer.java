@@ -9,11 +9,11 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 import java.util.ArrayList;
@@ -26,6 +26,14 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ACTION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ARGS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ID_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_NAME_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_PATH_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ASSIGNMENT_ACTION;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -36,11 +44,16 @@ public class SeqStepsTransformer extends AbstractTransformer
     private static final String SEQ_OPERATION_HAS_MISSING_TAGS =
             "Sequential operation step has the following missing tags: ";
     private static final Pattern OUTPUT_ASSIGNMENT = compile("Parameter\\(\"[^\"]+\"\\)");
-    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEP_ID_KEY,
-            SlangTextualKeys.SEQ_STEP_PATH_KEY, SlangTextualKeys.SEQ_STEP_ACTION_KEY);
-    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEP_ARGS_KEY,
-            SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY,SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY,
-            SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY, SlangTextualKeys.SEQ_STEP_NAME_KEY);
+
+    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SEQ_STEP_ID_KEY,
+            SEQ_STEP_PATH_KEY, SEQ_STEP_ACTION_KEY);
+    private static final Set<String> WAIT_MANDATORY_KEYS = newHashSet(SEQ_STEP_ID_KEY, SEQ_STEP_ACTION_KEY,
+            SEQ_STEP_DEFAULT_ARGS_KEY);
+    private static final Set<String> WAIT_OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY);
+    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY,
+            SEQ_STEP_DEFAULT_ARGS_KEY, SEQ_STEP_HIGHLIGHT_ID_KEY,
+            SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY);
+
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for sequential operation step.";
     private static final String INVALID_ASSIGNMENT_OPERATION =
@@ -49,6 +62,12 @@ public class SeqStepsTransformer extends AbstractTransformer
             "Sequential operation step has the following empty tags: ";
     private static final String SEQ_OPERATION_ILLEGAL_TAGS =
             "Sequential operation step has the following illegal tags: ";
+
+    private static final String WAIT = "Wait";
+    private static final String WAIT_INVALID_ARG = "Invalid argument for 'Wait': %s.";
+    private static final String WAIT_PARAM_REQUIRED = "Parameter required for 'Wait'.";
+
+    private static final Pattern WAIT_ARGS = compile("\"\\d+[ \\t]*(,[ \\t]*\\d+)?\"");
 
     @Override
     public TransformModellingResult<ArrayList<SeqStep>> transform(List<Map<String, Map<String, String>>> rawData) {
@@ -65,16 +84,29 @@ public class SeqStepsTransformer extends AbstractTransformer
             Set<String> ids = new HashSet<>();
             for (Map<String, Map<String, String>> mapStep : rawData) {
                 Map<String, String> stepProps = mapStep.values().iterator().next();
+
                 try {
-                    validateNotEmptyValues(stepProps);
-                    validateOnlySupportedKeys(stepProps);
+                    boolean isWaitStep = isWaitStep(stepProps);
+                    if (isWaitStep) {
+                        validateWaitStep(stepProps);
+                    }
+
+                    Set<String> mandatoryKeySet = isWaitStep ? WAIT_MANDATORY_KEYS : MANDATORY_KEY_SET;
+                    Set<String> optionalKeySet = isWaitStep ? WAIT_OPTIONAL_KEY_SET : OPTIONAL_KEY_SET;
+
+                    validateNotEmptyValues(stepProps, mandatoryKeySet, optionalKeySet);
+                    validateOnlySupportedKeys(stepProps, mandatoryKeySet, optionalKeySet);
 
                     SeqStep seqStep = transformStep(stepProps);
 
                     validateUniqueIds(ids, seqStep);
-                    validateAssignmentAction(seqStep);
+
+                    if (!isWaitStep) {
+                        validateAssignmentAction(seqStep);
+                    }
 
                     transformedData.add(seqStep);
+
                 } catch (RuntimeException rex) {
                     errors.add(rex);
                 }
@@ -82,6 +114,21 @@ public class SeqStepsTransformer extends AbstractTransformer
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
+    }
+
+    private void validateWaitStep(Map<String, String> stepProps) {
+        String args = stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY);
+        if (StringUtils.isEmpty(args)) {
+            throw new RuntimeException(WAIT_PARAM_REQUIRED);
+        }
+
+        if (!WAIT_ARGS.matcher(args).matches()) {
+            throw new RuntimeException(String.format(WAIT_INVALID_ARG, args));
+        }
+    }
+
+    private boolean isWaitStep(Map<String, String> stepProps) {
+        return StringUtils.equals(WAIT, stepProps.get(SEQ_STEP_ACTION_KEY));
     }
 
     private void validateAssignmentAction(SeqStep seqStep) {
@@ -100,25 +147,26 @@ public class SeqStepsTransformer extends AbstractTransformer
 
     private SeqStep transformStep(Map<String, String> stepProps) {
         SeqStep seqStep = new SeqStep();
-        seqStep.setId(stepProps.get(SlangTextualKeys.SEQ_STEP_ID_KEY));
-        seqStep.setObjectPath(stepProps.get(SlangTextualKeys.SEQ_STEP_PATH_KEY));
-        seqStep.setAction(stepProps.get(SlangTextualKeys.SEQ_STEP_ACTION_KEY));
-        seqStep.setArgs(stepProps.get(SlangTextualKeys.SEQ_STEP_ARGS_KEY));
-        seqStep.setDefaultArgs(stepProps.get(SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY));
-        seqStep.setName(stepProps.get(SlangTextualKeys.SEQ_STEP_NAME_KEY));
-        seqStep.setSnapshot(stepProps.get(SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY));
-        seqStep.setHighlightId(stepProps.get(SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY));
+        seqStep.setId(stepProps.get(SEQ_STEP_ID_KEY));
+        seqStep.setObjectPath(stepProps.get(SEQ_STEP_PATH_KEY));
+        seqStep.setAction(stepProps.get(SEQ_STEP_ACTION_KEY));
+        seqStep.setArgs(stepProps.get(SEQ_STEP_ARGS_KEY));
+        seqStep.setDefaultArgs(stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY));
+        seqStep.setName(stepProps.get(SEQ_STEP_NAME_KEY));
+        seqStep.setSnapshot(stepProps.get(SEQ_STEP_SNAPSHOT_KEY));
+        seqStep.setHighlightId(stepProps.get(SEQ_STEP_HIGHLIGHT_ID_KEY));
         return seqStep;
     }
 
-    private void validateNotEmptyValues(Map<String, String> tMap) {
+    private void validateNotEmptyValues(Map<String, String> tMap, Set<String> mandatoryKeySet,
+                                        Set<String> optionalKeySet) {
         Validate.notNull(tMap);
-        Validate.notNull(MANDATORY_KEY_SET);
-        Validate.notNull(OPTIONAL_KEY_SET);
+        Validate.notNull(mandatoryKeySet);
+        Validate.notNull(optionalKeySet);
 
         Set<String> missingKeys = new HashSet<>();
         Set<String> emptyValuesKeys = new HashSet<>();
-        for (String reqKey : MANDATORY_KEY_SET) {
+        for (String reqKey : mandatoryKeySet) {
             String reqValue = tMap.get(reqKey);
             if (reqValue == null) {
                 missingKeys.add(reqKey);
@@ -135,10 +183,11 @@ public class SeqStepsTransformer extends AbstractTransformer
         }
     }
 
-    private void validateOnlySupportedKeys(Map<String, String> tMap) {
+    private void validateOnlySupportedKeys(Map<String, String> tMap, Set<String> mandatoryKeys,
+                                           Set<String> optionalKeys) {
         Set<String> invalidKeys = new HashSet<>(tMap.keySet());
-        invalidKeys.removeAll(MANDATORY_KEY_SET);
-        invalidKeys.removeAll(OPTIONAL_KEY_SET);
+        invalidKeys.removeAll(mandatoryKeys);
+        invalidKeys.removeAll(optionalKeys);
         if (isNotEmpty(invalidKeys)) {
             throw new RuntimeException(SEQ_OPERATION_ILLEGAL_TAGS + invalidKeys.toString() +
                     INVALID_KEYS_ERROR_MESSAGE_SUFFIX);
