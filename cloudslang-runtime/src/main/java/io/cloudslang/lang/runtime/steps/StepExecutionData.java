@@ -18,7 +18,9 @@ import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.MapUtils;
+import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -61,7 +63,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
     @SuppressWarnings("unused")
     public void beginStep(
-                          @Param("worker_group") WorkerGroupStatement workerGroup,
+                          @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
                           @Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -112,11 +114,9 @@ public class StepExecutionData extends AbstractExecutionData {
                     .bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 
-            Value workerGroupValue = scriptEvaluator.evalExpr("get_sp('wgsysprop1')",
-                    flowContext.getImmutableViewOfVariables(),
-                    runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
-            executionRuntimeServices.setWorkerGroupName(workerGroupValue.toString());
-            executionRuntimeServices.setShouldCheckGroup(true);
+            if (workerGroup != null) {
+                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            }
 
             sendEndBindingArgumentsEvent(
                     stepInputs,
@@ -158,7 +158,8 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallelLoop) {
 
         try {
-            executionRuntimeServices.setWorkerGroupName(null);
+            executionRuntimeServices.setWorkerGroupName(RuntimeConstants.DEFAULT_GROUP);
+            executionRuntimeServices.setShouldCheckGroup(true);
 
             Context flowContext = runEnv.getStack().popContext();
 
@@ -254,5 +255,20 @@ public class StepExecutionData extends AbstractExecutionData {
         );
     }
 
+    private void handleWorkerGroup(WorkerGroupStatement workerGroup, Context flowContext, RunEnvironment runEnv,
+                                   ExecutionRuntimeServices execRuntimeServices) {
+        Value workerGroupValue;
+        String expression = workerGroup.getExpression();
+        if (workerGroup.getFunctionDependencies() == null && workerGroup.getSystemPropertyDependencies() == null) {
+            workerGroupValue = ValueFactory.create(expression);
+        }
+        else {
+            workerGroupValue = scriptEvaluator.evalExpr(expression.substring(2, expression.length() - 1),
+                    flowContext.getImmutableViewOfVariables(), runEnv.getSystemProperties(),
+                    workerGroup.getFunctionDependencies());
+        }
+        execRuntimeServices.setWorkerGroupName(workerGroupValue.toString());
+        execRuntimeServices.setShouldCheckGroup(true);
+    }
 
 }

@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,8 @@ import java.util.regex.Pattern;
 public class WorkerGroupTransformer extends AbstractInOutForTransformer
         implements Transformer<String, WorkerGroupStatement> {
 
-    private static final String VARIABLE_REGEX = "^\\$\\{get\\_sp\\(\\'(\\w+)\\'\\)\\}$";
+    private static final String SYSTEM_PROPERTY_REGEX = "^\\$\\{get_sp\\('(\\w+)'\\)}$";
+    private static final String VARIABLE_REGEX = "^\\$\\{[\\w\\d]+}$";
 
     @Override
     public TransformModellingResult<WorkerGroupStatement> transform(String rawData) {
@@ -34,26 +36,35 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
 
     @Override
     public TransformModellingResult<WorkerGroupStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
+        if (StringUtils.isBlank(rawData)) {
+            return new BasicTransformModellingResult<>(null, Collections.emptyList());
+        }
+
         Accumulator dependencyAccumulator = extractFunctionData(rawData);
         List<RuntimeException> errors = new ArrayList<>();
 
         WorkerGroupStatement workerGroupStatement = null;
-        String expression;
+        String expression = null;
 
+        Pattern regexSysProperty = Pattern.compile(SYSTEM_PROPERTY_REGEX);
         Pattern regexVariable = Pattern.compile(VARIABLE_REGEX);
+        Matcher matcherSysProperty = regexSysProperty.matcher(rawData);
         Matcher matcherVariable = regexVariable.matcher(rawData);
 
         try {
-            if (matcherVariable.find()) {
+            if (matcherSysProperty.find()) {
+                expression = matcherSysProperty.group();
+            }
+            else if (matcherVariable.find()) {
                 expression = matcherVariable.group();
+            }
 
-                workerGroupStatement = new WorkerGroupStatement(expression,
+            if (expression != null) {
+                workerGroupStatement = new WorkerGroupStatement(rawData,
                         dependencyAccumulator.getFunctionDependencies(),
                         dependencyAccumulator.getSystemPropertyDependencies());
             } else {
-                workerGroupStatement = workerGroupStatement = new WorkerGroupStatement(rawData,
-                        dependencyAccumulator.getFunctionDependencies(),
-                        dependencyAccumulator.getSystemPropertyDependencies());
+                workerGroupStatement = new WorkerGroupStatement(rawData, null, null);
             }
         } catch (RuntimeException e) {
             errors.add(e);

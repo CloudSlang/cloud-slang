@@ -21,4 +21,6 @@ public interface RuntimeConstants {
     String SPLIT_ITEM_KEY = "splitItem";
     String BRANCH_RETURN_VALUES_KEY = "branchReturnValues";
 
+    String DEFAULT_GROUP = "RAS_Operator_Path";
+
 }
