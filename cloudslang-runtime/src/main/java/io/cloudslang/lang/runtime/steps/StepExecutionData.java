@@ -63,8 +63,8 @@ public class StepExecutionData extends AbstractExecutionData {
 
     @SuppressWarnings("unused")
     public void beginStep(
-                          @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
                           @Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
+                          @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
