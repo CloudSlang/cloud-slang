@@ -86,6 +86,10 @@ public class StepExecutionData extends AbstractExecutionData {
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
+            if (workerGroup != null) {
+                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            }
+
             fireEvent(
                     executionRuntimeServices,
                     runEnv,
@@ -113,10 +117,6 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> boundInputs = argumentsBinding
                     .bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
-
-            if (workerGroup != null) {
-                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
-            }
 
             sendEndBindingArgumentsEvent(
                     stepInputs,
@@ -158,9 +158,6 @@ public class StepExecutionData extends AbstractExecutionData {
                         @Param(ScoreLangConstants.PARALLEL_LOOP_KEY) boolean parallelLoop) {
 
         try {
-            executionRuntimeServices.setWorkerGroupName(RuntimeConstants.DEFAULT_GROUP);
-            executionRuntimeServices.setShouldCheckGroup(true);
-
             Context flowContext = runEnv.getStack().popContext();
 
             removeStepSerializableSessionObjects(runEnv);
@@ -226,6 +223,9 @@ public class StepExecutionData extends AbstractExecutionData {
                     returnValues,
                     outputsBindingContext
             );
+
+            executionRuntimeServices.setWorkerGroupName(RuntimeConstants.DEFAULT_GROUP);
+            executionRuntimeServices.setShouldCheckGroup(true);
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
