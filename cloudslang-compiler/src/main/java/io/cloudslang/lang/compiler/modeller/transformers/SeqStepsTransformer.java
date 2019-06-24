@@ -117,7 +117,7 @@ public class SeqStepsTransformer extends AbstractTransformer
     }
 
     private void validateWaitStep(Map<String, String> stepProps) {
-        String args = stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY);
+        String args = stepProps.getOrDefault(SEQ_STEP_ARGS_KEY, stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY));
         if (StringUtils.isEmpty(args)) {
             throw new RuntimeException(WAIT_PARAM_REQUIRED);
         }
