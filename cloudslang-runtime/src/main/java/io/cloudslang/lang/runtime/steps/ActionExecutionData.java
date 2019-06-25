@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SEQUENTIAL;
 
 /**
  * User: stoneo
@@ -109,11 +110,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
                     break;
                 case SEQUENTIAL:
-                    returnValue = runSequentialAction(
-                            callArguments,
-                            gav,
-                            steps,
-                            execution);
+                    returnValue = runSequentialAction(callArguments, gav, steps, execution, runEnv, nextStepId);
                     break;
                 default:
                     break;
@@ -147,14 +144,24 @@ public class ActionExecutionData extends AbstractExecutionData {
             callArgumentsDeepCopy
         );
 
-        runEnv.putNextStepPosition(nextStepId);
+        if (!SEQUENTIAL.equals(actionType.getValue())) {
+            /*
+            Due to the way Sequential Actions work, we have to pause the execution BEFORE the actual run.
+            Thus, we have to populate the run environment with the required data before pausing and persisting.
+            We let the sequential action handler do it, since here it would be too late.
+             */
+            runEnv.putNextStepPosition(nextStepId);
+        }
     }
 
     private Map<String, Value> runSequentialAction(
             Map<String, Value> currentContext,
             String gav,
             List<SeqStep> seqSteps,
-            Serializable execution) {
+            Serializable execution,
+            RunEnvironment runEnv,
+            Long nextStepId) {
+        runEnv.putNextStepPosition(nextStepId);
         @SuppressWarnings("unchecked")
         Map<String, Serializable> returnMap =
                 (Map<String, Serializable>)
