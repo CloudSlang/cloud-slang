@@ -60,7 +60,7 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
             }
 
             if (expression != null) {
-                workerGroupStatement = new WorkerGroupStatement(rawData,
+                workerGroupStatement = new WorkerGroupStatement(rawData.substring(2, rawData.length() - 1),
                         dependencyAccumulator.getFunctionDependencies(),
                         dependencyAccumulator.getSystemPropertyDependencies());
             } else {

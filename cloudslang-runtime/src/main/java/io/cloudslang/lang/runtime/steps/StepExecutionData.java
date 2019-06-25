@@ -263,9 +263,8 @@ public class StepExecutionData extends AbstractExecutionData {
             workerGroupValue = ValueFactory.create(expression);
         }
         else {
-            workerGroupValue = scriptEvaluator.evalExpr(expression.substring(2, expression.length() - 1),
-                    flowContext.getImmutableViewOfVariables(), runEnv.getSystemProperties(),
-                    workerGroup.getFunctionDependencies());
+            workerGroupValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
+                    runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
         }
         execRuntimeServices.setWorkerGroupName(workerGroupValue.toString());
         execRuntimeServices.setShouldCheckGroup(true);
