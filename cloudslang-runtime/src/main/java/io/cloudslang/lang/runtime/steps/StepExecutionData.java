@@ -225,7 +225,7 @@ public class StepExecutionData extends AbstractExecutionData {
             );
 
             executionRuntimeServices.setWorkerGroupName(RuntimeConstants.DEFAULT_GROUP);
-            executionRuntimeServices.setShouldCheckGroup(true);
+            executionRuntimeServices.setShouldCheckGroup();
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
@@ -267,7 +267,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
         }
         execRuntimeServices.setWorkerGroupName(workerGroupValue.toString());
-        execRuntimeServices.setShouldCheckGroup(true);
+        execRuntimeServices.setShouldCheckGroup();
     }
 
 }
