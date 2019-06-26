@@ -17,7 +17,6 @@ import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,6 +27,14 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
 
     private static final String SYSTEM_PROPERTY_REGEX = "^\\$\\{get_sp\\('(\\w+)'\\)}$";
     private static final String VARIABLE_REGEX = "^\\$\\{[\\w\\d]+}$";
+
+    private final Pattern regexSysProperty;
+    private final Pattern regexVariable;
+
+    public WorkerGroupTransformer() {
+        this.regexSysProperty = Pattern.compile(SYSTEM_PROPERTY_REGEX);
+        this.regexVariable = Pattern.compile(VARIABLE_REGEX);
+    }
 
     @Override
     public TransformModellingResult<WorkerGroupStatement> transform(String rawData) {
@@ -41,36 +48,32 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
         }
 
         Accumulator dependencyAccumulator = extractFunctionData(rawData);
-        List<RuntimeException> errors = new ArrayList<>();
+        WorkerGroupStatement workerGroupStatement;
 
-        WorkerGroupStatement workerGroupStatement = null;
-        String expression = null;
-
-        Pattern regexSysProperty = Pattern.compile(SYSTEM_PROPERTY_REGEX);
-        Pattern regexVariable = Pattern.compile(VARIABLE_REGEX);
         Matcher matcherSysProperty = regexSysProperty.matcher(rawData);
         Matcher matcherVariable = regexVariable.matcher(rawData);
 
-        try {
-            if (matcherSysProperty.find()) {
-                expression = matcherSysProperty.group();
-            }
-            else if (matcherVariable.find()) {
-                expression = matcherVariable.group();
-            }
+        String expression = findExpression(matcherSysProperty, matcherVariable);
 
-            if (expression != null) {
-                workerGroupStatement = new WorkerGroupStatement(rawData.substring(2, rawData.length() - 1),
-                        dependencyAccumulator.getFunctionDependencies(),
-                        dependencyAccumulator.getSystemPropertyDependencies());
-            } else {
-                workerGroupStatement = new WorkerGroupStatement(rawData, null, null);
-            }
-        } catch (RuntimeException e) {
-            errors.add(e);
+        if (expression != null) {
+            workerGroupStatement = new WorkerGroupStatement(rawData.substring(2, rawData.length() - 1),
+                    dependencyAccumulator.getFunctionDependencies(),
+                    dependencyAccumulator.getSystemPropertyDependencies());
+        } else {
+            workerGroupStatement = new WorkerGroupStatement(rawData, null, null);
         }
 
-        return new BasicTransformModellingResult<>(workerGroupStatement, errors);
+        return new BasicTransformModellingResult<>(workerGroupStatement, Collections.emptyList());
+    }
+
+    private String findExpression(Matcher matcherSysProperty, Matcher matcherVariable) {
+        String expression = null;
+        if (matcherSysProperty.find()) {
+            expression = matcherSysProperty.group();
+        } else if (matcherVariable.find()) {
+            expression = matcherVariable.group();
+        }
+        return expression;
     }
 
     @Override

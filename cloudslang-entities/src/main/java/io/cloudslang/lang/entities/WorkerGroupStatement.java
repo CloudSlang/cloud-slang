@@ -21,10 +21,11 @@ import java.util.Set;
 public class WorkerGroupStatement implements Serializable {
 
     private final String expression;
-    private Set<ScriptFunction> functionDependencies;
-    private Set<String> systemPropertyDependencies;
+    private final Set<ScriptFunction> functionDependencies;
+    private final Set<String> systemPropertyDependencies;
 
-    public WorkerGroupStatement(String expression, Set<ScriptFunction> functionDependencies,
+    public WorkerGroupStatement(String expression,
+                                Set<ScriptFunction> functionDependencies,
                                 Set<String> systemPropertyDependencies) {
 
         Validate.notBlank(expression, "worker group expression cannot be empty");
@@ -37,6 +38,7 @@ public class WorkerGroupStatement implements Serializable {
     protected WorkerGroupStatement() {
         expression = null;
         functionDependencies = null;
+        systemPropertyDependencies = null;
     }
 
     public String getExpression() {

@@ -20,7 +20,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.MapUtils;
-import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -62,8 +61,7 @@ public class StepExecutionData extends AbstractExecutionData {
     private ScriptEvaluator scriptEvaluator;
 
     @SuppressWarnings("unused")
-    public void beginStep(
-                          @Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
+    public void beginStep(@Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
                           @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -224,7 +222,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     outputsBindingContext
             );
 
-            executionRuntimeServices.setWorkerGroupName(RuntimeConstants.DEFAULT_GROUP);
+            executionRuntimeServices.setWorkerGroupName(null);
             executionRuntimeServices.setShouldCheckGroup();
 
             runEnv.getStack().pushContext(flowContext);
@@ -255,10 +253,20 @@ public class StepExecutionData extends AbstractExecutionData {
         );
     }
 
-    private void handleWorkerGroup(WorkerGroupStatement workerGroup, Context flowContext, RunEnvironment runEnv,
+    private void handleWorkerGroup(WorkerGroupStatement workerGroup,
+                                   Context flowContext,
+                                   RunEnvironment runEnv,
                                    ExecutionRuntimeServices execRuntimeServices) {
+        String workerGroupValue = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
+        execRuntimeServices.setWorkerGroupName(workerGroupValue);
+        execRuntimeServices.setShouldCheckGroup();
+    }
+
+    private String computeWorkerGroup(WorkerGroupStatement workerGroup,
+                                      Context flowContext,
+                                      RunEnvironment runEnv,
+                                      String expression) {
         Value workerGroupValue;
-        String expression = workerGroup.getExpression();
         if (workerGroup.getFunctionDependencies() == null && workerGroup.getSystemPropertyDependencies() == null) {
             workerGroupValue = ValueFactory.create(expression);
         }
@@ -266,8 +274,8 @@ public class StepExecutionData extends AbstractExecutionData {
             workerGroupValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
                     runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
         }
-        execRuntimeServices.setWorkerGroupName(workerGroupValue.toString());
-        execRuntimeServices.setShouldCheckGroup();
+        return workerGroupValue.toString();
     }
+
 
 }

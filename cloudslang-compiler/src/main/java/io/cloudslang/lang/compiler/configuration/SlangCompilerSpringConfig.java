@@ -376,8 +376,7 @@ public class SlangCompilerSpringConfig {
 
     @Bean
     public WorkerGroupTransformer workerGroupTransformer() {
-        WorkerGroupTransformer workerGroupTransformer = new WorkerGroupTransformer();
-        return workerGroupTransformer;
+        return new WorkerGroupTransformer();
     }
 
     @Bean
