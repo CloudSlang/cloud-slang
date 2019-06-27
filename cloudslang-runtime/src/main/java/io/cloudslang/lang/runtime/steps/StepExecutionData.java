@@ -237,19 +237,19 @@ public class StepExecutionData extends AbstractExecutionData {
     private void removeStepSerializableSessionObjects(final RunEnvironment runEnv) {
         final int flowDepth = runEnv.getParentFlowStack().size();
         runEnv.getSerializableDataMap().entrySet().removeIf(
-            (Map.Entry<String, ?> entry) -> {
-                try {
-                    final String key = entry.getKey();
-                    final String valueClassName = entry.getValue()
-                                                       .getClass()
-                                                       .getName();
-                    final int entryDepth = Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
-                    return (entryDepth > flowDepth) &&
-                            valueClassName.equals(StepSerializableSessionObject.class.getName());
-                } catch (Exception ignore) {
-                    return false;
+                (Map.Entry<String, ?> entry) -> {
+                    try {
+                        final String key = entry.getKey();
+                        final String valueClassName = entry.getValue()
+                                .getClass()
+                                .getName();
+                        final int entryDepth = Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
+                        return (entryDepth > flowDepth) &&
+                                valueClassName.equals(StepSerializableSessionObject.class.getName());
+                    } catch (Exception ignore) {
+                        return false;
+                    }
                 }
-            }
         );
     }
 
@@ -269,8 +269,7 @@ public class StepExecutionData extends AbstractExecutionData {
         Value workerGroupValue;
         if (workerGroup.getFunctionDependencies() == null && workerGroup.getSystemPropertyDependencies() == null) {
             workerGroupValue = ValueFactory.create(expression);
-        }
-        else {
+        } else {
             workerGroupValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
                     runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
         }

@@ -36,10 +36,10 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
         }
 
         WorkerGroupStatement workerGroupStatement;
-        Accumulator dependencyAccumulator = extractFunctionData(rawData);
-
+        Accumulator dependencyAccumulator;
         String expression;
         try {
+            dependencyAccumulator = extractFunctionData(rawData);
             expression = ExpressionUtils.extractExpression(rawData);
         } catch (IllegalStateException | IndexOutOfBoundsException e) {
             return new BasicTransformModellingResult<>(null, Collections.singletonList(e));
