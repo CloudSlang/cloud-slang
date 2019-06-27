@@ -15,26 +15,14 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class WorkerGroupTransformer extends AbstractInOutForTransformer
         implements Transformer<String, WorkerGroupStatement> {
-
-    private static final String SYSTEM_PROPERTY_REGEX = "^\\$\\{get_sp\\('(\\w+)'\\)}$";
-    private static final String VARIABLE_REGEX = "^\\$\\{[\\w\\d]+}$";
-
-    private final Pattern regexSysProperty;
-    private final Pattern regexVariable;
-
-    public WorkerGroupTransformer() {
-        this.regexSysProperty = Pattern.compile(SYSTEM_PROPERTY_REGEX);
-        this.regexVariable = Pattern.compile(VARIABLE_REGEX);
-    }
 
     @Override
     public TransformModellingResult<WorkerGroupStatement> transform(String rawData) {
@@ -47,16 +35,18 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
             return new BasicTransformModellingResult<>(null, Collections.emptyList());
         }
 
-        Accumulator dependencyAccumulator = extractFunctionData(rawData);
         WorkerGroupStatement workerGroupStatement;
+        Accumulator dependencyAccumulator = extractFunctionData(rawData);
 
-        Matcher matcherSysProperty = regexSysProperty.matcher(rawData);
-        Matcher matcherVariable = regexVariable.matcher(rawData);
-
-        String expression = findExpression(matcherSysProperty, matcherVariable);
+        String expression;
+        try {
+            expression = ExpressionUtils.extractExpression(rawData);
+        } catch (IllegalStateException | IndexOutOfBoundsException e) {
+            return new BasicTransformModellingResult<>(null, Collections.singletonList(e));
+        }
 
         if (expression != null) {
-            workerGroupStatement = new WorkerGroupStatement(rawData.substring(2, rawData.length() - 1),
+            workerGroupStatement = new WorkerGroupStatement(expression,
                     dependencyAccumulator.getFunctionDependencies(),
                     dependencyAccumulator.getSystemPropertyDependencies());
         } else {
@@ -64,16 +54,6 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
         }
 
         return new BasicTransformModellingResult<>(workerGroupStatement, Collections.emptyList());
-    }
-
-    private String findExpression(Matcher matcherSysProperty, Matcher matcherVariable) {
-        String expression = null;
-        if (matcherSysProperty.find()) {
-            expression = matcherSysProperty.group();
-        } else if (matcherVariable.find()) {
-            expression = matcherVariable.group();
-        }
-        return expression;
     }
 
     @Override
