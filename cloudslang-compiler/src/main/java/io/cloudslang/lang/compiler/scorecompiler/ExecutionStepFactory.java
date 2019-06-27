@@ -53,7 +53,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
 
         if (workerGroup != null) {
-            actionData.put("workerGroup", workerGroup);
+            actionData.put(ScoreLangConstants.WORKER_GROUP, preStepData.get(SlangTextualKeys.WORKER_GROUP));
         }
         return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "beginStep", actionData);
     }

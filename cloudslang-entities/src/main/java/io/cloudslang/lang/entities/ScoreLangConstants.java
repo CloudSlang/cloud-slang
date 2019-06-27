@@ -60,6 +60,7 @@ public interface ScoreLangConstants {
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
     String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
+    String WORKER_GROUP = "workerGroup";
 
     // parallel loop
     String PARALLEL_LOOP_KEY = "parallelLoop";

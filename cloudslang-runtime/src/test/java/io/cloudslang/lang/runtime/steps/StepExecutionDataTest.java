@@ -42,7 +42,6 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import io.cloudslang.score.lang.SystemContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -117,7 +116,7 @@ public class StepExecutionDataTest {
     public void testBeginStepEmptyInputs() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         stepExecutionData
-            .beginStep(new ArrayList<Argument>(), null, runEnv, createRuntimeServices(),
+            .beginStep(new ArrayList<Argument>(), null, null, runEnv, createRuntimeServices(),
                     "step1", 1L, 2L, "2");
         Map<String, Value> callArgs = runEnv.removeCallArguments();
         Assert.assertTrue(callArgs.isEmpty());
@@ -137,7 +136,7 @@ public class StepExecutionDataTest {
         beginStepsIds.put(refExecutionPlanId, subflowBeginStepId);
         ExecutionRuntimeServices runtimeServices = createRuntimeServicesWithSubflows(runningPlansIds, beginStepsIds);
         stepExecutionData
-            .beginStep(new ArrayList<Argument>(), null, runEnv, runtimeServices,
+            .beginStep(new ArrayList<Argument>(), null, null, runEnv, runtimeServices,
                 "step1", runningExecutionPlanId, nextStepId, refExecutionPlanId);
 
         ParentFlowData parentFlowData = runEnv.getParentFlowStack().popParentFlowData();
@@ -162,7 +161,7 @@ public class StepExecutionDataTest {
         )).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        stepExecutionData.beginStep(arguments, null, runEnv, runtimeServices, "step1",
+        stepExecutionData.beginStep(arguments, null, null, runEnv, runtimeServices, "step1",
                 1L, 2L, "2");
         Map<String, Value> callArgs = runEnv.removeCallArguments();
         Assert.assertFalse(callArgs.isEmpty());
@@ -366,7 +365,7 @@ public class StepExecutionDataTest {
         when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
             .thenReturn(new ForLoopCondition(Arrays.asList(ValueFactory.create("1"), ValueFactory.create("2"))));
         runEnv.getStack().pushContext(context);
-        stepExecutionData.beginStep(new ArrayList<Argument>(), statement,
+        stepExecutionData.beginStep(new ArrayList<Argument>(), null, statement,
             runEnv, createRuntimeServices(), nodeName, 1L, 2L, "2");
         verify(loopsBinding).getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName);
     }
@@ -385,7 +384,7 @@ public class StepExecutionDataTest {
         runEnv.getStack().pushContext(context);
         Long nextStepId = 2L;
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
-        stepExecutionData.beginStep(new ArrayList<Argument>(), statement, runEnv,
+        stepExecutionData.beginStep(new ArrayList<Argument>(), null, statement, runEnv,
             runtimeServices, nodeName, 1L, nextStepId, "2");
         assertEquals(nextStepId, runEnv.removeNextStepPosition());
         assertEquals(context, runEnv.getStack().popContext());
@@ -408,7 +407,7 @@ public class StepExecutionDataTest {
         ExecutionRuntimeServices runtimeServices = mock(ExecutionRuntimeServices.class);
         Long subflowFirstStepId = 11L;
         when(runtimeServices.getSubFlowBeginStep(anyString())).thenReturn(subflowFirstStepId);
-        stepExecutionData.beginStep(new ArrayList<Argument>(), statement, runEnv,
+        stepExecutionData.beginStep(new ArrayList<Argument>(), null, statement, runEnv,
             runtimeServices, nodeName, 1L, nextStepId, "2");
         assertEquals(subflowFirstStepId, runEnv.removeNextStepPosition());
         assertEquals(context, runEnv.getStack().popContext());
@@ -427,7 +426,7 @@ public class StepExecutionDataTest {
         when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
             .thenReturn(mockLoopCondition);
         runEnv.getStack().pushContext(context);
-        stepExecutionData.beginStep(new ArrayList<Argument>(), statement, runEnv,
+        stepExecutionData.beginStep(new ArrayList<Argument>(), null, statement, runEnv,
             createRuntimeServices(), nodeName, 1L, 2L, "2");
         verify(loopsBinding).incrementListForLoop("x", context, mockLoopCondition);
     }

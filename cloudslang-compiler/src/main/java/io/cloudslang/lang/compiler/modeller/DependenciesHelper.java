@@ -13,7 +13,6 @@ package io.cloudslang.lang.compiler.modeller;
  * Created by orius123 on 05/11/14.
  */
 
-import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -21,6 +20,7 @@ import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -159,7 +159,7 @@ public class DependenciesHelper {
         List<Transformer> relevantTransformers = new ArrayList<>();
         relevantTransformers.add(publishTransformer);
 
-        result.addAll(getSystemPropertiesFromLoopStatement(step.getPreStepActionData()));
+        result.addAll(getSystemPropertiesFromLoopAndWorkerGroupStatement(step.getPreStepActionData()));
         result.addAll(getSystemPropertiesFromInOutParam(step.getArguments()));
         result.addAll(
                 getSystemPropertiesFromPostStepActionData(
@@ -172,11 +172,18 @@ public class DependenciesHelper {
         return result;
     }
 
-    private Set<String> getSystemPropertiesFromLoopStatement(Map<String, Serializable> preStepActionData) {
+    private Set<String> getSystemPropertiesFromLoopAndWorkerGroupStatement(
+            Map<String, Serializable> preStepActionData) {
         Set<String> result = new HashSet<>();
         for (Map.Entry<String, Serializable> entry : preStepActionData.entrySet()) {
             if (entry.getValue() instanceof LoopStatement) {
                 result.addAll(((LoopStatement) entry.getValue()).getSystemPropertyDependencies());
+            }
+            if (entry.getValue() instanceof WorkerGroupStatement) {
+                Set<String> sysPropDep = ((WorkerGroupStatement) entry.getValue()).getSystemPropertyDependencies();
+                if (sysPropDep != null) {
+                    result.addAll(sysPropDep);
+                }
             }
         }
         return result;
