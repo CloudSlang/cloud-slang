@@ -110,6 +110,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 nodeName,
                 callArguments);
 
+            executionRuntimeServices.setShouldCheckGroup();
+
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();
