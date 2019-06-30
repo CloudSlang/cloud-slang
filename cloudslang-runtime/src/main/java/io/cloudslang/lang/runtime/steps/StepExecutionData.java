@@ -222,7 +222,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     outputsBindingContext
             );
 
-            executionRuntimeServices.setWorkerGroupName(null);
+            executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
             executionRuntimeServices.setShouldCheckGroup();
 
             runEnv.getStack().pushContext(flowContext);
@@ -259,7 +259,6 @@ public class StepExecutionData extends AbstractExecutionData {
                                    ExecutionRuntimeServices execRuntimeServices) {
         String workerGroupValue = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
         execRuntimeServices.setWorkerGroupName(workerGroupValue);
-        execRuntimeServices.setShouldCheckGroup();
     }
 
     private String computeWorkerGroup(WorkerGroupStatement workerGroup,
