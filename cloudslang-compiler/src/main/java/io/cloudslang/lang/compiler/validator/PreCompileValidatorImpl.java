@@ -115,11 +115,14 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
 
     @Override
     public List<Map<String, Map<String, String>>> validateSeqActionSteps(Object oSeqActionStepsRawData,
-                                                                         List<RuntimeException> errors) {
+                                                                         List<RuntimeException> errors,
+                                                                         boolean external) {
         if (oSeqActionStepsRawData == null) {
             oSeqActionStepsRawData = new ArrayList<>();
-            errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
-                    SEQ_STEPS_KEY + "' property."));
+            if (!external) {
+                errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
+                        SEQ_STEPS_KEY + "' property."));
+            }
         }
         List<Map<String, Map<String, String>>> stepsRawData;
         try {
@@ -130,9 +133,12 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             errors.add(new RuntimeException("Error compiling sequential operation: syntax is illegal.\n" +
                     "Below '" + SEQ_STEPS_KEY + "' property there should be a list of steps and not a map."));
         }
-        if (CollectionUtils.isEmpty(stepsRawData)) {
+        if (CollectionUtils.isEmpty(stepsRawData) && !external) {
             errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
                     SEQ_STEPS_KEY + "' data."));
+        } else if (!CollectionUtils.isEmpty(stepsRawData) && external) {
+            errors.add(new RuntimeException("Error compiling sequential operation: property '" +
+                    SEQ_STEPS_KEY + "' is not supported for external operations."));
         }
         for (Map<String, Map<String, String>> step : stepsRawData) {
             if (step.size() > 1) {

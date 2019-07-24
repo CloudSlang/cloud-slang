@@ -45,7 +45,9 @@ import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ACTION_GAV_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_EXTERNAL_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_STEPS_KEY;
+import static java.lang.Boolean.FALSE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -86,6 +88,7 @@ public class SeqActionTransformerTest extends TransformersTestParent {
         Map<String, Serializable> expectedSeqActionSimple = new LinkedHashMap<>();
         expectedSeqActionSimple.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_seq_op:1.0.0");
         expectedSeqActionSimple.put(SEQ_STEPS_KEY, newArrayList(new SeqStep()));
+        expectedSeqActionSimple.put(SEQ_EXTERNAL_KEY, FALSE);
 
         TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer
                 .transform(new HashMap<>(initialSeqActionSimple));
@@ -140,7 +143,7 @@ public class SeqActionTransformerTest extends TransformersTestParent {
         assertNull(transformedAction.getTransformedData());
         assertThat(transformedAction.getErrors(), is(not(empty())));
         assertEquals(transformedAction.getErrors().get(0).getMessage(),
-                "Following tags are missing: [gav, steps]");
+                "Following tags are missing: [gav]");
     }
 
     @Test
@@ -153,6 +156,7 @@ public class SeqActionTransformerTest extends TransformersTestParent {
         Map<String, Serializable> expectedSeqActionSimple = new LinkedHashMap<>();
         expectedSeqActionSimple.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_seq_op:1.0.0");
         expectedSeqActionSimple.put(SEQ_STEPS_KEY, newArrayList());
+        expectedSeqActionSimple.put(SEQ_EXTERNAL_KEY, FALSE);
 
         TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer
                 .transform(rawData);

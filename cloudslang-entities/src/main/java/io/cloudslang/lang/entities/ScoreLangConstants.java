@@ -41,6 +41,7 @@ public interface ScoreLangConstants {
 
     String SEQ_ACTION_GAV_KEY = "gav";
     String SEQ_STEPS_KEY = "steps";
+    String SEQ_EXTERNAL_KEY = "external";
 
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";

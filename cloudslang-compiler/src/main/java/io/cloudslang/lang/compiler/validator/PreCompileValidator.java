@@ -32,7 +32,8 @@ public interface PreCompileValidator {
                                                                    List<RuntimeException> errors);
 
     List<Map<String, Map<String, String>>> validateSeqActionSteps(Object oSeqActionStepsRawData,
-                                                                  List<RuntimeException> errors);
+                                                                  List<RuntimeException> errors,
+                                                                  boolean external);
 
     ExecutableModellingResult validateResult(ParsedSlang parsedSlang,
                                              String executableName,
