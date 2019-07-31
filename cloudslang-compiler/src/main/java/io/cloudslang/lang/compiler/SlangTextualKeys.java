@@ -72,6 +72,8 @@ public interface SlangTextualKeys {
     String SEQ_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
     String SEQ_STEP_SNAPSHOT_KEY = "snapshot";
     String SEQ_OUTPUT_ROBOT_KEY = "robot";
+    String SEQ_SKILLS_KEY = "skills";
+    String SEQ_SETTINGS_KEY = "settings";
 
     //inputs
     String VALUE_KEY = "value";
