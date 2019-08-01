@@ -51,6 +51,9 @@ public interface SlangTextualKeys {
     String SEQ_ACTION_KEY = "sequential_action";
     String SEQ_STEPS_KEY = "steps";
     String SEQ_ACTION_GAV_KEY = "gav";
+    String SEQ_SKILLS_KEY = "skills";
+    String SEQ_SETTINGS_KEY = "settings";
+    String SEQ_EXTERNAL_KEY = "external";
 
     //step
     String DO_KEY = "do";
@@ -71,8 +74,6 @@ public interface SlangTextualKeys {
     String SEQ_STEP_DEFAULT_ARGS_KEY = "default_args";
     String SEQ_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
     String SEQ_STEP_SNAPSHOT_KEY = "snapshot";
-    String SEQ_OUTPUT_ROBOT_KEY = "robot";
-    String SEQ_EXTERNAL_KEY = "external";
 
     //inputs
     String VALUE_KEY = "value";
@@ -80,6 +81,7 @@ public interface SlangTextualKeys {
     String REQUIRED_KEY = "required";
     String SENSITIVE_KEY = "sensitive";
     String PRIVATE_INPUT_KEY = "private";
+    String SEQ_OUTPUT_ROBOT_KEY = "robot";
 
     // system properties
     String SYSTEM_PROPERTY_KEY = "properties";
