@@ -53,7 +53,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             "'on_failure' should be last step in the workflow";
     public static final String FLOW_RESULTS_WITH_EXPRESSIONS_MESSAGE =
             "Explicit values are not allowed for flow results. Correct format is:";
-    public static final String FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE =
+    private static final String FLOW_RESULTS_NOT_ALLOWED_EXPRESSIONS_MESSAGE =
             "Valid results are:";
 
     @Override
@@ -119,10 +119,6 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
                                                                          boolean external) {
         if (oSeqActionStepsRawData == null) {
             oSeqActionStepsRawData = new ArrayList<>();
-            if (!external) {
-                errors.add(new RuntimeException("Error compiling sequential operation: missing '" +
-                        SEQ_STEPS_KEY + "' property."));
-            }
         }
         List<Map<String, Map<String, String>>> stepsRawData;
         try {
@@ -277,8 +273,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     public List<RuntimeException> validateNoDuplicateInOutParams(List<? extends InOutParam> inputs,
                                                                  InOutParam element) {
         List<RuntimeException> errors = new ArrayList<>();
-        Collection<InOutParam> inOutParams = new ArrayList<>();
-        inOutParams.addAll(inputs);
+        Collection<InOutParam> inOutParams = new ArrayList<>(inputs);
 
         String message = "Duplicate " + getMessagePart(element.getClass()) + " found: " + element.getName();
         validateNotDuplicateInOutParam(inOutParams, element, message, errors);
@@ -291,7 +286,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         validateStringValue(prefix, value);
     }
 
-    public static void validateStringValue(String errorMessagePrefix, Serializable value) {
+    private static void validateStringValue(String errorMessagePrefix, Serializable value) {
         if (value != null && !(value instanceof String)) {
             throw new RuntimeException(errorMessagePrefix + "' should have a String value, but got value '" + value +
                     "' of type " + value.getClass().getSimpleName() + ".");

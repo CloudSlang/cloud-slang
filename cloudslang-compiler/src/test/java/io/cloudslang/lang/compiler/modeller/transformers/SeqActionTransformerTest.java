@@ -48,6 +48,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ACTION_GAV_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_EXTERNAL_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_STEPS_KEY;
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -164,6 +165,69 @@ public class SeqActionTransformerTest extends TransformersTestParent {
         assertThat(transformedAction.getErrors(), is(not(empty())));
         assertEquals(transformedAction.getErrors().get(0).getMessage(),
                 "Error compiling sequential operation: missing 'steps' data.");
+    }
+
+    @Test
+    public void testTransformExternalWithSteps() {
+        doReturn(new BasicTransformModellingResult<>(newArrayList(), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
+
+        HashMap<String, Serializable> rawData = new HashMap<>(initialSeqActionSimple);
+        rawData.put(SEQ_EXTERNAL_KEY, TRUE);
+        rawData.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_external_seq_op:1.0.0");
+        Map<String, Serializable> expectedSeqActionSimple = new LinkedHashMap<>();
+        expectedSeqActionSimple.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_external_seq_op:1.0.0");
+        expectedSeqActionSimple.put(SEQ_STEPS_KEY, newArrayList());
+        expectedSeqActionSimple.put(SEQ_EXTERNAL_KEY, TRUE);
+
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer.transform(rawData);
+
+        assertEquals(expectedSeqActionSimple, transformedAction.getTransformedData());
+        assertThat(transformedAction.getErrors(), is(not(empty())));
+        assertEquals(transformedAction.getErrors().get(0).getMessage(),
+                "Error compiling sequential operation: property 'steps' is not supported for external operations.");
+    }
+
+    @Test
+    public void testTransformExternalWithNoSteps() {
+        doReturn(new BasicTransformModellingResult<>(newArrayList(), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
+
+        HashMap<String, Serializable> rawData = new HashMap<>(initialSeqActionSimple);
+        rawData.put(SEQ_EXTERNAL_KEY, TRUE);
+        rawData.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_external_seq_op:1.0.0");
+        rawData.remove(SEQ_STEPS_KEY);
+        Map<String, Serializable> expectedSeqActionSimple = new LinkedHashMap<>();
+        expectedSeqActionSimple.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_external_seq_op:1.0.0");
+        expectedSeqActionSimple.put(SEQ_STEPS_KEY, newArrayList());
+        expectedSeqActionSimple.put(SEQ_EXTERNAL_KEY, TRUE);
+
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer.transform(rawData);
+
+        assertEquals(expectedSeqActionSimple, transformedAction.getTransformedData());
+        assertThat(transformedAction.getErrors(), is(empty()));
+    }
+
+    @Test
+    public void testTransformWithInvalidExternalValue() {
+        doReturn(new BasicTransformModellingResult<>(newArrayList(), new ArrayList<>()))
+                .when(seqStepsTransformer).transform(any(), any());
+
+        HashMap<String, Serializable> rawData = new HashMap<>(initialSeqActionSimple);
+        rawData.put(SEQ_EXTERNAL_KEY, 567);
+        rawData.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_external_seq_op:1.0.0");
+        rawData.remove(SEQ_STEPS_KEY);
+        Map<String, Serializable> expectedSeqActionSimple = new LinkedHashMap<>();
+        expectedSeqActionSimple.put(SEQ_ACTION_GAV_KEY, "seq:seqf.simple_valid_external_seq_op:1.0.0");
+        expectedSeqActionSimple.put(SEQ_STEPS_KEY, newArrayList());
+        expectedSeqActionSimple.put(SEQ_EXTERNAL_KEY, FALSE);
+
+        TransformModellingResult<Map<String, Serializable>> transformedAction = seqActionTransformer.transform(rawData);
+
+        assertEquals(expectedSeqActionSimple, transformedAction.getTransformedData());
+        assertThat(transformedAction.getErrors(), is(not(empty())));
+        assertEquals(transformedAction.getErrors().get(0).getMessage(),
+                "Unsupported value found for 'external' key. Supported values are: [true, false].");
     }
 
     @Test
