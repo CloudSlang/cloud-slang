@@ -27,7 +27,6 @@ import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_ACTION_KEY;
 import static io.cloudslang.lang.compiler.modeller.transformers.Transformer.Scope.ACTION;
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 
 public class SeqActionTransformer extends AbstractTransformer
@@ -46,7 +45,8 @@ public class SeqActionTransformer extends AbstractTransformer
 
     private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_ACTION_GAV_KEY,
             SlangTextualKeys.SEQ_STEPS_KEY);
-    private static final Set<String> OPTIONAL_KEY_SET = emptySet();
+    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.SEQ_SKILLS_KEY,
+            SlangTextualKeys.SEQ_SETTINGS_KEY);
 
     @Override
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData) {
