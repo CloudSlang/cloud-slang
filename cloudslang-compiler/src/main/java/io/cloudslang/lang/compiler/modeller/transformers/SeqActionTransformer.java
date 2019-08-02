@@ -47,7 +47,7 @@ public class SeqActionTransformer extends AbstractTransformer
 
     private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_ACTION_GAV_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEPS_KEY,
-            SlangTextualKeys.SEQ_EXTERNAL_KEY, SlangTextualKeys.SEQ_SETTINGS_KEY);
+            SlangTextualKeys.SEQ_EXTERNAL_KEY, SlangTextualKeys.SEQ_SETTINGS_KEY, SlangTextualKeys.SEQ_SKILLS_KEY);
 
     @Override
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData) {
