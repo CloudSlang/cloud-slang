@@ -79,6 +79,7 @@ public class ActionExecutionData extends AbstractExecutionData {
                          @Param(ScoreLangConstants.PYTHON_ACTION_SCRIPT_KEY) String script,
                          @Param(ScoreLangConstants.PYTHON_ACTION_DEPENDENCIES_KEY) Collection<String> dependencies,
                          @Param(ScoreLangConstants.SEQ_STEPS_KEY) List<SeqStep> steps,
+                         @Param(ScoreLangConstants.SEQ_EXTERNAL_KEY) Boolean external,
                          @Param(ExecutionParametersConsts.EXECUTION) Serializable execution) {
 
         Map<String, Value> returnValue = new HashMap<>();
@@ -110,7 +111,8 @@ public class ActionExecutionData extends AbstractExecutionData {
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments);
                     break;
                 case SEQUENTIAL:
-                    returnValue = runSequentialAction(callArguments, gav, steps, execution, runEnv, nextStepId);
+                    returnValue = runSequentialAction(callArguments, gav, steps, Boolean.TRUE.equals(external),
+                            execution, runEnv, nextStepId);
                     break;
                 default:
                     break;
@@ -158,6 +160,7 @@ public class ActionExecutionData extends AbstractExecutionData {
             Map<String, Value> currentContext,
             String gav,
             List<SeqStep> seqSteps,
+            boolean external,
             Serializable execution,
             RunEnvironment runEnv,
             Long nextStepId) {
@@ -169,7 +172,8 @@ public class ActionExecutionData extends AbstractExecutionData {
                                 gav,
                                 new CloudSlangSequentialExecutionParametersProviderImpl(
                                         currentContext,
-                                        seqSteps), execution);
+                                        seqSteps,
+                                        external), execution);
         return (returnMap != null) ? handleSensitiveValues(returnMap, currentContext) :
                 new HashMap<>();
     }
