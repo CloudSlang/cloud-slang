@@ -45,6 +45,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,7 +65,9 @@ import java.util.Map;
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
 import static io.cloudslang.lang.entities.ActionType.SEQUENTIAL;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -1073,6 +1076,72 @@ public class ActionStepsTest {
                 eq(GAV_DEFAULT),
                 any(CloudSlangSequentialExecutionParametersProviderImpl.class),
                 eq(null));
+    }
+
+    @Test
+    public void doActionExternalTrue() {
+        RunEnvironment runEnv = new RunEnvironment();
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                true,
+                null
+        );
+
+        ArgumentCaptor<CloudSlangSequentialExecutionParametersProviderImpl> mockedProviderCaptor =
+                ArgumentCaptor.forClass(CloudSlangSequentialExecutionParametersProviderImpl.class);
+
+
+        verify(seqExecutionService).execute(
+                any(String.class),
+                mockedProviderCaptor.capture(),
+                any(Serializable.class)
+        );
+
+        CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();
+        assertTrue(mockedProvider.getExternal());
+    }
+
+    @Test
+    public void doActionExternalFalse() {
+        RunEnvironment runEnv = new RunEnvironment();
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
+        );
+
+        ArgumentCaptor<CloudSlangSequentialExecutionParametersProviderImpl> mockedProviderCaptor =
+                ArgumentCaptor.forClass(CloudSlangSequentialExecutionParametersProviderImpl.class);
+
+
+        verify(seqExecutionService).execute(
+                any(String.class),
+                mockedProviderCaptor.capture(),
+                any(Serializable.class)
+        );
+
+        CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();
+        assertFalse(mockedProvider.getExternal());
     }
 
     @Configuration
