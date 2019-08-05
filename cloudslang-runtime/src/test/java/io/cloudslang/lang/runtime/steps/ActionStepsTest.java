@@ -71,6 +71,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -106,6 +107,7 @@ public class ActionStepsTest {
     public void setUp() {
         nonSerializableExecutionData = new HashMap<>();
         seqSteps = new ArrayList<>();
+        reset(seqExecutionService);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
