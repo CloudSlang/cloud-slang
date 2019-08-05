@@ -29,12 +29,15 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
     public static final String SEQUENTIAL_PARAMETER = "Parameter(";
     private final Map<String, Value> currentContext;
     private final List<SeqStep> seqSteps;
+    private final boolean external;
 
     public CloudSlangSequentialExecutionParametersProviderImpl(
             Map<String, Value> currentContext,
-            List<SeqStep> seqSteps) {
+            List<SeqStep> seqSteps,
+            Boolean external) {
         this.currentContext = currentContext;
         this.seqSteps = seqSteps;
+        this.external = external;
     }
 
     @Override
@@ -53,5 +56,10 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
         }
         // TODO fix get execution from map
         return new Object[]{execParams};
+    }
+
+    @Override
+    public boolean getExternal() {
+        return external;
     }
 }
