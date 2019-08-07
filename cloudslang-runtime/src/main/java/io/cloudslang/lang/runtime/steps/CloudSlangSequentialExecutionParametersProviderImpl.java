@@ -43,14 +43,20 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
     @Override
     public Object[] getExecutionParameters() {
         Map<String, Value> execParams = new HashMap<>();
-        for (SeqStep step : seqSteps) {
-            String args = step.getArgs();
-            if (StringUtils.startsWith(args, SEQUENTIAL_PARAMETER)) {
-                String paramName = substring(args, SEQUENTIAL_PARAMETER.length(), args.length() - 1)
-                        .replaceAll("^\"|\"$", "");
-                Value value = currentContext.get(paramName);
-                if (value != null) {
-                    execParams.put(paramName, value);
+
+        if (external) {
+            // External seq operation doesn't require step args filtering since all the inputs are external
+            execParams = currentContext;
+        } else {
+            for (SeqStep step : seqSteps) {
+                String args = step.getArgs();
+                if (StringUtils.startsWith(args, SEQUENTIAL_PARAMETER)) {
+                    String paramName = substring(args, SEQUENTIAL_PARAMETER.length(), args.length() - 1)
+                            .replaceAll("^\"|\"$", "");
+                    Value value = currentContext.get(paramName);
+                    if (value != null) {
+                        execParams.put(paramName, value);
+                    }
                 }
             }
         }
