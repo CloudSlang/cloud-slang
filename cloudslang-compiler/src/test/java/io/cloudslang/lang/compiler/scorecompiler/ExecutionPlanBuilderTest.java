@@ -44,10 +44,12 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -123,11 +125,17 @@ public class ExecutionPlanBuilderTest {
         String execName = executable.getName();
         List<Input> inputs = executable.getInputs();
         when(stepFactory
-                .createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName),
-                        eq(ExecutableType.FLOW))).thenReturn(new ExecutionStep(1L));
+                .createStartStep(eq(2L), same(preExecActionData), same(inputs), same(execName),
+                        eq(ExecutableType.FLOW))).thenReturn(new ExecutionStep(2L));
         when(stepFactory
                 .createStartStep(eq(1L), same(preExecActionData), same(inputs), same(execName),
                         eq(ExecutableType.OPERATION))).thenReturn(new ExecutionStep(1L));
+    }
+
+    private void mockPreconditionStep(Executable executable) {
+        String execName = executable.getName();
+        when(stepFactory
+                .createPreconditionStep(eq(1L), same(execName))).thenReturn(new ExecutionStep(1L));
     }
 
     private void mockEndStep(Long stepId, Executable executable, ExecutableType executableType) {
@@ -232,12 +240,13 @@ public class ExecutionPlanBuilderTest {
                         flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
         mockStartStep(compiledFlow);
+        mockPreconditionStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
-        mockBeginStep(2L, step);
-        mockFinishStep(3L, step);
+        mockBeginStep(3L, step);
+        mockFinishStep(4L, step);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
-        assertEquals("different number of execution steps than expected", 4, executionPlan.getSteps().size());
+        assertEquals("different number of execution steps than expected", 5, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
         assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", Long.valueOf(1), executionPlan.getBeginStep());
@@ -261,33 +270,34 @@ public class ExecutionPlanBuilderTest {
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
                         flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
+        mockPreconditionStep(compiledFlow);
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
-        mockAddBranchesStep(2L, 5L, 3L, step, compiledFlow);
-        mockBeginStep(3L, step);
-        mockFinishParallelLoopStep(4L, step);
-        mockJoinBranchesStep(5L, step);
+        mockAddBranchesStep(3L, 6L, 4L, step, compiledFlow);
+        mockBeginStep(4L, step);
+        mockFinishParallelLoopStep(5L, step);
+        mockJoinBranchesStep(6L, step);
         final ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         verify(stepFactory).createAddBranchesStep(
-                eq(2L),
-                eq(5L),
                 eq(3L),
+                eq(6L),
+                eq(4L),
                 eq(step.getPreStepActionData()),
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
         verify(stepFactory)
-                .createBeginStepStep(eq(3L), anyListOf(Argument.class), eq(step.getPreStepActionData()),
+                .createBeginStepStep(eq(4L), anyListOf(Argument.class), eq(step.getPreStepActionData()),
                         eq(step.getRefId()), eq(step.getName()), eq(step.getWorkerGroup()));
         verify(stepFactory)
-                .createFinishStepStep(eq(4L), eq(step.getPostStepActionData()),
+                .createFinishStepStep(eq(5L), eq(step.getPostStepActionData()),
                         anyMapOf(String.class, ResultNavigation.class), eq(step.getName()),
                         eq(step.getWorkerGroup()), eq(step.isParallelLoop()));
         verify(stepFactory)
-                .createJoinBranchesStep(eq(5L), eq(step.getPostStepActionData()),
+                .createJoinBranchesStep(eq(6L), eq(step.getPostStepActionData()),
                         anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 
-        assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
+        assertEquals("different number of execution steps than expected", 7, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
         assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", Long.valueOf(1), executionPlan.getBeginStep());
@@ -323,16 +333,17 @@ public class ExecutionPlanBuilderTest {
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
                         flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
+        mockPreconditionStep(compiledFlow);
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
 
-        mockBeginStep(2L, firstStep);
-        mockFinishStep(3L, firstStep);
-        mockBeginStep(4L, secondStep);
-        mockFinishStep(5L, secondStep);
+        mockBeginStep(3L, firstStep);
+        mockFinishStep(4L, firstStep);
+        mockBeginStep(5L, secondStep);
+        mockFinishStep(6L, secondStep);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
-        assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
+        assertEquals("different number of execution steps than expected", 7, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
         assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", Long.valueOf(1), executionPlan.getBeginStep());
@@ -354,6 +365,7 @@ public class ExecutionPlanBuilderTest {
                 new Flow(preFlowActionData, postFlowActionData, workflow, flowNamespace,
                         flowName, null, inputs, outputs, results, null, systemPropertyDependencies);
 
+        mockPreconditionStep(compiledFlow);
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
 

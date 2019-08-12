@@ -56,9 +56,9 @@ public class CompileFlowReferenceIdTest {
 
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        Assert.assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
 
-        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(3L);
         @SuppressWarnings("unchecked")
         String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
@@ -77,9 +77,9 @@ public class CompileFlowReferenceIdTest {
 
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        Assert.assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
 
-        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(3L);
         @SuppressWarnings("unchecked")
         String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
@@ -98,9 +98,9 @@ public class CompileFlowReferenceIdTest {
 
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        Assert.assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
 
-        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(3L);
         @SuppressWarnings("unchecked")
         String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
@@ -119,9 +119,9 @@ public class CompileFlowReferenceIdTest {
 
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        Assert.assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
 
-        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(3L);
         @SuppressWarnings("unchecked")
         String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 
@@ -140,9 +140,9 @@ public class CompileFlowReferenceIdTest {
 
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        Assert.assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        Assert.assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
 
-        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(3L);
         @SuppressWarnings("unchecked")
         String referenceId = (String) beginStepExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
 

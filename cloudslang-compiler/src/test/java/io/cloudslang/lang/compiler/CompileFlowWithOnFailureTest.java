@@ -62,20 +62,20 @@ public class CompileFlowWithOnFailureTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 8, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 9, executionPlan.getSteps().size());
         assertEquals("execution plan name is different than expected", "flow_with_on_failure", executionPlan.getName());
         assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
 
-        long firstOnFailureStep = 6L;
+        long firstOnFailureStep = 7L;
         long endFlowStep = 0L;
 
-        ExecutionStep firstStep = executionPlan.getStep(3L);
+        ExecutionStep firstStep = executionPlan.getStep(4L);
         assertEquals("first step didn't navigate to on failure",
                 firstOnFailureStep, getFailureNavigationStepId(firstStep));
-        ExecutionStep secondStep = executionPlan.getStep(5L);
+        ExecutionStep secondStep = executionPlan.getStep(6L);
         assertEquals(endFlowStep, getFailureNavigationStepId(secondStep));
-        ExecutionStep firstOnFailStep = executionPlan.getStep(7L);
+        ExecutionStep firstOnFailStep = executionPlan.getStep(8L);
         assertEquals(endFlowStep, getFailureNavigationStepId(firstOnFailStep));
     }
 
