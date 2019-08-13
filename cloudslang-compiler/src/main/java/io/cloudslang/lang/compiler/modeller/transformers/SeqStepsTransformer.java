@@ -64,10 +64,8 @@ public class SeqStepsTransformer extends AbstractTransformer
             "Sequential operation step has the following illegal tags: ";
 
     private static final String WAIT = "Wait";
-    private static final String WAIT_INVALID_ARG = "Invalid argument for 'Wait': %s.";
     private static final String WAIT_PARAM_REQUIRED = "Parameter required for 'Wait'.";
 
-    private static final Pattern WAIT_ARGS = compile("\"\\d+[ \\t]*(,[ \\t]*\\d+)?\"");
 
     @Override
     public TransformModellingResult<ArrayList<SeqStep>> transform(List<Map<String, Map<String, String>>> rawData) {
@@ -118,17 +116,13 @@ public class SeqStepsTransformer extends AbstractTransformer
 
     private void validateWaitStep(Map<String, String> stepProps) {
         String args = stepProps.getOrDefault(SEQ_STEP_ARGS_KEY, stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY));
-        if (StringUtils.isEmpty(args)) {
+        if (StringUtils.isEmpty(args) || StringUtils.equals("\"\"", args)) {
             throw new RuntimeException(WAIT_PARAM_REQUIRED);
-        }
-
-        if (!WAIT_ARGS.matcher(args).matches()) {
-            throw new RuntimeException(String.format(WAIT_INVALID_ARG, args));
         }
     }
 
     private boolean isWaitStep(Map<String, String> stepProps) {
-        return StringUtils.equals(WAIT, stepProps.get(SEQ_STEP_ACTION_KEY));
+        return StringUtils.equalsIgnoreCase(WAIT, stepProps.get(SEQ_STEP_ACTION_KEY));
     }
 
     private void validateAssignmentAction(SeqStep seqStep) {
