@@ -26,8 +26,9 @@ import java.util.Set;
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_ACTION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_EXTERNAL_KEY;
 import static io.cloudslang.lang.compiler.modeller.transformers.Transformer.Scope.ACTION;
-import static java.util.Collections.emptySet;
+import static java.lang.Boolean.FALSE;
 import static java.util.Collections.singletonList;
 
 public class SeqActionTransformer extends AbstractTransformer
@@ -44,9 +45,9 @@ public class SeqActionTransformer extends AbstractTransformer
         this.seqStepsTransformer = seqStepsTransformer;
     }
 
-    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_ACTION_GAV_KEY,
-            SlangTextualKeys.SEQ_STEPS_KEY);
-    private static final Set<String> OPTIONAL_KEY_SET = emptySet();
+    private static final Set<String> MANDATORY_KEY_SET = newHashSet(SlangTextualKeys.SEQ_ACTION_GAV_KEY);
+    private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SlangTextualKeys.SEQ_STEPS_KEY,
+            SlangTextualKeys.SEQ_EXTERNAL_KEY, SlangTextualKeys.SEQ_SETTINGS_KEY, SlangTextualKeys.SEQ_SKILLS_KEY);
 
     @Override
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData) {
@@ -82,16 +83,34 @@ public class SeqActionTransformer extends AbstractTransformer
     private void transformSteps(Map<String, Serializable> rawData,
                                 List<RuntimeException> errors,
                                 SensitivityLevel sensitivityLevel) {
+        Serializable externalValue = rawData.remove(SlangTextualKeys.SEQ_EXTERNAL_KEY);
+        Boolean external = parseExternalValue(errors, externalValue);
+        rawData.put(ScoreLangConstants.SEQ_EXTERNAL_KEY, external);
+
         List<Map<String, Map<String, String>>> steps = preCompileValidator
-                .validateSeqActionSteps(rawData.remove(SlangTextualKeys.SEQ_STEPS_KEY), errors);
+                .validateSeqActionSteps(rawData.remove(SlangTextualKeys.SEQ_STEPS_KEY), errors, external);
         TransformModellingResult<ArrayList<SeqStep>> transformedSteps = seqStepsTransformer
                 .transform(steps, sensitivityLevel);
         errors.addAll(transformedSteps.getErrors());
         ArrayList<SeqStep> transformedData = transformedSteps.getTransformedData();
-        if (transformedData.isEmpty()) {
-            errors.add(new RuntimeException("Missing sequential operation steps."));
-        }
+
         rawData.put(ScoreLangConstants.SEQ_STEPS_KEY, transformedData);
+    }
+
+    private Boolean parseExternalValue(List<RuntimeException> errors, Serializable externalValue) {
+        Boolean external;
+        if (externalValue instanceof Boolean) {
+            external = (Boolean) externalValue;
+        } else if (externalValue instanceof String) {
+            external = Boolean.valueOf((String) externalValue);
+        } else {
+            external = FALSE;
+            if (externalValue != null) {
+                errors.add(new RuntimeException("Unsupported value found for '" + SEQ_EXTERNAL_KEY + "' key. " +
+                        "Supported values are: [true, false]."));
+            }
+        }
+        return external;
     }
 
     @Override

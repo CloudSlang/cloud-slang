@@ -45,6 +45,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,10 +65,13 @@ import java.util.Map;
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
 import static io.cloudslang.lang.entities.ActionType.SEQUENTIAL;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -103,6 +107,7 @@ public class ActionStepsTest {
     public void setUp() {
         nonSerializableExecutionData = new HashMap<>();
         seqSteps = new ArrayList<>();
+        reset(seqExecutionService);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -127,6 +132,7 @@ public class ActionStepsTest {
                 null,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
 
@@ -167,6 +173,7 @@ public class ActionStepsTest {
                 null,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
 
@@ -193,6 +200,7 @@ public class ActionStepsTest {
                 null,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
 
@@ -237,6 +245,7 @@ public class ActionStepsTest {
                 userPythonScript,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
 
@@ -284,6 +293,7 @@ public class ActionStepsTest {
                 null,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
 
@@ -327,6 +337,7 @@ public class ActionStepsTest {
                 null,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
 
@@ -367,6 +378,7 @@ public class ActionStepsTest {
                     null,
                     DEPENDENCIES_DEFAULT,
                     seqSteps,
+                    null,
                     null
             );
         } catch (RuntimeException ex) {
@@ -408,7 +420,7 @@ public class ActionStepsTest {
                 "doJavaActionWrongReturnType",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -448,7 +460,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -484,7 +496,7 @@ public class ActionStepsTest {
                 "doJavaNumberAsString",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
     }
@@ -508,7 +520,7 @@ public class ActionStepsTest {
                 "doJavaNumbersAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
         ReturnValues returnValues = runEnv.removeReturnValues();
@@ -535,7 +547,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction_NOT_FOUND",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -570,7 +582,7 @@ public class ActionStepsTest {
                 "doJavaActionMissingAnnotation",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -607,7 +619,7 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -645,7 +657,7 @@ public class ActionStepsTest {
                 "setNameOnNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -676,7 +688,7 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -708,7 +720,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -738,7 +750,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -765,7 +777,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -807,7 +819,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -856,7 +868,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
 
@@ -898,7 +910,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
     }
@@ -925,7 +937,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
     }
@@ -953,7 +965,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
     }
@@ -980,6 +992,7 @@ public class ActionStepsTest {
                 "",
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
     }
@@ -1004,7 +1017,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
     }
@@ -1031,7 +1044,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT, seqSteps,
+                DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
     }
@@ -1057,6 +1070,7 @@ public class ActionStepsTest {
                 null,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
+                null,
                 null
         );
 
@@ -1064,6 +1078,72 @@ public class ActionStepsTest {
                 eq(GAV_DEFAULT),
                 any(CloudSlangSequentialExecutionParametersProviderImpl.class),
                 eq(null));
+    }
+
+    @Test
+    public void doActionExternalTrue() {
+        RunEnvironment runEnv = new RunEnvironment();
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                true,
+                null
+        );
+
+        ArgumentCaptor<CloudSlangSequentialExecutionParametersProviderImpl> mockedProviderCaptor =
+                ArgumentCaptor.forClass(CloudSlangSequentialExecutionParametersProviderImpl.class);
+
+
+        verify(seqExecutionService).execute(
+                any(String.class),
+                mockedProviderCaptor.capture(),
+                any(Serializable.class)
+        );
+
+        CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();
+        assertTrue(mockedProvider.getExternal());
+    }
+
+    @Test
+    public void doActionExternalFalse() {
+        RunEnvironment runEnv = new RunEnvironment();
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
+        );
+
+        ArgumentCaptor<CloudSlangSequentialExecutionParametersProviderImpl> mockedProviderCaptor =
+                ArgumentCaptor.forClass(CloudSlangSequentialExecutionParametersProviderImpl.class);
+
+
+        verify(seqExecutionService).execute(
+                any(String.class),
+                mockedProviderCaptor.capture(),
+                any(Serializable.class)
+        );
+
+        CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();
+        assertFalse(mockedProvider.getExternal());
     }
 
     @Configuration
