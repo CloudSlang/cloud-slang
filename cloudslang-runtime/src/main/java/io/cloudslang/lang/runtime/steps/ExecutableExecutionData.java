@@ -240,7 +240,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
                     Thread.sleep(5_000);
                 } catch (InterruptedException e) {
-                    logger.error("Thread was interrupted while sleeping due to execution precondition not being fulfilled.");
+                    logger.error("Thread was interrupted while waiting for execution precondition to be fulfilled.");
                 }
             }
 
