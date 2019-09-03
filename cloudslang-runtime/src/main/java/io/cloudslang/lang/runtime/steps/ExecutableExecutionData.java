@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static java.lang.String.valueOf;
 
 /**
  * User: stoneo
@@ -224,6 +225,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     }
 
     public void canExecute(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                            @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
@@ -233,20 +235,19 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 return;
             }
 
-            logger.error("[FRP LOG] Invoked precondition microstep");
-            while (!executionPreconditionService.canExecute()) {
+            while (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
                 try {
-                    logger.error("Sleeping");
+                    logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
                     Thread.sleep(5_000);
                 } catch (InterruptedException e) {
-                    logger.error("Thread was interrupted");
+                    logger.error("Thread was interrupted while sleeping due to execution precondition not being fulfilled.");
                 }
             }
 
             // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
-            logger.error("There was an error running the start executable execution step of: \'" + nodeName +
+            logger.error("There was an error running the canExecute execution step of: \'" + nodeName +
                     "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
