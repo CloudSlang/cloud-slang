@@ -235,13 +235,14 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 return;
             }
 
-            while (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
-                try {
-                    logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
-                    Thread.sleep(5_000);
-                } catch (InterruptedException e) {
-                    logger.error("Thread was interrupted while waiting for execution precondition to be fulfilled.");
+            if (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
+                logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
+
+                if (!executionRuntimeServices.getNoLicenseAvailable()) {
+                    executionRuntimeServices.setNoLicenseAvailable();
                 }
+            } else if (executionRuntimeServices.getNoLicenseAvailable()) {
+                executionRuntimeServices.removeNoLicenseAvailable();
             }
 
             // put the next step position for the navigation
