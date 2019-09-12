@@ -230,26 +230,24 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
             if (!StringUtils.isEmpty(runEnv.getExecutionPath().getParentPath())) {
-                //If it is start of a sub flow then the check should not happen
+                // If it is start of a sub flow then the check should not happen
                 runEnv.putNextStepPosition(nextStepId);
                 return;
             }
 
             while (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
                 try {
-                    logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
-                    Thread.sleep(5_000);
+                    Thread.sleep(5_000L);
                 } catch (InterruptedException e) {
                     logger.error("Thread was interrupted while waiting for execution precondition to be fulfilled.");
                 }
             }
 
-            // put the next step position for the navigation
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
-            logger.error("There was an error running the canExecute execution step of: \'" + nodeName +
+            logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
                     "\'.\n\tError is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
+            throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }
 
