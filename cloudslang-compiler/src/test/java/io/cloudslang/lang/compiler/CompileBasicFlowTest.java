@@ -58,7 +58,7 @@ public class CompileBasicFlowTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
         assertEquals("execution plan name is different than expected", "basic_flow", executionPlan.getName());
         assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         assertEquals("the inputs size is not as expected", 3, compilationArtifact.getInputs().size());
@@ -75,17 +75,17 @@ public class CompileBasicFlowTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
         assertEquals("execution plan name is different than expected", "flow_with_data", executionPlan.getName());
         assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
 
-        ExecutionStep startStep = executionPlan.getStep(1L);
+        ExecutionStep startStep = executionPlan.getStep(2L);
         @SuppressWarnings("unchecked") List<Input> inputs = (List<Input>) startStep.getActionData()
                 .get(ScoreLangConstants.EXECUTABLE_INPUTS_KEY);
         Assert.assertNotNull("inputs doesn't exist", inputs);
         assertEquals("there is a different number of inputs than expected", 1, inputs.size());
 
-        ExecutionStep beginStepExecutionStep = executionPlan.getStep(2L);
+        ExecutionStep beginStepExecutionStep = executionPlan.getStep(3L);
         @SuppressWarnings("unchecked")
         List<Argument> stepInputs = (List<Argument>) beginStepExecutionStep.getActionData()
                 .get(ScoreLangConstants.STEP_INPUTS_KEY);
@@ -95,7 +95,7 @@ public class CompileBasicFlowTest {
         assertEquals("country", stepInputs.get(1).getName());
         assertEquals("CheckWeather", beginStepExecutionStep.getActionData().get(ScoreLangConstants.NODE_NAME_KEY));
 
-        ExecutionStep endStepExecutionStep = executionPlan.getStep(3L);
+        ExecutionStep endStepExecutionStep = executionPlan.getStep(4L);
         @SuppressWarnings("unchecked")
         List<Output> publish = (List<Output>) endStepExecutionStep.getActionData()
                 .get(ScoreLangConstants.STEP_PUBLISH_KEY);
@@ -155,9 +155,9 @@ public class CompileBasicFlowTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 4, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 5, executionPlan.getSteps().size());
 
-        ExecutionStep endStepExecutionStep = executionPlan.getStep(3L);
+        ExecutionStep endStepExecutionStep = executionPlan.getStep(4L);
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigationValues =
                 (Map<String, ResultNavigation>) endStepExecutionStep.getActionData()
                         .get(ScoreLangConstants.STEP_NAVIGATION_KEY);

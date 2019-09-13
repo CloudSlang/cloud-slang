@@ -54,7 +54,7 @@ public class CompileFlowWithMultipleStepsTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         Assert.assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 10, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 11, executionPlan.getSteps().size());
         assertEquals("execution plan name is different than expected",
                 "flow_with_multiple_steps", executionPlan.getName());
         assertEquals("the dependencies size is not as expected", 3, compilationArtifact.getDependencies().size());
