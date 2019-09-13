@@ -38,6 +38,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.String.valueOf;
 
@@ -84,17 +89,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
-                    executableInputs,
-                    runEnv,
-                    executionRuntimeServices,
-                    "Pre Input binding for " + stepType,
-                    stepType,
-                    nodeName,
-                    callArguments
+                executableInputs,
+                runEnv,
+                executionRuntimeServices,
+                "Pre Input binding for " + stepType,
+                stepType,
+                nodeName,
+                callArguments
             );
 
             Map<String, Value> boundInputValues = inputsBinding
-                    .bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
+                .bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
 
             Map<String, Value> actionArguments = new HashMap<>();
 
@@ -108,14 +113,14 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             updateCallArgumentsAndPushContextToStack(runEnv, new Context(boundInputValues), actionArguments);
 
             sendEndBindingInputsEvent(
-                    executableInputs,
-                    boundInputValues,
-                    runEnv,
-                    executionRuntimeServices,
-                    "Post Input binding for " + stepType,
-                    stepType,
-                    nodeName,
-                    callArguments);
+                executableInputs,
+                boundInputValues,
+                runEnv,
+                executionRuntimeServices,
+                "Post Input binding for " + stepType,
+                stepType,
+                nodeName,
+                callArguments);
 
             executionRuntimeServices.setShouldCheckGroup();
 
@@ -124,7 +129,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.getExecutionPath().down();
         } catch (RuntimeException e) {
             logger.error("There was an error running the start executable execution step of: \'" + nodeName +
-                    "\'.\n\tError is: " + e.getMessage());
+                "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
     }
@@ -147,56 +152,56 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.getExecutionPath().up();
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Value> operationVariables = operationContext == null ?
-                    null : operationContext.getImmutableViewOfVariables();
+                null : operationContext.getImmutableViewOfVariables();
 
             ReturnValues actionReturnValues = buildReturnValues(runEnv, executableType);
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             fireEvent(
-                    executionRuntimeServices,
-                    runEnv,
-                    ScoreLangConstants.EVENT_OUTPUT_START,
-                    "Output binding started",
-                    stepType,
-                    nodeName,
-                    operationVariables,
-                    Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
-                    Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) executableResults),
-                    Pair.of(ACTION_RETURN_VALUES_KEY,
-                            executableType == ExecutableType.OPERATION ?
-                                    new ReturnValues(new HashMap<String, Value>(), actionReturnValues.getResult()) :
-                                    actionReturnValues)
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.EVENT_OUTPUT_START,
+                "Output binding started",
+                stepType,
+                nodeName,
+                operationVariables,
+                Pair.of(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) executableOutputs),
+                Pair.of(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) executableResults),
+                Pair.of(ACTION_RETURN_VALUES_KEY,
+                    executableType == ExecutableType.OPERATION ?
+                        new ReturnValues(new HashMap<String, Value>(), actionReturnValues.getResult()) :
+                        actionReturnValues)
             );
 
             // Resolving the result of the operation/flow
             String result = resultsBinding.resolveResult(
-                    operationVariables,
-                    actionReturnValues.getOutputs(),
-                    runEnv.getSystemProperties(),
-                    executableResults,
-                    actionReturnValues.getResult()
+                operationVariables,
+                actionReturnValues.getOutputs(),
+                runEnv.getSystemProperties(),
+                executableResults,
+                actionReturnValues.getResult()
             );
 
             Map<String, Value> outputsBindingContext =
-                    MapUtils.mergeMaps(operationVariables, actionReturnValues.getOutputs());
+                MapUtils.mergeMaps(operationVariables, actionReturnValues.getOutputs());
             Map<String, Value> operationReturnOutputs =
-                    outputsBinding.bindOutputs(
-                            outputsBindingContext,
-                            runEnv.getSystemProperties(),
-                            executableOutputs
-                    );
+                outputsBinding.bindOutputs(
+                    outputsBindingContext,
+                    runEnv.getSystemProperties(),
+                    executableOutputs
+                );
 
             ReturnValues returnValues = new ReturnValues(operationReturnOutputs, result);
             runEnv.putReturnValues(returnValues);
             fireEvent(
-                    executionRuntimeServices,
-                    runEnv,
-                    ScoreLangConstants.EVENT_OUTPUT_END,
-                    "Output binding finished",
-                    stepType,
-                    nodeName,
-                    operationVariables,
-                    Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
-                    Pair.of(LanguageEventData.RESULT, returnValues.getResult())
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.EVENT_OUTPUT_END,
+                "Output binding finished",
+                stepType,
+                nodeName,
+                operationVariables,
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs),
+                Pair.of(LanguageEventData.RESULT, returnValues.getResult())
             );
 
             // If we have parent flow data on the stack, we pop it and request the score engine to switch
@@ -206,15 +211,15 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 handleNavigationToParent(runEnv, executionRuntimeServices);
             } else {
                 fireEvent(
-                        executionRuntimeServices,
-                        runEnv,
-                        ScoreLangConstants.EVENT_EXECUTION_FINISHED,
-                        "Execution finished running",
-                        stepType,
-                        nodeName,
-                        operationVariables,
-                        Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-                        Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs)
+                    executionRuntimeServices,
+                    runEnv,
+                    ScoreLangConstants.EVENT_EXECUTION_FINISHED,
+                    "Execution finished running",
+                    stepType,
+                    nodeName,
+                    operationVariables,
+                    Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                    Pair.of(LanguageEventData.OUTPUTS, (Serializable) operationReturnOutputs)
                 );
             }
         } catch (RuntimeException e) {
@@ -248,7 +253,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
-                    "\'.\n\tError is: " + e.getMessage());
+                "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }
