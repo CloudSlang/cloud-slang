@@ -75,15 +75,15 @@ public class ExecutionPlanBuilderTest {
         return createSimpleCompiledStep(stepName, false);
     }
 
-    private Step createSimpleCompiledStep(String stepName, List<Map<String, String>> navigationStrings) {
+    private Step createSimpleCompiledStep(String stepName, List<Map<String, Serializable>> navigationStrings) {
         return createSimpleCompiledStep(stepName, false, navigationStrings);
     }
 
     private Step createSimpleCompiledStep(String stepName, boolean isParallelLoop) {
-        List<Map<String, String>> navigationStrings = new ArrayList<>();
-        Map<String, String> successMap = new HashMap<>();
+        List<Map<String, Serializable>> navigationStrings = new ArrayList<>();
+        Map<String, Serializable> successMap = new HashMap<>();
         successMap.put(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.SUCCESS_RESULT);
-        Map<String, String> failureMap = new HashMap<>();
+        Map<String, Serializable> failureMap = new HashMap<>();
         failureMap.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
         navigationStrings.add(successMap);
         navigationStrings.add(failureMap);
@@ -92,7 +92,7 @@ public class ExecutionPlanBuilderTest {
     }
 
     private Step createSimpleCompiledStep(String stepName, boolean isParallelLoop,
-                                          List<Map<String, String>> navigationStrings) {
+                                          List<Map<String, Serializable>> navigationStrings) {
         Map<String, Serializable> preStepActionData = new HashMap<>();
 
         if (isParallelLoop) {
@@ -307,10 +307,10 @@ public class ExecutionPlanBuilderTest {
     public void createFlowWithTwoSteps() throws Exception {
         final Deque<Step> steps = new LinkedList<>();
         String secondStepName = "2ndStep";
-        List<Map<String, String>> navigationStrings = new ArrayList<>();
-        Map<String, String> successMap = new HashMap<>();
+        List<Map<String, Serializable>> navigationStrings = new ArrayList<>();
+        Map<String, Serializable> successMap = new HashMap<>();
         successMap.put(ScoreLangConstants.SUCCESS_RESULT, secondStepName);
-        Map<String, String> failureMap = new HashMap<>();
+        Map<String, Serializable> failureMap = new HashMap<>();
         failureMap.put(ScoreLangConstants.FAILURE_RESULT, ScoreLangConstants.FAILURE_RESULT);
         navigationStrings.add(successMap);
         navigationStrings.add(failureMap);

@@ -29,7 +29,12 @@ flow:
             - city: 'input_1'
             - alla: 'walla'
         navigate:
-          - SUCCESS: SUCCESS
+          - SUCCESS:
+            - next_step: SUCCESS
+            - ROI: 1
+            - another_option:
+              - option1: 'value1'
+              - option2: 'value2'
           - FAILURE: FAILURE
 
     - on_failure:

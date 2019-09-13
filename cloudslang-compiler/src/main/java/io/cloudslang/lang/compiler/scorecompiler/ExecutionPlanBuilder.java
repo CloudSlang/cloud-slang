@@ -20,6 +20,8 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
 
 /*
  * Created by orius123 on 11/11/14.
@@ -152,9 +155,9 @@ public class ExecutionPlanBuilder {
 
         //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
-        for (Map<String, String> map : step.getNavigationStrings()) {
-            Map.Entry<String, String> entry = map.entrySet().iterator().next();
-            String nextStepName = entry.getValue();
+        for (Map<String, Serializable> map : step.getNavigationStrings()) {
+            Map.Entry<String, Serializable> entry = map.entrySet().iterator().next();
+            String nextStepName = getNavigationStepName(entry.getValue());
             if (stepReferences.get(nextStepName) == null) {
                 Step nextStepToCompile = selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
                 stepExecutionSteps.addAll(

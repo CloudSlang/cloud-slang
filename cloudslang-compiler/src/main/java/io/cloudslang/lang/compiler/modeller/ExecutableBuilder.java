@@ -70,6 +70,8 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WARNING_RESULT;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.setNavigationStepName;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -632,7 +634,7 @@ public class ExecutableBuilder {
             }
         }
 
-        List<Map<String, String>> navigationStrings =
+        List<Map<String, Serializable>> navigationStrings =
                 getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
         Step step = createStep(stepName, onFailureSection, preStepData, postStepData,
@@ -642,7 +644,7 @@ public class ExecutableBuilder {
 
     private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,
                             Map<String, Serializable> postStepData, List<Argument> arguments,
-                            String workerGroup, String refId, List<Map<String, String>> navigationStrings) {
+                            String workerGroup, String refId, List<Map<String, Serializable>> navigationStrings) {
         if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
             return new ExternalStep(stepName,
                     preStepData,
@@ -687,17 +689,20 @@ public class ExecutableBuilder {
         Serializable navigationData = postStepData.get(NAVIGATION_KEY);
         if (navigationData != null) {
             @SuppressWarnings("unchecked") // from NavigateTransformer
-                    List<Map<String, String>> navigationStrings = (List<Map<String, String>>) navigationData;
-            List<Map<String, String>> transformedNavigationStrings = new ArrayList<>();
+            List<Map<String, Serializable>> navigationStrings =
+                    (List<Map<String, Serializable>>) navigationData;
+            List<Map<String, Serializable>> transformedNavigationStrings = new ArrayList<>();
 
-            for (Map<String, String> navigation : navigationStrings) {
-                Map.Entry<String, String> navigationEntry = navigation.entrySet().iterator().next();
-                Map<String, String> transformedNavigation = new HashMap<>(navigation);
-                if (navigationEntry.getValue().equals(ON_FAILURE_KEY)) {
+            for (Map<String, Serializable> navigation : navigationStrings) {
+                Map.Entry<String, Serializable> navigationEntry = navigation.entrySet().iterator().next();
+                Map<String, Serializable> transformedNavigation = new HashMap<>(navigation);
+                if (getNavigationStepName(navigationEntry.getValue()).equals(ON_FAILURE_KEY)) {
                     if (StringUtils.isEmpty(onFailureStepName)) {
-                        transformedNavigation.put(navigationEntry.getKey(), ScoreLangConstants.FAILURE_RESULT);
+                        transformedNavigation.put(navigationEntry.getKey(), setNavigationStepName(
+                                navigationEntry.getValue(), ScoreLangConstants.FAILURE_RESULT));
                     } else {
-                        transformedNavigation.put(navigationEntry.getKey(), onFailureStepName);
+                        transformedNavigation.put(navigationEntry.getKey(), setNavigationStepName(
+                                navigationEntry.getValue(), onFailureStepName));
                     }
                 } else {
                     transformedNavigation.put(navigationEntry.getKey(), navigationEntry.getValue());
@@ -708,20 +713,20 @@ public class ExecutableBuilder {
         }
     }
 
-    private List<Map<String, String>> getNavigationStrings(
+    private List<Map<String, Serializable>> getNavigationStrings(
             Map<String, Serializable> postStepData,
             String defaultSuccess,
             String defaultFailure,
             List<RuntimeException> errors) {
-        @SuppressWarnings("unchecked") List<Map<String, String>> navigationStrings =
-                (List<Map<String, String>>) postStepData.get(NAVIGATION_KEY);
+        @SuppressWarnings("unchecked") List<Map<String, Serializable>> navigationStrings =
+                (List<Map<String, Serializable>>) postStepData.get(NAVIGATION_KEY);
 
         //default navigation
         if (CollectionUtils.isEmpty(navigationStrings)) {
             navigationStrings = new ArrayList<>();
-            Map<String, String> successMap = new HashMap<>();
+            Map<String, Serializable> successMap = new HashMap<>();
             successMap.put(SUCCESS_RESULT, defaultSuccess);
-            Map<String, String> failureMap = new HashMap<>();
+            Map<String, Serializable> failureMap = new HashMap<>();
             failureMap.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
             navigationStrings.add(successMap);
             navigationStrings.add(failureMap);

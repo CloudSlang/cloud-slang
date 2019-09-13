@@ -39,6 +39,7 @@ public interface SlangTextualKeys {
     String EXECUTABLE_NAME_KEY = "name";
     String WORKFLOW_KEY = "workflow";
     String ON_FAILURE_KEY = "on_failure";
+    String NEXT_STEP = "next_step";
 
     //action
     String JAVA_ACTION_KEY = "java_action";
