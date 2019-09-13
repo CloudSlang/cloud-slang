@@ -166,14 +166,14 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
         verifyParallelLoopStatement(addBranchesActionData);
 
-        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
-        assertNotNull("join branches method not found", executionPlan.getStep(5L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(5L));
+        assertNotNull("join branches method not found", executionPlan.getStep(6L));
     }
 
     @Test
@@ -188,19 +188,19 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
         verifyParallelLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(6L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyPublishValues(joinBranchesActionData);
 
-        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        ExecutionStep branchEndStepExecutionStep = executionPlan.getStep(4L);
+        assertNotNull("branch begin step method not found", executionPlan.getStep(4L));
+        ExecutionStep branchEndStepExecutionStep = executionPlan.getStep(5L);
         assertNotNull("branch end step method not found", branchEndStepExecutionStep);
 
         verifyBranchPublishValuesIsEmpty(branchEndStepExecutionStep.getActionData());
@@ -220,19 +220,19 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
         verifyParallelLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(6L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyNavigationValuesSuccessFailure(joinBranchesActionData);
 
-        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(5L));
     }
 
     @Test
@@ -249,19 +249,19 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
         verifyParallelLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(6L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyNavigationValuesSuccessFailure(joinBranchesActionData);
 
-        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(5L));
     }
 
     @Test
@@ -298,19 +298,19 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
         verifyParallelLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(6L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyNavigationValuesSuccess(joinBranchesActionData);
 
-        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(5L));
     }
 
     @Test
@@ -347,19 +347,19 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
         verifyParallelLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(6L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyNavigationValuesSuccess(joinBranchesActionData);
 
-        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        assertNotNull("branch end step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch begin step method not found", executionPlan.getStep(4L));
+        assertNotNull("branch end step method not found", executionPlan.getStep(5L));
     }
 
     @Test
@@ -394,21 +394,21 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(2L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
         verifyParallelLoopStatement(addBranchesActionData);
 
-        ExecutionStep joinBranchesStep = executionPlan.getStep(5L);
+        ExecutionStep joinBranchesStep = executionPlan.getStep(6L);
         Map<String, ?> joinBranchesActionData = joinBranchesStep.getActionData();
 
         verifyPublishValues(joinBranchesActionData);
 
         verifyNavigationValuesSuccessFailure(joinBranchesActionData);
 
-        assertNotNull("branch begin step method not found", executionPlan.getStep(3L));
-        ExecutionStep branchEndStepExecutionStep = executionPlan.getStep(4L);
+        assertNotNull("branch begin step method not found", executionPlan.getStep(4L));
+        ExecutionStep branchEndStepExecutionStep = executionPlan.getStep(5L);
         assertNotNull("branch end step method not found", branchEndStepExecutionStep);
 
         verifyBranchPublishValuesIsEmpty(branchEndStepExecutionStep.getActionData());
@@ -474,7 +474,7 @@ public class CompileParallelLoopFlowTest {
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigateValues =
                 (Map<String, ResultNavigation>) joinBranchesActionData.get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
-        expectedNavigationValues.put("SUCCESS", new ResultNavigation(6L, null));
+        expectedNavigationValues.put("SUCCESS", new ResultNavigation(7L, null));
         expectedNavigationValues.put("FAILURE", new ResultNavigation(0L, "FAILURE"));
         assertEquals("navigation values not as expected", expectedNavigationValues, actualNavigateValues);
     }
@@ -484,7 +484,7 @@ public class CompileParallelLoopFlowTest {
         @SuppressWarnings("unchecked") Map<String, ResultNavigation> actualNavigateValues =
                 (Map<String, ResultNavigation>) joinBranchesActionData.get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         Map<String, ResultNavigation> expectedNavigationValues = new HashMap<>();
-        expectedNavigationValues.put("SUCCESS", new ResultNavigation(6L, null));
+        expectedNavigationValues.put("SUCCESS", new ResultNavigation(7L, null));
         assertEquals("navigation values not as expected", expectedNavigationValues, actualNavigateValues);
     }
 

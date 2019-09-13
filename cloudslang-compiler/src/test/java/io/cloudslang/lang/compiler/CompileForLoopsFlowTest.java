@@ -192,7 +192,7 @@ public class CompileForLoopsFlowTest {
         assertNotNull("artifact is null", artifact);
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
-        Map<String, ?> startStepActionData = executionPlan.getStep(2L)
+        Map<String, ?> startStepActionData = executionPlan.getStep(3L)
                 .getActionData();
         assertTrue(startStepActionData.containsKey(ScoreLangConstants.LOOP_KEY));
         LoopStatement forStatement = (LoopStatement) startStepActionData.get(ScoreLangConstants.LOOP_KEY);
@@ -200,7 +200,7 @@ public class CompileForLoopsFlowTest {
         assertEquals("values.split(\",\")", listLoopStatement.getExpression());
         assertEquals("value", listLoopStatement.getVarName());
 
-        Map<String, ?> endStepActionData = executionPlan.getStep(3L)
+        Map<String, ?> endStepActionData = executionPlan.getStep(4L)
                 .getActionData();
         assertEquals(Collections.singletonList(ScoreLangConstants.FAILURE_RESULT),
                 endStepActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
@@ -240,7 +240,7 @@ public class CompileForLoopsFlowTest {
         assertNotNull("artifact is null", artifact);
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
 
-        Map<String, ?> endStepActionData = executionPlan.getStep(3L)
+        Map<String, ?> endStepActionData = executionPlan.getStep(4L)
                 .getActionData();
         assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
                 endStepActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
@@ -312,7 +312,7 @@ public class CompileForLoopsFlowTest {
         assertNotNull("artifact is null", artifact);
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
-        Map<String, ?> startStartActionData = executionPlan.getStep(2L)
+        Map<String, ?> startStartActionData = executionPlan.getStep(3L)
                 .getActionData();
         assertTrue(startStartActionData.containsKey(ScoreLangConstants.LOOP_KEY));
         LoopStatement forStatement = (LoopStatement) startStartActionData.get(ScoreLangConstants.LOOP_KEY);
@@ -321,7 +321,7 @@ public class CompileForLoopsFlowTest {
         assertEquals("k", mapLoopStatement.getKeyName());
         assertEquals("v", mapLoopStatement.getValueName());
 
-        Map<String, ?> endStepActionData = executionPlan.getStep(3L)
+        Map<String, ?> endStepActionData = executionPlan.getStep(4L)
                 .getActionData();
         assertEquals(Collections.singletonList(ScoreLangConstants.FAILURE_RESULT),
                 endStepActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));
@@ -337,7 +337,7 @@ public class CompileForLoopsFlowTest {
         assertNotNull("artifact is null", artifact);
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
 
-        Map<String, ?> endStepActionData = executionPlan.getStep(3L)
+        Map<String, ?> endStepActionData = executionPlan.getStep(4L)
                 .getActionData();
         assertEquals(Arrays.asList(ScoreLangConstants.SUCCESS_RESULT, ScoreLangConstants.FAILURE_RESULT),
                 endStepActionData.get(ScoreLangConstants.BREAK_LOOP_KEY));

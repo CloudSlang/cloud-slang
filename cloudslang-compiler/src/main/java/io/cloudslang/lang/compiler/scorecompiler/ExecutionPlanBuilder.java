@@ -45,7 +45,8 @@ public class ExecutionPlanBuilder {
     private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 2;
     private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 2;
     private static final long FLOW_END_STEP_ID = 0L;
-    private static final long FLOW_START_STEP_ID = 1L;
+    private static final long FLOW_PRECONDITION_STEP_ID = 1L;
+    private static final long FLOW_START_STEP_ID = 2L;
 
     public ExecutionPlan createOperationExecutionPlan(Operation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
@@ -93,7 +94,8 @@ public class ExecutionPlanBuilder {
         executionPlan.setFlowUuid(compiledFlow.getId());
         executionPlan.setWorkerGroup(compiledFlow.getWorkerGroup());
 
-        executionPlan.setBeginStep(FLOW_START_STEP_ID);
+        executionPlan.setBeginStep(FLOW_PRECONDITION_STEP_ID);
+        executionPlan.addStep(stepFactory.createPreconditionStep(FLOW_PRECONDITION_STEP_ID, compiledFlow.getName()));
         //flow start step
         executionPlan.addStep(stepFactory.createStartStep(FLOW_START_STEP_ID, compiledFlow.getPreExecActionData(),
                 compiledFlow.getInputs(), compiledFlow.getName(), ExecutableType.FLOW));
@@ -204,8 +206,11 @@ public class ExecutionPlanBuilder {
             }
         }
 
-        if (step == null || !step.isParallelLoop()) {
-            // the reference is not a step or is not a parallel loop step
+        if (step == null) {
+            // the reference is not a step - usually this means this is the first begin step
+            currentId = FLOW_START_STEP_ID + 1L;
+        } else if (!step.isParallelLoop()) {
+            // the reference is not a parallel loop step
             currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS;
         } else {
             //async step

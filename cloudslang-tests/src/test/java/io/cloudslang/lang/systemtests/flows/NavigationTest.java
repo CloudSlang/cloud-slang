@@ -328,7 +328,7 @@ public class NavigationTest extends SystemsTestsParent {
         Set<SlangSource> path = newHashSet(fromFile(operationPython));
         CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
         Map stepNavigationValues = (Map) compilationArtifact.getExecutionPlan()
-                .getSteps().get(3L).getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
+                .getSteps().get(4L).getActionData().get(ScoreLangConstants.STEP_NAVIGATION_KEY);
         ResultNavigation resultNavigation =
                 (ResultNavigation) stepNavigationValues.get(ScoreLangConstants.FAILURE_RESULT);
         assertEquals(ScoreLangConstants.FAILURE_RESULT, resultNavigation.getPresetResult());

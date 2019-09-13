@@ -25,8 +25,12 @@ import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
-import io.cloudslang.score.api.execution.ExecutionParametersConsts;
+import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -34,12 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static java.lang.String.valueOf;
 
 /**
  * User: stoneo
@@ -51,16 +51,23 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
 
-    @Autowired
-    private ResultsBinding resultsBinding;
+    private final ResultsBinding resultsBinding;
 
-    @Autowired
-    private InputsBinding inputsBinding;
+    private final InputsBinding inputsBinding;
 
-    @Autowired
-    private OutputsBinding outputsBinding;
+    private final OutputsBinding outputsBinding;
+
+    private final ExecutionPreconditionService executionPreconditionService;
 
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
+
+    public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
+                                   OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService) {
+        this.resultsBinding = resultsBinding;
+        this.inputsBinding = inputsBinding;
+        this.outputsBinding = outputsBinding;
+        this.executionPreconditionService = preconditionService;
+    }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
                                 @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -213,6 +220,33 @@ public class ExecutableExecutionData extends AbstractExecutionData {
         } catch (RuntimeException e) {
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
                 "\'.\n\tError is: " + e.getMessage());
+            throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
+        }
+    }
+
+    public void canExecute(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+                           @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+        try {
+            if (!StringUtils.isEmpty(runEnv.getExecutionPath().getParentPath())) {
+                // If it is start of a sub flow then the check should not happen
+                runEnv.putNextStepPosition(nextStepId);
+                return;
+            }
+
+            while (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
+                try {
+                    Thread.sleep(5_000L);
+                } catch (InterruptedException e) {
+                    logger.error("Thread was interrupted while waiting for execution precondition to be fulfilled.");
+                }
+            }
+
+            runEnv.putNextStepPosition(nextStepId);
+        } catch (RuntimeException e) {
+            logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
+                    "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }

@@ -34,6 +34,7 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.events.ScoreEvent;
@@ -81,6 +82,9 @@ public class ExecutableStepsTest {
 
     @Autowired
     private OutputsBinding outputsBinding;
+
+    @Autowired
+    private ExecutionPreconditionService executionPreconditionService;
 
     @Test
     public void testStart() throws Exception {
@@ -346,6 +350,11 @@ public class ExecutableStepsTest {
         }
 
         @Bean
+        public ExecutionPreconditionService executionPreconditionService() {
+            return mock(ExecutionPreconditionService.class);
+        }
+
+        @Bean
         public ScriptEvaluator scriptEvaluator() {
             return mock(ScriptEvaluator.class);
         }
@@ -372,7 +381,8 @@ public class ExecutableStepsTest {
 
         @Bean
         public ExecutableExecutionData operationSteps() {
-            return new ExecutableExecutionData();
+            return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
+                    executionPreconditionService());
         }
 
         @Bean
