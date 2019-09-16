@@ -58,9 +58,7 @@ public abstract class YamlParser {
         Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
 
         try {
-            String objectRepository = source.getContent().replace("object_repository", "objectRepository");
-            ParsedSlang parsedSlang = getYaml().loadAs(objectRepository, ParsedSlang.class);
-
+            ParsedSlang parsedSlang = getYaml().loadAs(source.getContent(), ParsedSlang.class);
             if (parsedSlang == null) {
                 throw new RuntimeException("Source " + source.getName() + " does not contain YAML content");
             }
