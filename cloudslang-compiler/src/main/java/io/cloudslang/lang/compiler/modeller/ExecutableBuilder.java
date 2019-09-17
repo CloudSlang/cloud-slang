@@ -71,7 +71,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER
 import static io.cloudslang.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WARNING_RESULT;
 import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
-import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.setNavigationStepName;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationTarget;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -698,11 +698,11 @@ public class ExecutableBuilder {
                 Map<String, Serializable> transformedNavigation = new HashMap<>(navigation);
                 if (getNavigationStepName(navigationEntry.getValue()).equals(ON_FAILURE_KEY)) {
                     if (StringUtils.isEmpty(onFailureStepName)) {
-                        transformedNavigation.put(navigationEntry.getKey(), setNavigationStepName(
-                                navigationEntry.getValue(), ScoreLangConstants.FAILURE_RESULT));
+                        transformedNavigation.put(navigationEntry.getKey(),
+                                getNavigationTarget(navigationEntry.getValue(), ScoreLangConstants.FAILURE_RESULT));
                     } else {
-                        transformedNavigation.put(navigationEntry.getKey(), setNavigationStepName(
-                                navigationEntry.getValue(), onFailureStepName));
+                        transformedNavigation.put(navigationEntry.getKey(),
+                                getNavigationTarget(navigationEntry.getValue(), onFailureStepName));
                     }
                 } else {
                     transformedNavigation.put(navigationEntry.getKey(), navigationEntry.getValue());

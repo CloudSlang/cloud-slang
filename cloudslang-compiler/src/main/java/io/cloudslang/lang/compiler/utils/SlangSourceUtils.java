@@ -55,7 +55,7 @@ public abstract class SlangSourceUtils {
         }
     }
 
-    public static Serializable setNavigationStepName(Serializable value, String newName) {
+    public static Serializable getNavigationTarget(Serializable value, String newName) {
         if (value instanceof String) {
             return newName;
         } else {
