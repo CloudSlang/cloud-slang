@@ -40,6 +40,7 @@ import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toList;
 
 /**
  * User: stoneo
@@ -81,8 +82,12 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
-                userInputs.forEach((inputName, inputValue) ->
-                        executableInputs.add(new Input.InputBuilder(inputName, inputValue).build()));
+                executableInputs.addAll(
+                        userInputs.entrySet()
+                                .stream()
+                                .map(entry -> new Input.InputBuilder(entry.getKey(), entry.getValue()).build())
+                                .collect(toList())
+                );
             }
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
