@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.values.SimpleValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
@@ -27,7 +28,6 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -40,6 +40,8 @@ import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.String.valueOf;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * User: stoneo
@@ -84,18 +86,21 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 userInputs.forEach((inputName, inputValue) -> {
                     Input updatedInput;
                     Input inputToUpdate = containsInputName(executableInputs, inputName);
-                    if (inputToUpdate != null) {
-                        updatedInput = new Input.InputBuilder(inputName, inputValue)
-                                .withFunctionDependencies(inputToUpdate.getFunctionDependencies())
-                                .withSystemPropertyDependencies(inputToUpdate.getSystemPropertyDependencies())
-                                .withPrivateInput(inputToUpdate.isPrivateInput())
-                                .withRequired(inputToUpdate.isRequired())
-                                .build();
-                        executableInputs.remove(inputToUpdate);
-                    } else {
-                        updatedInput = new Input.InputBuilder(inputName, inputValue).build();
+                    if (inputValue instanceof SimpleValue &&
+                            isNotBlank((CharSequence) ((SimpleValue) inputValue).getContent())) {
+                        if (inputToUpdate != null) {
+                            updatedInput = new Input.InputBuilder(inputName, inputValue)
+                                    .withFunctionDependencies(inputToUpdate.getFunctionDependencies())
+                                    .withSystemPropertyDependencies(inputToUpdate.getSystemPropertyDependencies())
+                                    .withPrivateInput(inputToUpdate.isPrivateInput())
+                                    .withRequired(inputToUpdate.isRequired())
+                                    .build();
+                            executableInputs.remove(inputToUpdate);
+                        } else {
+                            updatedInput = new Input.InputBuilder(inputName, inputValue).build();
+                        }
+                        executableInputs.add(updatedInput);
                     }
-                    executableInputs.add(updatedInput);
                 });
             }
 
@@ -255,7 +260,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                            @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
-            if (!StringUtils.isEmpty(runEnv.getExecutionPath().getParentPath())) {
+            if (!isEmpty(runEnv.getExecutionPath().getParentPath())) {
                 // If it is start of a sub flow then the check should not happen
                 runEnv.putNextStepPosition(nextStepId);
                 return;
