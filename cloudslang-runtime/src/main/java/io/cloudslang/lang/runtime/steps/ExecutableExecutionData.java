@@ -219,7 +219,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
         } catch (RuntimeException e) {
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
-                "\'.\n\tError is: " + e.getMessage());
+                    "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }
@@ -235,18 +235,20 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 return;
             }
 
-            while (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
-                try {
-                    Thread.sleep(5_000L);
-                } catch (InterruptedException e) {
-                    logger.error("Thread was interrupted while waiting for execution precondition to be fulfilled.");
+            if (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
+                logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
+
+                if (!executionRuntimeServices.getPreconditionNotFulfilled()) {
+                    executionRuntimeServices.setPreconditionNotFulfilled();
                 }
+            } else if (executionRuntimeServices.getPreconditionNotFulfilled()) {
+                executionRuntimeServices.removePreconditionNotFulfilled();
             }
 
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
-                    "\'.\n\tError is: " + e.getMessage());
+                "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }
