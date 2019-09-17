@@ -81,6 +81,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
+                userInputs.forEach((inputName, inputValue) ->
+                        executableInputs.add(new Input.InputBuilder(inputName, inputValue).build()));
             }
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
