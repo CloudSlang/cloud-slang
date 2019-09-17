@@ -238,11 +238,11 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             if (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
                 logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
 
-                if (!executionRuntimeServices.getNoLicenseAvailable()) {
-                    executionRuntimeServices.setNoLicenseAvailable();
+                if (!executionRuntimeServices.getPreconditionNotFulfilled()) {
+                    executionRuntimeServices.setPreconditionNotFulfilled();
                 }
-            } else if (executionRuntimeServices.getNoLicenseAvailable()) {
-                executionRuntimeServices.removeNoLicenseAvailable();
+            } else if (executionRuntimeServices.getPreconditionNotFulfilled()) {
+                executionRuntimeServices.removePreconditionNotFulfilled();
             }
 
             runEnv.putNextStepPosition(nextStepId);
