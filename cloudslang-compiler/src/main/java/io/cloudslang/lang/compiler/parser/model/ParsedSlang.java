@@ -27,6 +27,7 @@ public class ParsedSlang {
     private String name;
     private Extension fileExtension;
     private Object extensions;
+    private Map<String, Object> objectRepository;
 
     public String getNamespace() {
         return namespace;
@@ -46,6 +47,10 @@ public class ParsedSlang {
 
     public Object getProperties() {
         return properties;
+    }
+
+    public Map<String, Object> getObjectRepository() {
+        return objectRepository;
     }
 
     public Object getExtensions() {
