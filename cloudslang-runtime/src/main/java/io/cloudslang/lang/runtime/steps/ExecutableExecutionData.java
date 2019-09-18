@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.SimpleValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.MapUtils;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.entities.ExecutableType.FLOW;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -83,25 +85,28 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
-                userInputs.forEach((inputName, inputValue) -> {
-                    Input updatedInput;
-                    Input inputToUpdate = containsInputName(executableInputs, inputName);
-                    if (inputValue instanceof SimpleValue &&
-                            isNotBlank((CharSequence) ((SimpleValue) inputValue).getContent())) {
-                        if (inputToUpdate != null) {
-                            updatedInput = new Input.InputBuilder(inputName, inputValue)
-                                    .withFunctionDependencies(inputToUpdate.getFunctionDependencies())
-                                    .withSystemPropertyDependencies(inputToUpdate.getSystemPropertyDependencies())
-                                    .withPrivateInput(inputToUpdate.isPrivateInput())
-                                    .withRequired(inputToUpdate.isRequired())
-                                    .build();
-                            executableInputs.remove(inputToUpdate);
-                        } else {
-                            updatedInput = new Input.InputBuilder(inputName, inputValue).build();
+                if (executableType.equals(FLOW)) {
+                    userInputs.forEach((inputName, inputValue) -> {
+                        Input updatedInput;
+                        Input inputToUpdate = containsInputName(executableInputs, inputName);
+                        if (inputValue instanceof SimpleValue &&
+                                isNotBlank((CharSequence) ((SimpleValue) inputValue).getContent()) ||
+                                inputValue instanceof SensitiveValue && inputValue.isSensitive()) {
+                            if (inputToUpdate != null) {
+                                updatedInput = new Input.InputBuilder(inputName, inputValue)
+                                        .withFunctionDependencies(inputToUpdate.getFunctionDependencies())
+                                        .withSystemPropertyDependencies(inputToUpdate.getSystemPropertyDependencies())
+                                        .withPrivateInput(inputToUpdate.isPrivateInput())
+                                        .withRequired(inputToUpdate.isRequired())
+                                        .build();
+                                executableInputs.remove(inputToUpdate);
+                            } else {
+                                updatedInput = new Input.InputBuilder(inputName, inputValue).build();
+                            }
+                            executableInputs.add(updatedInput);
                         }
-                        executableInputs.add(updatedInput);
-                    }
-                });
+                    });
+                }
             }
 
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
