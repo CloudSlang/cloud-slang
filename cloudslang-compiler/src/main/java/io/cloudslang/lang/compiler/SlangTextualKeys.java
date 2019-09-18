@@ -87,4 +87,7 @@ public interface SlangTextualKeys {
     // system properties
     String SYSTEM_PROPERTY_KEY = "properties";
 
+    // object repository
+    String OBJECT_REPOSITORY_KEY = "object_repository";
+
 }
