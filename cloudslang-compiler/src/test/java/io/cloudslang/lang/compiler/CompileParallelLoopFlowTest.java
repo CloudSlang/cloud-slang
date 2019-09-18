@@ -22,6 +22,7 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -523,7 +524,7 @@ public class CompileParallelLoopFlowTest {
     }
 
     private void verifyNavigationStrings(List<Map<String, String>> expectedNavigationStrings, Step step) {
-        List<Map<String, String>> actualNavigationStrings = step.getNavigationStrings();
+        List<Map<String, Serializable>> actualNavigationStrings = step.getNavigationStrings();
         assertEquals(expectedNavigationStrings, actualNavigationStrings);
     }
 
