@@ -11,35 +11,33 @@ imports:
   ops: user.ops
 
 flow:
-  name: flow_with_on_failure
-  inputs:
-    - input1
+  name: flow_with_roi
   workflow:
-    - first_step:
+    - main_step:
         do:
           ops.test_op:
-            - city: 'input_1'
-            - alla: 'walla'
-        publish:
-          - weather
+            - city: 'sin'
+            - alla: ':-)'
+        navigate:
+          - SUCCESS:
+            - next_step: SUCCESS
+            - ROI: 11
+          - FAILURE:
+            - next_step: reset_step_on_failure
 
-    - second_step:
+    - reset_step_on_failure:
         do:
           ops.test_op:
-            - city: 'input_1'
-            - alla: 'walla'
+            - city: 'N/A'
+            - alla: ':-('
         navigate:
           - SUCCESS:
             - next_step: SUCCESS
             - ROI: 1
-            - another_option:
-              - option1: 'value1'
-              - option2: 'value2'
-          - FAILURE: FAILURE
+          - FAILURE:
+            - next_step: FAILURE
+            - ROI: -1
 
-    - on_failure:
-        - check_something:
-            do:
-              ops.test_op:
-                - city: 'a'
-                - alla: 'a'
+  results:
+    - SUCCESS
+    - FAILURE

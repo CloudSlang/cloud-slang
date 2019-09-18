@@ -227,9 +227,9 @@ public class CompileValidatorImpl extends AbstractValidator implements CompileVa
                 "' since for step '" + step.getName() + "'";
     }
 
-    private List<String> getMapKeyList(List<Map<String, String>> collection) {
+    private List<String> getMapKeyList(List<Map<String, Serializable>> collection) {
         List<String> result = new ArrayList<>();
-        for (Map<String, String> element : collection) {
+        for (Map<String, Serializable> element : collection) {
             result.add(element.keySet().iterator().next());
         }
         return result;
