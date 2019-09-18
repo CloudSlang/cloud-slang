@@ -20,6 +20,7 @@ import io.cloudslang.score.api.ExecutionStep;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -120,6 +121,46 @@ public class CompileFlowWithOnFailureTest {
 
         URI flow = getClass().getResource("/corrupted/flow_with_on_failure_second_step.sl").toURI();
         compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testCompileNavigationWithRoi() throws Exception {
+        URI flow = getClass().getResource("/flow_with_roi.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        assertNotNull("execution plan is null", executionPlan);
+        assertEquals("there is a different number of steps than expected", 7, executionPlan.getSteps().size());
+        assertEquals("execution plan name is different than expected", "flow_with_roi", executionPlan.getName());
+        assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
+
+        final long step1 = 1;
+        final long step3 = 3;
+
+        ExecutionStep firstStep = executionPlan.getStep(step1);
+        assertTrue("navigation data is not empty", firstStep.getNavigationData() == null ||
+                firstStep.getNavigationData().isEmpty());
+
+        ExecutionStep thirdStep = executionPlan.getStep(step3);
+        assertTrue("navigation data is empty", thirdStep.getNavigationData() != null &&
+                !thirdStep.getNavigationData().isEmpty());
+        Map<String, Object> optionsMap = (Map<String, Object>) thirdStep.getNavigationData().get("options");
+        assertNotNull("navigation data options is empty", optionsMap);
+        List<Map<String, Object>> successOptions = (List<Map<String, Object>>) optionsMap.get("SUCCESS");
+        assertNotNull("navigation SUCCESS options is empty", successOptions);
+        assertEquals(2, successOptions.size());
+        assertEquals("navigation SUCCESS next_step options is invalid", "SUCCESS",
+                successOptions.get(0).get("next_step"));
+        assertEquals("navigation SUCCESS ROI options is invalid", 11, successOptions.get(1).get("ROI"));
+        List<Map<String, Object>> failureOptions = (List<Map<String, Object>>) optionsMap.get("FAILURE");
+        assertNotNull("navigation FAILURE options is empty", failureOptions);
+        assertEquals(1, failureOptions.size());
+        assertEquals("navigation FAILURE next_step options is invalid", "reset_step_on_failure",
+                failureOptions.get(0).get("next_step"));
     }
 
     @Test

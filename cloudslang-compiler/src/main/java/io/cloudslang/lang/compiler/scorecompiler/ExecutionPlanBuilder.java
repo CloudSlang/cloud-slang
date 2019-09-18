@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
@@ -151,7 +152,9 @@ public class ExecutionPlanBuilder {
             );
         }
 
-        stepExecutionSteps.add(createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(step, compiledFlow)));
+        ExecutionStep executionStep = createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(
+                step, compiledFlow));
+        stepExecutionSteps.add(executionStep);
 
         //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
@@ -169,6 +172,7 @@ public class ExecutionPlanBuilder {
             if (!navigationValues.containsKey(navigationKey)) {
                 navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
             }
+            addNavigationData(executionStep, entry);
         }
         if (parallelLoop) {
             stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(),
@@ -248,5 +252,19 @@ public class ExecutionPlanBuilder {
 
     public void setExternalStepFactory(ExternalExecutionStepFactory externalStepFactory) {
         this.externalStepFactory = externalStepFactory;
+    }
+
+    private void addNavigationData(ExecutionStep executionStep, Map.Entry<String, Serializable> navigation) {
+        if (navigation.getValue() instanceof List) {
+            Map<String, Object> navigationData = (Map<String, Object>) executionStep.getNavigationData();
+            if (navigationData == null) {
+                navigationData = new HashMap<String, Object>();
+                executionStep.setNavigationData(navigationData);
+            }
+            if (!navigationData.containsKey("options")) {
+                navigationData.put("options", new LinkedHashMap<String, Object>());
+            }
+            ((Map<String, Object>)navigationData.get("options")).put(navigation.getKey(), navigation.getValue());
+        }
     }
 }

@@ -24,3 +24,11 @@ flow:
           break:
             - SUCCESS
             - FAILURE
+        navigate:
+          - SUCCESS:
+            - next_step: SUCCESS
+            - ROI: 11
+          - FAILURE: FAILURE
+  results:
+    - FAILURE
+    - SUCCESS
