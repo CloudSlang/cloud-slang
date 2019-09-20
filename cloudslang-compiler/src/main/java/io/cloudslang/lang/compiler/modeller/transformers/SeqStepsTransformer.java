@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +66,9 @@ public class SeqStepsTransformer extends AbstractTransformer
 
     private static final String WAIT = "Wait";
     private static final String WAIT_PARAM_REQUIRED = "Parameter required for 'Wait'.";
+    private static final String WAIT_PARAM_INVALID = "Parameter is invalid for 'Wait'.";
+    private static final double WAIT_MIN_VALUE = 1.0;
+    private static final double WAIT_MAX_VALUE = 86400.0;
 
 
     @Override
@@ -118,6 +122,17 @@ public class SeqStepsTransformer extends AbstractTransformer
         String args = stepProps.getOrDefault(SEQ_STEP_ARGS_KEY, stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY));
         if (StringUtils.isEmpty(args) || StringUtils.equals("\"\"", args)) {
             throw new RuntimeException(WAIT_PARAM_REQUIRED);
+        }
+        // we need to check only constant value. It's wrapped into double quotes.
+        if (StringUtils.startsWith(args,"\"") && StringUtils.startsWith(args,"\"")) {
+            String constValue = StringUtils.substring(args, 1, args.length() - 1);
+            // throw exception when value is a number but not in range
+            if (NumberUtils.isNumber(constValue)) {
+                double value = NumberUtils.createDouble(constValue);
+                if (value < WAIT_MIN_VALUE || value > WAIT_MAX_VALUE) {
+                    throw new RuntimeException(WAIT_PARAM_INVALID);
+                }
+            }
         }
     }
 

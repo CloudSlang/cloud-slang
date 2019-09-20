@@ -190,6 +190,20 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
+    @Test
+    public void testTransformWaitStepInappropriateArg() {
+        List<Map<String, Map<String, String>>> steps = new ArrayList<>();
+        steps.add(newStep("1", null, "Wait", "\"-1\"", "1",null, null));
+        steps.add(newStep("2", null, "Wait", "\"100000\"", "1",null, null));
+
+        TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
+
+        assertThat(transform.getErrors(), hasSize(2));
+        assertEquals(transform.getErrors().get(0).getMessage(),"Parameter is invalid for 'Wait'.");
+        assertEquals(transform.getErrors().get(1).getMessage(),"Parameter is invalid for 'Wait'.");
+        assertEquals(new ArrayList<>(), transform.getTransformedData());
+    }
+
     private Map<String, Map<String, String>> newStep(String id,
                                                      String objPath,
                                                      String action,
