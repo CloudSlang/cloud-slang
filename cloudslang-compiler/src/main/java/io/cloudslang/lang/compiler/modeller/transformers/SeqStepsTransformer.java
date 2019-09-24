@@ -133,7 +133,7 @@ public class SeqStepsTransformer extends AbstractTransformer
                 if (value < WAIT_MIN_VALUE || value > WAIT_MAX_VALUE) {
                     throw new RuntimeException(String.format(WAIT_PARAM_INVALID, WAIT_MIN_VALUE, WAIT_MAX_VALUE));
                 }
-            } catch (NumberFormatException nfEx) {
+            } catch (NumberFormatException ignore) {
                // not a numeric input is valid
             }
         }
