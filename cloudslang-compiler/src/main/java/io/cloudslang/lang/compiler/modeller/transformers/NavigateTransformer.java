@@ -22,26 +22,29 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, String>>> {
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.containsNavigationNextStep;
+
+public class NavigateTransformer implements Transformer<List<Object>, List<Map<String, Serializable>>> {
 
     private ExecutableValidator executableValidator;
     private Type type = Type.INTERNAL;
 
 
     @Override
-    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData) {
+    public TransformModellingResult<List<Map<String, Serializable>>> transform(List<Object> rawData) {
         return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override
-    public TransformModellingResult<List<Map<String, String>>> transform(List<Object> rawData,
+    public TransformModellingResult<List<Map<String, Serializable>>> transform(List<Object> rawData,
                                                                          SensitivityLevel sensitivityLevel) {
-        List<Map<String, String>> transformedData = new ArrayList<>();
+        List<Map<String, Serializable>> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(rawData)) {
@@ -59,15 +62,29 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
                     // - SUCCESS: some_step
                     Map.Entry navigationEntry = (Map.Entry) elementAsMap.entrySet().iterator().next();
                     Object navigationKey = navigationEntry.getKey();
-                    Object navigationValue = navigationEntry.getValue();
+                    Serializable navigationValue = (Serializable) navigationEntry.getValue();
                     if (!(navigationKey instanceof String)) {
                         throw new RuntimeException("Each key in the navigate section should be a string.");
                     }
-                    if (!(navigationValue instanceof String)) {
-                        throw new RuntimeException("Each value in the navigate section should be a string.");
+
+                    if (navigationValue instanceof List) {
+                        // - SUCCESS:
+                        //   - next_step: some_step
+                        //   - option_1: value_1
+                        //   - option_2: value_2
+                        //   - ...
+                        if (!containsNavigationNextStep(navigationValue)) {
+                            throw new RuntimeException("Expected single 'next_step' option in first position.");
+                        }
+                    }
+                    else {
+                        // - SUCCESS: some_step
+                        if (!(navigationValue instanceof String)) {
+                            throw new RuntimeException("Each value in the navigate section should be a string.");
+                        }
                     }
                     @SuppressWarnings("unchecked")
-                    Map<String, String> elementAsStringMap = elementAsMap;
+                    Map<String, Serializable> elementAsStringMap = elementAsMap;
                     transformedData.add(elementAsStringMap);
                 } else {
                     throw new RuntimeException(
@@ -81,7 +98,7 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
         }
 
         try {
-            List<Map<String, String>> navigationStrings = (List<Map<String, String>>) (List) rawData;
+            List<Map<String, Serializable>> navigationStrings = (List<Map<String, Serializable>>) (List) rawData;
             if (!navigationStrings.isEmpty() && errors.isEmpty()) {
                 executableValidator.validateNavigationStrings(navigationStrings);
             }

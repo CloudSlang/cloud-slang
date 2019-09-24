@@ -43,6 +43,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
 
 public class PreCompileValidatorImpl extends AbstractValidator implements PreCompileValidator {
 
@@ -452,9 +453,9 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
             List<String> stepResultCollisionNames) {
         String currentStepName = currentStep.getName();
         reachableStepNames.add(currentStepName);
-        for (Map<String, String> map : currentStep.getNavigationStrings()) {
-            Map.Entry<String, String> entry = map.entrySet().iterator().next();
-            String navigationTarget = entry.getValue();
+        for (Map<String, Serializable> map : currentStep.getNavigationStrings()) {
+            Map.Entry<String, Serializable> entry = map.entrySet().iterator().next();
+            String navigationTarget = getNavigationStepName(entry.getValue());
 
             boolean isResult = resultNames.contains(navigationTarget);
             Step nextStepToCompile = selectNextStepToCompile(steps, navigationTarget);

@@ -13,9 +13,12 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
 
 /**
  * @author Bonczidai Levente
@@ -108,11 +111,11 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
     }
 
     @Override
-    public void validateNavigationStrings(List<Map<String, String>> navigationStrings) {
-        for (Map<String, String> element : navigationStrings) {
-            Map.Entry<String, String> navigation = element.entrySet().iterator().next();
+    public void validateNavigationStrings(List<Map<String, Serializable>> navigationStrings) {
+        for (Map<String, Serializable> element : navigationStrings) {
+            Map.Entry<String, Serializable> navigation = element.entrySet().iterator().next();
             String navigationKey = navigation.getKey();
-            String navigationValue = navigation.getValue();
+            Serializable navigationValue = navigation.getValue();
             validateNavigationKey(navigationKey);
             validateNavigationValue(navigationValue);
         }
@@ -145,11 +148,11 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
         validateResultNameRules(navigationKey);
     }
 
-    private void validateNavigationValue(String navigationValue) {
+    private void validateNavigationValue(Serializable navigationValue) {
         try {
-            validateStepName(navigationValue);
+            validateStepName(getNavigationStepName(navigationValue));
         } catch (RuntimeException rex) {
-            validateResultName(navigationValue);
+            validateResultName(getNavigationStepName(navigationValue));
         }
     }
 
