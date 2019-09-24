@@ -199,8 +199,10 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), hasSize(2));
-        assertEquals(transform.getErrors().get(0).getMessage(),"Parameter is invalid for 'Wait'.");
-        assertEquals(transform.getErrors().get(1).getMessage(),"Parameter is invalid for 'Wait'.");
+        assertEquals(transform.getErrors().get(0).getMessage(),
+                "'Wait' parameter is invalid. It should be between 1 and 86400.");
+        assertEquals(transform.getErrors().get(1).getMessage(),
+                "'Wait' parameter is invalid. It should be between 1 and 86400.");
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
