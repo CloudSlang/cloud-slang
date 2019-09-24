@@ -149,14 +149,14 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitSteps() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null,"Wait", null, "\"2\"",null, null));
-        steps.add(newStep("2", null,"Wait", null, "\"2 , 5\"",null, null));
-        steps.add(newStep("3", null,"Wait", "\"33\"", "\"44\"",null, null));
+        steps.add(newStep("1", null, "Wait", null, "\"2\"", null, null));
+        steps.add(newStep("2", null, "Wait", null, "\"2 , 5\"", null, null));
+        steps.add(newStep("3", null, "Wait", "\"33\"", "\"44\"", null, null));
 
         List<SeqStep> expectedSteps = new ArrayList<>();
-        expectedSteps.add(newSeqStep("1", null,"Wait", null, "\"2\"",null, null));
-        expectedSteps.add(newSeqStep("2", null,"Wait", null, "\"2 , 5\"",null, null));
-        expectedSteps.add(newSeqStep("3", null,"Wait", "\"33\"", "\"44\"",null, null));
+        expectedSteps.add(newSeqStep("1", null, "Wait", null, "\"2\"", null, null));
+        expectedSteps.add(newSeqStep("2", null, "Wait", null, "\"2 , 5\"", null, null));
+        expectedSteps.add(newSeqStep("3", null, "Wait", "\"33\"", "\"44\"", null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -167,7 +167,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitStepInvalidSyntaxNoParam() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null, "Wait", null, null,null, null));
+        steps.add(newStep("1", null, "Wait", null, null, null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -180,7 +180,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitStepInvalidArg() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null, "Wait", "\"\"", "12",null, null));
+        steps.add(newStep("1", null, "Wait", "\"\"", "12", null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -193,8 +193,8 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitStepInappropriateArg() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null, "Wait", "\"-1\"", "1",null, null));
-        steps.add(newStep("2", null, "Wait", "\"100000\"", "1",null, null));
+        steps.add(newStep("1", null, "Wait", "\"-1\"", "1", null, null));
+        steps.add(newStep("2", null, "Wait", "\"100000\"", "1", null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 

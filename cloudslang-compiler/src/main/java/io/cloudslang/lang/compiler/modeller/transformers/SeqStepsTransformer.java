@@ -15,7 +15,6 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,11 +128,13 @@ public class SeqStepsTransformer extends AbstractTransformer
     private void validateWaitArgRange(String args) {
         if (StringUtils.startsWith(args,"\"") && StringUtils.endsWith(args,"\"")) {
             String constValue = StringUtils.substring(args, 1, args.length() - 1);
-            if (NumberUtils.isParsable(constValue)) {
+            try {
                 double value = Double.parseDouble(constValue);
                 if (value < WAIT_MIN_VALUE || value > WAIT_MAX_VALUE) {
                     throw new RuntimeException(String.format(WAIT_PARAM_INVALID, WAIT_MIN_VALUE, WAIT_MAX_VALUE));
                 }
+            } catch (NumberFormatException nfEx) {
+               // not a numeric input is valid
             }
         }
     }
