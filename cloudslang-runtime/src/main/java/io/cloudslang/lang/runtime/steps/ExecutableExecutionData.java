@@ -63,6 +63,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     private final ExecutionPreconditionService executionPreconditionService;
 
+    private static final String SCHEDULE = "SCHEDULE";
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
@@ -85,26 +86,22 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
-                if (executableType.equals(FLOW)) {
+                if (executionRuntimeServices.getTriggerType().equals(SCHEDULE)) {
                     userInputs.forEach((inputName, inputValue) -> {
                         Input updatedInput;
                         Input inputToUpdate = containsInputName(executableInputs, inputName);
-                        if (inputValue instanceof SimpleValue &&
-                                isNotBlank((CharSequence) ((SimpleValue) inputValue).getContent()) ||
-                                inputValue instanceof SensitiveValue && inputValue.isSensitive()) {
-                            if (inputToUpdate != null) {
-                                updatedInput = new Input.InputBuilder(inputName, inputValue)
-                                        .withFunctionDependencies(inputToUpdate.getFunctionDependencies())
-                                        .withSystemPropertyDependencies(inputToUpdate.getSystemPropertyDependencies())
-                                        .withPrivateInput(inputToUpdate.isPrivateInput())
-                                        .withRequired(inputToUpdate.isRequired())
-                                        .build();
-                                executableInputs.remove(inputToUpdate);
-                            } else {
-                                updatedInput = new Input.InputBuilder(inputName, inputValue).build();
-                            }
-                            executableInputs.add(updatedInput);
+                        if (inputToUpdate != null) {
+                            updatedInput = new Input.InputBuilder(inputName, inputValue)
+                                    .withFunctionDependencies(inputToUpdate.getFunctionDependencies())
+                                    .withSystemPropertyDependencies(inputToUpdate.getSystemPropertyDependencies())
+                                    .withPrivateInput(inputToUpdate.isPrivateInput())
+                                    .withRequired(inputToUpdate.isRequired())
+                                    .build();
+                            executableInputs.remove(inputToUpdate);
+                        } else {
+                            updatedInput = new Input.InputBuilder(inputName, inputValue).build();
                         }
+                        executableInputs.add(updatedInput);
                     });
                 }
             }
