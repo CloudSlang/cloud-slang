@@ -39,11 +39,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.cloudslang.lang.entities.ExecutableType.FLOW;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * User: stoneo
@@ -63,7 +61,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     private final ExecutionPreconditionService executionPreconditionService;
 
-    private static final String SCHEDULE = "SCHEDULE";
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
@@ -86,18 +83,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
-                if (executionRuntimeServices.getTriggerType().equals(SCHEDULE)) {
+                if (executionRuntimeServices.getMergeUserInputs()) {
+                    Map<String, Input> executableInputsMap = new HashMap<>();
+                    executableInputs.forEach(input -> executableInputsMap.put(input.getName(), input));
                     userInputs.forEach((inputName, inputValue) -> {
                         Input updatedInput;
-                        Input inputToUpdate = containsInputName(executableInputs, inputName);
-                        if (inputToUpdate != null) {
-                            updatedInput = new Input.InputBuilder(inputName, inputValue)
-                                    .withFunctionDependencies(inputToUpdate.getFunctionDependencies())
-                                    .withSystemPropertyDependencies(inputToUpdate.getSystemPropertyDependencies())
-                                    .withPrivateInput(inputToUpdate.isPrivateInput())
-                                    .withRequired(inputToUpdate.isRequired())
+                        Input inputToUpdate = executableInputsMap.get(inputName);
+                        if (executableInputsMap.containsKey(inputName)) {
+                            updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
                                     .build();
                             executableInputs.remove(inputToUpdate);
+                            executableInputsMap.remove(inputName);
                         } else {
                             updatedInput = new Input.InputBuilder(inputName, inputValue).build();
                         }
@@ -151,15 +147,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
-    }
-
-    private Input containsInputName(List<Input> executableInputs, String inputName) {
-        for (Input executableInput : executableInputs) {
-            if (executableInput.getName().equalsIgnoreCase(inputName)) {
-                return executableInput;
-            }
-        }
-        return null;
     }
 
     /**
