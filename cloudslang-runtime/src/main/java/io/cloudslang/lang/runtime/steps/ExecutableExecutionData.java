@@ -95,8 +95,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                     .build();
                             executableInputs.set(executableInputs.indexOf(inputToUpdate), updatedInput);
                         } else {
-                            Input updatedInput = new Input.InputBuilder(inputName, inputValue).build();
-                            executableInputs.add(updatedInput);
+                            Input toAddInput = new Input.InputBuilder(inputName, inputValue).build();
+                            executableInputs.add(toAddInput);
                         }
                     }
                 }
