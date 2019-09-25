@@ -15,8 +15,6 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
-import io.cloudslang.lang.entities.bindings.values.SimpleValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
@@ -38,9 +36,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -83,22 +83,22 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
+                // merge is done only for flows that have extra inputs besides those defined as "flow inputs"
                 if (executionRuntimeServices.getMergeUserInputs()) {
-                    Map<String, Input> executableInputsMap = new HashMap<>();
-                    executableInputs.forEach(input -> executableInputsMap.put(input.getName(), input));
-                    userInputs.forEach((inputName, inputValue) -> {
-                        Input updatedInput;
+                    Map<String, Input> executableInputsMap = executableInputs.stream()
+                            .collect(toMap(Input::getName, Function.identity()));
+                    for (String inputName : userInputs.keySet()) {
+                        Value inputValue = userInputs.get(inputName);
                         Input inputToUpdate = executableInputsMap.get(inputName);
-                        if (executableInputsMap.containsKey(inputName)) {
-                            updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
+                        if (inputToUpdate != null) {
+                            Input updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
                                     .build();
-                            executableInputs.remove(inputToUpdate);
-                            executableInputsMap.remove(inputName);
+                            executableInputs.set(executableInputs.indexOf(inputToUpdate), updatedInput);
                         } else {
-                            updatedInput = new Input.InputBuilder(inputName, inputValue).build();
+                            Input updatedInput = new Input.InputBuilder(inputName, inputValue).build();
+                            executableInputs.add(updatedInput);
                         }
-                        executableInputs.add(updatedInput);
-                    });
+                    }
                 }
             }
 
