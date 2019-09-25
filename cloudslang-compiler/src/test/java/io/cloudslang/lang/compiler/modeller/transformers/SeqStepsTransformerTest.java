@@ -149,14 +149,14 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitSteps() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null,"Wait", null, "\"2\"",null, null));
-        steps.add(newStep("2", null,"Wait", null, "\"2 , 5\"",null, null));
-        steps.add(newStep("3", null,"Wait", "\"33\"", "\"44\"",null, null));
+        steps.add(newStep("1", null, "Wait", null, "\"2\"", null, null));
+        steps.add(newStep("2", null, "Wait", null, "\"2 , 5\"", null, null));
+        steps.add(newStep("3", null, "Wait", "\"33\"", "\"44\"", null, null));
 
         List<SeqStep> expectedSteps = new ArrayList<>();
-        expectedSteps.add(newSeqStep("1", null,"Wait", null, "\"2\"",null, null));
-        expectedSteps.add(newSeqStep("2", null,"Wait", null, "\"2 , 5\"",null, null));
-        expectedSteps.add(newSeqStep("3", null,"Wait", "\"33\"", "\"44\"",null, null));
+        expectedSteps.add(newSeqStep("1", null, "Wait", null, "\"2\"", null, null));
+        expectedSteps.add(newSeqStep("2", null, "Wait", null, "\"2 , 5\"", null, null));
+        expectedSteps.add(newSeqStep("3", null, "Wait", "\"33\"", "\"44\"", null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -167,7 +167,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitStepInvalidSyntaxNoParam() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null, "Wait", null, null,null, null));
+        steps.add(newStep("1", null, "Wait", null, null, null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
@@ -180,13 +180,29 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWaitStepInvalidArg() {
         List<Map<String, Map<String, String>>> steps = new ArrayList<>();
-        steps.add(newStep("1", null, "Wait", "\"\"", "12",null, null));
+        steps.add(newStep("1", null, "Wait", "\"\"", "12", null, null));
 
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
                 "Parameter required for 'Wait'.");
+        assertEquals(new ArrayList<>(), transform.getTransformedData());
+    }
+
+    @Test
+    public void testTransformWaitStepInappropriateArg() {
+        List<Map<String, Map<String, String>>> steps = new ArrayList<>();
+        steps.add(newStep("1", null, "Wait", "\"-1\"", "1", null, null));
+        steps.add(newStep("2", null, "Wait", "\"100000\"", "1", null, null));
+
+        TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
+
+        assertThat(transform.getErrors(), hasSize(2));
+        assertEquals(transform.getErrors().get(0).getMessage(),
+                "'Wait' parameter is invalid. It should be between 1 and 86400.");
+        assertEquals(transform.getErrors().get(1).getMessage(),
+                "'Wait' parameter is invalid. It should be between 1 and 86400.");
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 

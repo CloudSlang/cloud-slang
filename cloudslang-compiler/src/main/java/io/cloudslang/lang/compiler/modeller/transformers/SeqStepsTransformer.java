@@ -65,6 +65,9 @@ public class SeqStepsTransformer extends AbstractTransformer
 
     private static final String WAIT = "Wait";
     private static final String WAIT_PARAM_REQUIRED = "Parameter required for 'Wait'.";
+    private static final String WAIT_PARAM_INVALID = "'Wait' parameter is invalid. It should be between %.0f and %.0f.";
+    private static final double WAIT_MIN_VALUE = 1.0;
+    private static final double WAIT_MAX_VALUE = 86400.0;
 
 
     @Override
@@ -118,6 +121,21 @@ public class SeqStepsTransformer extends AbstractTransformer
         String args = stepProps.getOrDefault(SEQ_STEP_ARGS_KEY, stepProps.get(SEQ_STEP_DEFAULT_ARGS_KEY));
         if (StringUtils.isEmpty(args) || StringUtils.equals("\"\"", args)) {
             throw new RuntimeException(WAIT_PARAM_REQUIRED);
+        }
+        validateWaitArgRange(args);
+    }
+
+    private void validateWaitArgRange(String args) {
+        if (StringUtils.startsWith(args,"\"") && StringUtils.endsWith(args,"\"")) {
+            String constValue = StringUtils.substring(args, 1, args.length() - 1);
+            try {
+                double value = Double.parseDouble(constValue);
+                if (value < WAIT_MIN_VALUE || value > WAIT_MAX_VALUE) {
+                    throw new RuntimeException(String.format(WAIT_PARAM_INVALID, WAIT_MIN_VALUE, WAIT_MAX_VALUE));
+                }
+            } catch (NumberFormatException ignore) {
+               // not a numeric input is valid
+            }
         }
     }
 
