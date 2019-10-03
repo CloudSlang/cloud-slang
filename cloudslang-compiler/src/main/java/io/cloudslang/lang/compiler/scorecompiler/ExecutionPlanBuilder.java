@@ -16,6 +16,7 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.ExecutableType;
+import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
@@ -35,6 +36,7 @@ import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
 import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
+import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 
 /*
  * Created by orius123 on 11/11/14.
@@ -172,7 +174,7 @@ public class ExecutionPlanBuilder {
             if (!navigationValues.containsKey(navigationKey)) {
                 navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
             }
-            addNavigationData(executionStep, entry);
+            addStepNavigationOptions(executionStep, entry, nextStepId);
         }
         if (parallelLoop) {
             stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(),
@@ -254,17 +256,19 @@ public class ExecutionPlanBuilder {
         this.externalStepFactory = externalStepFactory;
     }
 
-    private void addNavigationData(ExecutionStep executionStep, Map.Entry<String, Serializable> navigation) {
+    private void addStepNavigationOptions(ExecutionStep executionStep, Map.Entry<String, Serializable> navigation,
+            long nextStepId) {
         if (navigation.getValue() instanceof List) {
             Map<String, Object> navigationData = (Map<String, Object>) executionStep.getNavigationData();
             if (navigationData == null) {
-                navigationData = new HashMap<String, Object>();
+                navigationData = new HashMap<>();
                 executionStep.setNavigationData(navigationData);
             }
-            if (!navigationData.containsKey("options")) {
-                navigationData.put("options", new LinkedHashMap<String, Object>());
-            }
-            ((Map<String, Object>)navigationData.get("options")).put(navigation.getKey(), navigation.getValue());
+            Map<String, Object> stepNavigationOptions = (Map<String, Object>) navigationData.computeIfAbsent(
+                    STEP_NAVIGATION_OPTIONS_KEY, key -> new LinkedHashMap<>());
+
+            stepNavigationOptions.put(navigation.getKey(), new NavigationOptions(executionStep.getExecStepId(),
+                    nextStepId, (List) navigation.getValue()));
         }
     }
 }
