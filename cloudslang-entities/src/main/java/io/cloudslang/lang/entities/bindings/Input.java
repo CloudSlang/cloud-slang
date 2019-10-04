@@ -124,6 +124,15 @@ public class Input extends InOutParam {
             this.systemPropertyDependencies = new HashSet<>();
         }
 
+        public InputBuilder(Input input, Value value) {
+            this.name = input.getName();
+            this.value = value;
+            this.required = input.isRequired();
+            this.privateInput = input.isPrivateInput();
+            this.functionDependencies = input.getFunctionDependencies();
+            this.systemPropertyDependencies = input.getSystemPropertyDependencies();
+        }
+
         public InputBuilder withRequired(boolean required) {
             this.required = required;
             return this;
