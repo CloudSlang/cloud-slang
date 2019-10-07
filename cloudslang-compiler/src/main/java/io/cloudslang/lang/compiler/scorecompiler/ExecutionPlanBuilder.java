@@ -265,8 +265,8 @@ public class ExecutionPlanBuilder {
             List<NavigationOptions> stepNavigationOptions = (List<NavigationOptions>) navigationData.computeIfAbsent(
                     STEP_NAVIGATION_OPTIONS_KEY, key -> new ArrayList<>());
 
-            stepNavigationOptions.add(new NavigationOptions(navigation.getKey(), (Map) navigation.getValue(),
-                    executionStep.getExecStepId()));
+            stepNavigationOptions.add(new NavigationOptions(navigation.getKey(), executionStep.getExecStepId(),
+                    (Map) navigation.getValue()));
         }
     }
 }

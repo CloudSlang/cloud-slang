@@ -20,13 +20,13 @@ import java.util.Map;
 public class NavigationOptions implements Serializable {
 
     private String name;
-    private Map<String, Serializable> options;
     private long currStepId;
+    private Map<String, Serializable> options;
 
-    public NavigationOptions(String name, Map<String, Serializable> options, long currStepId) {
+    public NavigationOptions(String name, long currStepId, Map<String, Serializable> options) {
         this.name = name;
-        this.options = options;
         this.currStepId = currStepId;
+        this.options = options;
     }
 
     /**
@@ -35,12 +35,12 @@ public class NavigationOptions implements Serializable {
     private NavigationOptions() {
     }
 
-    public long getCurrStepId() {
-        return this.currStepId;
-    }
-
     public String getName() {
         return this.name;
+    }
+
+    public long getCurrStepId() {
+        return this.currStepId;
     }
 
     public Map<String, Serializable> getOptions() {
