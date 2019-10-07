@@ -21,14 +21,12 @@ public class NavigationOptions implements Serializable {
 
     private String name;
     private Map<String, Serializable> options;
-    private long nextStepId;
     private long currStepId;
 
-    public NavigationOptions(String name, Map<String, Serializable> options, long currStepId, long nextStepId) {
+    public NavigationOptions(String name, Map<String, Serializable> options, long currStepId) {
         this.name = name;
         this.options = options;
         this.currStepId = currStepId;
-        this.nextStepId = nextStepId;
     }
 
     /**
@@ -39,10 +37,6 @@ public class NavigationOptions implements Serializable {
 
     public long getCurrStepId() {
         return this.currStepId;
-    }
-
-    public long getNextStepId() {
-        return this.nextStepId;
     }
 
     public String getName() {

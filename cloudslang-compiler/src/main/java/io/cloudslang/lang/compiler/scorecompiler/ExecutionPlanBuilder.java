@@ -173,7 +173,7 @@ public class ExecutionPlanBuilder {
             if (!navigationValues.containsKey(navigationKey)) {
                 navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
             }
-            addStepNavigationOptions(executionStep, entry, nextStepId);
+            addStepNavigationOptions(executionStep, entry);
         }
         if (parallelLoop) {
             stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(),
@@ -255,8 +255,7 @@ public class ExecutionPlanBuilder {
         this.externalStepFactory = externalStepFactory;
     }
 
-    private void addStepNavigationOptions(ExecutionStep executionStep, Map.Entry<String, Serializable> navigation,
-            long nextStepId) {
+    private void addStepNavigationOptions(ExecutionStep executionStep, Map.Entry<String, Serializable> navigation) {
         if (navigation.getValue() instanceof Map) {
             Map<String, Serializable> navigationData = (Map<String, Serializable>) executionStep.getNavigationData();
             if (navigationData == null) {
@@ -267,7 +266,7 @@ public class ExecutionPlanBuilder {
                     STEP_NAVIGATION_OPTIONS_KEY, key -> new ArrayList<>());
 
             stepNavigationOptions.add(new NavigationOptions(navigation.getKey(), (Map) navigation.getValue(),
-                    executionStep.getExecStepId(), nextStepId));
+                    executionStep.getExecStepId()));
         }
     }
 }
