@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
@@ -258,17 +257,17 @@ public class ExecutionPlanBuilder {
 
     private void addStepNavigationOptions(ExecutionStep executionStep, Map.Entry<String, Serializable> navigation,
             long nextStepId) {
-        if (navigation.getValue() instanceof List) {
-            Map<String, Object> navigationData = (Map<String, Object>) executionStep.getNavigationData();
+        if (navigation.getValue() instanceof Map) {
+            Map<String, Serializable> navigationData = (Map<String, Serializable>) executionStep.getNavigationData();
             if (navigationData == null) {
                 navigationData = new HashMap<>();
                 executionStep.setNavigationData(navigationData);
             }
-            Map<String, Object> stepNavigationOptions = (Map<String, Object>) navigationData.computeIfAbsent(
-                    STEP_NAVIGATION_OPTIONS_KEY, key -> new LinkedHashMap<>());
+            List<NavigationOptions> stepNavigationOptions = (List<NavigationOptions>) navigationData.computeIfAbsent(
+                    STEP_NAVIGATION_OPTIONS_KEY, key -> new ArrayList<>());
 
-            stepNavigationOptions.put(navigation.getKey(), new NavigationOptions(executionStep.getExecStepId(),
-                    nextStepId, (List) navigation.getValue()));
+            stepNavigationOptions.add(new NavigationOptions(navigation.getKey(), (Map) navigation.getValue(),
+                    executionStep.getExecStepId(), nextStepId));
         }
     }
 }

@@ -47,11 +47,8 @@ public abstract class SlangSourceUtils {
         if (value instanceof String) {
             return (String) value;
         } else {
-            List<Map<String, Serializable>> optionList = (List<Map<String, Serializable>>) value;
-            if (!optionList.isEmpty()) {
-                return (String) optionList.get(0).get(NEXT_STEP);
-            }
-            return null;
+            Map<String, Serializable> options = (Map<String, Serializable>) value;
+            return (String) options.get(NEXT_STEP);
         }
     }
 
@@ -59,28 +56,17 @@ public abstract class SlangSourceUtils {
         if (value instanceof String) {
             return newName;
         } else {
-            List<Map<String, Serializable>> optionList = (List<Map<String, Serializable>>) value;
-            if (!optionList.isEmpty()) {
-                optionList.get(0).put(NEXT_STEP, newName);
+            Map<String, Serializable> options = (Map<String, Serializable>) value;
+            if (!options.isEmpty()) {
+                options.put(NEXT_STEP, newName);
             }
             return value;
         }
     }
 
     public static boolean containsNavigationNextStep(Serializable value) {
-        List<Map<String, Serializable>> optionList = (List<Map<String, Serializable>>) value;
-        for (Map<String, Serializable> m: optionList) {
-            if (m == optionList.get(0)) {
-                if (!m.containsKey(NEXT_STEP)) {
-                    return false;
-                }
-            } else {
-                if (m.containsKey(NEXT_STEP)) {
-                    return false;
-                }
-            }
-        }
-        return !optionList.isEmpty();
+        Map<String, Serializable> options = (Map<String, Serializable>) value;
+        return options.containsKey(NEXT_STEP);
     }
 
 }

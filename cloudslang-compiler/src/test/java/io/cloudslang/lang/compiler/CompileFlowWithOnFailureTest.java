@@ -150,22 +150,22 @@ public class CompileFlowWithOnFailureTest {
         ExecutionStep thirdStep = executionPlan.getStep(step3);
         assertTrue("navigation data is empty", thirdStep.getNavigationData() != null &&
                 !thirdStep.getNavigationData().isEmpty());
-        Map<String, Object> optionsMap = (Map<String, Object>) thirdStep.getNavigationData()
+        List<NavigationOptions> optionsList = (List<NavigationOptions>) thirdStep.getNavigationData()
                 .get(ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY);
-        assertNotNull("navigation data options is empty", optionsMap);
-        NavigationOptions successNavigationOptions = (NavigationOptions) optionsMap.get("SUCCESS");
-        assertNotNull("navigation SUCCESS options is empty", successNavigationOptions);
-        List<Map<String, Serializable>> successOptions = successNavigationOptions.getOptions();
+        assertTrue("navigation data options is empty", !optionsList.isEmpty());
+        assertEquals(optionsList.get(0).getName(), "SUCCESS");
+        assertNotNull("navigation SUCCESS options is empty", optionsList.get(0).getOptions());
+        Map<String, Serializable> successOptions = optionsList.get(0).getOptions();
         assertEquals(2, successOptions.size());
         assertEquals("navigation SUCCESS next_step options is invalid", "SUCCESS",
-                successOptions.get(0).get("next_step"));
-        assertEquals("navigation SUCCESS ROI options is invalid", 11, successOptions.get(1).get("ROI"));
-        NavigationOptions failureNavigationOptions = (NavigationOptions) optionsMap.get("FAILURE");
-        assertNotNull("navigation FAILURE options is empty", failureNavigationOptions);
-        List<Map<String, Serializable>> failureOptions = failureNavigationOptions.getOptions();
+                successOptions.get("next_step"));
+        assertEquals("navigation SUCCESS ROI options is invalid", 11, successOptions.get("ROI"));
+        assertEquals(optionsList.get(1).getName(), "FAILURE");
+        assertNotNull("navigation FAILURE options is empty", optionsList.get(1).getOptions());
+        Map<String, Serializable> failureOptions = optionsList.get(1).getOptions();
         assertEquals(1, failureOptions.size());
         assertEquals("navigation FAILURE next_step options is invalid", "reset_step_on_failure",
-                failureOptions.get(0).get("next_step"));
+                failureOptions.get("next_step"));
     }
 
     @Test

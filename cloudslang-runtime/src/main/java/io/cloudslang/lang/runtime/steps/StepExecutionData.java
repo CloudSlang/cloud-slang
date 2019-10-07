@@ -31,6 +31,7 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -77,7 +78,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                           @Param(ScoreLangConstants.REF_ID) String refId,
-                          @Param(STEP_NAVIGATION_OPTIONS_KEY) Map<String, NavigationOptions> stepNavigationOptions) {
+                          @Param(STEP_NAVIGATION_OPTIONS_KEY) List<NavigationOptions> stepNavigationOptions) {
         try {
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
@@ -217,7 +218,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
             final ReturnValues returnValues = getReturnValues(executableResult, presetResult, outputs);
 
-            Map<String, NavigationOptions> stepNavigationOptions = runEnv.removeStepNavigationOptions(previousStepId);
+            List<NavigationOptions> stepNavigationOptions = runEnv.removeStepNavigationOptions(previousStepId);
             final Double roiValue = getRoiValue(executableResult, stepNavigationOptions);
 
             runEnv.putReturnValues(returnValues);
@@ -286,25 +287,18 @@ public class StepExecutionData extends AbstractExecutionData {
         return workerGroupValue.toString();
     }
 
-    private void putStepNavigationOptions(RunEnvironment runEnv, Map<String, NavigationOptions> stepNavigationOptions) {
-        if (stepNavigationOptions != null) {
-            for (NavigationOptions options: stepNavigationOptions.values()) {
-                runEnv.putStepNavigationOptions(options.getCurrStepId(), stepNavigationOptions);
-                break;
-            }
+    private void putStepNavigationOptions(RunEnvironment runEnv, List<NavigationOptions> stepNavigationOptions) {
+        if (CollectionUtils.isNotEmpty(stepNavigationOptions)) {
+            runEnv.putStepNavigationOptions(stepNavigationOptions.get(0).getCurrStepId(), stepNavigationOptions);
         }
     }
 
-    private Double getRoiValue(String stepExecutableResult, Map<String, NavigationOptions> stepNavigationOptions) {
-        if (StringUtils.isNotEmpty(stepExecutableResult) && stepNavigationOptions != null) {
-            NavigationOptions navigationOptions = stepNavigationOptions.get(stepExecutableResult);
-            if (navigationOptions != null && navigationOptions.getOptions() != null) {
-                List<Map<String, Serializable>> options = navigationOptions.getOptions();
-                for (Map<String, Serializable> option: options) {
-                    Serializable roiValue = option.get(LanguageEventData.ROI);
-                    if (roiValue != null) {
-                        return (Double) roiValue;
-                    }
+    private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions) {
+        if (StringUtils.isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
+            for (NavigationOptions navigationOptions: stepNavigationOptions) {
+                if (navigationOptions.getName().equals(stepExecutableResult)) {
+                    Double roiValue = (Double) navigationOptions.getOptions().get(LanguageEventData.ROI);
+                    return roiValue != null ? roiValue : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
                 }
             }
         }

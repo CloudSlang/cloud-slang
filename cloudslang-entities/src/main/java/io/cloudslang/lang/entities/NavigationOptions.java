@@ -10,7 +10,6 @@
 package io.cloudslang.lang.entities;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,14 +19,16 @@ import java.util.Map;
  */
 public class NavigationOptions implements Serializable {
 
+    private String name;
+    private Map<String, Serializable> options;
     private long nextStepId;
     private long currStepId;
-    private List<Map<String, Serializable>> options;
 
-    public NavigationOptions(long currStepId, long nextStepId, List<Map<String, Serializable>> options) {
+    public NavigationOptions(String name, Map<String, Serializable> options, long currStepId, long nextStepId) {
+        this.name = name;
+        this.options = options;
         this.currStepId = currStepId;
         this.nextStepId = nextStepId;
-        this.options = options;
     }
 
     /**
@@ -44,7 +45,11 @@ public class NavigationOptions implements Serializable {
         return this.nextStepId;
     }
 
-    public List<Map<String, Serializable>> getOptions() {
+    public String getName() {
+        return this.name;
+    }
+
+    public Map<String, Serializable> getOptions() {
         return this.options;
     }
 
