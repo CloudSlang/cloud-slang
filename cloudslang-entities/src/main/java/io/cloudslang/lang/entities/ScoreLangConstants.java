@@ -57,6 +57,7 @@ public interface ScoreLangConstants {
     String STEP_INPUTS_KEY = "stepInputs";
     String STEP_PUBLISH_KEY = "stepPublishValues";
     String STEP_NAVIGATION_KEY = "stepNavigationValues";
+    String STEP_NAVIGATION_OPTIONS_KEY = "stepNavigationOptions";
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";

@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
@@ -30,6 +31,8 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
@@ -73,7 +77,8 @@ public class StepExecutionData extends AbstractExecutionData {
                           //CHECKSTYLE:ON
 
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
-                          @Param(ScoreLangConstants.REF_ID) String refId) {
+                          @Param(ScoreLangConstants.REF_ID) String refId,
+                          @Param(STEP_NAVIGATION_OPTIONS_KEY) List<NavigationOptions> stepNavigationOptions) {
         try {
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
@@ -137,6 +142,8 @@ public class StepExecutionData extends AbstractExecutionData {
             // set the start step of the given ref as the next step to execute
             // (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
+
+            putStepNavigationOptions(runEnv, stepNavigationOptions);
         } catch (RuntimeException e) {
             logger.error("There was an error running the beginStep execution step of: \'" + nodeName +
                     "\'. Error is: " + e.getMessage());
@@ -211,6 +218,9 @@ public class StepExecutionData extends AbstractExecutionData {
 
             final ReturnValues returnValues = getReturnValues(executableResult, presetResult, outputs);
 
+            List<NavigationOptions> stepNavigationOptions = runEnv.removeStepNavigationOptions(previousStepId);
+            final Double roiValue = getRoiValue(executableResult, stepNavigationOptions);
+
             runEnv.putReturnValues(returnValues);
             throwEventOutputEnd(
                     runEnv,
@@ -219,9 +229,11 @@ public class StepExecutionData extends AbstractExecutionData {
                     publishValues,
                     nextPosition,
                     returnValues,
+                    roiValue,
                     outputsBindingContext
             );
 
+            executionRuntimeServices.addRoiValue(roiValue);
             executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
             executionRuntimeServices.setShouldCheckGroup();
 
@@ -273,6 +285,24 @@ public class StepExecutionData extends AbstractExecutionData {
                     runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
         }
         return workerGroupValue.toString();
+    }
+
+    private void putStepNavigationOptions(RunEnvironment runEnv, List<NavigationOptions> stepNavigationOptions) {
+        if (CollectionUtils.isNotEmpty(stepNavigationOptions)) {
+            runEnv.putStepNavigationOptions(stepNavigationOptions.get(0).getCurrStepId(), stepNavigationOptions);
+        }
+    }
+
+    private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions) {
+        if (StringUtils.isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
+            for (NavigationOptions navigationOptions: stepNavigationOptions) {
+                if (navigationOptions.getName().equals(stepExecutableResult)) {
+                    Double roiValue = (Double) navigationOptions.getOptions().get(LanguageEventData.ROI);
+                    return roiValue != null ? roiValue : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
+                }
+            }
+        }
+        return ExecutionParametersConsts.DEFAULT_ROI_VALUE;
     }
 
 

@@ -67,12 +67,12 @@ public class NavigateTransformer implements Transformer<List<Object>, List<Map<S
                         throw new RuntimeException("Each key in the navigate section should be a string.");
                     }
 
-                    if (navigationValue instanceof List) {
+                    if (navigationValue instanceof Map) {
                         // - SUCCESS:
-                        //   - next_step: some_step
-                        //   - option_1: value_1
-                        //   - option_2: value_2
-                        //   - ...
+                        //     next_step: some_step
+                        //     option_1: value_1
+                        //     option_2: value_2
+                        //     ...
                         if (!containsNavigationNextStep(navigationValue)) {
                             throw new RuntimeException("Expected single 'next_step' option in first position.");
                         }

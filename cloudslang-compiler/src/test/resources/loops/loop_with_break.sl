@@ -26,8 +26,8 @@ flow:
             - FAILURE
         navigate:
           - SUCCESS:
-            - next_step: SUCCESS
-            - ROI: 11
+              next_step: SUCCESS
+              ROI: 11
           - FAILURE: FAILURE
   results:
     - FAILURE
