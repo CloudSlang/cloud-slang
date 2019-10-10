@@ -33,6 +33,7 @@ import io.cloudslang.lang.runtime.env.ParentFlowStack;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -170,6 +171,7 @@ public abstract class AbstractExecutionData {
                         publishValues,
                         previousStepId,
                         new ReturnValues(publishValues, executableReturnValues.getResult()),
+                        ExecutionParametersConsts.DEFAULT_ROI_VALUE,
                         outputsBindingContext
                 );
                 runEnv.getExecutionPath().forward();
@@ -187,12 +189,14 @@ public abstract class AbstractExecutionData {
                                               Map<String, Value> publishValues,
                                               Long nextPosition,
                                               ReturnValues returnValues,
+                                              Double roiValue,
                                               Map<String, Value> context) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
                 context,
                 Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                Pair.of(LanguageEventData.ROI, roiValue),
                 Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextPosition),
                 Pair.of(LanguageEventData.WORKER_GROUP_NAME, executionRuntimeServices.getWorkerGroupName()),
                 Pair.of(LanguageEventData.CONSUMER_WORKER_UUID, executionRuntimeServices.removeConsumerWorkerId()),

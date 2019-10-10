@@ -20,10 +20,10 @@ flow:
             - alla: ':-)'
         navigate:
           - SUCCESS:
-            - next_step: SUCCESS
-            - ROI: 11
+              next_step: SUCCESS
+              ROI: 11
           - FAILURE:
-            - next_step: reset_step_on_failure
+              next_step: reset_step_on_failure
 
     - reset_step_on_failure:
         do:
@@ -32,11 +32,11 @@ flow:
             - alla: ':-('
         navigate:
           - SUCCESS:
-            - next_step: SUCCESS
-            - ROI: 1
+              next_step: SUCCESS
+              ROI: 1
           - FAILURE:
-            - next_step: FAILURE
-            - ROI: -1
+              next_step: FAILURE
+              ROI: -1
 
   results:
     - SUCCESS

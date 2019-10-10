@@ -30,11 +30,9 @@ flow:
             - alla: 'walla'
         navigate:
           - SUCCESS:
-            - next_step: SUCCESS
-            - ROI: 1
-            - another_option:
-              - option1: 'value1'
-              - option2: 'value2'
+              next_step: SUCCESS
+              ROI: 1
+              another_option: 'value0'
           - FAILURE: FAILURE
 
     - on_failure:
