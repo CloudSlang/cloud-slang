@@ -20,6 +20,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
@@ -219,7 +220,7 @@ public class StepExecutionData extends AbstractExecutionData {
             final ReturnValues returnValues = getReturnValues(executableResult, presetResult, outputs);
 
             List<NavigationOptions> stepNavigationOptions = runEnv.removeStepNavigationOptions(previousStepId);
-            final Double roiValue = getRoiValue(executableResult, stepNavigationOptions);
+            final Double roiValue = getRoiValue(executableResult, stepNavigationOptions, flowVariables);
 
             runEnv.putReturnValues(returnValues);
             throwEventOutputEnd(
@@ -293,11 +294,18 @@ public class StepExecutionData extends AbstractExecutionData {
         }
     }
 
-    private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions) {
+    private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions,
+                               Map<String, Value> flowVariables) {
         if (StringUtils.isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
             for (NavigationOptions navigationOptions: stepNavigationOptions) {
                 if (navigationOptions.getName().equals(stepExecutableResult)) {
                     Serializable roi = navigationOptions.getOptions().get(LanguageEventData.ROI);
+                    if (roi instanceof String) {
+                        String expr = ExpressionUtils.extractExpression(roi);
+                        if (StringUtils.isNotEmpty(expr) && flowVariables.containsKey(expr)) {
+                            roi = flowVariables.get(expr).get();
+                        }
+                    }
                     return roi != null ? Double.valueOf(roi.toString()) : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
                 }
             }
