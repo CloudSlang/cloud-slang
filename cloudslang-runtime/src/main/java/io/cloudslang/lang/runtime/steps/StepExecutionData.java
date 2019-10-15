@@ -297,8 +297,8 @@ public class StepExecutionData extends AbstractExecutionData {
         if (StringUtils.isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
             for (NavigationOptions navigationOptions: stepNavigationOptions) {
                 if (navigationOptions.getName().equals(stepExecutableResult)) {
-                    Double roiValue = (Double) navigationOptions.getOptions().get(LanguageEventData.ROI);
-                    return roiValue != null ? roiValue : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
+                    Serializable roi = navigationOptions.getOptions().get(LanguageEventData.ROI);
+                    return roi != null ? Double.valueOf(roi.toString()) : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
                 }
             }
         }
