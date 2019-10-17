@@ -72,7 +72,7 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, parallelLoop);
 
         if (workerGroup != null) {
-            actionData.put("workerGroup", workerGroup);
+            actionData.put(ScoreLangConstants.WORKER_GROUP, workerGroup);
         }
         if (!parallelLoop) {
             actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));

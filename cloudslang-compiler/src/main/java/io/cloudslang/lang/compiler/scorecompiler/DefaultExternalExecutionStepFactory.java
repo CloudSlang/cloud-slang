@@ -26,7 +26,8 @@ public class DefaultExternalExecutionStepFactory implements ExternalExecutionSte
     public ExecutionStep createBeginExternalFlowStep(Long index, List<Argument> stepInputs,
                                                      Map<String, Serializable> preStepData,
                                                      String refId,
-                                                     String stepName) {
+                                                     String stepName,
+                                                     String workerGroup) {
         throw new UnsupportedOperationException(EXTERNAL_STEPS_NOT_SUPPORTED);
     }
 
@@ -35,6 +36,7 @@ public class DefaultExternalExecutionStepFactory implements ExternalExecutionSte
                                                       Map<String, Serializable> postStepData,
                                                       Map<String, ResultNavigation> navigationValues,
                                                       String stepName,
+                                                      String workerGroup,
                                                       boolean parallelLoop) {
         throw new UnsupportedOperationException(EXTERNAL_STEPS_NOT_SUPPORTED);
     }

@@ -19,10 +19,10 @@ import java.util.Map;
 public interface ExternalExecutionStepFactory {
 
     ExecutionStep createBeginExternalFlowStep(Long index, List<Argument> stepInputs,
-                                             Map<String, Serializable> preStepData,
-                                              String refId, String stepName);
+                                              Map<String, Serializable> preStepData,
+                                              String refId, String stepName, String workerGroup);
 
     ExecutionStep createFinishExternalFlowStep(Long index, Map<String, Serializable> postStepData,
-                                       Map<String, ResultNavigation> navigationValues,
-                                       String stepName, boolean parallelLoop);
+                                               Map<String, ResultNavigation> navigationValues,
+                                               String stepName, String workerGroup, boolean parallelLoop);
 }
