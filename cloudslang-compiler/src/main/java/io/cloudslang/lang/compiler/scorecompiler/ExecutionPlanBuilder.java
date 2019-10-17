@@ -232,7 +232,7 @@ public class ExecutionPlanBuilder {
             ResultNavigation> navigationValues, String workerGroup, boolean parallelLoop) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
-                    navigationValues, step.getName(), parallelLoop);
+                    navigationValues, step.getName(), workerGroup, parallelLoop);
         }
         return stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
                 navigationValues, step.getName(), workerGroup, parallelLoop);
@@ -241,7 +241,7 @@ public class ExecutionPlanBuilder {
     private ExecutionStep createBeginStep(Long id, Step step, String workerGroup) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
-                    step.getPreStepActionData(), step.getRefId(), step.getName());
+                    step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
         }
         return stepFactory.createBeginStepStep(id, step.getArguments(),
                 step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
