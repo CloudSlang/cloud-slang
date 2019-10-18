@@ -92,6 +92,10 @@ public class RunEnvironment implements Serializable {
         this.callArguments.putAll(callArguments);
     }
 
+    public Map<String, Value> getCallArguments() {
+        return callArguments;
+    }
+
     public ReturnValues removeReturnValues() {
         ReturnValues values = returnValues;
         returnValues = null;
