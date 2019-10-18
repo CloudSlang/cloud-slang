@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>1.0.89-SNAPSHOT</version>
+    <version>1.0.90-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -43,7 +43,7 @@
         <!--Project dependencies-->
         <spring.version>4.3.17.RELEASE</spring.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <score.version>0.3.105</score.version>
+        <score.version>0.3.107</score.version>
         <h2.version>1.4.199</h2.version>
         <!--Project properties-->
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
