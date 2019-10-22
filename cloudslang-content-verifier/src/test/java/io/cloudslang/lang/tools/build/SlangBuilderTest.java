@@ -134,7 +134,7 @@ public class SlangBuilderTest {
                     new ArrayList<Input>(),
                     new HashSet<String>()
             );
-    private static final Flow EMPTY_EXECUTABLE = new Flow(null, null, null, "no_dependencies", "empty_flow",
+    private static final Flow EMPTY_EXECUTABLE = new Flow(null, null, null, "no_dependencies", "empty_flow", null,
             null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
 
     private static final Metadata EMPTY_METADATA = new Metadata();
@@ -325,8 +325,8 @@ public class SlangBuilderTest {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dep1");
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null,
-                flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null,
+                null, null, null, flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(newExecutable, new HashSet<Executable>()))
@@ -356,11 +356,11 @@ public class SlangBuilderTest {
 
         Set<String> flowDependencies = new HashSet<>();
         flowDependencies.add("dependencies.dependency");
-        Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null,
+        Flow emptyFlowExecutable = new Flow(null, null, null, "dependencies", "empty_flow", null, null, null, null,
                 flowDependencies, SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(emptyFlowSource))
                 .thenReturn(new ExecutableModellingResult(emptyFlowExecutable, new ArrayList<RuntimeException>()));
-        Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null,
+        Flow dependencyExecutable = new Flow(null, null, null, "dependencies", "dependency", null, null, null, null,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(dependencySource))
                 .thenReturn(new ExecutableModellingResult(dependencyExecutable, new ArrayList<RuntimeException>()));
@@ -383,8 +383,8 @@ public class SlangBuilderTest {
     @Test
     public void testInvalidNamespaceFlow() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
-        final Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null, null, null,
-                new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null,
+                null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
@@ -405,8 +405,8 @@ public class SlangBuilderTest {
     @Test
     public void testInvalidFlowName() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
-        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null, null, null,
-                new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null,
+                null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
@@ -430,7 +430,7 @@ public class SlangBuilderTest {
     @Test
     public void testValidFlowNamespaceWithAllValidCharsTypes() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies-0123456789").toURI();
-        final Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow",
+        final Flow executable = new Flow(null, null, null, "no_dependencies-0123456789", "empty_flow", null,
                 null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(executable, new ArrayList<RuntimeException>()));
@@ -446,8 +446,8 @@ public class SlangBuilderTest {
     @Test
     public void testValidFlowNamespaceCaseInsensitive() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
-        final Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null, null, null,
-                new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final Flow executable = new Flow(null, null, null, "No_Dependencies", "empty_flow", null,
+                null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(executable, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(executable, new HashSet<Executable>()))
@@ -464,8 +464,8 @@ public class SlangBuilderTest {
     @Test
     public void testNamespaceWithInvalidCharsFlow() throws Exception {
         final URI resource = getClass().getResource("/invalid-chars$").toURI();
-        final Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null, null,
-                null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
+        final Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null,
+                null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(newExecutable, new ArrayList<RuntimeException>()));
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))

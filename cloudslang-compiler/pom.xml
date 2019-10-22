@@ -11,7 +11,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>1.0.23-SNAPSHOT</version>
+        <version>1.0.92-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -109,6 +109,12 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -125,6 +131,10 @@
                         </goals>
                         <configuration>
                             <failOnWarning>true</failOnWarning>
+                            <ignoredUnusedDeclaredDependencies combine.children="append">
+                                <ignoredUnusedDeclaredDependency>org.hamcrest:hamcrest-core:jar:${hamcrest.version}
+                                </ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>

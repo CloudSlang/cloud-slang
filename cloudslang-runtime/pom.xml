@@ -11,7 +11,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>1.0.23-SNAPSHOT</version>
+        <version>1.0.92-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -127,6 +127,12 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cloudslang.lang</groupId>
+            <artifactId>cloudslang-compiler</artifactId>
+            <version>${parent.version}</version>
         </dependency>
 
     </dependencies>

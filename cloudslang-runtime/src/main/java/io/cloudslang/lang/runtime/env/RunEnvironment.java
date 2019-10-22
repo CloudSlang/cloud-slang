@@ -12,6 +12,7 @@ package io.cloudslang.lang.runtime.env;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
+import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -40,6 +41,9 @@ public class RunEnvironment implements Serializable {
 
     // The position of the next step
     private Long nextStepPosition;
+
+    // Navigation options, e.g. ROI value for each navigation step
+    private Map<Long, List<NavigationOptions>> navigationOptions;
 
     // Stack holding the contexts of the parent scopes
     private ContextStack contextStack;
@@ -88,6 +92,10 @@ public class RunEnvironment implements Serializable {
         this.callArguments.putAll(callArguments);
     }
 
+    public Map<String, Value> getCallArguments() {
+        return callArguments;
+    }
+
     public ReturnValues removeReturnValues() {
         ReturnValues values = returnValues;
         returnValues = null;
@@ -106,6 +114,20 @@ public class RunEnvironment implements Serializable {
 
     public void putNextStepPosition(Long nextStepPosition) {
         this.nextStepPosition = nextStepPosition;
+    }
+
+    public List<NavigationOptions> removeStepNavigationOptions(Long stepId) {
+        if (navigationOptions != null) {
+            return navigationOptions.remove(stepId);
+        }
+        return null;
+    }
+
+    public void putStepNavigationOptions(Long id, List<NavigationOptions> stepNavigationOptions) {
+        if (navigationOptions == null) {
+            navigationOptions = new HashMap<>();
+        }
+        this.navigationOptions.put(id, stepNavigationOptions);
     }
 
     public ExecutionPath getExecutionPath() {

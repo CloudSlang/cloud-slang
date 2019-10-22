@@ -13,13 +13,16 @@ import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
+import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,20 +65,20 @@ public class CompileFlowWithOnFailureTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 8, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 9, executionPlan.getSteps().size());
         assertEquals("execution plan name is different than expected", "flow_with_on_failure", executionPlan.getName());
         assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
 
-        long firstOnFailureStep = 6L;
+        long firstOnFailureStep = 7L;
         long endFlowStep = 0L;
 
-        ExecutionStep firstStep = executionPlan.getStep(3L);
+        ExecutionStep firstStep = executionPlan.getStep(4L);
         assertEquals("first step didn't navigate to on failure",
                 firstOnFailureStep, getFailureNavigationStepId(firstStep));
-        ExecutionStep secondStep = executionPlan.getStep(5L);
+        ExecutionStep secondStep = executionPlan.getStep(6L);
         assertEquals(endFlowStep, getFailureNavigationStepId(secondStep));
-        ExecutionStep firstOnFailStep = executionPlan.getStep(7L);
+        ExecutionStep firstOnFailStep = executionPlan.getStep(8L);
         assertEquals(endFlowStep, getFailureNavigationStepId(firstOnFailStep));
     }
 
@@ -120,6 +123,49 @@ public class CompileFlowWithOnFailureTest {
 
         URI flow = getClass().getResource("/corrupted/flow_with_on_failure_second_step.sl").toURI();
         compiler.compile(SlangSource.fromFile(flow), path);
+    }
+
+    @Test
+    public void testCompileNavigationWithRoi() throws Exception {
+        URI flow = getClass().getResource("/flow_with_roi.sl").toURI();
+        URI operation = getClass().getResource("/test_op.sl").toURI();
+
+        Set<SlangSource> path = new HashSet<>();
+        path.add(SlangSource.fromFile(operation));
+
+        CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
+        ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
+        assertNotNull("execution plan is null", executionPlan);
+        assertEquals("there is a different number of steps than expected", 7, executionPlan.getSteps().size());
+        assertEquals("execution plan name is different than expected", "flow_with_roi", executionPlan.getName());
+        assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
+
+        final long step1 = 1;
+        final long step3 = 3;
+
+        ExecutionStep firstStep = executionPlan.getStep(step1);
+        assertTrue("navigation data is not empty", firstStep.getNavigationData() == null ||
+                firstStep.getNavigationData().isEmpty());
+
+        ExecutionStep thirdStep = executionPlan.getStep(step3);
+        assertTrue("navigation data is empty", thirdStep.getNavigationData() != null &&
+                !thirdStep.getNavigationData().isEmpty());
+        List<NavigationOptions> optionsList = (List<NavigationOptions>) thirdStep.getNavigationData()
+                .get(ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY);
+        assertTrue("navigation data options is empty", !optionsList.isEmpty());
+        assertEquals(optionsList.get(0).getName(), "SUCCESS");
+        assertNotNull("navigation SUCCESS options is empty", optionsList.get(0).getOptions());
+        Map<String, Serializable> successOptions = optionsList.get(0).getOptions();
+        assertEquals(2, successOptions.size());
+        assertEquals("navigation SUCCESS next_step options is invalid", "SUCCESS",
+                successOptions.get("next_step"));
+        assertEquals("navigation SUCCESS ROI options is invalid", 11, successOptions.get("ROI"));
+        assertEquals(optionsList.get(1).getName(), "FAILURE");
+        assertNotNull("navigation FAILURE options is empty", optionsList.get(1).getOptions());
+        Map<String, Serializable> failureOptions = optionsList.get(1).getOptions();
+        assertEquals(1, failureOptions.size());
+        assertEquals("navigation FAILURE next_step options is invalid", "reset_step_on_failure",
+                failureOptions.get("next_step"));
     }
 
     @Test

@@ -51,7 +51,8 @@ public class StaticValidatorTest {
         List<Input> inputList = Lists.newArrayList(new Input.InputBuilder("input1", "value1").build(),
                 new Input.InputBuilder("input2", "value2").build(),
                 new Input.InputBuilder("input3", "value3").build());
-        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", inputList, null, null,
+        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null,
+                inputList, null, null,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
         Map<String, String> inputMap = new HashMap<>();
@@ -75,7 +76,8 @@ public class StaticValidatorTest {
         List<Input> inputList = Lists.newArrayList(new Input.InputBuilder("input1", "value1").build(),
                 new Input.InputBuilder("input2", "value2").build(),
                 new Input.InputBuilder("input3", "value3").withPrivateInput(true).build());
-        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", inputList, null, null,
+        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null,
+                inputList, null, null,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
         Map<String, String> inputMap = new HashMap<>();
@@ -97,7 +99,8 @@ public class StaticValidatorTest {
                         Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
                 new Output("output3", ValueFactory.create("value3"),
                         Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()));
-        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, outputList, null,
+        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null,
+                null, outputList, null,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
         Map<String, String> outputMap = new HashMap<>();
@@ -120,7 +123,8 @@ public class StaticValidatorTest {
         List<Result> resultList = Lists.newArrayList(new Result("result1", ValueFactory.create("value1")),
                 new Result("result2", ValueFactory.create("value2")),
                 new Result("result3", ValueFactory.create("value3")));
-        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, resultList,
+        final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null,
+                null, null, resultList,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
         Map<String, String> inputMap = new HashMap<>();
@@ -143,7 +147,7 @@ public class StaticValidatorTest {
         List<Result> resultList = Lists.newArrayList(new Result("result1", ValueFactory.create("value1")),
                 new Result("result2", ValueFactory.create("value2")),
                 new Result("result3", ValueFactory.create("value3")));
-        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, resultList,
+        Flow newExecutable = new Flow(null, null, null, "no_dependencies", "empty_flow", null, null, null, resultList,
                 new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         Metadata metadata = new Metadata();
 

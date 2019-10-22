@@ -15,6 +15,7 @@ import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -26,6 +27,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.steps.ContentTestActions.NonSerializableObject;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.runtime.impl.java.JavaExecutionCachedEngine;
 import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
@@ -43,6 +45,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +55,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,8 +64,15 @@ import java.util.Map;
 
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
+import static io.cloudslang.lang.entities.ActionType.SEQUENTIAL;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 /**
  * Date: 10/31/2014
@@ -85,12 +96,18 @@ public class ActionStepsTest {
     public ExpectedException exception = ExpectedException.none();
     ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
     private Map<String, Map<String, Object>> nonSerializableExecutionData;
+    private List<SeqStep> seqSteps;
     @Autowired
     private ActionExecutionData actionSteps;
+
+    @Autowired
+    private SequentialExecutionService seqExecutionService;
 
     @Before
     public void setUp() {
         nonSerializableExecutionData = new HashMap<>();
+        seqSteps = new ArrayList<>();
+        reset(seqExecutionService);
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -113,7 +130,10 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
         );
 
         //construct expected outputs
@@ -151,7 +171,10 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
         );
 
         //verify matching
@@ -175,7 +198,10 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -217,7 +243,10 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -262,7 +291,10 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -303,7 +335,10 @@ public class ActionStepsTest {
                 "wrongMethodName",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -341,7 +376,10 @@ public class ActionStepsTest {
                     "doJavaActionExceptionMethod",
                     GAV_DEFAULT,
                     null,
-                    DEPENDENCIES_DEFAULT
+                    DEPENDENCIES_DEFAULT,
+                    seqSteps,
+                    null,
+                    null
             );
         } catch (RuntimeException ex) {
             exceptionThrown = true;
@@ -382,7 +420,8 @@ public class ActionStepsTest {
                 "doJavaActionWrongReturnType",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
@@ -421,7 +460,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         //construct expected outputs
@@ -456,7 +496,8 @@ public class ActionStepsTest {
                 "doJavaNumberAsString",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
     }
 
@@ -479,7 +520,8 @@ public class ActionStepsTest {
                 "doJavaNumbersAction",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
         ReturnValues returnValues = runEnv.removeReturnValues();
         assertEquals(5, returnValues.getOutputs().get("port").get());
@@ -505,7 +547,8 @@ public class ActionStepsTest {
                 "doJavaSampleAction_NOT_FOUND",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         //construct expected outputs
@@ -539,7 +582,8 @@ public class ActionStepsTest {
                 "doJavaActionMissingAnnotation",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         //construct expected outputs
@@ -575,7 +619,8 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -612,7 +657,8 @@ public class ActionStepsTest {
                 "setNameOnNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         Map<String, Object> globalSessionObject = nonSerializableExecutionData.get(GLOBAL_SESSION_OBJECT);
@@ -642,7 +688,8 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -673,7 +720,8 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -702,7 +750,8 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         Map<String, Value> outputs = runEnv.removeReturnValues().getOutputs();
@@ -728,7 +777,8 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         Map<String, SerializableSessionObject> serializableSessionMap = runEnv.getSerializableDataMap();
@@ -769,7 +819,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         //construct expected outputs
@@ -817,7 +868,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
 
         //extract actual outputs
@@ -858,7 +910,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
     }
 
@@ -884,7 +937,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
     }
 
@@ -911,7 +965,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
     }
 
@@ -935,7 +990,10 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 "",
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
         );
     }
 
@@ -959,7 +1017,8 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 null,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
     }
 
@@ -985,8 +1044,106 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
-                DEPENDENCIES_DEFAULT
+                DEPENDENCIES_DEFAULT, seqSteps, null,
+                null
         );
+    }
+
+    @Test
+    public void doActionSeqType() {
+        RunEnvironment runEnv = new RunEnvironment();
+        Map<String, Value> initialCallArguments = new HashMap<>();
+        initialCallArguments.put("name", ValueFactory.create("nameTest"));
+        initialCallArguments.put("role", ValueFactory.create("roleTest"));
+        runEnv.putCallArguments(initialCallArguments);
+
+        //invoke doAction
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
+        );
+
+        verify(seqExecutionService).execute(
+                eq(GAV_DEFAULT),
+                any(CloudSlangSequentialExecutionParametersProviderImpl.class),
+                eq(null));
+    }
+
+    @Test
+    public void doActionExternalTrue() {
+        RunEnvironment runEnv = new RunEnvironment();
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                true,
+                null
+        );
+
+        ArgumentCaptor<CloudSlangSequentialExecutionParametersProviderImpl> mockedProviderCaptor =
+                ArgumentCaptor.forClass(CloudSlangSequentialExecutionParametersProviderImpl.class);
+
+
+        verify(seqExecutionService).execute(
+                any(String.class),
+                mockedProviderCaptor.capture(),
+                any(Serializable.class)
+        );
+
+        CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();
+        assertTrue(mockedProvider.getExternal());
+    }
+
+    @Test
+    public void doActionExternalFalse() {
+        RunEnvironment runEnv = new RunEnvironment();
+        actionSteps.doAction(
+                executionRuntimeServicesMock,
+                runEnv,
+                nonSerializableExecutionData,
+                2L,
+                SEQUENTIAL,
+                ContentTestActions.class.getName(),
+                "doSeqSampleAction",
+                GAV_DEFAULT,
+                null,
+                DEPENDENCIES_DEFAULT,
+                seqSteps,
+                null,
+                null
+        );
+
+        ArgumentCaptor<CloudSlangSequentialExecutionParametersProviderImpl> mockedProviderCaptor =
+                ArgumentCaptor.forClass(CloudSlangSequentialExecutionParametersProviderImpl.class);
+
+
+        verify(seqExecutionService).execute(
+                any(String.class),
+                mockedProviderCaptor.capture(),
+                any(Serializable.class)
+        );
+
+        CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();
+        assertFalse(mockedProvider.getExternal());
     }
 
     @Configuration
@@ -1041,5 +1198,11 @@ public class ActionStepsTest {
         public EventBus eventBus() {
             return new EventBusImpl();
         }
+
+        @Bean
+        public SequentialExecutionService seqExecutionService() {
+            return mock(SequentialExecutionService.class);
+        }
+
     }
 }

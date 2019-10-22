@@ -23,8 +23,9 @@ public class Step {
     private final Map<String, Serializable> preStepActionData;
     private final Map<String, Serializable> postStepActionData;
     private final List<Argument> arguments;
-    private final List<Map<String, String>> navigationStrings;
+    private final List<Map<String, Serializable>> navigationStrings;
     private final String refId;
+    private final String workerGroup;
     private final boolean parallelLoop;
     private final boolean onFailureStep;
 
@@ -33,8 +34,9 @@ public class Step {
             Map<String, Serializable> preStepActionData,
             Map<String, Serializable> postStepActionData,
             List<Argument> arguments,
-            List<Map<String, String>> navigationStrings,
+            List<Map<String, Serializable>> navigationStrings,
             String refId,
+            String workerGroup,
             boolean parallelLoop,
             boolean onFailureStep) {
         this.name = name;
@@ -43,6 +45,7 @@ public class Step {
         this.arguments = arguments;
         this.navigationStrings = navigationStrings;
         this.refId = refId;
+        this.workerGroup = workerGroup;
         this.parallelLoop = parallelLoop;
         this.onFailureStep = onFailureStep;
     }
@@ -63,7 +66,7 @@ public class Step {
         return arguments;
     }
 
-    public List<Map<String, String>> getNavigationStrings() {
+    public List<Map<String, Serializable>> getNavigationStrings() {
         return navigationStrings;
     }
 
@@ -83,4 +86,7 @@ public class Step {
         return true;
     }
 
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
 }

@@ -98,7 +98,7 @@ public class ScoreServicesImplTest {
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("a", ValueFactory.create(1));
         Set<SystemProperty> systemProperties = newHashSet(
-                new SystemProperty("ns", "b", "c")
+                new SystemProperty("ns", "b", "c", "")
         );
 
         long executionId = scoreServicesImpl.trigger(compilationArtifact, inputs, systemProperties);
@@ -114,7 +114,7 @@ public class ScoreServicesImplTest {
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("a", ValueFactory.create(1));
         Set<SystemProperty> systemProperties = newHashSet(
-                new SystemProperty("ns", "b", "c")
+                new SystemProperty("ns", "b", "c", "")
         );
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
@@ -159,7 +159,7 @@ public class ScoreServicesImplTest {
         final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("a", ValueFactory.create(1));
-        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c"));
+        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c", ""));
 
         /* stubbing subscribeEvents method - mocking the behaviour of the EventBus
          * After a specific amount of time a erroneous event followed by a onCompilationFinish event
@@ -206,7 +206,7 @@ public class ScoreServicesImplTest {
         final CompilationArtifact compilationArtifact = mock(CompilationArtifact.class);
         final Map<String, Value> inputs = new HashMap<>();
         ValueFactory.create(1);
-        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c"));
+        final Set<SystemProperty> systemProperties = newHashSet(new SystemProperty("ns", "b", "c", ""));
 
         doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) {

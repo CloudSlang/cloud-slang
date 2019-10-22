@@ -39,6 +39,10 @@ public interface ScoreLangConstants {
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
+    String SEQ_ACTION_GAV_KEY = "gav";
+    String SEQ_STEPS_KEY = "steps";
+    String SEQ_EXTERNAL_KEY = "external";
+
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
     String PREVIOUS_STEP_ID_KEY = "previousStepId";
@@ -53,10 +57,12 @@ public interface ScoreLangConstants {
     String STEP_INPUTS_KEY = "stepInputs";
     String STEP_PUBLISH_KEY = "stepPublishValues";
     String STEP_NAVIGATION_KEY = "stepNavigationValues";
+    String STEP_NAVIGATION_OPTIONS_KEY = "stepNavigationOptions";
     String REF_ID = "refId";
     String LOOP_KEY = "loop";
     String BREAK_LOOP_KEY = "breakOn";
     String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
+    String WORKER_GROUP = "workerGroup";
 
     // parallel loop
     String PARALLEL_LOOP_KEY = "parallelLoop";
@@ -85,6 +91,9 @@ public interface ScoreLangConstants {
 
     // results
     String SUCCESS_RESULT = "SUCCESS";
+    String WARNING_RESULT = "WARNING";
     String FAILURE_RESULT = "FAILURE";
+
+    String SEQ_ASSIGNMENT_ACTION = "=";
 
 }

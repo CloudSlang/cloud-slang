@@ -23,6 +23,8 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -131,7 +133,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
         if (onFailureStep != null) {
             Executable onFailureDependency = filteredDependencies.get(onFailureStep.getRefId());
             for (Result result : onFailureDependency.getResults()) {
-                Map<String, String> navigationString = new HashMap<>();
+                Map<String, Serializable> navigationString = new HashMap<>();
                 navigationString.put(result.getName(), ScoreLangConstants.FAILURE_RESULT);
                 onFailureStep.getNavigationStrings().add(navigationString);
             }

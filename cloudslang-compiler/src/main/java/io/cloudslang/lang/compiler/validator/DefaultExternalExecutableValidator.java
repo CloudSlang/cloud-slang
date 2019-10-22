@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.validator;
 
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class DefaultExternalExecutableValidator implements ExecutableValidator {
     }
 
     @Override
-    public void validateNavigationStrings(List<Map<String, String>> navigationStrings) {
+    public void validateNavigationStrings(List<Map<String, Serializable>> navigationStrings) {
     }
 
     @Override

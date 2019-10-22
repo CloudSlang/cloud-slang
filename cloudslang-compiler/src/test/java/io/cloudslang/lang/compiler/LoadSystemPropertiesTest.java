@@ -280,7 +280,7 @@ public class LoadSystemPropertiesTest {
     }
 
     private Set<SystemProperty> getSystemPropertiesValidNullValue() {
-        return newHashSet(new SystemProperty("a.b", "host", (String) null));
+        return newHashSet(new SystemProperty("a.b", "host", (String) null, null));
     }
 
     private Set<SystemProperty> loadSystemProperties(SlangSource source) {
@@ -292,9 +292,9 @@ public class LoadSystemPropertiesTest {
     }
 
     private Set<SystemProperty> getSystemPropertiesBasic(String namespace) {
-        return newHashSet(new SystemProperty(namespace, "host", "localhost"),
-                new SystemProperty(namespace, "c.name", "john doe"),
-                new SystemProperty(namespace, "restrict.out.port", "8080"));
+        return newHashSet(new SystemProperty(namespace, "host", "localhost", null),
+                new SystemProperty(namespace, "c.name", "john doe", null),
+                new SystemProperty(namespace, "restrict.out.port", "8080", null));
     }
 
 }

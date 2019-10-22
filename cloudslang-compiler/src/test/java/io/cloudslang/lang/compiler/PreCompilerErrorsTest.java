@@ -635,11 +635,13 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
 
         List<RuntimeException> errors = result.getErrors();
-        assertTrue(errors.size() == 2);
+        assertTrue(errors.size() == 1);
 
-        assertContains(errors, 0, "Failed to compile step: print_message1. " +
-                "The step/result name: CUSTOM of navigation: FAILURE -> CUSTOM is missing");
-        assertContains(errors, 1, "The following results are not wired: [UNREACHABLE_RESULT].");
+        assertEquals("Flow unreachable_flow_results_missing_nav has errors:\n" +
+                        "Failed to compile step: print_message1. " +
+                        "The step/result name: CUSTOM of navigation: FAILURE -> CUSTOM is missing\n" +
+                        "The following results are not wired: [UNREACHABLE_RESULT].",
+                errors.get(0).getMessage());
     }
 
     @Test

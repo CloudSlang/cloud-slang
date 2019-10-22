@@ -12,21 +12,28 @@ package io.cloudslang.lang.runtime.steps;
 import com.hp.oo.sdk.content.annotations.Param;
 import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 
 /**
@@ -54,9 +62,12 @@ public class StepExecutionData extends AbstractExecutionData {
     private OutputsBinding outputsBinding;
     @Autowired
     private LoopsBinding loopsBinding;
+    @Autowired
+    private ScriptEvaluator scriptEvaluator;
 
     @SuppressWarnings("unused")
     public void beginStep(@Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
+                          @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
                           @Param(ScoreLangConstants.LOOP_KEY) LoopStatement loop,
                           @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                           @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -67,7 +78,8 @@ public class StepExecutionData extends AbstractExecutionData {
                           //CHECKSTYLE:ON
 
                           @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
-                          @Param(ScoreLangConstants.REF_ID) String refId) {
+                          @Param(ScoreLangConstants.REF_ID) String refId,
+                          @Param(STEP_NAVIGATION_OPTIONS_KEY) List<NavigationOptions> stepNavigationOptions) {
         try {
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
@@ -77,6 +89,10 @@ public class StepExecutionData extends AbstractExecutionData {
 
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
+
+            if (workerGroup != null) {
+                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            }
 
             fireEvent(
                     executionRuntimeServices,
@@ -127,6 +143,8 @@ public class StepExecutionData extends AbstractExecutionData {
             // set the start step of the given ref as the next step to execute
             // (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
+
+            putStepNavigationOptions(runEnv, stepNavigationOptions);
         } catch (RuntimeException e) {
             logger.error("There was an error running the beginStep execution step of: \'" + nodeName +
                     "\'. Error is: " + e.getMessage());
@@ -201,6 +219,9 @@ public class StepExecutionData extends AbstractExecutionData {
 
             final ReturnValues returnValues = getReturnValues(executableResult, presetResult, outputs);
 
+            List<NavigationOptions> stepNavigationOptions = runEnv.removeStepNavigationOptions(previousStepId);
+            final Double roiValue = getRoiValue(executableResult, stepNavigationOptions, flowVariables);
+
             runEnv.putReturnValues(returnValues);
             throwEventOutputEnd(
                     runEnv,
@@ -209,8 +230,13 @@ public class StepExecutionData extends AbstractExecutionData {
                     publishValues,
                     nextPosition,
                     returnValues,
+                    roiValue,
                     outputsBindingContext
             );
+
+            executionRuntimeServices.addRoiValue(roiValue);
+            executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
+            executionRuntimeServices.setShouldCheckGroup();
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
@@ -238,6 +264,53 @@ public class StepExecutionData extends AbstractExecutionData {
                 }
             }
         );
+    }
+
+    private void handleWorkerGroup(WorkerGroupStatement workerGroup,
+                                   Context flowContext,
+                                   RunEnvironment runEnv,
+                                   ExecutionRuntimeServices execRuntimeServices) {
+        String workerGroupValue = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
+        execRuntimeServices.setWorkerGroupName(workerGroupValue);
+    }
+
+    private String computeWorkerGroup(WorkerGroupStatement workerGroup,
+                                      Context flowContext,
+                                      RunEnvironment runEnv,
+                                      String expression) {
+        Value workerGroupValue;
+        if (workerGroup.getFunctionDependencies() == null && workerGroup.getSystemPropertyDependencies() == null) {
+            workerGroupValue = ValueFactory.create(expression);
+        } else {
+            workerGroupValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
+                    runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
+        }
+        return workerGroupValue.toString();
+    }
+
+    private void putStepNavigationOptions(RunEnvironment runEnv, List<NavigationOptions> stepNavigationOptions) {
+        if (CollectionUtils.isNotEmpty(stepNavigationOptions)) {
+            runEnv.putStepNavigationOptions(stepNavigationOptions.get(0).getCurrStepId(), stepNavigationOptions);
+        }
+    }
+
+    private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions,
+                               Map<String, Value> flowVariables) {
+        if (StringUtils.isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
+            for (NavigationOptions navigationOptions: stepNavigationOptions) {
+                if (navigationOptions.getName().equals(stepExecutableResult)) {
+                    Serializable roi = navigationOptions.getOptions().get(LanguageEventData.ROI);
+                    if (roi instanceof String) {
+                        String expr = ExpressionUtils.extractExpression(roi);
+                        if (StringUtils.isNotEmpty(expr) && flowVariables.containsKey(expr)) {
+                            roi = flowVariables.get(expr).get();
+                        }
+                    }
+                    return roi != null ? Double.valueOf(roi.toString()) : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
+                }
+            }
+        }
+        return ExecutionParametersConsts.DEFAULT_ROI_VALUE;
     }
 
 

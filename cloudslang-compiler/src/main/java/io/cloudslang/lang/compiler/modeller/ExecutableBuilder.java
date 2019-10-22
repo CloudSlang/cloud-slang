@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler.modeller;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Action;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
+import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
@@ -50,6 +51,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.filter;
@@ -61,9 +63,15 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKER_GROUP;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
+import static io.cloudslang.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
+import static io.cloudslang.lang.entities.ScoreLangConstants.WARNING_RESULT;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationTarget;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -89,8 +97,9 @@ public class ExecutableBuilder {
 
     private List<String> executableAdditionalKeywords = singletonList(SlangTextualKeys.EXECUTABLE_NAME_KEY);
     private List<String> operationAdditionalKeywords =
-            asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY);
-    private List<String> flowAdditionalKeywords = singletonList(SlangTextualKeys.WORKFLOW_KEY);
+            asList(SlangTextualKeys.JAVA_ACTION_KEY, SlangTextualKeys.PYTHON_ACTION_KEY,
+                    SlangTextualKeys.SEQ_ACTION_KEY);
+    private List<String> flowAdditionalKeywords = asList(WORKFLOW_KEY, WORKER_GROUP);
     private List<String> allExecutableAdditionalKeywords;
 
     private List<Transformer> actionTransformers;
@@ -102,8 +111,11 @@ public class ExecutableBuilder {
     private List<Transformer> externalPreStepTransformers;
     private List<Transformer> externalPostStepTransformers;
 
-    private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY);
-    private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY);
+    private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY,
+            WORKER_GROUP);
+    private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY, WORKER_GROUP);
+
+    private List<String> seqSupportedResults = asList(SUCCESS_RESULT, WARNING_RESULT, FAILURE_RESULT);
 
     // @PostConstruct
     public void initScopedTransformersAndKeys() {
@@ -124,7 +136,7 @@ public class ExecutableBuilder {
 
         // keys excluding each other
         executableConstraintGroups = new ArrayList<>();
-        executableConstraintGroups.add(ListUtils.union(flowAdditionalKeywords, operationAdditionalKeywords));
+        executableConstraintGroups.add(ListUtils.union(singletonList(WORKFLOW_KEY), operationAdditionalKeywords));
 
         //step transformers
         preStepTransformers = filterTransformers(Transformer.Scope.BEFORE_STEP);
@@ -163,6 +175,7 @@ public class ExecutableBuilder {
                                                            SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
+        String workerGroup = (String)executableRawData.get(SlangTextualKeys.WORKER_GROUP);
 
         errors.addAll(preCompileValidator.checkKeyWords(
                 execName,
@@ -200,6 +213,10 @@ public class ExecutableBuilder {
 
         String namespace = parsedSlang.getNamespace();
         Set<String> systemPropertyDependencies = null;
+
+        Executable executable;
+        boolean isSeqAction = false;
+
         switch (parsedSlang.getType()) {
             case FLOW:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData
@@ -228,15 +245,17 @@ public class ExecutableBuilder {
                 try {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForFlow(inputs, outputs, results, workflow.getSteps());
+
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
-                Flow flow = new Flow(
+                executable = new Flow(
                         preExecutableActionData,
                         postExecutableActionData,
                         workflow,
                         namespace,
                         execName,
+                        workerGroup,
                         inputs,
                         outputs,
                         results,
@@ -244,8 +263,8 @@ public class ExecutableBuilder {
                         externalExecutableDependencies,
                         systemPropertyDependencies
                 );
-                return preCompileValidator
-                        .validateResult(parsedSlang, execName, new ExecutableModellingResult(flow, errors));
+
+                break;
 
             case OPERATION:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY),
@@ -257,16 +276,23 @@ public class ExecutableBuilder {
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
 
-                preCompileValidator.validateResultTypes(results, execName, errors);
-                preCompileValidator.validateDefaultResult(results, execName, errors);
+                isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
+                if (!isSeqAction) {
+                    preCompileValidator.validateResultTypes(results, execName, errors);
+                    preCompileValidator.validateDefaultResult(results, execName, errors);
+                } else {
+                    preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
+                    preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
+                }
 
                 try {
                     systemPropertyDependencies = dependenciesHelper
                             .getSystemPropertiesForOperation(inputs, outputs, results);
+
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
-                Operation operation = new Operation(
+                executable = new Operation(
                         preExecutableActionData,
                         postExecutableActionData,
                         action,
@@ -279,8 +305,8 @@ public class ExecutableBuilder {
                         systemPropertyDependencies
                 );
 
-                return preCompileValidator
-                        .validateResult(parsedSlang, execName, new ExecutableModellingResult(operation, errors));
+                break;
+
             case DECISION:
                 resultsTransformer.addDefaultResultsIfNeeded((List) executableRawData.get(SlangTextualKeys.RESULTS_KEY),
                         ExecutableType.DECISION, results, errors);
@@ -295,7 +321,7 @@ public class ExecutableBuilder {
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
-                Decision decision = new Decision(
+                executable = new Decision(
                         preExecutableActionData,
                         postExecutableActionData,
                         namespace,
@@ -306,24 +332,38 @@ public class ExecutableBuilder {
                         Collections.<String>emptySet(),
                         systemPropertyDependencies
                 );
-                return preCompileValidator.validateResult(
-                        parsedSlang,
-                        execName,
-                        new ExecutableModellingResult(decision, errors)
-                );
+
+                break;
+
             default:
                 throw new RuntimeException("Error compiling " + parsedSlang.getName() +
                         ". It is not of flow, operations or decision type");
         }
+
+        if (!isSeqAction && outputs != null) {
+            errors.addAll(validateOutputs(outputs));
+        }
+
+        return preCompileValidator
+                .validateResult(parsedSlang, execName, new ExecutableModellingResult(executable, errors));
     }
 
-    private Map<String, Object> getActionRawData(
-            Map<String, Object> executableRawData,
-            List<RuntimeException> errors,
-            ParsedSlang parsedSlang, String execName) {
+    private List<RuntimeException> validateOutputs(List<Output> outputs) {
+
+        Function<Output, RuntimeException> map = output -> new RuntimeException("'" +
+                SlangTextualKeys.SEQ_OUTPUT_ROBOT_KEY + "' property allowed only for outputs of " +
+                SlangTextualKeys.SEQ_ACTION_KEY + ". Encountered at output " + output.getName());
+
+        return outputs.stream().filter(output -> output.hasRobotProperty()).map(map).collect(Collectors.toList());
+    }
+
+    private Map<String, Object> getActionRawData(Map<String, Object> executableRawData,
+                                                 List<RuntimeException> errors,
+                                                 ParsedSlang parsedSlang, String execName) {
         Map<String, Object> actionRawData = new HashMap<>();
         Object javaActionRawData = executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
         Object pythonActionRawData = executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        Object seqActionRawData = executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
         if (javaActionRawData != null) {
             actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY,
                     executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
@@ -331,6 +371,10 @@ public class ExecutableBuilder {
         if (pythonActionRawData != null) {
             actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY,
                     executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
+        }
+        if (seqActionRawData != null) {
+            actionRawData.put(SlangTextualKeys.SEQ_ACTION_KEY,
+                    executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY));
         }
         if (MapUtils.isEmpty(actionRawData)) {
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() +
@@ -494,7 +538,7 @@ public class ExecutableBuilder {
                 defaultSuccess = nextStepData.keySet().iterator().next();
             } else {
                 defaultSuccess = onFailureSection ?
-                        ScoreLangConstants.FAILURE_RESULT : ScoreLangConstants.SUCCESS_RESULT;
+                        ScoreLangConstants.FAILURE_RESULT : SUCCESS_RESULT;
             }
 
             String onFailureStepName = onFailureStepFound ? onFailureStepNames.get(0) : null;
@@ -575,6 +619,7 @@ public class ExecutableBuilder {
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
+        String workerGroup = (String)stepRawData.get(SlangTextualKeys.WORKER_GROUP);
 
         String refId = "";
         final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
@@ -589,17 +634,17 @@ public class ExecutableBuilder {
             }
         }
 
-        List<Map<String, String>> navigationStrings =
+        List<Map<String, Serializable>> navigationStrings =
                 getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
         Step step = createStep(stepName, onFailureSection, preStepData, postStepData,
-                arguments, refId, navigationStrings);
+                arguments, workerGroup, refId, navigationStrings);
         return new StepModellingResult(step, errors);
     }
 
     private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,
                             Map<String, Serializable> postStepData, List<Argument> arguments,
-                            String refId, List<Map<String, String>> navigationStrings) {
+                            String workerGroup, String refId, List<Map<String, Serializable>> navigationStrings) {
         if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
             return new ExternalStep(stepName,
                     preStepData,
@@ -607,6 +652,7 @@ public class ExecutableBuilder {
                     arguments,
                     navigationStrings,
                     refId,
+                    workerGroup,
                     preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
                     onFailureSection);
         } else {
@@ -617,6 +663,7 @@ public class ExecutableBuilder {
                     arguments,
                     navigationStrings,
                     refId,
+                    workerGroup,
                     preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
                     onFailureSection);
         }
@@ -642,17 +689,20 @@ public class ExecutableBuilder {
         Serializable navigationData = postStepData.get(NAVIGATION_KEY);
         if (navigationData != null) {
             @SuppressWarnings("unchecked") // from NavigateTransformer
-                    List<Map<String, String>> navigationStrings = (List<Map<String, String>>) navigationData;
-            List<Map<String, String>> transformedNavigationStrings = new ArrayList<>();
+            List<Map<String, Serializable>> navigationStrings =
+                    (List<Map<String, Serializable>>) navigationData;
+            List<Map<String, Serializable>> transformedNavigationStrings = new ArrayList<>();
 
-            for (Map<String, String> navigation : navigationStrings) {
-                Map.Entry<String, String> navigationEntry = navigation.entrySet().iterator().next();
-                Map<String, String> transformedNavigation = new HashMap<>(navigation);
-                if (navigationEntry.getValue().equals(ON_FAILURE_KEY)) {
+            for (Map<String, Serializable> navigation : navigationStrings) {
+                Map.Entry<String, Serializable> navigationEntry = navigation.entrySet().iterator().next();
+                Map<String, Serializable> transformedNavigation = new HashMap<>(navigation);
+                if (getNavigationStepName(navigationEntry.getValue()).equals(ON_FAILURE_KEY)) {
                     if (StringUtils.isEmpty(onFailureStepName)) {
-                        transformedNavigation.put(navigationEntry.getKey(), ScoreLangConstants.FAILURE_RESULT);
+                        transformedNavigation.put(navigationEntry.getKey(),
+                                getNavigationTarget(navigationEntry.getValue(), ScoreLangConstants.FAILURE_RESULT));
                     } else {
-                        transformedNavigation.put(navigationEntry.getKey(), onFailureStepName);
+                        transformedNavigation.put(navigationEntry.getKey(),
+                                getNavigationTarget(navigationEntry.getValue(), onFailureStepName));
                     }
                 } else {
                     transformedNavigation.put(navigationEntry.getKey(), navigationEntry.getValue());
@@ -663,20 +713,20 @@ public class ExecutableBuilder {
         }
     }
 
-    private List<Map<String, String>> getNavigationStrings(
+    private List<Map<String, Serializable>> getNavigationStrings(
             Map<String, Serializable> postStepData,
             String defaultSuccess,
             String defaultFailure,
             List<RuntimeException> errors) {
-        @SuppressWarnings("unchecked") List<Map<String, String>> navigationStrings =
-                (List<Map<String, String>>) postStepData.get(NAVIGATION_KEY);
+        @SuppressWarnings("unchecked") List<Map<String, Serializable>> navigationStrings =
+                (List<Map<String, Serializable>>) postStepData.get(NAVIGATION_KEY);
 
         //default navigation
         if (CollectionUtils.isEmpty(navigationStrings)) {
             navigationStrings = new ArrayList<>();
-            Map<String, String> successMap = new HashMap<>();
-            successMap.put(ScoreLangConstants.SUCCESS_RESULT, defaultSuccess);
-            Map<String, String> failureMap = new HashMap<>();
+            Map<String, Serializable> successMap = new HashMap<>();
+            successMap.put(SUCCESS_RESULT, defaultSuccess);
+            Map<String, Serializable> failureMap = new HashMap<>();
             failureMap.put(ScoreLangConstants.FAILURE_RESULT, defaultFailure);
             navigationStrings.add(successMap);
             navigationStrings.add(failureMap);

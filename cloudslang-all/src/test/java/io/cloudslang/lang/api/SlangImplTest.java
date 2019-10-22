@@ -170,7 +170,7 @@ public class SlangImplTest {
 
     @Test
     public void testRun() {
-        SystemProperty expectedSystemProperty = new SystemProperty("docker.sys", "props.port", "22");
+        SystemProperty expectedSystemProperty = new SystemProperty("docker.sys", "props.port", "22", "");
         Long executionId = slang.run(
                 emptyCompilationArtifact,
                 new HashMap<String, Value>(),

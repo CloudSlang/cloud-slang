@@ -106,11 +106,7 @@ public class PreCompileTransformersTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(flow));
         List<RuntimeException> errors = result.getErrors();
         Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("It is illegal to specify properties for step publish outputs.");
-        exception.expectMessage("Please remove the properties for flow_output_1.");
-        throw errors.get(0);
+        Assert.assertEquals(0, errors.size());
     }
 
     @Test

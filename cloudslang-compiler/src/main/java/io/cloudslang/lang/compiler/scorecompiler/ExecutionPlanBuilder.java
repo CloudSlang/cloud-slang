@@ -16,10 +16,13 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.entities.ExecutableType;
+import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
@@ -31,6 +34,8 @@ import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.equalTo;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
+import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 
 /*
  * Created by orius123 on 11/11/14.
@@ -45,7 +50,8 @@ public class ExecutionPlanBuilder {
     private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 2;
     private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 2;
     private static final long FLOW_END_STEP_ID = 0L;
-    private static final long FLOW_START_STEP_ID = 1L;
+    private static final long FLOW_PRECONDITION_STEP_ID = 1L;
+    private static final long FLOW_START_STEP_ID = 2L;
 
     public ExecutionPlan createOperationExecutionPlan(Operation compiledOp) {
         ExecutionPlan executionPlan = new ExecutionPlan();
@@ -91,8 +97,10 @@ public class ExecutionPlanBuilder {
         executionPlan.setName(compiledFlow.getName());
         executionPlan.setLanguage(CLOUDSLANG_NAME);
         executionPlan.setFlowUuid(compiledFlow.getId());
+        executionPlan.setWorkerGroup(compiledFlow.getWorkerGroup());
 
-        executionPlan.setBeginStep(FLOW_START_STEP_ID);
+        executionPlan.setBeginStep(FLOW_PRECONDITION_STEP_ID);
+        executionPlan.addStep(stepFactory.createPreconditionStep(FLOW_PRECONDITION_STEP_ID, compiledFlow.getName()));
         //flow start step
         executionPlan.addStep(stepFactory.createStartStep(FLOW_START_STEP_ID, compiledFlow.getPreExecActionData(),
                 compiledFlow.getInputs(), compiledFlow.getName(), ExecutableType.FLOW));
@@ -145,13 +153,15 @@ public class ExecutionPlanBuilder {
             );
         }
 
-        stepExecutionSteps.add(createBeginStep(currentId++, step));
+        ExecutionStep executionStep = createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(
+                step, compiledFlow));
+        stepExecutionSteps.add(executionStep);
 
         //End Step
         Map<String, ResultNavigation> navigationValues = new HashMap<>();
-        for (Map<String, String> map : step.getNavigationStrings()) {
-            Map.Entry<String, String> entry = map.entrySet().iterator().next();
-            String nextStepName = entry.getValue();
+        for (Map<String, Serializable> map : step.getNavigationStrings()) {
+            Map.Entry<String, Serializable> entry = map.entrySet().iterator().next();
+            String nextStepName = getNavigationStepName(entry.getValue());
             if (stepReferences.get(nextStepName) == null) {
                 Step nextStepToCompile = selectFirst(steps, having(on(Step.class).getName(), equalTo(nextStepName)));
                 stepExecutionSteps.addAll(
@@ -163,17 +173,30 @@ public class ExecutionPlanBuilder {
             if (!navigationValues.containsKey(navigationKey)) {
                 navigationValues.put(navigationKey, new ResultNavigation(nextStepId, presetResult));
             }
+            addStepNavigationOptions(executionStep, entry);
         }
         if (parallelLoop) {
-            stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(), true));
+            stepExecutionSteps.add(createFinishStepStep(currentId++, step, new HashMap<>(),
+                    inheritWorkerGroupFromFlow(step, compiledFlow), true));
             stepExecutionSteps.add(
                     stepFactory.createJoinBranchesStep(currentId, step.getPostStepActionData(),
                             navigationValues, stepName)
             );
         } else {
-            stepExecutionSteps.add(createFinishStepStep(currentId, step, navigationValues, false));
+            stepExecutionSteps.add(createFinishStepStep(currentId, step, navigationValues,
+                    inheritWorkerGroupFromFlow(step, compiledFlow), false));
         }
         return stepExecutionSteps;
+    }
+
+    private String inheritWorkerGroupFromFlow(Step step, Flow flow) {
+        if (step.getWorkerGroup() != null) {
+            return step.getWorkerGroup();
+        } else if (flow.getWorkerGroup() != null) {
+            return flow.getWorkerGroup();
+        } else {
+            return null;
+        }
     }
 
     private long getCurrentId(Map<String, Long> stepReferences, Deque<Step> steps) {
@@ -191,8 +214,11 @@ public class ExecutionPlanBuilder {
             }
         }
 
-        if (step == null || !step.isParallelLoop()) {
-            // the reference is not a step or is not a parallel loop step
+        if (step == null) {
+            // the reference is not a step - usually this means this is the first begin step
+            currentId = FLOW_START_STEP_ID + 1L;
+        } else if (!step.isParallelLoop()) {
+            // the reference is not a parallel loop step
             currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS;
         } else {
             //async step
@@ -203,23 +229,22 @@ public class ExecutionPlanBuilder {
     }
 
     private ExecutionStep createFinishStepStep(long currentId, Step step, Map<String,
-            ResultNavigation> navigationValues, boolean parallelLoop) {
+            ResultNavigation> navigationValues, String workerGroup, boolean parallelLoop) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createFinishExternalFlowStep(currentId, step.getPostStepActionData(),
-                    navigationValues, step.getName(), parallelLoop);
+                    navigationValues, step.getName(), workerGroup, parallelLoop);
         }
         return stepFactory.createFinishStepStep(currentId, step.getPostStepActionData(),
-                navigationValues, step.getName(), parallelLoop);
+                navigationValues, step.getName(), workerGroup, parallelLoop);
     }
 
-    private ExecutionStep createBeginStep(Long id, Step step) {
+    private ExecutionStep createBeginStep(Long id, Step step, String workerGroup) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
-                    step.getPreStepActionData(), step.getRefId(), step.getName());
+                    step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
         }
         return stepFactory.createBeginStepStep(id, step.getArguments(),
-                    step.getPreStepActionData(), step.getRefId(), step.getName());
-
+                step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {
@@ -228,5 +253,20 @@ public class ExecutionPlanBuilder {
 
     public void setExternalStepFactory(ExternalExecutionStepFactory externalStepFactory) {
         this.externalStepFactory = externalStepFactory;
+    }
+
+    private void addStepNavigationOptions(ExecutionStep executionStep, Map.Entry<String, Serializable> navigation) {
+        if (navigation.getValue() instanceof Map) {
+            Map<String, Serializable> navigationData = (Map<String, Serializable>) executionStep.getNavigationData();
+            if (navigationData == null) {
+                navigationData = new HashMap<>();
+                executionStep.setNavigationData(navigationData);
+            }
+            List<NavigationOptions> stepNavigationOptions = (List<NavigationOptions>) navigationData.computeIfAbsent(
+                    STEP_NAVIGATION_OPTIONS_KEY, key -> new ArrayList<>());
+
+            stepNavigationOptions.add(new NavigationOptions(navigation.getKey(), executionStep.getExecStepId(),
+                    (Map) navigation.getValue()));
+        }
     }
 }

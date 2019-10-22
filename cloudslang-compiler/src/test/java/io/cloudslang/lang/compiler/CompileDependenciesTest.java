@@ -122,7 +122,7 @@ public class CompileDependenciesTest {
         Assert.assertNotNull(executionPlan);
         assertEquals("different number of dependencies than expected", 2,
                 compilationArtifact.getDependencies().size());
-        ExecutionStep secondStepStartExecutionStep = executionPlan.getStep(4L);
+        ExecutionStep secondStepStartExecutionStep = executionPlan.getStep(5L);
         String refId = (String) secondStepStartExecutionStep.getActionData().get(ScoreLangConstants.REF_ID);
         assertEquals("refId is not as expected", "user.flows.circular.child_flow", refId);
     }

@@ -118,7 +118,7 @@ public class DeserializeTest {
 
     @Test
     public void testDeserializeSystemProperty() throws IOException {
-        SystemProperty systemProperty = new SystemProperty("a.b", "c.host", "localhost");
+        SystemProperty systemProperty = new SystemProperty("a.b", "c.host", "localhost", "description");
         testToAndFromJson(systemProperty, SystemProperty.class);
     }
 

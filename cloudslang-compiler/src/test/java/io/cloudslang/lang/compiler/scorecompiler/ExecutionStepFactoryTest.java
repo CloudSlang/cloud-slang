@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.ActionType;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -31,6 +32,8 @@ import java.util.Map;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ExecutionStepFactoryTest {
 
@@ -66,7 +69,7 @@ public class ExecutionStepFactoryTest {
                 new HashSet<String>(), false);
         HashMap<String, Serializable> preStepData = new HashMap<>();
         preStepData.put(SlangTextualKeys.FOR_KEY, statement);
-        ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "");
+        ExecutionStep startStep = factory.createBeginStepStep(1L, new ArrayList<Argument>(), preStepData, "", "", null);
         LoopStatement actualStatement = (LoopStatement) startStep.getActionData()
                 .get(ScoreLangConstants.LOOP_KEY);
         Assert.assertNotNull("for key is null", actualStatement);
@@ -80,6 +83,7 @@ public class ExecutionStepFactoryTest {
                 new HashMap<String, Serializable>(),
                 new HashMap<String, ResultNavigation>(),
                 "stepName",
+                null,
                 false);
         Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.PREVIOUS_STEP_ID_KEY));
         Assert.assertTrue(finishStepStep.getActionData().containsKey(ScoreLangConstants.BREAK_LOOP_KEY));
@@ -238,6 +242,22 @@ public class ExecutionStepFactoryTest {
         Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_PUBLISH_KEY));
         Assert.assertTrue(actionData.containsKey(ScoreLangConstants.STEP_NAVIGATION_KEY));
         Assert.assertTrue(actionData.containsKey(ScoreLangConstants.NODE_NAME_KEY));
+    }
+
+    @Test
+    public void testCreateActionStepWithSeqAction() {
+        Map<String, Serializable> actionData = new HashMap<>();
+        HashMap<String, String> seqActionData = new HashMap<>();
+
+        seqActionData.put("key", "value");
+        actionData.put("sequential_action", seqActionData);
+
+        ExecutionStep result;
+        result = factory.createActionStep(1L, actionData);
+
+        assertEquals(ActionType.SEQUENTIAL, result.getActionData().get(ScoreLangConstants.ACTION_TYPE));
+        assertEquals(2L, result.getActionData().get(ScoreLangConstants.NEXT_STEP_ID_KEY));
+        assertEquals("value", result.getActionData().get("key"));
     }
 
 }

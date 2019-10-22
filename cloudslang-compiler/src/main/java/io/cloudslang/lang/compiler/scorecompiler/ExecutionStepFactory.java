@@ -20,12 +20,14 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
+import org.apache.commons.lang.Validate;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.Validate;
+
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 public class ExecutionStepFactory {
 
@@ -39,7 +41,8 @@ public class ExecutionStepFactory {
 
 
     public ExecutionStep createBeginStepStep(Long index, List<Argument> stepInputs,
-                                             Map<String, Serializable> preStepData, String refId, String stepName) {
+                                             Map<String, Serializable> preStepData, String refId, String stepName,
+                                             String workerGroup) {
         Validate.notNull(preStepData, "preStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.STEP_INPUTS_KEY, (Serializable) stepInputs);
@@ -48,18 +51,18 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
         actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+
+        if (workerGroup != null) {
+            actionData.put(ScoreLangConstants.WORKER_GROUP, preStepData.get(SlangTextualKeys.WORKER_GROUP));
+        }
         return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "beginStep", actionData);
     }
 
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
                                               Map<String, ResultNavigation> navigationValues,
-                                              String stepName, boolean parallelLoop) {
+                                              String stepName, String workerGroup, boolean parallelLoop) {
         Validate.notNull(postStepData, "postStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
-
-        if (!parallelLoop) {
-            actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
-        }
 
         actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
         actionData.put(ScoreLangConstants.BREAK_LOOP_KEY, postStepData.get(SlangTextualKeys.BREAK_KEY));
@@ -68,9 +71,23 @@ public class ExecutionStepFactory {
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.PARALLEL_LOOP_KEY, parallelLoop);
 
+        if (workerGroup != null) {
+            actionData.put(ScoreLangConstants.WORKER_GROUP, workerGroup);
+        }
+        if (!parallelLoop) {
+            actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
+        }
+
         ExecutionStep finishStep = createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "endStep", actionData);
         finishStep.setNavigationData(null);
         return finishStep;
+    }
+
+    public ExecutionStep createPreconditionStep(Long index, String executableName) {
+        Map<String, Serializable> actionData = new HashMap<>();
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, executableName);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+        return createGeneralStep(index, OPERATION_STEPS_CLASS, "canExecute", actionData);
     }
 
     public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData, List<Input>
@@ -97,8 +114,13 @@ public class ExecutionStepFactory {
         @SuppressWarnings("unchecked")
         Map<String, Serializable> pythonActionData =
                 (Map<String, Serializable>) actionRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
-        boolean javaActionFound = MapUtils.isNotEmpty(javaActionData);
-        boolean pythonActionFound = MapUtils.isNotEmpty(pythonActionData);
+        @SuppressWarnings("unchecked")
+        Map<String, String> seqActionData =
+                (Map<String, String>) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
+
+        boolean javaActionFound = isNotEmpty(javaActionData);
+        boolean pythonActionFound = isNotEmpty(pythonActionData);
+        boolean seqActionFound = isNotEmpty(seqActionData);
 
         if (javaActionFound) {
             actionType = ActionType.JAVA;
@@ -106,8 +128,11 @@ public class ExecutionStepFactory {
         } else if (pythonActionFound) {
             actionType = ActionType.PYTHON;
             actionData.putAll(pythonActionData);
+        } else if (seqActionFound) {
+            actionType = ActionType.SEQUENTIAL;
+            actionData.putAll(seqActionData);
         } else {
-            // java action or python script data is missing
+            // action data is missing
             throw new RuntimeException("Invalid action data");
         }
 
@@ -171,9 +196,8 @@ public class ExecutionStepFactory {
         step.setActionData(actionData);
 
         step.setNavigation(new ControlActionMetadata(NAVIGATION_ACTIONS_CLASS, SIMPLE_NAVIGATION_METHOD));
-        step.setNavigationData(new HashMap<String, Object>());
+        step.setNavigationData(new HashMap<>());
 
         return step;
     }
-
 }

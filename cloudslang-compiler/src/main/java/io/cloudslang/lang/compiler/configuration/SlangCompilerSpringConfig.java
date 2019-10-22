@@ -10,6 +10,8 @@
 package io.cloudslang.lang.compiler.configuration;
 
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.OBJECT_REPOSITORY_KEY;
+
 import com.google.common.collect.Lists;
 import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.compiler.MetadataExtractor;
@@ -41,10 +43,14 @@ import io.cloudslang.lang.compiler.modeller.transformers.ParallelLoopForTransfor
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PythonActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.SeqActionTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.SeqStepsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.modeller.transformers.WorkFlowTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.WorkerGroupTransformer;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.YamlParser;
+import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidatorImpl;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -64,13 +70,18 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import java.beans.IntrospectionException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
+
 
 import java.util.List;
 
@@ -79,10 +90,12 @@ import java.util.List;
 @Import(SlangEntitiesSpringConfig.class)
 public class SlangCompilerSpringConfig {
 
+    private static final String OBJECT_REPOSITORY_CAMEL_CASE = "objectRepository";
+
     @Bean
     @Scope("prototype")
     public Yaml yaml() {
-        Yaml yaml = new Yaml();
+        Yaml yaml = new Yaml(getConstructor());
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml;
     }
@@ -229,6 +242,7 @@ public class SlangCompilerSpringConfig {
         slangCompiler.setSlangModeller(slangModeller());
         slangCompiler.setSystemPropertyValidator(systemPropertyValidator());
         slangCompiler.setYamlParser(yamlParser());
+        slangCompiler.setMetadataExtractor(metadataExtractor());
 
         return slangCompiler;
     }
@@ -271,6 +285,16 @@ public class SlangCompilerSpringConfig {
         pythonActionTransformer.setDependencyFormatValidator(dependencyFormatValidator());
 
         return pythonActionTransformer;
+    }
+
+    @Bean
+    public SeqActionTransformer seqActionTransformer() {
+        return new SeqActionTransformer(dependencyFormatValidator(), precompileValidator(), seqStepsTransformer());
+    }
+
+    @Bean
+    public SeqStepsTransformer seqStepsTransformer() {
+        return new SeqStepsTransformer();
     }
 
     @Bean
@@ -361,6 +385,11 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public WorkerGroupTransformer workerGroupTransformer() {
+        return new WorkerGroupTransformer();
+    }
+
+    @Bean
     public ExecutableBuilder executableBuilder() {
         ExecutableBuilder executableBuilder = new ExecutableBuilder();
         executableBuilder.setTransformers(transformers());
@@ -401,7 +430,23 @@ public class SlangCompilerSpringConfig {
                 outputsTransformer(),
                 javaActionTransformer(),
                 forTransformer(),
-                breakTransformer());
+                breakTransformer(),
+                seqActionTransformer(),
+                workerGroupTransformer());
+    }
+
+    private Constructor getConstructor() {
+        Constructor constructor = new Constructor(ParsedSlang.class);
+        constructor.setPropertyUtils(new PropertyUtils() {
+            @Override
+            public Property getProperty(Class<? extends Object> type, String name) throws IntrospectionException {
+                if (name.equals(OBJECT_REPOSITORY_KEY)) {
+                    name = OBJECT_REPOSITORY_CAMEL_CASE;
+                }
+                return super.getProperty(type, name);
+            }
+        });
+        return constructor;
     }
 
     private void setAbstractOutputTransformerDependencies(AbstractOutputsTransformer abstractOutputsTransformer) {

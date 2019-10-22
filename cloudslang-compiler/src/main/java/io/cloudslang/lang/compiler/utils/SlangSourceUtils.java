@@ -12,9 +12,13 @@ package io.cloudslang.lang.compiler.utils;
 import io.cloudslang.lang.compiler.SlangSource;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static io.cloudslang.lang.compiler.SlangTextualKeys.NEXT_STEP;
 
 /**
  * @author Bonczidai Levente
@@ -38,4 +42,31 @@ public abstract class SlangSourceUtils {
     private static String getNextLine(BufferedReader reader) throws IOException {
         return reader.readLine();
     }
+
+    public static String getNavigationStepName(Serializable value) {
+        if (value instanceof String) {
+            return (String) value;
+        } else {
+            Map<String, Serializable> options = (Map<String, Serializable>) value;
+            return (String) options.get(NEXT_STEP);
+        }
+    }
+
+    public static Serializable getNavigationTarget(Serializable value, String newName) {
+        if (value instanceof String) {
+            return newName;
+        } else {
+            Map<String, Serializable> options = (Map<String, Serializable>) value;
+            if (!options.isEmpty()) {
+                options.put(NEXT_STEP, newName);
+            }
+            return value;
+        }
+    }
+
+    public static boolean containsNavigationNextStep(Serializable value) {
+        Map<String, Serializable> options = (Map<String, Serializable>) value;
+        return options.containsKey(NEXT_STEP);
+    }
+
 }
