@@ -255,7 +255,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 return;
             }
 
-            if (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()))) {
+            if (!executionPreconditionService.canExecute(valueOf(executionRuntimeServices.getExecutionId()),
+                    executionRuntimeServices.isEnterpriseMode())) {
                 logger.warn("Execution precondition not fulfilled. Waiting for it to be true.");
 
                 if (!executionRuntimeServices.getPreconditionNotFulfilled()) {
