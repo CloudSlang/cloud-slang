@@ -43,7 +43,7 @@ public class RunEnvironment implements Serializable {
     private Long nextStepPosition;
 
     // Navigation options, e.g. ROI value for each navigation step
-    private Map<Long, List<NavigationOptions>> navigationOptions;
+    private Map<String, List<NavigationOptions>> navigationOptions;
 
     // Stack holding the contexts of the parent scopes
     private ContextStack contextStack;
@@ -116,18 +116,18 @@ public class RunEnvironment implements Serializable {
         this.nextStepPosition = nextStepPosition;
     }
 
-    public List<NavigationOptions> removeStepNavigationOptions(Long stepId) {
+    public List<NavigationOptions> removeStepNavigationOptions(String key) {
         if (navigationOptions != null) {
-            return navigationOptions.remove(stepId);
+            return navigationOptions.remove(key);
         }
         return null;
     }
 
-    public void putStepNavigationOptions(Long id, List<NavigationOptions> stepNavigationOptions) {
+    public void putStepNavigationOptions(String key, List<NavigationOptions> stepNavigationOptions) {
         if (navigationOptions == null) {
             navigationOptions = new HashMap<>();
         }
-        this.navigationOptions.put(id, stepNavigationOptions);
+        this.navigationOptions.put(key, stepNavigationOptions);
     }
 
     public ExecutionPath getExecutionPath() {
