@@ -144,7 +144,7 @@ public class StepExecutionData extends AbstractExecutionData {
             // (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
 
-            putStepNavigationOptions(runEnv, stepNavigationOptions);
+            putStepNavigationOptions(runEnv, stepNavigationOptions, nodeName);
         } catch (RuntimeException e) {
             logger.error("There was an error running the beginStep execution step of: \'" + nodeName +
                     "\'. Error is: " + e.getMessage());
@@ -219,7 +219,8 @@ public class StepExecutionData extends AbstractExecutionData {
 
             final ReturnValues returnValues = getReturnValues(executableResult, presetResult, outputs);
 
-            List<NavigationOptions> stepNavigationOptions = runEnv.removeStepNavigationOptions(previousStepId);
+            List<NavigationOptions> stepNavigationOptions = runEnv
+                    .removeStepNavigationOptions(nodeName + previousStepId);
             final Double roiValue = getRoiValue(executableResult, stepNavigationOptions, flowVariables);
 
             runEnv.putReturnValues(returnValues);
@@ -288,9 +289,11 @@ public class StepExecutionData extends AbstractExecutionData {
         return workerGroupValue.toString();
     }
 
-    private void putStepNavigationOptions(RunEnvironment runEnv, List<NavigationOptions> stepNavigationOptions) {
+    private void putStepNavigationOptions(RunEnvironment runEnv, List<NavigationOptions> stepNavigationOptions,
+                                          String nodeName) {
         if (CollectionUtils.isNotEmpty(stepNavigationOptions)) {
-            runEnv.putStepNavigationOptions(stepNavigationOptions.get(0).getCurrStepId(), stepNavigationOptions);
+            runEnv.putStepNavigationOptions(nodeName + stepNavigationOptions.get(0).getCurrStepId(),
+                    stepNavigationOptions);
         }
     }
 
