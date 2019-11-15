@@ -439,7 +439,7 @@ public class SlangCompilerSpringConfig {
         Constructor constructor = new Constructor(ParsedSlang.class);
         constructor.setPropertyUtils(new PropertyUtils() {
             @Override
-            public Property getProperty(Class<? extends Object> type, String name) throws IntrospectionException {
+            public Property getProperty(Class<? extends Object> type, String name) {
                 if (name.equals(OBJECT_REPOSITORY_KEY)) {
                     name = OBJECT_REPOSITORY_CAMEL_CASE;
                 }
