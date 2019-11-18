@@ -17,6 +17,7 @@ import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidator;
 import io.cloudslang.lang.entities.SensitivityLevel;
 
 import java.io.Serializable;
@@ -38,6 +39,7 @@ public class PythonActionTransformer extends AbstractTransformer
         implements Transformer<Map<String, Serializable>, Map<String, Serializable>> {
 
     private DependencyFormatValidator dependencyFormatValidator;
+    private ExternalPythonScriptValidator externalPythonScriptValidator;
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(PYTHON_ACTION_SCRIPT_KEY);
     private static Set<String> optionalKeySet = Sets.newHashSet(PYTHON_ACTION_USE_JYTHON_KEY, PYTHON_ACTION_VERSION_KEY);
@@ -56,6 +58,7 @@ public class PythonActionTransformer extends AbstractTransformer
         List<RuntimeException> errors = new ArrayList<>();
         Map<String, Serializable> transformedData = null;
 
+
         try {
             if (rawData != null) {
                 validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
@@ -69,6 +72,12 @@ public class PythonActionTransformer extends AbstractTransformer
                         }
                     }
                 }
+
+                if (isExternalPythonExecution(rawData)) {
+                    // validate script
+                    String script = (String) rawData.get(PYTHON_ACTION_SCRIPT_KEY);
+                    externalPythonScriptValidator.validateExecutionMethodSignature(script);
+                }
                 transformedData = rawData;
             }
         } catch (RuntimeException rex) {
@@ -76,6 +85,11 @@ public class PythonActionTransformer extends AbstractTransformer
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
+    }
+
+    private boolean isExternalPythonExecution(Map<String, Serializable> rawData) {
+        Boolean isJython = (Boolean) rawData.getOrDefault(PYTHON_ACTION_USE_JYTHON_KEY, true);
+        return !isJython;
     }
 
     @Override
@@ -90,5 +104,9 @@ public class PythonActionTransformer extends AbstractTransformer
 
     public void setDependencyFormatValidator(DependencyFormatValidator dependencyFormatValidator) {
         this.dependencyFormatValidator = dependencyFormatValidator;
+    }
+
+    public void setExternalPythonScriptValidator(ExternalPythonScriptValidator externalPythonScriptValidator) {
+        this.externalPythonScriptValidator = externalPythonScriptValidator;
     }
 }

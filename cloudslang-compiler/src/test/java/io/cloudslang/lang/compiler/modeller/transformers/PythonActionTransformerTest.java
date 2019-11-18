@@ -16,10 +16,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-import io.cloudslang.lang.compiler.validator.ExecutableValidator;
-import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
-import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
-import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
+import io.cloudslang.lang.compiler.validator.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -63,6 +60,9 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     private Map<String, Serializable> initialPythonActionSimple;
     private Map<String, Serializable> initialPythonActionWithDependencies;
     private Map<String, Serializable> initialPythonActionInvalidKey;
+    private Map<String, Serializable> initialExternalPythonAction;
+    private Map<String, Serializable> initialExternalPythonInvalidAction;
+    private Map<String, Serializable> initialExternalPythonInvalidAction2;
     private Map<String, Serializable> expectedPythonActionSimple;
 
     @Before
@@ -70,6 +70,11 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         initialPythonActionSimple = loadPythonActionData("/python_action_simple.sl");
         initialPythonActionWithDependencies = loadPythonActionData("/python_action_with_dependencies.sl");
         initialPythonActionInvalidKey = loadPythonActionData("/corrupted/python_action_invalid_key.sl");
+        initialPythonActionSimple = loadPythonActionData("/python_action_simple.sl");
+        initialExternalPythonAction = loadPythonActionData("/python_external_valid_action.sl");
+        initialExternalPythonInvalidAction = loadPythonActionData("/python_external_invalid_action1.sl");
+        initialExternalPythonInvalidAction2 = loadPythonActionData("/python_external_invalid_action2.sl");
+
 
         expectedPythonActionSimple = new HashMap<>();
         expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY, "pass");
@@ -145,6 +150,27 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(pythonActionTransformer, initialPythonActionInvalidKey);
     }
 
+    @Test
+    public void testTransformWithExternalPythonValid() {
+        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonAction);
+    }
+
+    @Test
+    public void testTransformWithExternalInvalidPythonValid() {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Method execution is missing or is invalid");
+
+        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction);
+    }
+
+    @Test
+    public void testTransformWithExternalInvalidPythonValid2() {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Overload of the execution method is not allowed");
+
+        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction2);
+    }
+
     private Map<String, Serializable> loadPythonActionData(String filePath) throws URISyntaxException {
         URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
@@ -153,6 +179,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         Map<String, Serializable> returnMap = (Map) op.get(SlangTextualKeys.PYTHON_ACTION_KEY);
         return returnMap;
     }
+
 
     private Map<String, Serializable> transformAndThrowErrorIfExists(PythonActionTransformer pythonActionTransformer,
                                                                      Map<String, Serializable> rawData) {
@@ -194,12 +221,20 @@ public class PythonActionTransformerTest extends TransformersTestParent {
 
         @Bean
         public PythonActionTransformer pythonActionTransformer() {
-            return new PythonActionTransformer();
+            PythonActionTransformer pythonActionTransformer = new PythonActionTransformer();
+            pythonActionTransformer.setExternalPythonScriptValidator(externalPythonScriptValidator());
+            pythonActionTransformer.setDependencyFormatValidator(dependencyFormatValidator());
+            return pythonActionTransformer;
         }
 
         @Bean
         public DependencyFormatValidator dependencyFormatValidator() {
             return new DependencyFormatValidator();
+        }
+
+        @Bean
+        public ExternalPythonScriptValidator externalPythonScriptValidator() {
+            return new ExternalPythonScriptValidatorImpl();
         }
 
         @Bean

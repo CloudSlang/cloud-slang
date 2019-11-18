@@ -60,17 +60,11 @@ import io.cloudslang.lang.compiler.scorecompiler.ExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ExternalExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompilerImpl;
-import io.cloudslang.lang.compiler.validator.CompileValidator;
-import io.cloudslang.lang.compiler.validator.CompileValidatorImpl;
-import io.cloudslang.lang.compiler.validator.DefaultExternalExecutableValidator;
-import io.cloudslang.lang.compiler.validator.ExecutableValidator;
-import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
-import io.cloudslang.lang.compiler.validator.PreCompileValidator;
-import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
-import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
-import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
+import io.cloudslang.lang.compiler.validator.*;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+
 import java.beans.IntrospectionException;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -190,6 +184,11 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public ExternalPythonScriptValidator externalPythonScriptValidator() {
+        return new ExternalPythonScriptValidatorImpl();
+    }
+
+    @Bean
     public MetadataExtractor metadataExtractor() {
         MetadataExtractorImpl metadataExtractor = new MetadataExtractorImpl();
         metadataExtractor.setMetadataModeller(metadataModeller());
@@ -283,6 +282,7 @@ public class SlangCompilerSpringConfig {
     public PythonActionTransformer pythonActionTransformer() {
         PythonActionTransformer pythonActionTransformer = new PythonActionTransformer();
         pythonActionTransformer.setDependencyFormatValidator(dependencyFormatValidator());
+        pythonActionTransformer.setExternalPythonScriptValidator(externalPythonScriptValidator());
 
         return pythonActionTransformer;
     }
