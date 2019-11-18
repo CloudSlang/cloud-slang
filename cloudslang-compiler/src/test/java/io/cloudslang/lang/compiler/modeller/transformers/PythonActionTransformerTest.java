@@ -60,7 +60,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     private Map<String, Serializable> initialPythonActionSimple;
     private Map<String, Serializable> initialPythonActionWithDependencies;
     private Map<String, Serializable> initialPythonActionInvalidKey;
-    private Map<String, Serializable> initialExternalPythonAction;
+    private Map<String, Serializable> initialExternalPythonAction1;
+    private Map<String, Serializable> initialExternalPythonAction2;
     private Map<String, Serializable> initialExternalPythonInvalidAction;
     private Map<String, Serializable> initialExternalPythonInvalidAction2;
     private Map<String, Serializable> expectedPythonActionSimple;
@@ -71,7 +72,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         initialPythonActionWithDependencies = loadPythonActionData("/python_action_with_dependencies.sl");
         initialPythonActionInvalidKey = loadPythonActionData("/corrupted/python_action_invalid_key.sl");
         initialPythonActionSimple = loadPythonActionData("/python_action_simple.sl");
-        initialExternalPythonAction = loadPythonActionData("/python_external_valid_action.sl");
+        initialExternalPythonAction1 = loadPythonActionData("/python_external_valid_action1.sl");
+        initialExternalPythonAction2 = loadPythonActionData("/python_external_valid_action2.sl");
         initialExternalPythonInvalidAction = loadPythonActionData("/python_external_invalid_action1.sl");
         initialExternalPythonInvalidAction2 = loadPythonActionData("/python_external_invalid_action2.sl");
 
@@ -151,8 +153,13 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     }
 
     @Test
-    public void testTransformWithExternalPythonValid() {
-        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonAction);
+    public void testTransformWithExternalPythonValid1() {
+        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonAction1);
+    }
+
+    @Test
+    public void testTransformWithExternalPythonValid2() {
+        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonAction2);
     }
 
     @Test
