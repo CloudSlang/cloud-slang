@@ -60,7 +60,17 @@ import io.cloudslang.lang.compiler.scorecompiler.ExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ExternalExecutionStepFactory;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompiler;
 import io.cloudslang.lang.compiler.scorecompiler.ScoreCompilerImpl;
-import io.cloudslang.lang.compiler.validator.*;
+import io.cloudslang.lang.compiler.validator.CompileValidator;
+import io.cloudslang.lang.compiler.validator.CompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.DefaultExternalExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidator;
+import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidatorImpl;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
+import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 
 import java.beans.IntrospectionException;
