@@ -16,6 +16,7 @@ package io.cloudslang.lang.compiler.modeller;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
@@ -132,8 +133,26 @@ public class DependenciesHelper {
     public Set<String> getSystemPropertiesForOperation(
             List<Input> inputs,
             List<Output> outputs,
-            List<Result> results) {
-        return getSystemPropertiesFromExecutable(inputs, outputs, results);
+            List<Result> results,
+            List<SeqStep> seqSteps) {
+        Set<String> result = new HashSet<>();
+        result.addAll(getSystemPropertiesFromExecutable(inputs, outputs, results));
+        result.addAll(getSystemPropertiesForSeqStep(seqSteps));
+        return result;
+    }
+
+    public Set<String> getSystemPropertiesForSeqStep(
+            List<SeqStep> seqSteps) {
+        Set<String> result = new HashSet<>();
+        if (seqSteps != null) {
+            for (SeqStep step : seqSteps) {
+                Set<String> systemPropertyDependencies = step.getSystemPropertyDependencies();
+                if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                    result.addAll(systemPropertyDependencies);
+                }
+            }
+        }
+        return result;
     }
 
     public Set<String> getSystemPropertiesForDecision(

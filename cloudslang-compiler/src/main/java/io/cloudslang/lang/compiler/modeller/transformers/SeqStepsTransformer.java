@@ -39,7 +39,7 @@ import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
-public class SeqStepsTransformer extends AbstractTransformer
+public class SeqStepsTransformer extends AbstractInOutForTransformer
         implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<SeqStep>> {
     private static final String SEQ_OPERATION_HAS_MISSING_TAGS =
             "Sequential operation step has the following missing tags: ";
@@ -53,6 +53,9 @@ public class SeqStepsTransformer extends AbstractTransformer
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY, SEQ_STEP_HIGHLIGHT_ID_KEY,
             SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY);
+
+    private static final String INVALID_KEYS_ERROR_MESSAGE_SUFFIX =
+            ". Please take a look at the supported features per versions link";
 
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for sequential operation step.";
@@ -167,6 +170,11 @@ public class SeqStepsTransformer extends AbstractTransformer
         seqStep.setName(stepProps.get(SEQ_STEP_NAME_KEY));
         seqStep.setSnapshot(stepProps.get(SEQ_STEP_SNAPSHOT_KEY));
         seqStep.setHighlightId(stepProps.get(SEQ_STEP_HIGHLIGHT_ID_KEY));
+
+        Accumulator accumulator = extractFunctionData(stepProps.get(SEQ_STEP_ARGS_KEY));
+        if (accumulator.getSystemPropertyDependencies() != null) {
+            seqStep.setSystemPropertyDependencies(accumulator.getSystemPropertyDependencies());
+        }
         return seqStep;
     }
 

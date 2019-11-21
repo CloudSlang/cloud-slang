@@ -16,12 +16,14 @@ import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
 import io.cloudslang.lang.compiler.modeller.result.ActionModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.StepModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
+import io.cloudslang.lang.compiler.modeller.transformers.ObjectRepositoryTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -34,6 +36,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import java.util.LinkedHashMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -63,6 +66,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKER_GROUP;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
@@ -176,7 +180,6 @@ public class ExecutableBuilder {
         List<RuntimeException> errors = new ArrayList<>();
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
         String workerGroup = (String)executableRawData.get(SlangTextualKeys.WORKER_GROUP);
-
         errors.addAll(preCompileValidator.checkKeyWords(
                 execName,
                 "",
@@ -275,19 +278,29 @@ public class ExecutableBuilder {
                 errors.addAll(actionModellingResult.getErrors());
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
-
+                ObjectRepositoryTransformer objectRepositoryTransformer = new ObjectRepositoryTransformer();
                 isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
+                List<SeqStep> seqSteps = new ArrayList<>();
+                Set<String> sysPropObjRepo = new HashSet<>();
                 if (!isSeqAction) {
                     preCompileValidator.validateResultTypes(results, execName, errors);
                     preCompileValidator.validateDefaultResult(results, execName, errors);
                 } else {
                     preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
                     preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
+                    seqSteps =
+                            (List<SeqStep>)((LinkedHashMap) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
+                                    .get(SEQ_STEPS_KEY);
+                    sysPropObjRepo = objectRepositoryTransformer
+                            .getObjectRepositorySystemProperties(parsedSlang.getObjectRepository());
                 }
 
                 try {
                     systemPropertyDependencies = dependenciesHelper
-                            .getSystemPropertiesForOperation(inputs, outputs, results);
+                            .getSystemPropertiesForOperation(inputs, outputs, results, seqSteps);
+                    if (!sysPropObjRepo.isEmpty()) {
+                        systemPropertyDependencies.addAll(sysPropObjRepo);
+                    }
 
                 } catch (RuntimeException ex) {
                     errors.add(ex);
