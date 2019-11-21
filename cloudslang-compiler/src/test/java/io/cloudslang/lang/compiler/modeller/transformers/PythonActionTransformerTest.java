@@ -16,7 +16,6 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-import io.cloudslang.lang.compiler.validator.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -26,6 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.cloudslang.lang.compiler.validator.ExecutableValidator;
+import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
+import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidator;
+import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidatorImpl;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
+import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import junit.framework.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;

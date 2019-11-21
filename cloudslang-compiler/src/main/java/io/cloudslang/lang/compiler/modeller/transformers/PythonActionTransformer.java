@@ -42,7 +42,8 @@ public class PythonActionTransformer extends AbstractTransformer
     private ExternalPythonScriptValidator externalPythonScriptValidator;
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(PYTHON_ACTION_SCRIPT_KEY);
-    private static Set<String> optionalKeySet = Sets.newHashSet(PYTHON_ACTION_USE_JYTHON_KEY, PYTHON_ACTION_VERSION_KEY);
+    private static Set<String> optionalKeySet = Sets.newHashSet(PYTHON_ACTION_USE_JYTHON_KEY,
+            PYTHON_ACTION_VERSION_KEY);
 
     @SuppressWarnings("FieldCanBeLocal") // remove when `dependencies` will be enabled
     private boolean dependenciesEnabled = false;
