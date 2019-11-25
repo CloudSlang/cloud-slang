@@ -41,7 +41,7 @@
         <maven-license-plugin.version>3.0</maven-license-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!--Project dependencies-->
-        <spring.version>4.3.17.RELEASE</spring.version>
+        <spring.version>5.2.1.RELEASE</spring.version>
         <hamcrest.version>1.3</hamcrest.version>
         <score.version>0.3.114</score.version>
         <h2.version>1.4.199</h2.version>
