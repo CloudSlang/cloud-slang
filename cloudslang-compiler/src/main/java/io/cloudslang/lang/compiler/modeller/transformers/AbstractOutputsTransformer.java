@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -39,7 +40,7 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
 
     private static final List<String> KNOWN_KEYS = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
 
-    public TransformModellingResult<List<Output>> transform(List<Object> rawData) {
+    public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
         List<Output> transformedData = new ArrayList<>();
         List<RuntimeException> errors = new ArrayList<>();
 
@@ -64,16 +65,17 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
                         //     property1: value1
                         //     property2: value2
                         // this is the verbose way of defining outputs with all of the properties available
-                        handleOutputProperties(transformedData, entry, errors);
+                        handleOutputProperties(transformedData, entry, errors, sensitivityLevel);
                     } else {
                         // - some_output: some_expression
-                        addOutput(transformedData, createOutput(entry.getKey(), entryValue, false), errors);
+                        addOutput(transformedData, createOutput(entry.getKey(), entryValue, false,
+                                sensitivityLevel), errors);
                     }
                 } else {
                     //- some_output
                     //this is our default behavior that if the user specifies only a key,
                     // the key is also the ref we look for
-                    addOutput(transformedData, createRefOutput((String) rawOutput, false), errors);
+                    addOutput(transformedData, createRefOutput((String) rawOutput, false, sensitivityLevel), errors);
                 }
             } catch (RuntimeException rex) {
                 errors.add(rex);
@@ -88,7 +90,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
     }
 
     abstract void handleOutputProperties(List<Output> transformedData,
-                                         Map.Entry<String, ?> entry, List<RuntimeException> errors);
+                                         Map.Entry<String, ?> entry, List<RuntimeException> errors,
+                                         SensitivityLevel sensitivityLevel);
 
     void addOutput(List<Output> outputs, Output element, List<RuntimeException> errors) {
         List<RuntimeException> validationErrors = preCompileValidator.validateNoDuplicateInOutParams(outputs, element);
@@ -99,20 +102,21 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         }
     }
 
-    Output createOutput(String outputName, Serializable outputExpression, boolean sensitive) {
+    Output createOutput(String outputName, Serializable outputExpression, boolean sensitive,
+                        SensitivityLevel sensitivityLevel) {
         executableValidator.validateOutputName(outputName);
         preCompileValidator.validateStringValue(outputName, outputExpression, this);
         Accumulator accumulator = extractFunctionData(outputExpression);
         return new Output(
                 outputName,
-                ValueFactory.create(outputExpression, sensitive),
+                ValueFactory.create(outputExpression, sensitive, sensitivityLevel),
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies()
         );
     }
 
-    Output createRefOutput(String rawOutput, boolean sensitive) {
-        return createOutput(rawOutput, transformNameToExpression(rawOutput), sensitive);
+    Output createRefOutput(String rawOutput, boolean sensitive, SensitivityLevel sensitivityLevel) {
+        return createOutput(rawOutput, transformNameToExpression(rawOutput), sensitive, sensitivityLevel);
     }
 
     private String transformNameToExpression(String name) {
@@ -127,7 +131,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         this.executableValidator = executableValidator;
     }
 
-    protected Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry) {
+    protected Output createPropOutput(Map.Entry<String, Map<String, Serializable>> entry,
+                                      SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> props = entry.getValue();
         validateKeys(entry, props);
         // default is sensitive=false
@@ -136,8 +141,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         Serializable value = props.get(VALUE_KEY);
 
         Output output = value == null ?
-                createRefOutput(outputName, sensitive) :
-                createOutput(outputName, value, sensitive);
+                createRefOutput(outputName, sensitive, sensitivityLevel) :
+                createOutput(outputName, value, sensitive, sensitivityLevel);
 
         if (props.containsKey(SEQ_OUTPUT_ROBOT_KEY)) {
             output.setRobot((boolean) props.get(SEQ_OUTPUT_ROBOT_KEY));

@@ -37,7 +37,7 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     public TransformModellingResult<List<Output>> transform(List<Object> rawData, SensitivityLevel sensitivityLevel) {
-        return super.transform(rawData);
+        return super.transform(rawData, sensitivityLevel);
     }
 
     @Override
@@ -52,8 +52,11 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
 
     @Override
     void handleOutputProperties(List<Output> transformedData,
-                                Map.Entry<String, ?> entry, List<RuntimeException> errors) {
-        addOutput(transformedData, createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry), errors);
+                                Map.Entry<String, ?> entry, List<RuntimeException> errors,
+                                SensitivityLevel sensitivityLevel) {
+        addOutput(transformedData,
+                createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry, sensitivityLevel),
+                errors);
     }
 
     @Override
