@@ -9,10 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
-import static org.apache.commons.lang3.tuple.Pair.of;
-
 import io.cloudslang.lang.compiler.modeller.transformers.AbstractInOutForTransformer;
-import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class SystemPropertiesHelper extends AbstractInOutForTransformer {
 
@@ -33,36 +29,29 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     private static final String OBJECT_PROPERTIES = "properties";
 
 
-    public Pair<Set<String>, Set<ScriptFunction>> getObjectRepositorySystemProperties(Map<String, Object> objectMap) {
+    public Set<String> getObjectRepositorySystemProperties(Map<String, Object> objectMap) {
         @SuppressWarnings("unchecked")
         List<Object> objects = (List<Object>) objectMap.get(OBJECTS);
         Set<String> systemProps = new HashSet<>();
-        Set<ScriptFunction> functions = new HashSet<>();
         Stack<List<Object>> stack = new Stack<>();
         getSystemPropertiesObjRepo(objects, stack);
         stack.parallelStream()
-                .forEach(stackElement -> {
-                    Pair<Set<String>, Set<ScriptFunction>> result = getSystemPropertyForObject(stackElement);
-                    systemProps.addAll(result.getLeft());
-                    functions.addAll(result.getRight());
-                });
-        return of(systemProps, functions);
-//        stack.removeAllElements();
+                .forEach(stackElement -> systemProps.addAll(getSystemPropertyForObject(stackElement)));
+        return systemProps;
+        //stack.removeAllElements();
     }
 
-    private Pair<Set<String>, Set<ScriptFunction>> getSystemPropertyForObject(Object object) {
+    private Set<String> getSystemPropertyForObject(Object object) {
         Set<String> stringSet = new HashSet<>();
-        Set<ScriptFunction> functionDependencies = new HashSet<>();
         if (object instanceof ArrayList) {
             for (Object elementList : (ArrayList) object) {
                 LinkedHashMap valueMap = (LinkedHashMap) ((LinkedHashMap) elementList).get(OBJECT_PROPERTY);
                 Accumulator accumulator = extractFunctionData(
                         (Serializable) ((LinkedHashMap) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
                 stringSet.addAll(accumulator.getSystemPropertyDependencies());
-                functionDependencies.addAll(accumulator.getFunctionDependencies());
             }
         }
-        return of(stringSet, functionDependencies);
+        return stringSet;
     }
 
     private void getSystemPropertiesObjRepo(List<Object> objRepository, Stack<List<Object>> stack) {
@@ -83,22 +72,64 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
         }
     }
 
-    public Pair<Set<String>, Set<ScriptFunction>> getSystemPropertiesFromSettings(Map<String, Object> objectMap) {
-        @SuppressWarnings("unchecked")
-        List<Object> objects = (List<Object>) objectMap.get("web_settings");
+    public Set<String> getSystemPropertiesFromSettings(Map<String, Object> objectMap) {
         Set<String> systemProps = new HashSet<>();
-        Set<ScriptFunction> functions = new HashSet<>();
-        Stack<List<Object>> stack = new Stack<>();
-        getSystemPropertiesObjRepo(objects, stack);
-        stack.parallelStream()
-                .forEach(stackElement -> {
-                    Pair<Set<String>, Set<ScriptFunction>> result = getSystemPropertyForObject(stackElement);
-                    systemProps.addAll(result.getLeft());
-                    functions.addAll(result.getRight());
-                });
-        return of(systemProps, functions);
-//        stack.removeAllElements();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> sapSettings = (Map<String, Object>) objectMap.get("sap_settings");
+        findSystemPropertiesSapSettings(sapSettings, systemProps);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> windowsSettings = (Map<String, Object>) objectMap.get("windows_settings");
+        findSystemPropertiesWindowsSettings(windowsSettings, systemProps);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> webSettings = (Map<String, Object>) objectMap.get("web_settings");
+        findSystemPropertiesWebSettings(webSettings, systemProps);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> terminalSettings = (Map<String, Object>) objectMap.get("terminal_settings");
+        findSystemPropertiesTerminalSettings(terminalSettings, systemProps);
+        return systemProps;
     }
 
+    private void findSystemPropertiesSapSettings(Map<String, Object> sapSettings,
+            Set<String> systemProps) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> sapSetting = (Map<String, Object>) sapSettings.get("sap");
+        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("user"))
+                .getSystemPropertyDependencies());
+        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("client"))
+                .getSystemPropertyDependencies());
+        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("language"))
+                .getSystemPropertyDependencies());
+        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("password"))
+                .getSystemPropertyDependencies());
+    }
+
+    private void findSystemPropertiesWindowsSettings(Map<String, Object> windowsSettings,
+            Set<String> systemProps) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> appType = (List<Map<String, Object>>) windowsSettings.get("apps");
+        for (Map<String, Object> app : appType) {
+            Map<String, Object> application = (Map<String, Object>) app.get("app");
+            systemProps.addAll(extractFunctionData((Serializable) application.get("args"))
+                    .getSystemPropertyDependencies());
+            systemProps.addAll(extractFunctionData((Serializable) application.get("path"))
+                    .getSystemPropertyDependencies());
+            systemProps.addAll(extractFunctionData((Serializable) application.get("directory"))
+                    .getSystemPropertyDependencies());
+        }
+    }
+
+    private void findSystemPropertiesWebSettings(Map<String, Object> webSettings,
+            Set<String> systemProps) {
+        systemProps.addAll(extractFunctionData((Serializable) webSettings.get("address"))
+                .getSystemPropertyDependencies());
+        systemProps.addAll(extractFunctionData((Serializable) webSettings.get("browser"))
+                .getSystemPropertyDependencies());
+    }
+
+    private void findSystemPropertiesTerminalSettings(Map<String, Object> terminalSettings,
+            Set<String> systemProps) {
+        systemProps.addAll(extractFunctionData((Serializable) terminalSettings.get("current_emulator"))
+                .getSystemPropertyDependencies());
+    }
 }
     

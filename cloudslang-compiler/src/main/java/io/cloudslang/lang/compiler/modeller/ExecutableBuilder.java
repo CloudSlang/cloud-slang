@@ -23,7 +23,6 @@ import io.cloudslang.lang.compiler.modeller.result.ActionModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.StepModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.WorkflowModellingResult;
-import io.cloudslang.lang.compiler.modeller.transformers.ObjectRepositoryTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -66,6 +65,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_SETTINGS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKER_GROUP;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
@@ -89,6 +89,8 @@ public class ExecutableBuilder {
     private TransformersHandler transformersHandler;
 
     private DependenciesHelper dependenciesHelper;
+
+    private SystemPropertiesHelper systemPropertiesHelper;
 
     private PreCompileValidator preCompileValidator;
 
@@ -278,21 +280,25 @@ public class ExecutableBuilder {
                 errors.addAll(actionModellingResult.getErrors());
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
-                ObjectRepositoryTransformer objectRepositoryTransformer = new ObjectRepositoryTransformer();
                 isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
                 List<SeqStep> seqSteps = new ArrayList<>();
                 Set<String> sysPropObjRepo = new HashSet<>();
+                Set<String> sysPropSettings = new HashSet<>();
+                Map<String, Object> settings = new HashMap<>();
                 if (!isSeqAction) {
                     preCompileValidator.validateResultTypes(results, execName, errors);
                     preCompileValidator.validateDefaultResult(results, execName, errors);
                 } else {
                     preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
                     preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
-                    seqSteps =
-                            (List<SeqStep>)((LinkedHashMap) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
+                    seqSteps = (List<SeqStep>)((LinkedHashMap) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
                                     .get(SEQ_STEPS_KEY);
-                    sysPropObjRepo = objectRepositoryTransformer
+                    settings = (Map<String, Object>) ((LinkedHashMap) actionRawData
+                            .get(SlangTextualKeys.SEQ_ACTION_KEY))
+                            .get(SEQ_SETTINGS_KEY);
+                    sysPropObjRepo = systemPropertiesHelper
                             .getObjectRepositorySystemProperties(parsedSlang.getObjectRepository());
+                    sysPropSettings = systemPropertiesHelper.getSystemPropertiesFromSettings(settings);
                 }
 
                 try {
@@ -300,6 +306,9 @@ public class ExecutableBuilder {
                             .getSystemPropertiesForOperation(inputs, outputs, results, seqSteps);
                     if (!sysPropObjRepo.isEmpty()) {
                         systemPropertyDependencies.addAll(sysPropObjRepo);
+                    }
+                    if (!settings.isEmpty()) {
+                        systemPropertyDependencies.addAll(sysPropSettings);
                     }
 
                 } catch (RuntimeException ex) {
@@ -819,6 +828,10 @@ public class ExecutableBuilder {
 
     public void setDependenciesHelper(DependenciesHelper dependenciesHelper) {
         this.dependenciesHelper = dependenciesHelper;
+    }
+
+    public void setObjectRepository(SystemPropertiesHelper objectRepository) {
+        this.systemPropertiesHelper = objectRepository;
     }
 
     public void setPreCompileValidator(PreCompileValidator preCompileValidator) {

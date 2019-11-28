@@ -174,6 +174,7 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
         Accumulator accumulator = extractFunctionData(stepProps.get(SEQ_STEP_ARGS_KEY));
         if (accumulator.getSystemPropertyDependencies() != null) {
             seqStep.setSystemPropertyDependencies(accumulator.getSystemPropertyDependencies());
+            seqStep.setFunctionDependencies(accumulator.getFunctionDependencies());
         }
         return seqStep;
     }
