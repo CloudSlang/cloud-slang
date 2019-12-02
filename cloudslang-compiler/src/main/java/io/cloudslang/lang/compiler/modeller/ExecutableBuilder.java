@@ -78,6 +78,7 @@ import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationSt
 import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationTarget;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 
 public class ExecutableBuilder {
@@ -217,7 +218,7 @@ public class ExecutableBuilder {
         results = results == null ? new ArrayList<Result>() : results;
 
         String namespace = parsedSlang.getNamespace();
-        Set<String> systemPropertyDependencies = null;
+        Set<String> systemPropertyDependencies = new HashSet<>();
 
         Executable executable;
         boolean isSeqAction = false;
@@ -282,9 +283,6 @@ public class ExecutableBuilder {
                 executableDependencies = new HashSet<>();
                 isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
                 List<SeqStep> seqSteps = new ArrayList<>();
-                Set<String> sysPropObjRepo = new HashSet<>();
-                Set<String> sysPropSettings = new HashSet<>();
-                Map<String, Object> settings = new HashMap<>();
                 if (!isSeqAction) {
                     preCompileValidator.validateResultTypes(results, execName, errors);
                     preCompileValidator.validateDefaultResult(results, execName, errors);
@@ -293,24 +291,24 @@ public class ExecutableBuilder {
                     preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
                     seqSteps = (List<SeqStep>)((LinkedHashMap) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
                                     .get(SEQ_STEPS_KEY);
-                    settings = (Map<String, Object>) ((LinkedHashMap) actionRawData
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> settings = (Map<String, Object>) ((LinkedHashMap) actionRawData
                             .get(SlangTextualKeys.SEQ_ACTION_KEY))
                             .get(SEQ_SETTINGS_KEY);
-                    sysPropObjRepo = systemPropertiesHelper
-                            .getObjectRepositorySystemProperties(parsedSlang.getObjectRepository());
-                    sysPropSettings = systemPropertiesHelper.getSystemPropertiesFromSettings(settings);
+                    if (isNotEmpty(parsedSlang.getObjectRepository())) {
+                        Set<String> sysPropObjRepo = systemPropertiesHelper
+                                .getObjectRepositorySystemProperties(parsedSlang.getObjectRepository());
+                        systemPropertyDependencies.addAll(sysPropObjRepo);
+                    }
+                    if (isNotEmpty(settings)) {
+                        Set<String> sysPropSettings = systemPropertiesHelper.getSystemPropertiesFromSettings(settings);
+                        systemPropertyDependencies.addAll(sysPropSettings);
+                    }
                 }
 
                 try {
-                    systemPropertyDependencies = dependenciesHelper
-                            .getSystemPropertiesForOperation(inputs, outputs, results, seqSteps);
-                    if (!sysPropObjRepo.isEmpty()) {
-                        systemPropertyDependencies.addAll(sysPropObjRepo);
-                    }
-                    if (!settings.isEmpty()) {
-                        systemPropertyDependencies.addAll(sysPropSettings);
-                    }
-
+                    systemPropertyDependencies.addAll(dependenciesHelper
+                            .getSystemPropertiesForOperation(inputs, outputs, results, seqSteps));
                 } catch (RuntimeException ex) {
                     errors.add(ex);
                 }
@@ -416,7 +414,7 @@ public class ExecutableBuilder {
         );
 
         Workflow onFailureWorkFlow = null;
-        if (MapUtils.isNotEmpty(onFailureStepData)) {
+        if (isNotEmpty(onFailureStepData)) {
             List<Map<String, Map<String, Object>>> onFailureData;
             try {
                 //noinspection unchecked
@@ -511,7 +509,7 @@ public class ExecutableBuilder {
                     "be a map of values in the format:\ndo:\n\top_name:";
             try {
                 stepRawDataValue = stepRawData.values().iterator().next();
-                if (MapUtils.isNotEmpty(stepRawDataValue)) {
+                if (isNotEmpty(stepRawDataValue)) {
                     boolean loopKeyFound = stepRawDataValue.containsKey(LOOP_KEY);
                     boolean parallelLoopKeyFound = stepRawDataValue.containsKey(PARALLEL_LOOP_KEY);
                     if (loopKeyFound) {
@@ -647,7 +645,7 @@ public class ExecutableBuilder {
         final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
         final Map<String, Object> doRawData = getRawDataFromDoStep(stepRawData);
 
-        if (MapUtils.isNotEmpty(doRawData)) {
+        if (isNotEmpty(doRawData)) {
             try {
                 String refString = doRawData.keySet().iterator().next();
                 refId = resolveReferenceId(refString, imports, namespace, preStepData);
@@ -777,7 +775,7 @@ public class ExecutableBuilder {
         } else {
             String prefix = StringUtils.substringBefore(rawReferenceId, NAMESPACE_DELIMITER);
             String suffix = StringUtils.substringAfter(rawReferenceId, NAMESPACE_DELIMITER);
-            if (MapUtils.isNotEmpty(imports) && imports.containsKey(prefix)) {
+            if (isNotEmpty(imports) && imports.containsKey(prefix)) {
                 // expand alias
                 resolvedReferenceId = imports.get(prefix) + NAMESPACE_DELIMITER + suffix;
             } else {

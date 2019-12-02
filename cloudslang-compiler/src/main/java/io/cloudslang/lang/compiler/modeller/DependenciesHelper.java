@@ -36,13 +36,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.Validate;
 
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.hamcrest.Matchers.equalTo;
 
 public class DependenciesHelper {
@@ -147,7 +147,7 @@ public class DependenciesHelper {
         if (seqSteps != null) {
             for (SeqStep step : seqSteps) {
                 Set<String> systemPropertyDependencies = step.getSystemPropertyDependencies();
-                if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                if (isNotEmpty(systemPropertyDependencies)) {
                     result.addAll(systemPropertyDependencies);
                 }
             }
@@ -213,7 +213,7 @@ public class DependenciesHelper {
         if (inOutParams != null) {
             for (InOutParam inOutParam : inOutParams) {
                 Set<String> systemPropertyDependencies = inOutParam.getSystemPropertyDependencies();
-                if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
+                if (isNotEmpty(systemPropertyDependencies)) {
                     result.addAll(systemPropertyDependencies);
                 }
             }

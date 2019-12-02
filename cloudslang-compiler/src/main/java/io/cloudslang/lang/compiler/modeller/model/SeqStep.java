@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.model;
 
-import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -25,7 +24,6 @@ public class SeqStep implements Serializable {
     private String highlightId;
     private String snapshot;
     private Set<String> systemPropertyDependencies;
-    private Set<ScriptFunction> functionDependencies;
 
     public String getName() {
         return name;
@@ -97,14 +95,6 @@ public class SeqStep implements Serializable {
 
     public void setSystemPropertyDependencies(Set<String> systemPropertyDependencies) {
         this.systemPropertyDependencies = systemPropertyDependencies;
-    }
-
-    public Set<ScriptFunction> getFunctionDependencies() {
-        return functionDependencies;
-    }
-
-    public void setFunctionDependencies(Set<ScriptFunction> functionDependencies) {
-        this.functionDependencies = functionDependencies;
     }
 
     @Override

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class SystemPropertiesHelper extends AbstractInOutForTransformer {
 
@@ -37,6 +39,7 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
         getSystemPropertiesObjRepo(objects, stack);
         stack.parallelStream()
                 .forEach(stackElement -> systemProps.addAll(getSystemPropertyForObject(stackElement)));
+        stack.clear();
         return systemProps;
         //stack.removeAllElements();
     }
@@ -75,61 +78,51 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     public Set<String> getSystemPropertiesFromSettings(Map<String, Object> objectMap) {
         Set<String> systemProps = new HashSet<>();
         @SuppressWarnings("unchecked")
-        Map<String, Object> sapSettings = (Map<String, Object>) objectMap.get("sap_settings");
+        Map<String, Object> sapSettings = (Map<String, Object>) objectMap.get("sap");
         findSystemPropertiesSapSettings(sapSettings, systemProps);
         @SuppressWarnings("unchecked")
-        Map<String, Object> windowsSettings = (Map<String, Object>) objectMap.get("windows_settings");
+        Map<String, Object> windowsSettings = (Map<String, Object>) objectMap.get("windows");
         findSystemPropertiesWindowsSettings(windowsSettings, systemProps);
         @SuppressWarnings("unchecked")
-        Map<String, Object> webSettings = (Map<String, Object>) objectMap.get("web_settings");
+        Map<String, Object> webSettings = (Map<String, Object>) objectMap.get("web");
         findSystemPropertiesWebSettings(webSettings, systemProps);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> terminalSettings = (Map<String, Object>) objectMap.get("terminal_settings");
-        findSystemPropertiesTerminalSettings(terminalSettings, systemProps);
         return systemProps;
     }
 
     private void findSystemPropertiesSapSettings(Map<String, Object> sapSettings,
             Set<String> systemProps) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> sapSetting = (Map<String, Object>) sapSettings.get("sap");
-        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("user"))
-                .getSystemPropertyDependencies());
-        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("client"))
-                .getSystemPropertyDependencies());
-        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("language"))
-                .getSystemPropertyDependencies());
-        systemProps.addAll(extractFunctionData((Serializable) sapSetting.get("password"))
-                .getSystemPropertyDependencies());
+        systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("user")));
+        systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("client")));
+        systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("language")));
+        systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("password")));
+        systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("server")));
     }
 
     private void findSystemPropertiesWindowsSettings(Map<String, Object> windowsSettings,
             Set<String> systemProps) {
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> appType = (List<Map<String, Object>>) windowsSettings.get("apps");
-        for (Map<String, Object> app : appType) {
-            Map<String, Object> application = (Map<String, Object>) app.get("app");
-            systemProps.addAll(extractFunctionData((Serializable) application.get("args"))
-                    .getSystemPropertyDependencies());
-            systemProps.addAll(extractFunctionData((Serializable) application.get("path"))
-                    .getSystemPropertyDependencies());
-            systemProps.addAll(extractFunctionData((Serializable) application.get("directory"))
-                    .getSystemPropertyDependencies());
+        LinkedHashMap<String, Object> appType = (LinkedHashMap) windowsSettings.get("apps");
+        if (MapUtils.isNotEmpty(appType)) {
+            for (Object value : appType.values()) {
+                systemProps.addAll(getSystemPropertyValue((String) ((LinkedHashMap) value).get("args")));
+                systemProps.addAll(getSystemPropertyValue((String) ((LinkedHashMap) value).get("path")));
+                systemProps.addAll(getSystemPropertyValue((String) ((LinkedHashMap) value).get("directory")));
+            }
         }
     }
 
     private void findSystemPropertiesWebSettings(Map<String, Object> webSettings,
             Set<String> systemProps) {
-        systemProps.addAll(extractFunctionData((Serializable) webSettings.get("address"))
-                .getSystemPropertyDependencies());
-        systemProps.addAll(extractFunctionData((Serializable) webSettings.get("browser"))
-                .getSystemPropertyDependencies());
+        systemProps.addAll(getSystemPropertyValue((String) webSettings.get("address")));
+        systemProps.addAll(getSystemPropertyValue((String) webSettings.get("browser")));
     }
 
-    private void findSystemPropertiesTerminalSettings(Map<String, Object> terminalSettings,
-            Set<String> systemProps) {
-        systemProps.addAll(extractFunctionData((Serializable) terminalSettings.get("current_emulator"))
-                .getSystemPropertyDependencies());
+    private Set<String> getSystemPropertyValue(String property) {
+        Set<String> systemProperties = new HashSet<>();
+        if (StringUtils.isNotEmpty(property)) {
+            systemProperties = extractFunctionData(property).getSystemPropertyDependencies();
+        }
+        return systemProperties;
     }
 }
     
