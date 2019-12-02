@@ -41,7 +41,6 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
                 .forEach(stackElement -> systemProps.addAll(getSystemPropertyForObject(stackElement)));
         stack.clear();
         return systemProps;
-        //stack.removeAllElements();
     }
 
     private Set<String> getSystemPropertyForObject(Object object) {
