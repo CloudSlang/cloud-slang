@@ -65,11 +65,6 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
     }
 
     @Override
-    public Object[] getCurrentContext() {
-        return new Object[]{currentContext};
-    }
-
-    @Override
     public boolean getExternal() {
         return external;
     }
