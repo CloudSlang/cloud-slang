@@ -35,19 +35,37 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
         @SuppressWarnings("unchecked")
         List<Object> objects = (List<Object>) objectMap.get(OBJECTS);
         Set<String> systemProps = new HashSet<>();
-        Stack<List<Object>> stack = new Stack<>();
-        getSystemPropertiesObjRepo(objects, stack);
-        stack.parallelStream()
-                .forEach(stackElement -> systemProps.addAll(getSystemPropertyForObject(stackElement)));
-        stack.clear();
+        getSystemPropertiesObjRepo(objects, systemProps);
         return systemProps;
-        //stack.removeAllElements();
     }
 
-    private Set<String> getSystemPropertyForObject(Object object) {
+    private void getSystemPropertiesObjRepo(List<Object> objects, Set<String> systemProps) {
+        Stack<LinkedHashMap> objectsStack = new Stack<>();
+        for (Object object : objects) {
+            @SuppressWarnings("unchecked") Map<String, Object> mappedObject =
+                    (Map<String, Object>) ((LinkedHashMap) object).get(OBJECT);
+            systemProps.addAll(getSystemPropertiesForProperties(mappedObject));
+            objectsStack.push((LinkedHashMap) mappedObject);
+            while (!objectsStack.empty()) {
+                LinkedHashMap currentObj = objectsStack.pop();
+                @SuppressWarnings("unchecked") List<Object> childObjects =
+                        (List<Object>) currentObj.get(CHILD_OBJECTS);
+                if (childObjects != null) {
+                    for (Object child : childObjects) {
+                        systemProps.addAll(getSystemPropertiesForProperties(child));
+                        objectsStack.push((LinkedHashMap) child);
+                    }
+                }
+            }
+        }
+    }
+
+    private Set<String> getSystemPropertiesForProperties(Object object) {
+        @SuppressWarnings("unchecked") List<Object> properties =
+                (List<Object>) ((LinkedHashMap)object).get(OBJECT_PROPERTIES);
         Set<String> stringSet = new HashSet<>();
-        if (object instanceof ArrayList) {
-            for (Object elementList : (ArrayList) object) {
+        if (properties instanceof ArrayList) {
+            for (Object elementList : properties) {
                 LinkedHashMap valueMap = (LinkedHashMap) ((LinkedHashMap) elementList).get(OBJECT_PROPERTY);
                 Accumulator accumulator = extractFunctionData(
                         (Serializable) ((LinkedHashMap) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
@@ -55,24 +73,6 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
             }
         }
         return stringSet;
-    }
-
-    private void getSystemPropertiesObjRepo(List<Object> objRepository, Stack<List<Object>> stack) {
-
-        if (objRepository != null) {
-            for (Object object : objRepository) {
-                @SuppressWarnings("unchecked") Map<String, Object> mappedObject =
-                        (Map<String, Object>) ((LinkedHashMap) object).get(OBJECT);
-                @SuppressWarnings("unchecked") List<Object> childObjects =
-                        (List<Object>) mappedObject.get(CHILD_OBJECTS);
-                @SuppressWarnings("unchecked") List<Object> properties =
-                        (List<Object>) mappedObject.get(OBJECT_PROPERTIES);
-                if (!childObjects.isEmpty()) {
-                    getSystemPropertiesObjRepo(childObjects, stack);
-                }
-                stack.push(properties);
-            }
-        }
     }
 
     public Set<String> getSystemPropertiesFromSettings(Map<String, Object> objectMap) {
