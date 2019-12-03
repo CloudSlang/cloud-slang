@@ -9,15 +9,17 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller;
 
+import static java.util.Objects.nonNull;
+
 import io.cloudslang.lang.compiler.modeller.transformers.AbstractInOutForTransformer;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -32,50 +34,56 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
 
 
     public Set<String> getObjectRepositorySystemProperties(Map<String, Object> objectMap) {
-        @SuppressWarnings("unchecked")
-        List<Object> objects = (List<Object>) objectMap.get(OBJECTS);
+        List objects = (List) objectMap.get(OBJECTS);
         Set<String> systemProps = new HashSet<>();
-        getSystemPropertiesObjRepo(objects, systemProps);
+        if (CollectionUtils.isNotEmpty(objects)) {
+            getSystemPropertiesObjRepo(objects, systemProps);
+        }
         return systemProps;
     }
 
-    private void getSystemPropertiesObjRepo(List<Object> objects, Set<String> systemProps) {
-        Stack<LinkedHashMap> objectsStack = new Stack<>();
+    private void getSystemPropertiesObjRepo(List objects, Set<String> systemProps) {
+        ArrayDeque<Map> objectsStack = new ArrayDeque<>();
         for (Object object : objects) {
             @SuppressWarnings("unchecked") Map<String, Object> mappedObject =
-                    (Map<String, Object>) ((LinkedHashMap) object).get(OBJECT);
-            systemProps.addAll(getSystemPropertiesForProperties(mappedObject));
-            objectsStack.push((LinkedHashMap) mappedObject);
-            while (!objectsStack.empty()) {
-                LinkedHashMap currentObj = objectsStack.pop();
-                @SuppressWarnings("unchecked") List<Object> childObjects =
-                        (List<Object>) currentObj.get(CHILD_OBJECTS);
-                if (childObjects != null) {
-                    for (Object child : childObjects) {
-                        @SuppressWarnings("unchecked") Map<String, Object> childObject =
-                                (Map<String, Object>) ((LinkedHashMap) child).get(OBJECT);
-                        systemProps.addAll(getSystemPropertiesForProperties(childObject));
-                        objectsStack.push((LinkedHashMap) childObject);
-                    }
+                    (Map<String, Object>) ((Map) object).get(OBJECT);
+            objectsStack.push(mappedObject);
+            systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(mappedObject));
+        }
+        while (!objectsStack.isEmpty()) {
+            Map currentObj = objectsStack.pop();
+            List childObjects =
+                    (List) currentObj.get(CHILD_OBJECTS);
+            if (childObjects != null) {
+                for (Object child : childObjects) {
+                    @SuppressWarnings("unchecked") Map<String, Object> childObject =
+                            (Map<String, Object>) ((Map) child).get(OBJECT);
+                    systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(childObject));
+                    objectsStack.push(childObject);
                 }
             }
         }
     }
 
-    private Set<String> getSystemPropertiesForProperties(Object object) {
+    private Set<String> getSystemPropertiesForObjRepositoryProperties(Object object) {
         @SuppressWarnings("unchecked") List<Object> properties =
-                (List<Object>) ((LinkedHashMap)object).get(OBJECT_PROPERTIES);
+                (List<Object>) ((Map) object).get(OBJECT_PROPERTIES);
         Set<String> stringSet = new HashSet<>();
-        if (properties instanceof ArrayList) {
+        if (nonNull(properties) && properties instanceof ArrayList) {
             for (Object elementList : properties) {
-                LinkedHashMap valueMap = (LinkedHashMap) ((LinkedHashMap) elementList).get(OBJECT_PROPERTY);
-                Accumulator accumulator = extractFunctionData(
-                        (Serializable) ((LinkedHashMap) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
-                stringSet.addAll(accumulator.getSystemPropertyDependencies());
+                Map valueMap = (Map) ((Map)elementList).get(OBJECT_PROPERTY);
+                boolean valueExist = nonNull(valueMap) && nonNull(valueMap.get(OBJECT_VALUE)) &&
+                        nonNull(((Map)valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
+                if (valueExist) {
+                    Accumulator accumulator = extractFunctionData(
+                            (Serializable) ((Map) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
+                    stringSet.addAll(accumulator.getSystemPropertyDependencies());
+                }
             }
         }
         return stringSet;
     }
+
 
     public Set<String> getSystemPropertiesFromSettings(Map<String, Object> objectMap) {
         Set<String> systemProps = new HashSet<>();
@@ -103,12 +111,12 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     private void findSystemPropertiesWindowsSettings(Map<String, Object> windowsSettings,
             Set<String> systemProps) {
         @SuppressWarnings("unchecked")
-        LinkedHashMap<String, Object> appType = (LinkedHashMap) windowsSettings.get("apps");
+        Map<String, Object> appType = (Map) windowsSettings.get("apps");
         if (MapUtils.isNotEmpty(appType)) {
             for (Object value : appType.values()) {
-                systemProps.addAll(getSystemPropertyValue((String) ((LinkedHashMap) value).get("args")));
-                systemProps.addAll(getSystemPropertyValue((String) ((LinkedHashMap) value).get("path")));
-                systemProps.addAll(getSystemPropertyValue((String) ((LinkedHashMap) value).get("directory")));
+                systemProps.addAll(getSystemPropertyValue((String) ((Map) value).get("args")));
+                systemProps.addAll(getSystemPropertyValue((String) ((Map) value).get("path")));
+                systemProps.addAll(getSystemPropertyValue((String) ((Map) value).get("directory")));
             }
         }
     }

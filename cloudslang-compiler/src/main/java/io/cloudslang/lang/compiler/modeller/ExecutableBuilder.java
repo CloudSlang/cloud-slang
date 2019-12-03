@@ -35,7 +35,6 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-import java.util.LinkedHashMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -281,6 +280,7 @@ public class ExecutableBuilder {
                 errors.addAll(actionModellingResult.getErrors());
                 final Action action = actionModellingResult.getAction();
                 executableDependencies = new HashSet<>();
+
                 isSeqAction = actionRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
                 List<SeqStep> seqSteps = new ArrayList<>();
                 if (!isSeqAction) {
@@ -289,10 +289,10 @@ public class ExecutableBuilder {
                 } else {
                     preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
                     preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
-                    seqSteps = (List<SeqStep>)((LinkedHashMap) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
+                    seqSteps = (List)((Map) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
                                     .get(SEQ_STEPS_KEY);
                     @SuppressWarnings("unchecked")
-                    Map<String, Object> settings = (Map<String, Object>) ((LinkedHashMap) actionRawData
+                    Map<String, Object> settings = (Map<String, Object>) ((Map) actionRawData
                             .get(SlangTextualKeys.SEQ_ACTION_KEY))
                             .get(SEQ_SETTINGS_KEY);
                     if (isNotEmpty(parsedSlang.getObjectRepository())) {
@@ -828,8 +828,8 @@ public class ExecutableBuilder {
         this.dependenciesHelper = dependenciesHelper;
     }
 
-    public void setObjectRepository(SystemPropertiesHelper objectRepository) {
-        this.systemPropertiesHelper = objectRepository;
+    public void setSystemPropertiesHelper(SystemPropertiesHelper systemPropertiesHelper) {
+        this.systemPropertiesHelper = systemPropertiesHelper;
     }
 
     public void setPreCompileValidator(PreCompileValidator preCompileValidator) {

@@ -34,6 +34,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ID_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_NAME_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_PATH_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY;
+import static io.cloudslang.lang.compiler.modeller.transformers.AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_SUFFIX;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ASSIGNMENT_ACTION;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -53,9 +54,6 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY, SEQ_STEP_HIGHLIGHT_ID_KEY,
             SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY);
-
-    private static final String INVALID_KEYS_ERROR_MESSAGE_SUFFIX =
-            ". Please take a look at the supported features per versions link";
 
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for sequential operation step.";
@@ -172,9 +170,8 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
         seqStep.setHighlightId(stepProps.get(SEQ_STEP_HIGHLIGHT_ID_KEY));
 
         Accumulator accumulator = extractFunctionData(stepProps.get(SEQ_STEP_ARGS_KEY));
-        if (accumulator.getSystemPropertyDependencies() != null) {
-            seqStep.setSystemPropertyDependencies(accumulator.getSystemPropertyDependencies());
-        }
+        seqStep.setSystemPropertyDependencies(accumulator.getSystemPropertyDependencies());
+
         return seqStep;
     }
 
