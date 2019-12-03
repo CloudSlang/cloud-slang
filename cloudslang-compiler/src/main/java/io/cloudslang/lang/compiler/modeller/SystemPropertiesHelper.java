@@ -52,8 +52,10 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
                         (List<Object>) currentObj.get(CHILD_OBJECTS);
                 if (childObjects != null) {
                     for (Object child : childObjects) {
-                        systemProps.addAll(getSystemPropertiesForProperties(child));
-                        objectsStack.push((LinkedHashMap) child);
+                        @SuppressWarnings("unchecked") Map<String, Object> childObject =
+                                (Map<String, Object>) ((LinkedHashMap) child).get(OBJECT);
+                        systemProps.addAll(getSystemPropertiesForProperties(childObject));
+                        objectsStack.push((LinkedHashMap) childObject);
                     }
                 }
             }
