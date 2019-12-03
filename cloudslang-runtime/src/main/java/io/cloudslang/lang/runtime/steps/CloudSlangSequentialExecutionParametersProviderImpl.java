@@ -10,9 +10,9 @@
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.compiler.modeller.model.SeqStep;
-import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -41,12 +41,12 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
     }
 
     @Override
-    public Object[] getExecutionParameters() {
-        Map<String, Value> execParams = new HashMap<>();
+    public Map<String, Pair<Boolean, Value>> getExecutionParameters() {
+        Map<String, Pair<Boolean, Value>> execParams = new HashMap<>();
 
         if (external) {
             // External seq operation doesn't require step args filtering since all the inputs are external
-            execParams = currentContext;
+            currentContext.forEach((key, value) -> execParams.put(key, new Pair<>(false, value)));
         } else {
             for (SeqStep step : seqSteps) {
                 String args = step.getArgs();
@@ -55,18 +55,21 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
                             .replaceAll("^\"|\"$", "");
                     Value value = currentContext.get(paramName);
                     if (value != null) {
-                        execParams.put(paramName, value);
+                        execParams.put(paramName, new Pair<>(true, value));
                     }
                 }
             }
+            addWholeContext(execParams);
         }
-        // TODO fix get execution from map
-        return new Object[]{execParams};
+        return execParams;
     }
 
-    @Override
-    public Object[] getCurrentContext() {
-        return new Object[]{currentContext};
+    private void addWholeContext(Map<String, Pair<Boolean, Value>> execParams) {
+        currentContext.forEach((key, value) -> {
+            if (!execParams.containsKey(key)) {
+                execParams.put(key, new Pair<>(false, value));
+            }
+        });
     }
 
     @Override
