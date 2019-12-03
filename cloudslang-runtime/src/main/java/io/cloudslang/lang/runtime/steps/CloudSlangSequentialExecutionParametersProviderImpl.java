@@ -44,7 +44,7 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
     }
 
     @Override
-    public Map<String, Pair<Value, Boolean>> getExecutionParameters() {
+    public Map<String, Pair<Serializable, Boolean>> getExecutionParameters() {
         Set<String> paramsUsedInScript;
         if (external) {
             paramsUsedInScript = new HashSet<>();
