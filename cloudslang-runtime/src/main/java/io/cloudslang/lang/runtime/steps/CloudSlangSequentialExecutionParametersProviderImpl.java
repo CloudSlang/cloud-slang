@@ -15,10 +15,10 @@ import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvide
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -57,7 +57,9 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
         }
 
         return currentContext.entrySet().stream()
-                .collect(toMap(Map.Entry::getKey, entry -> of(entry.getValue(), paramsUsedInScript.contains(entry.getKey()))));
+                .collect(toMap(
+                    Map.Entry::getKey,
+                    entry -> of(entry.getValue(), paramsUsedInScript.contains(entry.getKey()))));
     }
 
     private String extractParameter(String args) {
