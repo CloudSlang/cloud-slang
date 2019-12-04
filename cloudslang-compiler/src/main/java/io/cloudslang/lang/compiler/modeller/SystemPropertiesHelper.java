@@ -10,6 +10,7 @@
 package io.cloudslang.lang.compiler.modeller;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import io.cloudslang.lang.compiler.modeller.transformers.AbstractInOutForTransformer;
 import java.io.Serializable;
@@ -19,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -36,44 +36,42 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     public Set<String> getObjectRepositorySystemProperties(Map<String, Object> objectMap) {
         List objects = (List) objectMap.get(OBJECTS);
         Set<String> systemProps = new HashSet<>();
-        if (CollectionUtils.isNotEmpty(objects)) {
+        if (isNotEmpty(objects)) {
             getSystemPropertiesObjRepo(objects, systemProps);
         }
         return systemProps;
     }
 
     private void getSystemPropertiesObjRepo(List objects, Set<String> systemProps) {
-        ArrayDeque<Map> objectsStack = new ArrayDeque<>();
+        ArrayDeque<Map> objectsQueue = new ArrayDeque<>();
 
-        for (Object object : objects) {
-            Map mappedObject = (Map) ((Map) object).get(OBJECT);
-            objectsStack.push(mappedObject);
-            systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(mappedObject));
-        }
-
-        while (!objectsStack.isEmpty()) {
-            Map currentObj = objectsStack.pop();
+        changeObjectProperties(objects, objectsQueue, systemProps);
+        while (!objectsQueue.isEmpty()) {
+            Map currentObj = objectsQueue.pop();
             List childObjects =
                     (List) currentObj.get(CHILD_OBJECTS);
             if (childObjects != null) {
-                for (Object child : childObjects) {
-                    Map childObject = (Map) ((Map) child).get(OBJECT);
-                    systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(childObject));
-                    objectsStack.push(childObject);
-                }
+                changeObjectProperties(childObjects, objectsQueue, systemProps);
             }
+        }
+    }
+
+    private void changeObjectProperties(List objects, ArrayDeque<Map> objectsQueue, Set<String> systemProps) {
+        for (Object object : objects) {
+            Map obj = (Map) ((Map) object).get(OBJECT);
+            systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(obj));
+            objectsQueue.push(obj);
         }
     }
 
     private Set<String> getSystemPropertiesForObjRepositoryProperties(Object object) {
         List properties = (List) ((Map) object).get(OBJECT_PROPERTIES);
         Set<String> stringSet = new HashSet<>();
-        if (nonNull(properties) && properties instanceof ArrayList) {
+        if (properties instanceof ArrayList) {
             for (Object elementList : properties) {
                 Map valueMap = (Map) ((Map) elementList).get(OBJECT_PROPERTY);
-                boolean valueExist = nonNull(valueMap) && nonNull(valueMap.get(OBJECT_VALUE)) &&
-                        nonNull(((Map) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
-                if (valueExist) {
+                if (nonNull(valueMap) && nonNull(valueMap.get(OBJECT_VALUE)) &&
+                        nonNull(((Map) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE))) {
                     Accumulator accumulator = extractFunctionData(
                             (Serializable) ((Map) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
                     stringSet.addAll(accumulator.getSystemPropertyDependencies());
