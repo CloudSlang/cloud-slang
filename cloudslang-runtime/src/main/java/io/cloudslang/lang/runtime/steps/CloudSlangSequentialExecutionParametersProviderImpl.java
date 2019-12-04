@@ -10,17 +10,21 @@
 package io.cloudslang.lang.runtime.steps;
 
 import io.cloudslang.lang.compiler.modeller.model.SeqStep;
-import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.substring;
+import static org.apache.commons.lang3.tuple.Pair.of;
 
 public class CloudSlangSequentialExecutionParametersProviderImpl implements SequentialExecutionParametersProvider,
         Serializable {
@@ -31,37 +35,35 @@ public class CloudSlangSequentialExecutionParametersProviderImpl implements Sequ
     private final List<SeqStep> seqSteps;
     private final boolean external;
 
-    public CloudSlangSequentialExecutionParametersProviderImpl(
-            Map<String, Value> currentContext,
-            List<SeqStep> seqSteps,
-            Boolean external) {
+    public CloudSlangSequentialExecutionParametersProviderImpl(Map<String, Value> currentContext,
+                                                               List<SeqStep> seqSteps,
+                                                               Boolean external) {
         this.currentContext = currentContext;
         this.seqSteps = seqSteps;
         this.external = external;
     }
 
     @Override
-    public Object[] getExecutionParameters() {
-        Map<String, Value> execParams = new HashMap<>();
-
+    public Map<String, Pair<Serializable, Boolean>> getExecutionParameters() {
+        Set<String> paramsUsedInScript;
         if (external) {
-            // External seq operation doesn't require step args filtering since all the inputs are external
-            execParams = currentContext;
+            paramsUsedInScript = new HashSet<>();
         } else {
-            for (SeqStep step : seqSteps) {
-                String args = step.getArgs();
-                if (StringUtils.startsWith(args, SEQUENTIAL_PARAMETER)) {
-                    String paramName = substring(args, SEQUENTIAL_PARAMETER.length(), args.length() - 1)
-                            .replaceAll("^\"|\"$", "");
-                    Value value = currentContext.get(paramName);
-                    if (value != null) {
-                        execParams.put(paramName, value);
-                    }
-                }
-            }
+            paramsUsedInScript = seqSteps.stream()
+                    .map(SeqStep::getArgs)
+                    .filter(args -> startsWith(args, SEQUENTIAL_PARAMETER))
+                    .map(this::extractParameter)
+                    .collect(toSet());
         }
-        // TODO fix get execution from map
-        return new Object[]{execParams};
+
+        return currentContext.entrySet().stream()
+                .collect(toMap(
+                    Map.Entry::getKey,
+                    entry -> of(entry.getValue(), paramsUsedInScript.contains(entry.getKey()))));
+    }
+
+    private String extractParameter(String args) {
+        return substring(args, SEQUENTIAL_PARAMETER.length(), args.length() - 1).replaceAll("^\"|\"$", "");
     }
 
     @Override
