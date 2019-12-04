@@ -34,12 +34,13 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ID_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_NAME_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_PATH_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_SNAPSHOT_KEY;
+import static io.cloudslang.lang.compiler.modeller.transformers.AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_SUFFIX;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ASSIGNMENT_ACTION;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
-public class SeqStepsTransformer extends AbstractTransformer
+public class SeqStepsTransformer extends AbstractInOutForTransformer
         implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<SeqStep>> {
     private static final String SEQ_OPERATION_HAS_MISSING_TAGS =
             "Sequential operation step has the following missing tags: ";
@@ -167,6 +168,10 @@ public class SeqStepsTransformer extends AbstractTransformer
         seqStep.setName(stepProps.get(SEQ_STEP_NAME_KEY));
         seqStep.setSnapshot(stepProps.get(SEQ_STEP_SNAPSHOT_KEY));
         seqStep.setHighlightId(stepProps.get(SEQ_STEP_HIGHLIGHT_ID_KEY));
+
+        Accumulator accumulator = extractFunctionData(stepProps.get(SEQ_STEP_ARGS_KEY));
+        seqStep.setSystemPropertyDependencies(accumulator.getSystemPropertyDependencies());
+
         return seqStep;
     }
 

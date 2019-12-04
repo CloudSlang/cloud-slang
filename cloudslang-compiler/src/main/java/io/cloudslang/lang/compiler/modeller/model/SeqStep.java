@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.modeller.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 public class SeqStep implements Serializable {
     private static final long serialVersionUID = -628265720682478108L;
@@ -22,6 +23,7 @@ public class SeqStep implements Serializable {
     private String defaultArgs;
     private String highlightId;
     private String snapshot;
+    private Set<String> systemPropertyDependencies;
 
     public String getName() {
         return name;
@@ -85,6 +87,14 @@ public class SeqStep implements Serializable {
 
     public void setDefaultArgs(String defaultArgs) {
         this.defaultArgs = defaultArgs;
+    }
+
+    public Set<String> getSystemPropertyDependencies() {
+        return systemPropertyDependencies;
+    }
+
+    public void setSystemPropertyDependencies(Set<String> systemPropertyDependencies) {
+        this.systemPropertyDependencies = systemPropertyDependencies;
     }
 
     @Override
