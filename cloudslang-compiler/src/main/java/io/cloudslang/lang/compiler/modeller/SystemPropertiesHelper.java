@@ -44,20 +44,20 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
 
     private void getSystemPropertiesObjRepo(List objects, Set<String> systemProps) {
         ArrayDeque<Map> objectsStack = new ArrayDeque<>();
+
         for (Object object : objects) {
-            @SuppressWarnings("unchecked") Map<String, Object> mappedObject =
-                    (Map<String, Object>) ((Map) object).get(OBJECT);
+            Map mappedObject = (Map) ((Map) object).get(OBJECT);
             objectsStack.push(mappedObject);
             systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(mappedObject));
         }
+
         while (!objectsStack.isEmpty()) {
             Map currentObj = objectsStack.pop();
             List childObjects =
                     (List) currentObj.get(CHILD_OBJECTS);
             if (childObjects != null) {
                 for (Object child : childObjects) {
-                    @SuppressWarnings("unchecked") Map<String, Object> childObject =
-                            (Map<String, Object>) ((Map) child).get(OBJECT);
+                    Map childObject = (Map) ((Map) child).get(OBJECT);
                     systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(childObject));
                     objectsStack.push(childObject);
                 }
@@ -66,14 +66,13 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     }
 
     private Set<String> getSystemPropertiesForObjRepositoryProperties(Object object) {
-        @SuppressWarnings("unchecked") List<Object> properties =
-                (List<Object>) ((Map) object).get(OBJECT_PROPERTIES);
+        List properties = (List) ((Map) object).get(OBJECT_PROPERTIES);
         Set<String> stringSet = new HashSet<>();
         if (nonNull(properties) && properties instanceof ArrayList) {
             for (Object elementList : properties) {
-                Map valueMap = (Map) ((Map)elementList).get(OBJECT_PROPERTY);
+                Map valueMap = (Map) ((Map) elementList).get(OBJECT_PROPERTY);
                 boolean valueExist = nonNull(valueMap) && nonNull(valueMap.get(OBJECT_VALUE)) &&
-                        nonNull(((Map)valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
+                        nonNull(((Map) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
                 if (valueExist) {
                     Accumulator accumulator = extractFunctionData(
                             (Serializable) ((Map) valueMap.get(OBJECT_VALUE)).get(OBJECT_VALUE));
@@ -85,21 +84,18 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     }
 
 
-    public Set<String> getSystemPropertiesFromSettings(Map<String, Object> objectMap) {
+    public Set<String> getSystemPropertiesFromSettings(Map objectMap) {
         Set<String> systemProps = new HashSet<>();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> sapSettings = (Map<String, Object>) objectMap.get("sap");
+        Map sapSettings = (Map) objectMap.get("sap");
         findSystemPropertiesSapSettings(sapSettings, systemProps);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> windowsSettings = (Map<String, Object>) objectMap.get("windows");
+        Map windowsSettings = (Map) objectMap.get("windows");
         findSystemPropertiesWindowsSettings(windowsSettings, systemProps);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> webSettings = (Map<String, Object>) objectMap.get("web");
+        Map webSettings = (Map) objectMap.get("web");
         findSystemPropertiesWebSettings(webSettings, systemProps);
         return systemProps;
     }
 
-    private void findSystemPropertiesSapSettings(Map<String, Object> sapSettings,
+    private void findSystemPropertiesSapSettings(Map sapSettings,
             Set<String> systemProps) {
         systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("user")));
         systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("client")));
@@ -108,10 +104,9 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
         systemProps.addAll(getSystemPropertyValue((String) sapSettings.get("server")));
     }
 
-    private void findSystemPropertiesWindowsSettings(Map<String, Object> windowsSettings,
+    private void findSystemPropertiesWindowsSettings(Map windowsSettings,
             Set<String> systemProps) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> appType = (Map) windowsSettings.get("apps");
+        Map appType = (Map) windowsSettings.get("apps");
         if (MapUtils.isNotEmpty(appType)) {
             for (Object value : appType.values()) {
                 systemProps.addAll(getSystemPropertyValue((String) ((Map) value).get("args")));
@@ -121,7 +116,7 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
         }
     }
 
-    private void findSystemPropertiesWebSettings(Map<String, Object> webSettings,
+    private void findSystemPropertiesWebSettings(Map webSettings,
             Set<String> systemProps) {
         systemProps.addAll(getSystemPropertyValue((String) webSettings.get("address")));
         systemProps.addAll(getSystemPropertyValue((String) webSettings.get("browser")));
