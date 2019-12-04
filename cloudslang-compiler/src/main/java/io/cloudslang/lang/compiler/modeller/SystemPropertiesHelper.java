@@ -47,7 +47,7 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
 
         changeObjectProperties(objects, objectsQueue, systemProps);
         while (!objectsQueue.isEmpty()) {
-            Map currentObj = objectsQueue.pop();
+            Map currentObj = objectsQueue.poll();
             List childObjects =
                     (List) currentObj.get(CHILD_OBJECTS);
             if (childObjects != null) {
@@ -60,7 +60,7 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
         for (Object object : objects) {
             Map obj = (Map) ((Map) object).get(OBJECT);
             systemProps.addAll(getSystemPropertiesForObjRepositoryProperties(obj));
-            objectsQueue.push(obj);
+            objectsQueue.offer(obj);
         }
     }
 
