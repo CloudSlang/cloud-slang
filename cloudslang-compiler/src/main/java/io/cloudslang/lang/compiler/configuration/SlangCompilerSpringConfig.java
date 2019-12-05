@@ -38,6 +38,7 @@ import io.cloudslang.lang.compiler.modeller.transformers.ForTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.InputsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.JavaActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.NavigateTransformer;
+import io.cloudslang.lang.compiler.modeller.SystemPropertiesHelper;
 import io.cloudslang.lang.compiler.modeller.transformers.OutputsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ParallelLoopForTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
@@ -72,8 +73,6 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-
-import java.beans.IntrospectionException;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -303,6 +302,11 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public SystemPropertiesHelper systemPropertiesHelper() {
+        return new SystemPropertiesHelper();
+    }
+
+    @Bean
     public SeqStepsTransformer seqStepsTransformer() {
         return new SeqStepsTransformer();
     }
@@ -408,6 +412,7 @@ public class SlangCompilerSpringConfig {
         executableBuilder.setPreCompileValidator(precompileValidator());
         executableBuilder.setResultsTransformer(resultsTransformer());
         executableBuilder.setExecutableValidator(executableValidator());
+        executableBuilder.setSystemPropertiesHelper(systemPropertiesHelper());
 
         executableBuilder.initScopedTransformersAndKeys();
         return executableBuilder;
