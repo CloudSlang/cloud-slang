@@ -387,6 +387,7 @@ public class ArgumentsBindingTest {
         public PythonExecutionEngine externalPythonExecutionEngine() {
             return new ExternalPythonExecutionNotCachedEngine();
         }
+
         @Bean
         public EventBus eventBus() {
             return new EventBusImpl();
