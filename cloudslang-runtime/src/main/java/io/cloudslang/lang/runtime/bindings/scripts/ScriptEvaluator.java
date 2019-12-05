@@ -19,9 +19,9 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ public class ScriptEvaluator extends ScriptProcessor {
 
     public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
 
-    @Autowired
+    @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService pythonRuntimeService;
 
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,

@@ -130,6 +130,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -171,6 +172,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -198,6 +200,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -243,6 +246,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -291,6 +295,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -335,6 +340,7 @@ public class ActionStepsTest {
                 "wrongMethodName",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -376,6 +382,7 @@ public class ActionStepsTest {
                     "doJavaActionExceptionMethod",
                     GAV_DEFAULT,
                     null,
+                    true,
                     DEPENDENCIES_DEFAULT,
                     seqSteps,
                     null,
@@ -420,6 +427,7 @@ public class ActionStepsTest {
                 "doJavaActionWrongReturnType",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -460,6 +468,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -496,6 +505,7 @@ public class ActionStepsTest {
                 "doJavaNumberAsString",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -520,6 +530,7 @@ public class ActionStepsTest {
                 "doJavaNumbersAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -547,6 +558,7 @@ public class ActionStepsTest {
                 "doJavaSampleAction_NOT_FOUND",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -582,6 +594,7 @@ public class ActionStepsTest {
                 "doJavaActionMissingAnnotation",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -619,6 +632,7 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -657,6 +671,7 @@ public class ActionStepsTest {
                 "setNameOnNonSerializableSession",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -688,6 +703,7 @@ public class ActionStepsTest {
                 "getNameFromNonSerializableSession",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -720,6 +736,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -750,6 +767,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -777,6 +795,7 @@ public class ActionStepsTest {
                 "getNameFromSerializableSession",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -819,6 +838,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -868,6 +888,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -910,6 +931,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -937,6 +959,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -965,6 +988,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -990,6 +1014,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 "",
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -1017,6 +1042,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -1044,6 +1070,7 @@ public class ActionStepsTest {
                 "",
                 GAV_DEFAULT,
                 userPythonScript,
+                true,
                 DEPENDENCIES_DEFAULT, seqSteps, null,
                 null
         );
@@ -1068,6 +1095,7 @@ public class ActionStepsTest {
                 "doSeqSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,
@@ -1093,6 +1121,7 @@ public class ActionStepsTest {
                 "doSeqSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 true,
@@ -1126,6 +1155,7 @@ public class ActionStepsTest {
                 "doSeqSampleAction",
                 GAV_DEFAULT,
                 null,
+                true,
                 DEPENDENCIES_DEFAULT,
                 seqSteps,
                 null,

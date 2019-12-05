@@ -14,9 +14,9 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,17 +30,43 @@ import java.util.Set;
  */
 @Component
 public class ScriptExecutor extends ScriptProcessor {
-    @Autowired
+    @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService pythonRuntimeService;
 
-    public Map<String, Value> executeScript(String script, Map<String, Value> callArguments) {
-        return executeScript(Collections.<String>emptySet(), script, callArguments);
+    @Resource(name = "externalPythonRuntimeService")
+    private PythonRuntimeService externalPytonRuntimeService;
+
+    public Map<String, Value> executeScript(String script, Map<String, Value> callArguments, boolean useJython) {
+        return executeScript(Collections.emptySet(), script, callArguments, useJython);
     }
 
-    public Map<String, Value> executeScript(Set<String> dependencies, String script, Map<String, Value> callArguments) {
+    public Map<String, Value> executeScript(Set<String> dependencies, String script, Map<String, Value> callArguments,
+                                            boolean useJython) {
+        if (useJython) {
+            return runJythonAction(dependencies, script, callArguments);
+        }
+        return runExternalPythonAction(dependencies, script, callArguments);
+    }
+
+    private Map<String, Value> runExternalPythonAction(Set<String> dependencies, String script,
+                                                       Map<String, Value> callArguments) {
+        Map<String, Serializable> executionResult = externalPytonRuntimeService.exec(dependencies, script,
+                new HashMap<>()).getExecutionResult();
+        Map<String, Value> result = new HashMap<>();
+
+        for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
+            result.put(entry.getKey(), ValueFactory.create(entry.getValue(), false));
+        }
+        return result;
+    }
+
+    private Map<String, Value> runJythonAction(Set<String> dependencies, String script,
+                                               Map<String, Value> callArguments) {
+
+        Map<String, Value> result = new HashMap<>();
         Map<String, Serializable> executionResult = pythonRuntimeService
                 .exec(dependencies, script, createPythonContext(callArguments)).getExecutionResult();
-        Map<String, Value> result = new HashMap<>();
+
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = callArguments.get(entry.getKey());
             Serializable theValue;

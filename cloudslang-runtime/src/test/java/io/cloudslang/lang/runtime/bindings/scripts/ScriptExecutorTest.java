@@ -80,7 +80,7 @@ public class ScriptExecutorTest {
         expectedScriptOutputs.put("output1", value1);
         expectedScriptOutputs.put("output2", value2);
 
-        final Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
+        final Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues, true);
 
         verify(execInterpreter).set(eq("input1"), eq((Value) pyObjectValue1));
         verify(execInterpreter).set(eq("input2"), eq((Value) pyObjectValue2));
@@ -98,7 +98,7 @@ public class ScriptExecutorTest {
         exception.expectMessage("error from interpreter");
         exception.expectMessage("Error executing python script");
 
-        scriptExecutor.executeScript(script, new HashMap<String, Value>());
+        scriptExecutor.executeScript(script, new HashMap<String, Value>(), true);
     }
 
     @Configuration

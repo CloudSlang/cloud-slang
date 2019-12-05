@@ -37,6 +37,7 @@ public interface ScoreLangConstants {
     String JAVA_ACTION_GAV_KEY = "gav";
 
     String PYTHON_ACTION_SCRIPT_KEY = "script";
+    String PYTHON_ACTION_USE_JYTHON_KEY = "useJython";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
 
     String SEQ_ACTION_GAV_KEY = "gav";
