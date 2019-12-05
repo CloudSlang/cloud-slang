@@ -24,6 +24,8 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import org.junit.Assert;
@@ -218,14 +220,24 @@ public class ResultBindingTest {
             return new MavenConfigImpl();
         }
 
-        @Bean
+        @Bean(name = "jythonRuntimeService")
         public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
-        @Bean
+        @Bean(name = "jythonExecutionEngine")
         public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
+        }
+
+        @Bean(name = "externalPythonRuntimeService")
+        public PythonRuntimeService externalPythonRuntimeService() {
+            return new ExternalPythonRuntimeServiceImpl();
+        }
+
+        @Bean(name = "externalPythonExecutionEngine")
+        public PythonExecutionEngine externalPythonExecutionEngine() {
+            return new ExternalPythonExecutionNotCachedEngine();
         }
 
         @Bean

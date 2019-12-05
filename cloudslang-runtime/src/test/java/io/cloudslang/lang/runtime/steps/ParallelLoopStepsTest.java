@@ -582,13 +582,23 @@ public class ParallelLoopStepsTest {
             return new MavenConfigImpl();
         }
 
-        @Bean
+        @Bean(name = "jythonRuntimeService")
         public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
-        @Bean
+        @Bean(name = "jythonExecutionEngine")
         public PythonExecutionEngine pythonExecutionEngine() {
+            return new PythonExecutionCachedEngine();
+        }
+
+        @Bean(name = "externalPythonRuntimeService")
+        public PythonRuntimeService externalPythonRuntimeService() {
+            return new PythonRuntimeServiceImpl();
+        }
+
+        @Bean(name = "externalPythonExecutionEngine")
+        public PythonExecutionEngine externalPythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
         }
 
