@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -84,7 +85,7 @@ public class ScriptEvaluatorTest {
     @Autowired
     private PythonInterpreter pythonInterpreter;
 
-    @Autowired
+    @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService pythonRuntimeService;
 
     @Test
