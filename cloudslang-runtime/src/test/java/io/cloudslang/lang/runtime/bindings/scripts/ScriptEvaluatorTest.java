@@ -22,6 +22,8 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import junit.framework.Assert;
@@ -38,6 +40,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,7 +85,7 @@ public class ScriptEvaluatorTest {
     @Autowired
     private PythonInterpreter pythonInterpreter;
 
-    @Autowired
+    @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService pythonRuntimeService;
 
     @Test
@@ -167,16 +170,16 @@ public class ScriptEvaluatorTest {
         }
 
         @Bean
-        public PythonRuntimeService pythonRuntimeService() {
-            return mock(PythonRuntimeService.class);
-        }
-
-        @Bean
         public PythonInterpreter pythonInterpreter() {
             return mock(PythonInterpreter.class);
         }
 
-        @Bean
+        @Bean(name = "jythonRuntimeService")
+        public PythonRuntimeService pythonRuntimeService() {
+            return mock(PythonRuntimeService.class);
+        }
+
+        @Bean(name = "jythonExecutionEngine")
         public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
@@ -187,6 +190,16 @@ public class ScriptEvaluatorTest {
                     };
                 }
             };
+        }
+
+        @Bean(name = "externalPythonRuntimeService")
+        public PythonRuntimeService externalPythonRuntimeService() {
+            return new ExternalPythonRuntimeServiceImpl();
+        }
+
+        @Bean(name = "externalPythonExecutionEngine")
+        public PythonExecutionEngine externalPythonExecutionEngine() {
+            return new ExternalPythonExecutionNotCachedEngine();
         }
 
         @Bean

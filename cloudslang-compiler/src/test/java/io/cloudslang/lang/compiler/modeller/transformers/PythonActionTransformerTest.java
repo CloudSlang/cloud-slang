@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,8 +84,9 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         initialExternalPythonInvalidAction2 = loadPythonActionData("/python_external_invalid_action2.sl");
 
 
-        expectedPythonActionSimple = new HashMap<>();
+        expectedPythonActionSimple = new LinkedHashMap<>();
         expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY, "pass");
+        expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY, true);
     }
 
     @Test
@@ -170,7 +172,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformWithExternalInvalidPythonValid() {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Method execution is missing or is invalid");
+        exception.expectMessage("Method {execute} is missing or is invalid");
 
         transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction);
     }

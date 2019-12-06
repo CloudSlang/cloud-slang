@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptValidator {
-    private static final String METHOD_SIGNATURE_REGEX = "def\\s+execution\\(([a-zA-Z0-9_]+,?\\s*)*\\):\\s*\\R";
+    private static final String METHOD_SIGNATURE_REGEX = "def\\s+execute\\(([a-zA-Z0-9_]+,?\\s*)*\\):\\s*\\R";
     private Pattern methodSignaturePattern = Pattern.compile(METHOD_SIGNATURE_REGEX);
 
     @Override
@@ -21,7 +21,7 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
         Matcher matcher = methodSignaturePattern.matcher(script);
 
         if (!matcher.find()) {
-            throw new IllegalArgumentException("Method execution is missing or is invalid");
+            throw new IllegalArgumentException("Method {execute} is missing or is invalid");
         }
 
         // multiple declarations of execution method

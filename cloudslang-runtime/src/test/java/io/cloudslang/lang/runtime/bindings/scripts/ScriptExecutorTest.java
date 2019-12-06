@@ -20,6 +20,8 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import junit.framework.Assert;
@@ -80,7 +82,7 @@ public class ScriptExecutorTest {
         expectedScriptOutputs.put("output1", value1);
         expectedScriptOutputs.put("output2", value2);
 
-        final Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues);
+        final Map<String, Value> outputs = scriptExecutor.executeScript(script, scriptInputValues, true);
 
         verify(execInterpreter).set(eq("input1"), eq((Value) pyObjectValue1));
         verify(execInterpreter).set(eq("input2"), eq((Value) pyObjectValue2));
@@ -98,7 +100,7 @@ public class ScriptExecutorTest {
         exception.expectMessage("error from interpreter");
         exception.expectMessage("Error executing python script");
 
-        scriptExecutor.executeScript(script, new HashMap<String, Value>());
+        scriptExecutor.executeScript(script, new HashMap<String, Value>(), true);
     }
 
     @Configuration
@@ -123,12 +125,12 @@ public class ScriptExecutorTest {
             return new MavenConfigImpl();
         }
 
-        @Bean
+        @Bean(name = "jythonRuntimeService")
         public PythonRuntimeService pythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
         }
 
-        @Bean
+        @Bean(name = "jythonExecutionEngine")
         public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine() {
                 protected PythonExecutor createNewExecutor(Set<String> filePaths) {
@@ -139,6 +141,16 @@ public class ScriptExecutorTest {
                     };
                 }
             };
+        }
+
+        @Bean(name = "externalPythonRuntimeService")
+        public PythonRuntimeService externalPythonRuntimeService() {
+            return new ExternalPythonRuntimeServiceImpl();
+        }
+
+        @Bean(name = "externalPythonExecutionEngine")
+        public PythonExecutionEngine externalPythonExecutionEngine() {
+            return new ExternalPythonExecutionNotCachedEngine();
         }
 
         @Bean
