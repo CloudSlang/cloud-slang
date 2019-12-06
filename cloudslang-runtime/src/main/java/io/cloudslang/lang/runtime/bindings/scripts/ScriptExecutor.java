@@ -55,7 +55,9 @@ public class ScriptExecutor extends ScriptProcessor {
         Map<String, Value> result = new HashMap<>();
 
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
-            result.put(entry.getKey(), ValueFactory.create(entry.getValue(), false));
+            Value inputValue = callArguments.get(entry.getKey());
+            boolean isSensitive = (inputValue != null) && inputValue.isSensitive();
+            result.put(entry.getKey(), ValueFactory.create(entry.getValue(), isSensitive));
         }
         return result;
     }
