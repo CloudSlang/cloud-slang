@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler.modeller;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 import io.cloudslang.lang.compiler.modeller.transformers.AbstractInOutForTransformer;
 import java.io.Serializable;
@@ -20,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class SystemPropertiesHelper extends AbstractInOutForTransformer {
@@ -85,11 +85,17 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     public Set<String> getSystemPropertiesFromSettings(Map objectMap) {
         Set<String> systemProps = new HashSet<>();
         Map sapSettings = (Map) objectMap.get("sap");
-        findSystemPropertiesSapSettings(sapSettings, systemProps);
+        if (isNotEmpty(sapSettings)) {
+            findSystemPropertiesSapSettings(sapSettings, systemProps);
+        }
         Map windowsSettings = (Map) objectMap.get("windows");
-        findSystemPropertiesWindowsSettings(windowsSettings, systemProps);
+        if (isNotEmpty(windowsSettings)) {
+            findSystemPropertiesWindowsSettings(windowsSettings, systemProps);
+        }
         Map webSettings = (Map) objectMap.get("web");
-        findSystemPropertiesWebSettings(webSettings, systemProps);
+        if (isNotEmpty(webSettings)) {
+            findSystemPropertiesWebSettings(webSettings, systemProps);
+        }
         return systemProps;
     }
 
@@ -105,7 +111,7 @@ public class SystemPropertiesHelper extends AbstractInOutForTransformer {
     private void findSystemPropertiesWindowsSettings(Map windowsSettings,
             Set<String> systemProps) {
         Map appType = (Map) windowsSettings.get("apps");
-        if (MapUtils.isNotEmpty(appType)) {
+        if (isNotEmpty(appType)) {
             for (Object value : appType.values()) {
                 systemProps.addAll(getSystemPropertyValue((String) ((Map) value).get("args")));
                 systemProps.addAll(getSystemPropertyValue((String) ((Map) value).get("path")));
