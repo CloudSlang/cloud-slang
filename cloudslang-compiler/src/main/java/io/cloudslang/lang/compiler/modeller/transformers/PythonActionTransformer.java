@@ -59,7 +59,6 @@ public class PythonActionTransformer extends AbstractTransformer
         List<RuntimeException> errors = new ArrayList<>();
         Map<String, Serializable> transformedData = null;
 
-
         try {
             if (rawData != null) {
                 validateKeySet(rawData.keySet(), mandatoryKeySet, optionalKeySet);
@@ -78,6 +77,9 @@ public class PythonActionTransformer extends AbstractTransformer
                     // validate script
                     String script = (String) rawData.get(PYTHON_ACTION_SCRIPT_KEY);
                     externalPythonScriptValidator.validateExecutionMethodSignature(script);
+                } else {
+                    //backwards compatibility
+                    rawData.put(PYTHON_ACTION_USE_JYTHON_KEY, true);
                 }
                 transformedData = rawData;
             }
