@@ -9,22 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.compiler.modeller.model.SeqStep;
-import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ACTION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ARGS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY;
@@ -40,11 +25,33 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.Sets;
+import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SeqStepsTransformerTest.Config.class})
 public class SeqStepsTransformerTest extends TransformersTestParent {
+
     @Autowired
     private SeqStepsTransformer seqStepsTransformer;
+
+    @Autowired
+    private DependenciesHelper dependenciesHelper;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -110,7 +117,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     public void testTransformStepWithDuplicateIds() {
         List<Map<String, Map<String, String>>> steps =
                 asList(newStep("1", "Browser", "Open", "www.google.com", "www.google.com", null, null),
-                newStep("1", "Tab", "Close", null, null, null, null));
+                        newStep("1", "Tab", "Close", null, null, null, null));
         List<SeqStep> expectedSteps =
                 singletonList(newSeqStep("1", "Browser", "Open", "www.google.com", "www.google.com", null, null));
         TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
@@ -206,13 +213,44 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
         assertEquals(new ArrayList<>(), transform.getTransformedData());
     }
 
+    @Test
+    public void testTransformSimpleWithSysProps() {
+        List<Map<String, Map<String, String>>> steps = asList(
+                newStep("1", "Browser", "Set", "${get_sp('step_weather')}", "weather", null, "1234"),
+                newStep("2", "Browser", "Click", "", "www.google.com", "snapshot", "1234"),
+                newStep("3", "Browser", "Click", "${get_sp('title')}", "", null, "1234"));
+        Set<String> systemProperties = newHashSet("step_weather", "title");
+
+        TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
+
+        assertThat(transform.getErrors(), is(empty()));
+        Set<String> systemPropertiesForOperation = dependenciesHelper
+                .getSystemPropertiesForOperation(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+                        transform.getTransformedData());
+        assertEquals(systemPropertiesForOperation, systemProperties);
+    }
+
+    @Test
+    public void testTransformSimpleWithInvalidSysProperty() {
+        List<Map<String, Map<String, String>>> steps = asList(
+                newStep("1", "Browser", "Set", "${get_sp('step_weather')}", "weather", null, "1234"),
+                newStep("2", "Browser", "Click", "${get_ssp('title')}", "", null, "1234"));
+
+        TransformModellingResult<ArrayList<SeqStep>> transform = seqStepsTransformer.transform(steps);
+
+        Set<String> systemPropertiesForOperation = dependenciesHelper
+                .getSystemPropertiesForOperation(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+                        transform.getTransformedData());
+        assertEquals(systemPropertiesForOperation, Sets.newHashSet("step_weather"));
+    }
+
     private Map<String, Map<String, String>> newStep(String id,
-                                                     String objPath,
-                                                     String action,
-                                                     String args,
-                                                     String defaultArgs,
-                                                     String snapshot,
-                                                     String highlightId) {
+            String objPath,
+            String action,
+            String args,
+            String defaultArgs,
+            String snapshot,
+            String highlightId) {
         Map<String, String> stepDetails = new HashMap<>();
 
         putIfValueNotNull(stepDetails, SEQ_STEP_ID_KEY, id);
@@ -230,12 +268,12 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     }
 
     private SeqStep newSeqStep(String id,
-                               String objPath,
-                               String action,
-                               String args,
-                               String defaultArgs,
-                               String snapshot,
-                               String highlightId) {
+            String objPath,
+            String action,
+            String args,
+            String defaultArgs,
+            String snapshot,
+            String highlightId) {
         SeqStep seqStep = new SeqStep();
 
         seqStep.setId(id);
@@ -256,9 +294,15 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     }
 
     public static class Config {
+
         @Bean
         public SeqStepsTransformer seqStepsTransformer() {
             return new SeqStepsTransformer();
+        }
+
+        @Bean
+        public DependenciesHelper dependenciesHelper() {
+            return new DependenciesHelper();
         }
     }
 }
