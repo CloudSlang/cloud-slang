@@ -46,12 +46,14 @@ public abstract class ValueFactory implements Serializable {
         return new SensitiveStringValue(value, preEncrypted);
     }
 
-    public static PyObjectValue createPyObjectValue(Serializable content, boolean sensitive) {
-        return PyObjectValueProxyFactory.create(content, sensitive);
+    public static PyObjectValue createPyObjectValue(Serializable content, boolean sensitive, boolean externalPython) {
+        return externalPython ? ExternalPyObjectValueProxyFactory.create(content, sensitive) :
+                PyObjectValueProxyFactory.create(content, sensitive);
     }
 
-    public static PyObjectValue createPyObjectValue(Value value) {
-        return createPyObjectValue(value == null ? null : value.get(), value != null && value.isSensitive());
+    public static PyObjectValue createPyObjectValue(Value value, boolean externalPython) {
+        return createPyObjectValue(value == null ? null : value.get(), value != null && value.isSensitive(),
+                externalPython);
     }
 
     private static Value createValue(Serializable content, boolean sensitive) {

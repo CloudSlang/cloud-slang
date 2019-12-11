@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings.scripts;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +23,10 @@ import java.util.Map;
  */
 public abstract class ScriptProcessor {
 
-    protected Map<String, Serializable> createPythonContext(Map<String, Value> context) {
+    protected Map<String, Serializable> createPythonContext(Map<String, Value> context, boolean externalPython) {
         Map<String, Serializable> pythonContext = new HashMap<>();
         for (Map.Entry<String, ? extends Value> entry : context.entrySet()) {
-            pythonContext.put(entry.getKey(), ValueFactory.createPyObjectValue(entry.getValue()));
+            pythonContext.put(entry.getKey(), ValueFactory.createPyObjectValue(entry.getValue(), externalPython));
         }
         return pythonContext;
     }
