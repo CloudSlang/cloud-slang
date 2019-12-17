@@ -21,6 +21,7 @@ public class ExternalPyObjectValueProxyFactory {
     public static PyObjectValue create(Serializable content, boolean sensitive) {
         ExternalPyString pyString = new ExternalPyString(content.toString());
         try {
+
             Class proxyClass = createProxyClass();
             PyObjectValue pyObjectProxy = (PyObjectValue) proxyClass.newInstance();
             ((Proxy) pyObjectProxy).setHandler(new ExternalPyObjectValueMethodHandler(content, sensitive, pyString));
