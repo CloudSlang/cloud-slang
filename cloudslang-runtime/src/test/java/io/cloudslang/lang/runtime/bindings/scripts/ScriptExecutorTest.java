@@ -71,8 +71,8 @@ public class ScriptExecutorTest {
         scriptInputValues.put("input1", value1);
         scriptInputValues.put("input2", value2);
         Map<Object, PyObject> scriptOutputValues = new HashMap<>();
-        PyObject pyObjectValue1 = (PyObject) ValueFactory.createPyObjectValue("value1", false);
-        PyObject pyObjectValue2 = (PyObject) ValueFactory.createPyObjectValue("value2", false);
+        PyObject pyObjectValue1 = (PyObject) ValueFactory.createPyObjectValue("value1", false, false);
+        PyObject pyObjectValue2 = (PyObject) ValueFactory.createPyObjectValue("value2", false, false);
         scriptOutputValues.put("output1", pyObjectValue1);
         scriptOutputValues.put("output2", pyObjectValue2);
         when(execInterpreter.getLocals()).thenReturn(new PyStringMap(scriptOutputValues));
