@@ -131,7 +131,7 @@ public class ScriptEvaluatorTest {
 
         Map<String, Serializable> expectedContext = new HashMap<>();
         Map<String, Value> properties = new HashMap<>();
-        properties.put("a.b.c.key", ValueFactory.createPyObjectValue("value", false));
+        properties.put("a.b.c.key", ValueFactory.createPyObjectValue("value", false, false));
 
         verify(pythonRuntimeService).eval(scriptCaptor.capture(), eq(expr), eq(expectedContext));
 

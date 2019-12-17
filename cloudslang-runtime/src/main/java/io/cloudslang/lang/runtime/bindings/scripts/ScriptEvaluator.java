@@ -57,7 +57,7 @@ public class ScriptEvaluator extends ScriptProcessor {
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
         try {
-            Map<String, Serializable> pythonContext = createPythonContext(context);
+            Map<String, Serializable> pythonContext = createPythonContext(context, false);
             boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
             if (systemPropertiesDefined) {
                 pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties));
@@ -113,7 +113,7 @@ public class ScriptEvaluator extends ScriptProcessor {
         Map<String, Value> processedSystemProperties = new HashMap<>();
         for (SystemProperty property : properties) {
             processedSystemProperties.put(property.getFullyQualifiedName(),
-                    ValueFactory.createPyObjectValue(property.getValue()));
+                    ValueFactory.createPyObjectValue(property.getValue(), false));
         }
         return processedSystemProperties;
     }

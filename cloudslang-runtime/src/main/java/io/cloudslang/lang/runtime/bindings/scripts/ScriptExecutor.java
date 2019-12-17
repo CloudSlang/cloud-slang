@@ -51,7 +51,7 @@ public class ScriptExecutor extends ScriptProcessor {
     private Map<String, Value> runExternalPythonAction(Set<String> dependencies, String script,
                                                        Map<String, Value> callArguments) {
         Map<String, Serializable> executionResult = externalPytonRuntimeService.exec(dependencies, script,
-                new HashMap<>()).getExecutionResult();
+                createPythonContext(callArguments, true)).getExecutionResult();
         Map<String, Value> result = new HashMap<>();
 
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
@@ -67,7 +67,7 @@ public class ScriptExecutor extends ScriptProcessor {
 
         Map<String, Value> result = new HashMap<>();
         Map<String, Serializable> executionResult = pythonRuntimeService
-                .exec(dependencies, script, createPythonContext(callArguments)).getExecutionResult();
+                .exec(dependencies, script, createPythonContext(callArguments, false)).getExecutionResult();
 
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value callArgumenet = callArguments.get(entry.getKey());

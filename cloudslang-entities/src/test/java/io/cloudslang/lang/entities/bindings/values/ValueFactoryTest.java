@@ -24,21 +24,21 @@ public class ValueFactoryTest {
 
     @Test
     public void testCreatePyObjectValue() {
-        PyObjectValue value = ValueFactory.createPyObjectValue("value1", false);
+        PyObjectValue value = ValueFactory.createPyObjectValue("value1", false, false);
         Assert.assertEquals("value1", value.get());
     }
 
     @Test
     public void testCreatePyObjectValueFromValue() {
         Value value = ValueFactory.create("value1", false);
-        PyObjectValue pyObjectValue = ValueFactory.createPyObjectValue(value);
+        PyObjectValue pyObjectValue = ValueFactory.createPyObjectValue(value, false);
         Assert.assertEquals("value1", pyObjectValue.get());
     }
 
     @Test
     public void testCreatePyObjectValueFromValueSensitive() {
         Value value = ValueFactory.create("value1", true);
-        PyObjectValue pyObjectValue = ValueFactory.createPyObjectValue(value);
+        PyObjectValue pyObjectValue = ValueFactory.createPyObjectValue(value, false);
         Assert.assertEquals("value1", pyObjectValue.get());
     }
 
