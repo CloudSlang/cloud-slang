@@ -16,9 +16,8 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.python.core.Py;
-import org.python.core.PyObject;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author stoneo
@@ -39,7 +39,7 @@ public class ScriptEvaluator extends ScriptProcessor {
     private static String LINE_SEPARATOR = System.lineSeparator();
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
-    private static final String INIT_ACCESSED_RESOURCE_SET = ACCESSED_RESOURCES_SET + " = {}";
+    private static final String INIT_ACCESSED_RESOURCE_SET = ACCESSED_RESOURCES_SET + " = set()";
     private static final String GET_FUNCTION_DEFINITION =
             "def get(key, default_value=None):" + LINE_SEPARATOR +
                     "  value = globals().get(key)" + LINE_SEPARATOR +
@@ -70,12 +70,9 @@ public class ScriptEvaluator extends ScriptProcessor {
             }
             PythonEvaluationResult result = pythonRuntimeService.eval(
                     buildAddFunctionsScript(functionDependencies), expr, pythonContext);
-            if (systemPropertiesDefined) {
-                pythonContext.remove(SYSTEM_PROPERTIES_MAP);
-            }
 
             //noinspection unchecked
-            Set<String> accessedResources = (Set<String>) result.getResultContext().get("accessedResources");
+            Set<String> accessedResources = (Set<String>) result.getResultContext().get(ACCESSED_RESOURCES_SET);
             return ValueFactory.create(result.getEvalResult(),
                     getSensitive(pythonContext, accessedResources));
         } catch (Exception exception) {
@@ -142,18 +139,30 @@ public class ScriptEvaluator extends ScriptProcessor {
     }
 
     private boolean getSensitive(Map<String, Serializable> fullContext, Set<String> accessedVariables) {
-        Collection<Serializable> acccesedValues = fullContext.entrySet().stream()
+        if (CollectionUtils.isEmpty(accessedVariables)) {
+            return false;
+        }
+        Collection<Serializable> accessedValues = fullContext.entrySet().stream()
+                .flatMap(entry -> {
+                    if (entry.getValue() instanceof Map) {
+                        //noinspection unchecked
+                        Map<String, Serializable> nestedContext = (Map<String, Serializable>) entry.getValue();
+                        return nestedContext.entrySet().stream();
+                    } else {
+                        return Stream.of(entry);
+                    }
+                })
                 .filter(entry -> accessedVariables.contains(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
-        return checkSensitivity(acccesedValues);
+        return checkSensitivity(accessedValues);
     }
 
     private boolean checkSensitivity(Collection<Serializable> values) {
         for (Serializable value : values) {
             if (value instanceof PyObjectValue) {
                 PyObjectValue pyObjectValue = (PyObjectValue) value;
-                if (pyObjectValue.isSensitive() && pyObjectValue.isAccessed()) {
+                if (pyObjectValue.isSensitive()) {
                     return true;
                 }
             }

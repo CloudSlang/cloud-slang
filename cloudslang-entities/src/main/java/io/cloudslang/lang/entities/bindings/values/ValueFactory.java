@@ -48,7 +48,7 @@ public abstract class ValueFactory implements Serializable {
 
     public static PyObjectValue createPyObjectValue(Serializable content, boolean sensitive, boolean externalPython) {
         if (externalPython) {
-            return new PlainPyObjectValue(content.toString(), sensitive);
+            return new PlainPyObjectValue(content == null ? null : content.toString(), sensitive);
         } else {
             return PyObjectValueProxyFactory.create(content, sensitive);
         }
