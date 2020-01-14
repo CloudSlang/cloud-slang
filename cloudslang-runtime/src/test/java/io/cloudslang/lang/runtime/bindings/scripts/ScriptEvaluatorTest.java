@@ -63,6 +63,8 @@ import static org.python.google.common.collect.Sets.newHashSet;
 public class ScriptEvaluatorTest {
 
     private static String LINE_SEPARATOR = System.lineSeparator();
+    private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
+    private static final String INIT_ACCESSED_RESOURCE_SET = ACCESSED_RESOURCES_SET + " = {}";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String GET_FUNCTION_DEFINITION =
             "def get(key, default_value=None):" + LINE_SEPARATOR +
@@ -140,6 +142,7 @@ public class ScriptEvaluatorTest {
         Set<String> actualFunctions = new HashSet<>();
         Collections.addAll(actualFunctions, actualFunctionsArray);
         Set<String> expectedFunctions = newHashSet(
+                INIT_ACCESSED_RESOURCE_SET,
                 GET_FUNCTION_DEFINITION,
                 GET_SP_FUNCTION_DEFINITION,
                 CHECK_EMPTY_FUNCTION_DEFINITION

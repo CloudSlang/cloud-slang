@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author stoneo
@@ -37,13 +38,17 @@ import java.util.Set;
 public class ScriptEvaluator extends ScriptProcessor {
     private static String LINE_SEPARATOR = System.lineSeparator();
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
+    private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
+    private static final String INIT_ACCESSED_RESOURCE_SET = ACCESSED_RESOURCES_SET + " = {}";
     private static final String GET_FUNCTION_DEFINITION =
             "def get(key, default_value=None):" + LINE_SEPARATOR +
                     "  value = globals().get(key)" + LINE_SEPARATOR +
+                    "  accessed_resources_set.add(key)" + LINE_SEPARATOR +
                     "  return default_value if value is None else value";
     private static final String GET_SP_FUNCTION_DEFINITION =
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
                     "  property_value = " + SYSTEM_PROPERTIES_MAP + ".get(key)" + LINE_SEPARATOR +
+                    "  accessed_resources_set.add(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
     private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
             "def check_empty(value_to_check, default_value=None):" + LINE_SEPARATOR +
@@ -57,10 +62,11 @@ public class ScriptEvaluator extends ScriptProcessor {
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
         try {
-            Map<String, Serializable> pythonContext = createPythonContext(context, false);
+            Map<String, Serializable> pythonContext = createPythonContext(context, true);
             boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
             if (systemPropertiesDefined) {
-                pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties));
+                pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties,
+                        true));
             }
             PythonEvaluationResult result = pythonRuntimeService.eval(
                     buildAddFunctionsScript(functionDependencies), expr, pythonContext);
@@ -68,8 +74,10 @@ public class ScriptEvaluator extends ScriptProcessor {
                 pythonContext.remove(SYSTEM_PROPERTIES_MAP);
             }
 
+            //noinspection unchecked
+            Set<String> accessedResources = (Set<String>) result.getResultContext().get("accessedResources");
             return ValueFactory.create(result.getEvalResult(),
-                    getSensitive(result.getResultContext(), systemPropertiesDefined));
+                    getSensitive(pythonContext, accessedResources));
         } catch (Exception exception) {
             throw new RuntimeException("Error in running script expression: '" +
                     getTruncatedExpression(expr) + "',\n\tException is: " +
@@ -83,6 +91,12 @@ public class ScriptEvaluator extends ScriptProcessor {
 
     private String buildAddFunctionsScript(Set<ScriptFunction> functionDependencies) {
         String functions = "";
+        boolean shouldInitAccessedResourcesSet = functionDependencies.stream()
+                .anyMatch(dep -> dep.equals(ScriptFunction.GET) || dep.equals(ScriptFunction.GET_SYSTEM_PROPERTY));
+        if (shouldInitAccessedResourcesSet) {
+            functions += INIT_ACCESSED_RESOURCE_SET;
+            functions = appendDelimiterBetweenFunctions(functions);
+        }
         for (ScriptFunction function : functionDependencies) {
             switch (function) {
                 case GET:
@@ -109,11 +123,11 @@ public class ScriptEvaluator extends ScriptProcessor {
         return text + LINE_SEPARATOR + LINE_SEPARATOR;
     }
 
-    private Map<String, Value> prepareSystemProperties(Set<SystemProperty> properties) {
+    private Map<String, Value> prepareSystemProperties(Set<SystemProperty> properties, boolean externalPython) {
         Map<String, Value> processedSystemProperties = new HashMap<>();
         for (SystemProperty property : properties) {
             processedSystemProperties.put(property.getFullyQualifiedName(),
-                    ValueFactory.createPyObjectValue(property.getValue(), false));
+                    ValueFactory.createPyObjectValue(property.getValue(), externalPython));
         }
         return processedSystemProperties;
     }
@@ -127,23 +141,17 @@ public class ScriptEvaluator extends ScriptProcessor {
         return processedMessage;
     }
 
-    private boolean getSensitive(Map<String, Serializable> executionResultContext, boolean systemPropertiesInContext) {
-        if (systemPropertiesInContext) {
-            Map<String, Serializable> context = new HashMap<>(executionResultContext);
-            PyObject rawSystemProperties = (PyObject) context.remove(SYSTEM_PROPERTIES_MAP);
-            @SuppressWarnings("unchecked")
-            Map<String, Value> systemProperties = Py.tojava(rawSystemProperties, Map.class);
-            @SuppressWarnings("unchecked")
-            Collection<Serializable> systemPropertyValues = (Collection) systemProperties.values();
-            return checkSensitivity(systemPropertyValues) || checkSensitivity(context.values());
-        } else {
-            return (checkSensitivity(executionResultContext.values()));
-        }
+    private boolean getSensitive(Map<String, Serializable> fullContext, Set<String> accessedVariables) {
+        Collection<Serializable> acccesedValues = fullContext.entrySet().stream()
+                .filter(entry -> accessedVariables.contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+        return checkSensitivity(acccesedValues);
     }
 
     private boolean checkSensitivity(Collection<Serializable> values) {
         for (Serializable value : values) {
-            if (value != null && value instanceof PyObjectValue) {
+            if (value instanceof PyObjectValue) {
                 PyObjectValue pyObjectValue = (PyObjectValue) value;
                 if (pyObjectValue.isSensitive() && pyObjectValue.isAccessed()) {
                     return true;
