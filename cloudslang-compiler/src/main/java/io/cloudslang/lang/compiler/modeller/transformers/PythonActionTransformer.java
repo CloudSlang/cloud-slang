@@ -33,6 +33,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_VERSION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
 
 
 public class PythonActionTransformer extends AbstractTransformer
@@ -43,7 +44,7 @@ public class PythonActionTransformer extends AbstractTransformer
 
     private static Set<String> mandatoryKeySet = Sets.newHashSet(PYTHON_ACTION_SCRIPT_KEY);
     private static Set<String> optionalKeySet = Sets.newHashSet(PYTHON_ACTION_USE_JYTHON_KEY,
-            PYTHON_ACTION_VERSION_KEY);
+            PYTHON_ACTION_VERSION_KEY, INPUTS_KEY);
 
     @SuppressWarnings("FieldCanBeLocal") // remove when `dependencies` will be enabled
     private boolean dependenciesEnabled = false;
@@ -76,7 +77,8 @@ public class PythonActionTransformer extends AbstractTransformer
                 if (isExternalPythonExecution(rawData)) {
                     // validate script
                     String script = (String) rawData.get(PYTHON_ACTION_SCRIPT_KEY);
-                    externalPythonScriptValidator.validateExecutionMethodSignature(script);
+                    List<String> inputs = getInputs(rawData);
+                    externalPythonScriptValidator.validateExecutionMethodSignature(script, inputs);
                 } else {
                     //backwards compatibility
                     rawData.put(PYTHON_ACTION_USE_JYTHON_KEY, true);
@@ -88,6 +90,14 @@ public class PythonActionTransformer extends AbstractTransformer
         }
 
         return new BasicTransformModellingResult<>(transformedData, errors);
+    }
+
+    private List<String> getInputs(Map<String, Serializable> rawData) {
+        try {
+            return (List<String>) rawData.get(INPUTS_KEY);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not get inputs for python action.");
+        }
     }
 
     private boolean isExternalPythonExecution(Map<String, Serializable> rawData) {
