@@ -21,7 +21,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import junit.framework.Assert;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -78,7 +80,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         initialPythonActionWithDependencies = loadPythonActionData("/python_action_with_dependencies.sl");
         initialPythonActionInvalidKey = loadPythonActionData("/corrupted/python_action_invalid_key.sl");
         initialPythonActionSimple = loadPythonActionData("/python_action_simple.sl");
-        initialExternalPythonAction1 = loadPythonActionData("/python_external_valid_action1.sl");
+        initialExternalPythonAction1 = loadPythonActionData("/python_external_valid_action1.sl", "a,b,c");
         initialExternalPythonAction2 = loadPythonActionData("/python_external_valid_action2.sl");
         initialExternalPythonInvalidAction = loadPythonActionData("/python_external_invalid_action1.sl");
         initialExternalPythonInvalidAction2 = loadPythonActionData("/python_external_invalid_action2.sl");
@@ -86,6 +88,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
 
         expectedPythonActionSimple = new LinkedHashMap<>();
         expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY, "pass");
+        expectedPythonActionSimple.put(SlangTextualKeys.INPUTS_KEY, new ArrayList<>());
         expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY, true);
     }
 
@@ -186,11 +189,20 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     }
 
     private Map<String, Serializable> loadPythonActionData(String filePath) throws URISyntaxException {
+        return loadPythonActionData(filePath, "");
+    }
+
+    private Map<String, Serializable> loadPythonActionData(String filePath, String inputs) throws URISyntaxException {
         URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
         Map op = file.getOperation();
         @SuppressWarnings("unchecked")
         Map<String, Serializable> returnMap = (Map) op.get(SlangTextualKeys.PYTHON_ACTION_KEY);
+        ArrayList<String> inputsList = new ArrayList<>();
+        if (StringUtils.isNotBlank(inputs)) {
+            inputsList = new ArrayList<>(Arrays.asList(inputs.split(",")));
+        }
+        returnMap.put(SlangTextualKeys.INPUTS_KEY, inputsList);
         return returnMap;
     }
 
