@@ -42,6 +42,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -145,7 +146,7 @@ public class ScriptExecutorTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl();
+            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
         }
 
         @Bean(name = "externalPythonExecutionEngine")
