@@ -34,6 +34,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_SCRIPT_
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_VERSION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
+import static java.util.Collections.emptyList;
 
 
 public class PythonActionTransformer extends AbstractTransformer
@@ -93,11 +94,14 @@ public class PythonActionTransformer extends AbstractTransformer
     }
 
     private List<String> getInputs(Map<String, Serializable> rawData) {
-        try {
-            return (List<String>) rawData.get(INPUTS_KEY);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Could not get inputs for python action.");
+        Object inputsObject = rawData.get(INPUTS_KEY);
+        if (inputsObject instanceof List) {
+            List<Object> inputs = (List) inputsObject;
+            if (!inputs.isEmpty() && inputs.get(0) instanceof String) {
+                return (List<String>) inputsObject;
+            }
         }
+        return emptyList();
     }
 
     private boolean isExternalPythonExecution(Map<String, Serializable> rawData) {
