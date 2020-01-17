@@ -68,6 +68,8 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_SETTINGS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKER_GROUP;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
@@ -389,8 +391,12 @@ public class ExecutableBuilder {
                     executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
         }
         if (pythonActionRawData != null) {
-            actionRawData.put(SlangTextualKeys.PYTHON_ACTION_KEY,
-                    executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY));
+            Object pythonActionObject = executableRawData.get(PYTHON_ACTION_KEY);
+            if (pythonActionObject instanceof Map) {
+                Map<String, Object> pythonAction = (Map<String, Object>) executableRawData.get(PYTHON_ACTION_KEY);
+                pythonAction.put(SlangTextualKeys.INPUTS_KEY, executableRawData.get(INPUTS_KEY));
+            }
+            actionRawData.put(PYTHON_ACTION_KEY, pythonActionObject);
         }
         if (seqActionRawData != null) {
             actionRawData.put(SlangTextualKeys.SEQ_ACTION_KEY,
