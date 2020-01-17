@@ -391,9 +391,12 @@ public class ExecutableBuilder {
                     executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
         }
         if (pythonActionRawData != null) {
-            Map<String, Object> pythonAction = (Map<String, Object>) executableRawData.get(PYTHON_ACTION_KEY);
-            pythonAction.put(SlangTextualKeys.INPUTS_KEY, executableRawData.get(INPUTS_KEY));
-            actionRawData.put(PYTHON_ACTION_KEY, pythonAction);
+            Object pythonActionObject = executableRawData.get(PYTHON_ACTION_KEY);
+            if (pythonActionObject instanceof Map) {
+                Map<String, Object> pythonAction = (Map<String, Object>) executableRawData.get(PYTHON_ACTION_KEY);
+                pythonAction.put(SlangTextualKeys.INPUTS_KEY, executableRawData.get(INPUTS_KEY));
+            }
+            actionRawData.put(PYTHON_ACTION_KEY, pythonActionObject);
         }
         if (seqActionRawData != null) {
             actionRawData.put(SlangTextualKeys.SEQ_ACTION_KEY,

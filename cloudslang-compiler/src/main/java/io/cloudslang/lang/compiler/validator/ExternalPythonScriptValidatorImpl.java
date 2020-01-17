@@ -58,7 +58,7 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
         matcher.find();
         String scriptInputsString = matcher.group(1);
         if (StringUtils.isNotBlank(scriptInputsString)) {
-            String[] scriptInputs = scriptInputsString.split(" ");
+            String[] scriptInputs = scriptInputsString.split(",");
             if (scriptInputs.length > 0) {
                 if (inputs == null || inputs.size() < scriptInputs.length) {
                     throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
@@ -68,7 +68,7 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
                     throw new IllegalArgumentException("There are inputs with the same name in execute method.");
                 }
                 if (!inputs.containsAll(scriptInputsSet)) {
-                    throw new IllegalArgumentException("Inputs are not defined for all execute method parameters.");
+                    throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
                 }
             }
         }
