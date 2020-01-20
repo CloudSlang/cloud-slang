@@ -9,8 +9,11 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings.values;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.io.Serializable;
 
+@JsonSerialize(using = PlainPyObjectValueSerializer.class)
 public class PlainPyObjectValue implements PyObjectValue {
     private static final long serialVersionUID = -2981575572912695201L;
     private final String value;

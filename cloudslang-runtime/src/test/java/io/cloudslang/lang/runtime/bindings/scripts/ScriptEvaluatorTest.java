@@ -22,7 +22,7 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -202,7 +202,7 @@ public class ScriptEvaluatorTest {
 
         @Bean(name = "externalPythonExecutionEngine")
         public PythonExecutionEngine externalPythonExecutionEngine() {
-            return new ExternalPythonExecutionNotCachedEngine();
+            return new ExternalPythonExecutionEngine();
         }
 
         @Bean

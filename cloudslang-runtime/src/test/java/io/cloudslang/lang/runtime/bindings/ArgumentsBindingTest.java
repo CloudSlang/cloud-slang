@@ -24,7 +24,7 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -71,7 +71,7 @@ public class ArgumentsBindingTest {
         System.setProperty(MavenConfigImpl.MAVEN_HOME, mavenHome.getAbsolutePath());
 
         System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
-        System.setProperty("maven.home", classLoader.getResource("maven").getPath());
+        System.setProperty("maven.home", classLoader.getResource("maven.zip").getPath());
 
         shouldRunMaven = System.getProperties().containsKey(MavenConfigImpl.MAVEN_REMOTE_URL) &&
                 System.getProperties().containsKey(MavenConfigImpl.MAVEN_PLUGINS_URL);
@@ -385,7 +385,7 @@ public class ArgumentsBindingTest {
 
         @Bean(name = "externalPythonExecutionEngine")
         public PythonExecutionEngine externalPythonExecutionEngine() {
-            return new ExternalPythonExecutionNotCachedEngine();
+            return new ExternalPythonExecutionEngine();
         }
 
         @Bean
