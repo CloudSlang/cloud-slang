@@ -16,12 +16,9 @@ import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
-import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
@@ -32,8 +29,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.python.core.PyDictionary;
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +42,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.isA;
@@ -64,8 +58,7 @@ import static org.python.google.common.collect.Sets.newHashSet;
 public class ScriptEvaluatorTest {
 
     private static String LINE_SEPARATOR = System.lineSeparator();
-    private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
-    private static final String INIT_ACCESSED_RESOURCE_SET = ACCESSED_RESOURCES_SET + " = {}";
+    private static final String ACCESSED_MONITOR_METHOD_NAME = "accessed";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String GET_FUNCTION_DEFINITION =
             "def get(key, default_value=None):" + LINE_SEPARATOR +
@@ -73,6 +66,7 @@ public class ScriptEvaluatorTest {
                     "  return default_value if value is None else value";
     private static final String GET_SP_FUNCTION_DEFINITION =
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
+                    "  " + ACCESSED_MONITOR_METHOD_NAME + "(key)" + LINE_SEPARATOR +
                     "  property_value = " + SYSTEM_PROPERTIES_MAP + ".get(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
     private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
@@ -85,10 +79,7 @@ public class ScriptEvaluatorTest {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    @Autowired
-    private PythonInterpreter pythonInterpreter;
-
-    @Resource(name = "jythonRuntimeService")
+    @Resource(name = "externalPythonRuntimeService")
     private PythonRuntimeService pythonRuntimeService;
 
     @Test
@@ -116,34 +107,27 @@ public class ScriptEvaluatorTest {
     @Test
     public void testEvalFunctions() throws Exception {
         reset(pythonRuntimeService);
-        Set<SystemProperty> props = new HashSet<>();
-        SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value", "");
-        props.add(systemProperty);
         Set<ScriptFunction> functionDependencies = newHashSet(ScriptFunction.GET,
                 ScriptFunction.GET_SYSTEM_PROPERTY, ScriptFunction.CHECK_EMPTY);
         final ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
 
         Map<String, Serializable> scriptReturnContext = new HashMap<>();
-        scriptReturnContext.put(SYSTEM_PROPERTIES_MAP, new PyDictionary());
+        scriptReturnContext.put(SYSTEM_PROPERTIES_MAP, new HashMap<>());
 
         when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
                 .thenReturn(new PythonEvaluationResult("result", scriptReturnContext));
 
         String expr = "";
-        scriptEvaluator.evalExpr(expr, new HashMap<String, Value>(), props, functionDependencies);
+        scriptEvaluator.evalExpr(expr, new HashMap<>(), new HashSet<>(), functionDependencies);
 
         Map<String, Serializable> expectedContext = new HashMap<>();
-        Map<String, Value> properties = new HashMap<>();
-        properties.put("a.b.c.key", ValueFactory.createPyObjectValue("value", false, false));
-
+        expectedContext.put(SYSTEM_PROPERTIES_MAP, new HashMap<>());
         verify(pythonRuntimeService).eval(scriptCaptor.capture(), eq(expr), eq(expectedContext));
-
         final String actualScript = scriptCaptor.getValue();
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
         Set<String> actualFunctions = new HashSet<>();
         Collections.addAll(actualFunctions, actualFunctionsArray);
         Set<String> expectedFunctions = newHashSet(
-                INIT_ACCESSED_RESOURCE_SET,
                 GET_FUNCTION_DEFINITION,
                 GET_SP_FUNCTION_DEFINITION,
                 CHECK_EMPTY_FUNCTION_DEFINITION
@@ -151,13 +135,9 @@ public class ScriptEvaluatorTest {
         Assert.assertEquals(expectedFunctions, actualFunctions);
     }
 
+
     @Configuration
     static class Config {
-        @Bean
-        public ScriptExecutor scriptExecutor() {
-            return new ScriptExecutor();
-        }
-
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
@@ -173,37 +153,15 @@ public class ScriptEvaluatorTest {
             return new MavenConfigImpl();
         }
 
-        @Bean
-        public PythonInterpreter pythonInterpreter() {
-            return mock(PythonInterpreter.class);
-        }
-
-        @Bean(name = "jythonRuntimeService")
-        public PythonRuntimeService pythonRuntimeService() {
-            return mock(PythonRuntimeService.class);
-        }
-
-        @Bean(name = "jythonExecutionEngine")
-        public PythonExecutionEngine pythonExecutionEngine() {
-            return new PythonExecutionCachedEngine() {
-                protected PythonExecutor createNewExecutor(Set<String> filePaths) {
-                    return new PythonExecutor(filePaths) {
-                        protected PythonInterpreter initInterpreter(Set<String> dependencies) {
-                            return pythonInterpreter();
-                        }
-                    };
-                }
-            };
-        }
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
+            return mock(ExternalPythonRuntimeServiceImpl.class);
         }
 
         @Bean(name = "externalPythonExecutionEngine")
         public PythonExecutionEngine externalPythonExecutionEngine() {
-            return new ExternalPythonExecutionEngine();
+            return mock(ExternalPythonExecutionEngine.class);
         }
 
         @Bean
