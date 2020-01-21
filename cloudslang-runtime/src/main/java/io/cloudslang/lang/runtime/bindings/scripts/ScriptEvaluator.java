@@ -39,12 +39,14 @@ public class ScriptEvaluator extends ScriptProcessor {
     private static String LINE_SEPARATOR = System.lineSeparator();
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
+    private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
     private static final String GET_FUNCTION_DEFINITION =
             "def get(key, default_value=None):" + LINE_SEPARATOR +
                     "  value = globals().get(key)" + LINE_SEPARATOR +
                     "  return default_value if value is None else value";
     private static final String GET_SP_FUNCTION_DEFINITION =
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
+                    "  " + ACCESS_MONITORING_METHOD_NAME + "(key)" + LINE_SEPARATOR +
                     "  property_value = " + SYSTEM_PROPERTIES_MAP + ".get(key)" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
     private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
