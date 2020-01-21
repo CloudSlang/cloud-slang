@@ -10,6 +10,8 @@
 
 package io.cloudslang.lang.compiler.validator;
 
+import java.util.List;
+
 public interface ExternalPythonScriptValidator {
-    void validateExecutionMethodSignature(String script);
+    void validateExecutionMethodSignature(String script, List<String> inputs);
 }

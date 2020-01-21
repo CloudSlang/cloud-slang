@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 import static org.junit.Assert.assertNull;
 
@@ -380,7 +381,7 @@ public class ArgumentsBindingTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl();
+            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
         }
 
         @Bean(name = "externalPythonExecutionEngine")

@@ -59,6 +59,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.anyMap;
@@ -383,7 +384,7 @@ public class ExecutableStepsTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl();
+            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
         }
 
         @Bean(name = "externalPythonExecutionEngine")

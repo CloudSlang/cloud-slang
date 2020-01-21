@@ -64,6 +64,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import static io.cloudslang.lang.entities.ActionType.JAVA;
 import static io.cloudslang.lang.entities.ActionType.PYTHON;
@@ -1204,7 +1205,7 @@ public class ActionStepsTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl();
+            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
         }
 
         @Bean(name = "externalPythonExecutionEngine")

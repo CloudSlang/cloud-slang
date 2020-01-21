@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>1.0.106-SNAPSHOT</version>
+    <version>1.0.108-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -43,7 +43,7 @@
         <!--Project dependencies-->
         <spring.version>4.3.17.RELEASE</spring.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <score.version>0.3.123-SNAPSHOT</score.version>
+        <score.version>0.3.125</score.version>
         <h2.version>1.4.199</h2.version>
         <!--Project properties-->
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -380,12 +380,6 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.8</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
                 <version>2.9.8</version>
             </dependency>
 
