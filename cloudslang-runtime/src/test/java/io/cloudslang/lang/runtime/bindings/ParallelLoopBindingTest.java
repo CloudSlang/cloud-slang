@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 import static org.python.google.common.collect.Lists.newArrayList;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ParallelLoopBindingTest {
+public class ParallelLoopBindingTest extends BaseTestClass {
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;

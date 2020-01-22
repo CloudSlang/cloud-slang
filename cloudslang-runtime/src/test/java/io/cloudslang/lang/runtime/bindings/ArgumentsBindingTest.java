@@ -53,7 +53,7 @@ import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
-public class ArgumentsBindingTest {
+public class ArgumentsBindingTest extends BaseTestClass {
     private static boolean shouldRunMaven;
 
     static {
@@ -83,6 +83,7 @@ public class ArgumentsBindingTest {
         String provideralAlreadyConfigured = System.setProperty("python.executor.engine",
                 PythonExecutionNotCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
+
     }
 
     @SuppressWarnings("unchecked")

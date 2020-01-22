@@ -51,7 +51,7 @@ import java.util.concurrent.Semaphore;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
-public class InputsBindingTest {
+public class InputsBindingTest extends BaseTestClass {
 
     @Autowired
     private InputsBinding inputsBinding;
@@ -500,7 +500,7 @@ public class InputsBindingTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
+            return new ExternalPythonRuntimeServiceImpl(new Semaphore(10));
         }
 
         @Bean(name = "externalPythonExecutionEngine")
