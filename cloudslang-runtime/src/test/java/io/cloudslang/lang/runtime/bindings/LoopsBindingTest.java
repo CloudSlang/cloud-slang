@@ -48,7 +48,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LoopsBindingTest extends BaseTestClass {
+public class LoopsBindingTest {
+    static {
+        System.setProperty("use.jython.expressions", "true");
+    }
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;

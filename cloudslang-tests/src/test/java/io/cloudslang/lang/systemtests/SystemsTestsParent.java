@@ -86,7 +86,7 @@ public abstract class SystemsTestsParent {
         System.setProperty(MavenConfigImpl.MAVEN_HOME, mavenHome.getAbsolutePath());
 
         System.setProperty(MavenConfigImpl.MAVEN_REPO_LOCAL, mavenRepo.getAbsolutePath());
-        System.setProperty("maven.home", classLoader.getResource("maven").getPath());
+        System.setProperty("maven.home", classLoader.getResource("maven.zip").getPath());
 
         String localRepository = System.getProperty(MavenConfigImpl.MAVEN_REPO_LOCAL);
         if (StringUtils.isNotEmpty(localRepository)) {
@@ -103,6 +103,7 @@ public abstract class SystemsTestsParent {
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
 
         System.setProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(), EventVerbosityLevel.DEFAULT.getValue());
+        System.setProperty("use.jython.expressions", "true");
     }
 
     @Autowired

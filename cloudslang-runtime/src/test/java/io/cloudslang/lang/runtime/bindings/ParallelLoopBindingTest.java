@@ -40,7 +40,10 @@ import static org.mockito.Mockito.when;
 import static org.python.google.common.collect.Lists.newArrayList;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ParallelLoopBindingTest extends BaseTestClass {
+public class ParallelLoopBindingTest {
+    static {
+        System.setProperty("use.jython.expressions", "true");
+    }
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;

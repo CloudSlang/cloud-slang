@@ -52,7 +52,10 @@ import static java.util.Arrays.asList;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ResultBindingTest.Config.class)
-public class ResultBindingTest extends BaseTestClass {
+public class ResultBindingTest {
+    static {
+        System.setProperty("use.jython.expressions", "true");
+    }
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;

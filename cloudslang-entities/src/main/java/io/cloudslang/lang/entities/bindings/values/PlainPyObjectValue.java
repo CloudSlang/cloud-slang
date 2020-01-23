@@ -26,7 +26,7 @@ public class PlainPyObjectValue implements PyObjectValue {
 
     @Override
     public boolean isAccessed() {
-        return false;
+        return true;
     }
 
     @Override

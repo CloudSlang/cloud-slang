@@ -56,10 +56,14 @@ import static org.python.google.common.collect.Sets.newHashSet;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
 public class ScriptEvaluatorTest {
+    static {
+        System.setProperty("use.jython.expressions", "true");
+    }
 
     private static String LINE_SEPARATOR = System.lineSeparator();
     private static final String ACCESSED_MONITOR_METHOD_NAME = "accessed";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
+    private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
     private static final String GET_FUNCTION_DEFINITION =
             "def get(key, default_value=None):" + LINE_SEPARATOR +
                     "  value = globals().get(key)" + LINE_SEPARATOR +
@@ -130,7 +134,8 @@ public class ScriptEvaluatorTest {
         Set<String> expectedFunctions = newHashSet(
                 GET_FUNCTION_DEFINITION,
                 GET_SP_FUNCTION_DEFINITION,
-                CHECK_EMPTY_FUNCTION_DEFINITION
+                CHECK_EMPTY_FUNCTION_DEFINITION,
+                BACKWARD_COMPATIBLE_ACCESS_METHOD
         );
         Assert.assertEquals(expectedFunctions, actualFunctions);
     }

@@ -55,7 +55,10 @@ import static java.util.Collections.singletonList;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = OutputsBindingTest.Config.class)
-public class OutputsBindingTest extends BaseTestClass {
+public class OutputsBindingTest {
+    static {
+        System.setProperty("use.jython.expressions", "true");
+    }
 
     private static final long DEFAULT_TIMEOUT = 10000;
     @SuppressWarnings("unchecked")
