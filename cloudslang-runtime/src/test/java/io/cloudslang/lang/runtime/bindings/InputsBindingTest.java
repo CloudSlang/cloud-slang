@@ -502,7 +502,7 @@ public class InputsBindingTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl(new Semaphore(10));
+            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
         }
 
         @Bean(name = "externalPythonExecutionEngine")
