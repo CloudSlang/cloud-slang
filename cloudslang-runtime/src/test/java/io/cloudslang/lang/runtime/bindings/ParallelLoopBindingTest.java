@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.python.google.common.collect.Lists.newArrayList;
 
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class ParallelLoopBindingTest extends BaseTestClass {
 

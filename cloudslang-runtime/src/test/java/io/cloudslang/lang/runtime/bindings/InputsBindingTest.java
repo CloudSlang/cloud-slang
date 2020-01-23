@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
-
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
 public class InputsBindingTest extends BaseTestClass {

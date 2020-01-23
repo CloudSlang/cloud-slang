@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -47,6 +48,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class LoopsBindingTest extends BaseTestClass {
 

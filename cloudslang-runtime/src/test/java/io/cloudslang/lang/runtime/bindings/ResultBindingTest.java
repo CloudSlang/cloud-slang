@@ -29,6 +29,7 @@ import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceIm
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ import static java.util.Arrays.asList;
  * Date: 06/11/2014
  * Time: 10:02
  */
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ResultBindingTest.Config.class)
 public class ResultBindingTest extends BaseTestClass {
