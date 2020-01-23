@@ -51,7 +51,6 @@ import java.util.concurrent.Semaphore;
 
 import static org.junit.Assert.assertNull;
 
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
 public class ArgumentsBindingTest extends BaseTestClass {

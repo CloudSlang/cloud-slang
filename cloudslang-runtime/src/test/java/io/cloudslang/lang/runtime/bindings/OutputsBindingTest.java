@@ -28,7 +28,6 @@ import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceIm
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import junit.framework.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Lists;
@@ -54,7 +53,6 @@ import static java.util.Collections.singletonList;
  *
  * @author Bonczidai Levente
  */
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = OutputsBindingTest.Config.class)
 public class OutputsBindingTest extends BaseTestClass {
