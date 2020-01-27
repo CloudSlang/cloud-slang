@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptValidator {
 
     private static final String METHOD_SIGNATURE_REGEX = "^def\\s+execute\\((([a-zA-Z0-9_]+,?\\s*)*)\\):\\s*\\R";
-    private Pattern methodSignaturePattern = Pattern.compile(METHOD_SIGNATURE_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
+    private Pattern methodSignaturePattern = Pattern.compile(METHOD_SIGNATURE_REGEX,
+            Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String METHOD_CONTENT_REGEX = METHOD_SIGNATURE_REGEX + "(.*)";
     private Pattern methodContentPattern = Pattern.compile(METHOD_CONTENT_REGEX, Pattern.MULTILINE);

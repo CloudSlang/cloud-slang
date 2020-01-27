@@ -192,10 +192,6 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction2);
     }
 
-    private Map<String, Serializable> loadPythonActionData(String filePath) throws URISyntaxException {
-        return loadPythonActionData(filePath, "");
-    }
-
     @Test
     public void testTransformerWithCommentedAndUncommentedExecuteMethod() {
         transformAndThrowErrorIfExists(pythonActionTransformer, commentedExecuteMethod);
@@ -204,6 +200,10 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     @Test
     public void testTransformerWithExecuteInClass() {
         transformAndThrowErrorIfExists(pythonActionTransformer, executeInClass);
+    }
+
+    private Map<String, Serializable> loadPythonActionData(String filePath) throws URISyntaxException {
+        return loadPythonActionData(filePath, "");
     }
 
     private Map<String, Serializable> loadPythonActionData(String filePath, String inputs) throws URISyntaxException {
