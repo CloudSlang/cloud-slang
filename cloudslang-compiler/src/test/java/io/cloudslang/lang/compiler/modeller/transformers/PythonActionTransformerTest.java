@@ -192,6 +192,12 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         return loadPythonActionData(filePath, "");
     }
 
+    @Test
+    public void testTransformerWithCommentedAndUncommentedExecuteMethod() throws URISyntaxException {
+        Map<String, Serializable> rawData = loadPythonActionData("/python_external_commented_overloaded_execute.sl");
+        transformAndThrowErrorIfExists(pythonActionTransformer, rawData);
+    }
+
     private Map<String, Serializable> loadPythonActionData(String filePath, String inputs) throws URISyntaxException {
         URL resource = getClass().getResource(filePath);
         ParsedSlang file = yamlParser.parse(SlangSource.fromFile(new File(resource.toURI())));
