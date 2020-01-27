@@ -122,8 +122,10 @@ public class ScriptEvaluator extends ScriptProcessor {
                     throw new RuntimeException("Error adding function to context: '" + function.getValue() +
                             "' is not valid.");
             }
-            functions += BACKWARD_COMPATIBLE_ACCESS_METHOD;
-            functions = appendDelimiterBetweenFunctions(functions);
+            if (!EXTERNAL_PYTHON) {
+                functions += BACKWARD_COMPATIBLE_ACCESS_METHOD;
+                functions = appendDelimiterBetweenFunctions(functions);
+            }
         }
         return functions;
     }
