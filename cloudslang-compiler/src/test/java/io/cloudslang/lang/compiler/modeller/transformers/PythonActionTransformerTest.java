@@ -73,6 +73,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     private Map<String, Serializable> initialExternalPythonInvalidAction;
     private Map<String, Serializable> initialExternalPythonInvalidAction2;
     private Map<String, Serializable> expectedPythonActionSimple;
+    private Map<String, Serializable> commentedExecuteMethod;
+    private Map<String, Serializable> executeInClass;
 
     @Before
     public void init() throws URISyntaxException {
@@ -84,6 +86,8 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         initialExternalPythonAction2 = loadPythonActionData("/python_external_valid_action2.sl");
         initialExternalPythonInvalidAction = loadPythonActionData("/python_external_invalid_action1.sl");
         initialExternalPythonInvalidAction2 = loadPythonActionData("/python_external_invalid_action2.sl");
+        commentedExecuteMethod = loadPythonActionData("/python_external_commented_overloaded_execute.sl");
+        executeInClass = loadPythonActionData("/python_external_execute_in_class.sl");
 
 
         expectedPythonActionSimple = new LinkedHashMap<>();
@@ -193,9 +197,13 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     }
 
     @Test
-    public void testTransformerWithCommentedAndUncommentedExecuteMethod() throws URISyntaxException {
-        Map<String, Serializable> rawData = loadPythonActionData("/python_external_commented_overloaded_execute.sl");
-        transformAndThrowErrorIfExists(pythonActionTransformer, rawData);
+    public void testTransformerWithCommentedAndUncommentedExecuteMethod() {
+        transformAndThrowErrorIfExists(pythonActionTransformer, commentedExecuteMethod);
+    }
+
+    @Test
+    public void testTransformerWithExecuteInClass() {
+        transformAndThrowErrorIfExists(pythonActionTransformer, executeInClass);
     }
 
     private Map<String, Serializable> loadPythonActionData(String filePath, String inputs) throws URISyntaxException {
