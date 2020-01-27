@@ -25,7 +25,7 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
             Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String METHOD_CONTENT_REGEX = METHOD_SIGNATURE_REGEX + "(.*)";
-    private Pattern methodContentPattern = Pattern.compile(METHOD_CONTENT_REGEX, Pattern.MULTILINE);
+    private Pattern methodContentPattern = Pattern.compile(METHOD_CONTENT_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String SINGLE_COMMENT_REGEX = "#.*?\n";
     private Pattern singleCommentPattern = Pattern.compile(SINGLE_COMMENT_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
