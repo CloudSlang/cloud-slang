@@ -25,14 +25,14 @@ public abstract class ValueFactory implements Serializable {
     }
 
     public static Value create(Serializable serializable, boolean sensitive) {
-        return serializable != null && serializable instanceof Value ?
+        return serializable instanceof Value ?
                 ValueFactory.createValue(((Value) serializable).get(),
                         ((Value) serializable).isSensitive() || sensitive) :
                 ValueFactory.createValue(serializable, sensitive);
     }
 
     public static Value create(Serializable serializable, boolean sensitive, SensitivityLevel sensitivityLevel) {
-        return serializable != null && serializable instanceof Value ?
+        return serializable instanceof Value ?
                 ValueFactory.createValue(((Value) serializable).get(),
                         ((Value) serializable).isSensitive() || sensitive, sensitivityLevel) :
                 ValueFactory.createValue(serializable, sensitive, sensitivityLevel);
@@ -47,8 +47,11 @@ public abstract class ValueFactory implements Serializable {
     }
 
     public static PyObjectValue createPyObjectValue(Serializable content, boolean sensitive, boolean externalPython) {
-        return externalPython ? ExternalPyObjectValueProxyFactory.create(content, sensitive) :
-                PyObjectValueProxyFactory.create(content, sensitive);
+        if (externalPython) {
+            return new PlainPyObjectValue(content == null ? null : content.toString(), sensitive);
+        } else {
+            return PyObjectValueProxyFactory.create(content, sensitive);
+        }
     }
 
     public static PyObjectValue createPyObjectValue(Value value, boolean externalPython) {

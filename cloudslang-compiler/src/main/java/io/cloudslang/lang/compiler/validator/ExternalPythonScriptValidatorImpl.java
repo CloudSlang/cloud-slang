@@ -33,10 +33,15 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
     private static final String MULTILINE_COMMENT_REGEX = "'''.*?'''";
     private Pattern multilineCommentPattern = Pattern.compile(MULTILINE_COMMENT_REGEX, Pattern.DOTALL);
 
-    public static final String INPUTS_ARE_MISSING_ERROR = "Inputs are not defined for all execute method parameters.";
+    private static final String INPUTS_ARE_MISSING_ERROR = "Inputs are not defined for all execute method parameters.";
+
+    private static final List<String> RESERVED_KEYWORDS = Arrays.asList("and", "del", "from", "not", "while", "as",
+            "elif", "global", "or", "with", "exec", "assert", "else", "if", "pass", "yield", "break", "except",
+            "import", "import", "print", "class", "in", "raise", "continue", "finally", "is", "return", "def", "for",
+            "lambda", "try");
 
     @Override
-    public void validateExecutionMethodSignature(String script, List<String> inputs) {
+    public void validateExecutionMethodAndInputs(String script, List<String> inputs) {
         Matcher matcher = methodSignaturePattern.matcher(script);
 
         if (!matcher.find()) {
@@ -68,9 +73,13 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
                 if (scriptInputs.length != scriptInputsSet.size()) {
                     throw new IllegalArgumentException("There are inputs with the same name in execute method.");
                 }
-                if (!inputs.containsAll(scriptInputsSet)) {
-                    throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
-                }
+                scriptInputsSet.stream()
+                        .filter(scriptInput -> !inputs.contains(scriptInput))
+                        .findFirst()
+                        .ifPresent((invalidInput) -> {
+                            throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
+                        });
+                validateInputNames(scriptInputsSet);
             }
         }
     }
@@ -84,5 +93,14 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
             result = matcher.group(3);
         }
         return StringUtils.isBlank(result);
+    }
+
+    private void validateInputNames(Set<String> inputs) {
+        List<String> illegalNames = inputs.stream()
+                .filter(RESERVED_KEYWORDS::contains)
+                .collect(Collectors.toList());
+        if (!illegalNames.isEmpty()) {
+            throw new IllegalArgumentException("Illegal input names: " + String.join(", ", illegalNames));
+        }
     }
 }

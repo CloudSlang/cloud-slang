@@ -9,12 +9,15 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.lang.entities.bindings.values.PlainPyObjectValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Script processor
@@ -28,6 +31,7 @@ public abstract class ScriptProcessor {
         for (Map.Entry<String, ? extends Value> entry : context.entrySet()) {
             pythonContext.put(entry.getKey(), ValueFactory.createPyObjectValue(entry.getValue(), externalPython));
         }
+
         return pythonContext;
     }
 }

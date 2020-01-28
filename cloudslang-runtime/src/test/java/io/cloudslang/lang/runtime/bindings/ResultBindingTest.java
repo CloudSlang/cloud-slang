@@ -24,7 +24,7 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -53,6 +53,9 @@ import static java.util.Arrays.asList;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ResultBindingTest.Config.class)
 public class ResultBindingTest {
+    static {
+        System.setProperty("use.jython.expressions", "true");
+    }
 
     @SuppressWarnings("unchecked")
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
@@ -238,7 +241,7 @@ public class ResultBindingTest {
 
         @Bean(name = "externalPythonExecutionEngine")
         public PythonExecutionEngine externalPythonExecutionEngine() {
-            return new ExternalPythonExecutionNotCachedEngine();
+            return new ExternalPythonExecutionEngine();
         }
 
         @Bean

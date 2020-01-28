@@ -34,7 +34,7 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
 import io.cloudslang.score.events.EventBus;
@@ -389,7 +389,7 @@ public class ExecutableStepsTest {
 
         @Bean(name = "externalPythonExecutionEngine")
         public PythonExecutionEngine externalPythonExecutionEngine() {
-            return new ExternalPythonExecutionNotCachedEngine();
+            return new ExternalPythonExecutionEngine();
         }
 
         @Bean

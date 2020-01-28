@@ -67,7 +67,7 @@ public class PyObjectValueProxyFactory {
                     ProxyFactory factory = new ProxyFactory();
                     factory.setSuperclass(pyObject.getClass());
                     factory.setInterfaces(new Class[]{PyObjectValue.class});
-                    factory.setFilter(new PublicMethodFilter());
+                    factory.setFilter(new PyObjectValueMethodFilter());
                     factory.setUseWriteReplace(false);
                     proxyClasses.putIfAbsent(proxyClassName, createProxyClass(factory.createClass(), pyObject));
                     proxyClass = proxyClasses.get(proxyClassName);
@@ -104,6 +104,14 @@ public class PyObjectValueProxyFactory {
             return parameterType.getConstructor(String.class).newInstance("0");
         } else {
             return null;
+        }
+    }
+
+    private static class PyObjectValueMethodFilter implements MethodFilter {
+
+        @Override
+        public boolean isHandled(Method method) {
+            return Modifier.isPublic(method.getModifiers());
         }
     }
 

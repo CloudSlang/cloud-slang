@@ -22,7 +22,7 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionNotCachedEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -48,10 +48,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
 public class InputsBindingTest {
+    static {
+        System.setProperty("use.jython.expressions", "true");
+    }
 
     @Autowired
     private InputsBinding inputsBinding;
@@ -505,7 +507,7 @@ public class InputsBindingTest {
 
         @Bean(name = "externalPythonExecutionEngine")
         public PythonExecutionEngine externalPythonExecutionEngine() {
-            return new ExternalPythonExecutionNotCachedEngine();
+            return new ExternalPythonExecutionEngine();
         }
 
         @Bean
