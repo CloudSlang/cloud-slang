@@ -73,12 +73,15 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
                 if (scriptInputs.length != scriptInputsSet.size()) {
                     throw new IllegalArgumentException("There are inputs with the same name in execute method.");
                 }
-                if (!inputs.containsAll(scriptInputsSet)) {
-                    throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
-                }
+                scriptInputsSet.stream()
+                        .filter(scriptInput -> !inputs.contains(scriptInput))
+                        .findFirst()
+                        .ifPresent((invalidInput) -> {
+                            throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
+                        });
+                validateInputNames(scriptInputsSet);
             }
         }
-        validateInputNames(inputs);
     }
 
     private boolean isExecuteMethodBlank(String script) {
@@ -92,7 +95,7 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
         return StringUtils.isBlank(result);
     }
 
-    private void validateInputNames(List<String> inputs) {
+    private void validateInputNames(Set<String> inputs) {
         List<String> illegalNames = inputs.stream()
                 .filter(RESERVED_KEYWORDS::contains)
                 .collect(Collectors.toList());
