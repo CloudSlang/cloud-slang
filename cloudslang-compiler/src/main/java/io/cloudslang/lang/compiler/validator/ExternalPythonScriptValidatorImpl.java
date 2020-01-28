@@ -20,14 +20,15 @@ import java.util.stream.Collectors;
 
 public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptValidator {
 
-    private static final String METHOD_SIGNATURE_REGEX = "def\\s+execute\\((([a-zA-Z0-9_]+,?\\s*)*)\\):\\s*\\R";
-    private Pattern methodSignaturePattern = Pattern.compile(METHOD_SIGNATURE_REGEX);
+    private static final String METHOD_SIGNATURE_REGEX = "^def\\s+execute\\((([a-zA-Z0-9_]+,?\\s*)*)\\):\\s*\\R";
+    private Pattern methodSignaturePattern = Pattern.compile(METHOD_SIGNATURE_REGEX,
+            Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String METHOD_CONTENT_REGEX = METHOD_SIGNATURE_REGEX + "(.*)";
-    private Pattern methodContentPattern = Pattern.compile(METHOD_CONTENT_REGEX, Pattern.DOTALL);
+    private Pattern methodContentPattern = Pattern.compile(METHOD_CONTENT_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String SINGLE_COMMENT_REGEX = "#.*?\n";
-    private Pattern singleCommentPattern = Pattern.compile(SINGLE_COMMENT_REGEX, Pattern.DOTALL);
+    private Pattern singleCommentPattern = Pattern.compile(SINGLE_COMMENT_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String MULTILINE_COMMENT_REGEX = "'''.*?'''";
     private Pattern multilineCommentPattern = Pattern.compile(MULTILINE_COMMENT_REGEX, Pattern.DOTALL);
@@ -80,8 +81,8 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
     }
 
     private boolean isExecuteMethodBlank(String script) {
-        String noSingleComments = singleCommentPattern.matcher(script + "\n").replaceAll(" ");
-        String noComments = multilineCommentPattern.matcher(noSingleComments).replaceAll(" ");
+        String noSingleComments = singleCommentPattern.matcher(script + "\n").replaceAll("");
+        String noComments = multilineCommentPattern.matcher(noSingleComments).replaceAll("");
         Matcher matcher = methodContentPattern.matcher(noComments);
         String result = null;
         if (matcher.find()) {
