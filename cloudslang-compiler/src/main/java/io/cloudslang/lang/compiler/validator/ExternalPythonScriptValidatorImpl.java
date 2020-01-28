@@ -35,9 +35,10 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
 
     private static final String INPUTS_ARE_MISSING_ERROR = "Inputs are not defined for all execute method parameters.";
 
-    private static final List<String> RESERVERD_KEYWORDS = Arrays.asList("and", "del", "from", "not", "while", "as", "elif", "global",
-            "or", "with", "exec", "assert", "else", "if", "pass", "yield", "break", "except", "import", "import",
-            "print", "class", "in", "raise", "continue", "finally", "is", "return", "def", "for", "lambda", "try");
+    private static final List<String> RESERVERD_KEYWORDS = Arrays.asList("and", "del", "from", "not", "while", "as",
+            "elif", "global", "or", "with", "exec", "assert", "else", "if", "pass", "yield", "break", "except",
+            "import", "import", "print", "class", "in", "raise", "continue", "finally", "is", "return", "def", "for",
+            "lambda", "try");
 
     @Override
     public void validateExecutionMethodAndInputs(String script, List<String> inputs) {
