@@ -90,7 +90,7 @@ public class StepExecutionData extends AbstractExecutionData {
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            if (workerGroup != null) {
+            if (workerGroup != null && flowDepth == 0) {
                 handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
             }
 
@@ -236,7 +236,9 @@ public class StepExecutionData extends AbstractExecutionData {
             );
 
             executionRuntimeServices.addRoiValue(roiValue);
-            executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
+            if (runEnv.getParentFlowStack().isEmpty()) {
+                executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
+            }
             executionRuntimeServices.setShouldCheckGroup();
 
             runEnv.getStack().pushContext(flowContext);
