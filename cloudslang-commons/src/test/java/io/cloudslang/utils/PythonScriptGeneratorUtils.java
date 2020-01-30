@@ -7,9 +7,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.runtime.bindings.scripts;
+package io.cloudslang.utils;
 
-import java.util.Collection;
+import java.util.List;
 
 public class PythonScriptGeneratorUtils {
     private static String LINE_SEPARATOR = System.lineSeparator();
@@ -17,7 +17,7 @@ public class PythonScriptGeneratorUtils {
             "  a = in1" + LINE_SEPARATOR +
             "  return locals()" + LINE_SEPARATOR;
 
-    public static String generateScript(Collection<String> params) {
+    public static String generateScript(List<String> params) {
         return VALID_PYTHON_SCRIPT.replace("{params}", String.join(", ", params));
     }
 }

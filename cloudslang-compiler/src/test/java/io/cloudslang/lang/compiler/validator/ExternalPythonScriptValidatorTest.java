@@ -16,7 +16,8 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.cloudslang.lang.compiler.PythonScriptGeneratorUtils.generateScript;
+import static io.cloudslang.utils.PythonScriptGeneratorUtils.generateScript;
+
 
 public class ExternalPythonScriptValidatorTest {
 

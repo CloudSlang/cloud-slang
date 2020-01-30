@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.utils;
 
-import static io.cloudslang.lang.compiler.PythonScriptGeneratorUtils.generateScript;
+import io.cloudslang.utils.PythonScriptGeneratorUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,14 +20,16 @@ public class ExternalPythonScriptUtilsTest {
 
     @Test
     public void testNoArgs() {
-        String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(generateScript(Collections.emptyList()));
+        String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(
+                PythonScriptGeneratorUtils.generateScript(Collections.emptyList()));
 
         Assert.assertArrayEquals(new String[]{}, scriptParams);
     }
 
     @Test
     public void testTwoArgs() {
-        String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(generateScript(Arrays.asList("a", "b")));
+        String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(
+                PythonScriptGeneratorUtils.generateScript(Arrays.asList("a", "b")));
 
         Assert.assertArrayEquals(new String[]{"a", "b"}, scriptParams);
     }
