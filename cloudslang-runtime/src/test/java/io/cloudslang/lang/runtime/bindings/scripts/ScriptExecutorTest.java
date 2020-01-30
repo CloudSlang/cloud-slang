@@ -15,6 +15,7 @@ import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.runtime.api.python.PythonExecutionResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -24,11 +25,13 @@ import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
-import junit.framework.Assert;
+import io.cloudslang.utils.PythonScriptGeneratorUtils;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
@@ -38,12 +41,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -61,6 +67,9 @@ public class ScriptExecutorTest {
 
     @Autowired
     private ScriptExecutor scriptExecutor;
+
+    @Resource(name = "externalPythonRuntimeService")
+    private PythonRuntimeService externalPyhonRuntimeService;
 
     @Test
     public void testExecuteScript() throws Exception {
@@ -102,6 +111,48 @@ public class ScriptExecutorTest {
         exception.expectMessage("Error executing python script");
 
         scriptExecutor.executeScript(script, new HashMap<String, Value>(), true);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testExternalPythonValid() {
+        Map<String, Value> scriptInputValues = new HashMap<>();
+        Value value1 = ValueFactory.create("value1");
+        Value value2 = ValueFactory.create("value2");
+        scriptInputValues.put("input1", value1);
+        scriptInputValues.put("input2", value2);
+        String script = PythonScriptGeneratorUtils.generateScript(scriptInputValues.keySet());
+        ArgumentCaptor<Map> callArgCaptor = ArgumentCaptor.forClass(Map.class);
+        when(externalPyhonRuntimeService.exec(any(), eq(script), callArgCaptor.capture()))
+                .thenReturn(new PythonExecutionResult(new HashMap<>()));
+
+        scriptExecutor.executeScript(script, scriptInputValues, false);
+
+        Map<String, Serializable> captured = callArgCaptor.getValue();
+        Assert.assertArrayEquals(scriptInputValues.keySet().toArray(), captured.keySet().toArray());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testExternalPythonValidExtraInputs() {
+        Map<String, Value> scriptInputValues = new HashMap<>();
+        Value value1 = ValueFactory.create("value1");
+        Value value2 = ValueFactory.create("value2");
+        Value value3 = ValueFactory.create("value3");
+        scriptInputValues.put("input1", value1);
+        scriptInputValues.put("input2", value2);
+        scriptInputValues.put("input3", value3);
+        String script = PythonScriptGeneratorUtils.generateScript(Arrays.asList("input1", "input2"));
+        ArgumentCaptor<Map> callArgCaptor = ArgumentCaptor.forClass(Map.class);
+        when(externalPyhonRuntimeService.exec(any(), eq(script), callArgCaptor.capture()))
+                .thenReturn(new PythonExecutionResult(new HashMap<>()));
+
+        scriptExecutor.executeScript(script, scriptInputValues, false);
+
+        List<String> expectedArgs = Arrays.asList("input1", "input2");
+        Map<String, Serializable> captured = callArgCaptor.getValue();
+        Set<String> actualArgs = captured.keySet();
+        Assert.assertTrue(expectedArgs.size() == actualArgs.size() && actualArgs.containsAll(expectedArgs));
     }
 
     @Configuration
@@ -146,7 +197,7 @@ public class ScriptExecutorTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
+            return mock(ExternalPythonRuntimeServiceImpl.class);
         }
 
         @Bean(name = "externalPythonExecutionEngine")
