@@ -39,4 +39,8 @@ public class ParentFlowStack implements Serializable {
     public int size() {
         return stack.size();
     }
+
+    public Stack<ParentFlowData> cloneParentStackData() {
+        return (Stack<ParentFlowData>) stack.clone();
+    }
 }

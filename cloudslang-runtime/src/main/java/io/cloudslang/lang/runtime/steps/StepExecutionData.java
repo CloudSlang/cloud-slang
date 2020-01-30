@@ -27,6 +27,7 @@ import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
@@ -43,6 +44,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
@@ -90,8 +92,29 @@ public class StepExecutionData extends AbstractExecutionData {
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            if (workerGroup != null && flowDepth == 0) {
-                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            String workerGroupVal = null;
+            boolean useParentWorker = false;
+            Stack<ParentFlowData> parentFlowStack = runEnv.getParentFlowStack().cloneParentStackData();
+            while (!parentFlowStack.isEmpty() && !useParentWorker) {
+                ParentFlowData parentFlowData = parentFlowStack.pop();
+                String workerGroupTemp = parentFlowData.getWorkerGroup();
+                if (!workerGroupTemp.equals("noWorker")) {
+                    useParentWorker = true;
+                    executionRuntimeServices.setWorkerGroupName(workerGroupTemp);
+                    workerGroupVal = workerGroupTemp;
+                }
+            }
+            if (!useParentWorker) {
+                if (workerGroup != null) {
+                    handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+                    workerGroupVal = computeWorkerGroup(workerGroup, flowContext, runEnv,
+                            workerGroup.getExpression());
+                    flowContext.setWorkerGroup(workerGroupVal);
+                } else {
+                    executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
+                    flowContext.setWorkerGroup("RAS_Operator_Path");
+                    workerGroupVal = "noWorker";
+                }
             }
 
             fireEvent(
@@ -137,7 +160,7 @@ public class StepExecutionData extends AbstractExecutionData {
             // request the score engine to switch to the execution plan of the given ref
             //CHECKSTYLE:OFF
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices,
-                    RUNNING_EXECUTION_PLAN_ID, refId, nextStepId);
+                    RUNNING_EXECUTION_PLAN_ID, refId, nextStepId, workerGroupVal);
             //CHECKSTYLE:ON
 
             // set the start step of the given ref as the next step to execute
@@ -172,7 +195,9 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
             Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
-
+            if (flowContext.getWorkerGroup() != null) {
+                executionRuntimeServices.setWorkerGroupName(flowContext.getWorkerGroup());
+            }
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
                     outputsBindingContext,
@@ -236,9 +261,6 @@ public class StepExecutionData extends AbstractExecutionData {
             );
 
             executionRuntimeServices.addRoiValue(roiValue);
-            if (runEnv.getParentFlowStack().isEmpty()) {
-                executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
-            }
             executionRuntimeServices.setShouldCheckGroup();
 
             runEnv.getStack().pushContext(flowContext);

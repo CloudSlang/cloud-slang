@@ -65,6 +65,7 @@ import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -237,7 +238,7 @@ public class ExecutableStepsTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();
         Long parentFirstStepPosition = 2L;
-        runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition));
+        runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition, anyString()));
 
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(),
             new ExecutionRuntimeServices(), "", ExecutableType.FLOW);

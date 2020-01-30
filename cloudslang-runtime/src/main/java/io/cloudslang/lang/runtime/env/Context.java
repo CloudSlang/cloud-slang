@@ -21,6 +21,7 @@ public class Context implements Serializable {
 
     private final Map<String, Value> variables;
     private final Map<String, Value> langVariables;
+    private String workerGroup;
 
     public Context(Map<String, Value> variables) {
         this.variables = variables;
@@ -57,6 +58,14 @@ public class Context implements Serializable {
 
     public Value removeLanguageVariable(String key) {
         return langVariables.remove(key);
+    }
+
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
+
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     @Override
