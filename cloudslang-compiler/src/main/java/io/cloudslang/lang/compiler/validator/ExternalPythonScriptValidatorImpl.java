@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.validator;
 
+import io.cloudslang.lang.compiler.utils.ExternalPythonScriptUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -60,27 +61,22 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
     }
 
     private void validateInputs(String script, List<String> inputs) {
-        Matcher matcher = methodSignaturePattern.matcher(script);
-        matcher.find();
-        String scriptInputsString = matcher.group(1);
-        if (StringUtils.isNotBlank(scriptInputsString)) {
-            String[] scriptInputs = scriptInputsString.split(",");
-            if (scriptInputs.length > 0) {
-                if (inputs == null || inputs.size() < scriptInputs.length) {
-                    throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
-                }
-                Set<String> scriptInputsSet = Arrays.stream(scriptInputs).map(String::trim).collect(Collectors.toSet());
-                if (scriptInputs.length != scriptInputsSet.size()) {
-                    throw new IllegalArgumentException("There are inputs with the same name in execute method.");
-                }
-                scriptInputsSet.stream()
-                        .filter(scriptInput -> !inputs.contains(scriptInput))
-                        .findFirst()
-                        .ifPresent((invalidInput) -> {
-                            throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
-                        });
-                validateInputNames(scriptInputsSet);
+        String[] scriptInputs = ExternalPythonScriptUtils.getScriptParams(script);
+        if (scriptInputs.length > 0) {
+            if (inputs == null || inputs.size() < scriptInputs.length) {
+                throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
             }
+            Set<String> scriptInputsSet = Arrays.stream(scriptInputs).map(String::trim).collect(Collectors.toSet());
+            if (scriptInputs.length != scriptInputsSet.size()) {
+                throw new IllegalArgumentException("There are inputs with the same name in execute method.");
+            }
+            scriptInputsSet.stream()
+                    .filter(scriptInput -> !inputs.contains(scriptInput))
+                    .findFirst()
+                    .ifPresent((invalidInput) -> {
+                        throw new IllegalArgumentException(INPUTS_ARE_MISSING_ERROR);
+                    });
+            validateInputNames(scriptInputsSet);
         }
     }
 

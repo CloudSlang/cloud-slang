@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings.scripts;
 
+import io.cloudslang.lang.compiler.utils.ExternalPythonScriptUtils;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
@@ -19,10 +20,12 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Bonczidai Levente
@@ -50,8 +53,14 @@ public class ScriptExecutor extends ScriptProcessor {
 
     private Map<String, Value> runExternalPythonAction(Set<String> dependencies, String script,
                                                        Map<String, Value> callArguments) {
+
+        String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(script);
+        Map<String, Value> neededArguments = callArguments.entrySet().stream()
+                .filter(entry -> Arrays.asList(scriptParams).contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         Map<String, Serializable> executionResult = externalPytonRuntimeService.exec(dependencies, script,
-                createPythonContext(callArguments, true)).getExecutionResult();
+                createPythonContext(neededArguments, true)).getExecutionResult();
         Map<String, Value> result = new HashMap<>();
 
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {

@@ -16,11 +16,10 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.cloudslang.lang.compiler.PythonScriptGeneratorUtils.generateScript;
+
 public class ExternalPythonScriptValidatorTest {
-    private static String LINE_SEPARATOR = System.lineSeparator();
-    private static final String VALID_PYTHON_SCRIPT = "def execute({params}):" + LINE_SEPARATOR +
-            "  a = in1" + LINE_SEPARATOR +
-            "  return locals()" + LINE_SEPARATOR;
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
@@ -62,7 +61,4 @@ public class ExternalPythonScriptValidatorTest {
         exception.expectMessage(message);
     }
 
-    private String generateScript(List<String> params) {
-        return VALID_PYTHON_SCRIPT.replace("{params}", String.join(", ", params));
-    }
 }
