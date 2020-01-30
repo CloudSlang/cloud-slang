@@ -238,7 +238,7 @@ public class ExecutableStepsTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();
         Long parentFirstStepPosition = 2L;
-        runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition, anyString()));
+        runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition, ""));
 
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(),
             new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
