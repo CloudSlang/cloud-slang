@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_KEY;
@@ -95,13 +97,21 @@ public class PythonActionTransformer extends AbstractTransformer
 
     private List<String> getInputs(Map<String, Serializable> rawData) {
         Object inputsObject = rawData.get(INPUTS_KEY);
-        if (inputsObject instanceof List) {
-            List<Object> inputs = (List) inputsObject;
-            if (!inputs.isEmpty() && inputs.get(0) instanceof String) {
-                return (List<String>) inputsObject;
-            }
+        if (inputsObject instanceof Collection) {
+            return ((Collection<?>) inputsObject).stream()
+                    .flatMap(this::getStreamOfInputs)
+                    .collect(Collectors.toList());
         }
         return emptyList();
+    }
+
+    private Stream<String> getStreamOfInputs(Object value) {
+        if (value instanceof String) {
+            return Stream.of((String) value);
+        } else if (value instanceof Map) {
+            return ((Map<?, ?>) value).keySet().stream().map(Object::toString);
+        }
+        return Stream.empty();
     }
 
     private boolean isExternalPythonExecution(Map<String, Serializable> rawData) {
