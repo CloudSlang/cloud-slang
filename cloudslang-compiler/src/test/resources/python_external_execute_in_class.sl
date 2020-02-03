@@ -10,7 +10,7 @@ namespace: user.ops
 operation:
   name: external_python_action_simple
   python_action:
-    useJython: false
+    use_jython: false
     script: "class Ignore:\n    def execute():\n        return 1\ndef execute():\n    a = 2 \n    b= \"ceva\" \n    return {\"a\": 2}"
 
   results:
