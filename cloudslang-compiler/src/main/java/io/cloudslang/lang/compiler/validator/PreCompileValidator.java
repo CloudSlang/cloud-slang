@@ -22,6 +22,10 @@ import java.util.Map;
 
 public interface PreCompileValidator {
 
+    String INPUTS_VALIDATION_ERROR = "Inputs validation failed.";
+
+    String OUTPUTS_VALIDATION_ERROR = "Outputs validation failed.";
+
     String validateExecutableRawData(ParsedSlang parsedSlang,
                                      Map<String, Object> executableRawData,
                                      List<RuntimeException> errors);

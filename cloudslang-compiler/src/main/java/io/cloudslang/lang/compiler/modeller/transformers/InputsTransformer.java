@@ -18,6 +18,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Input;
 import org.apache.commons.collections4.CollectionUtils;
@@ -25,6 +26,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 public class InputsTransformer extends AbstractInputsTransformer implements Transformer<List<Object>, List<Input>> {
 
@@ -52,12 +56,20 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
                 List<RuntimeException> validationErrors = preCompileValidator
                         .validateNoDuplicateInOutParams(transformedData, input);
                 transformedData.add(input);
-                errors.addAll(validationErrors);
+
+                errors.addAll(validationErrors.stream()
+                        .map(this::getInputsRuntimeException)
+                        .collect(Collectors.toList()));
             } catch (RuntimeException rex) {
-                errors.add(rex);
+                errors.add(getInputsRuntimeException(rex));
             }
         }
         return new BasicTransformModellingResult<>(transformedData, errors);
+    }
+
+    private RuntimeException getInputsRuntimeException(RuntimeException e) {
+        String errorMessage = PreCompileValidator.INPUTS_VALIDATION_ERROR + SPACE + e.getMessage();
+        return new RuntimeException(errorMessage, e);
     }
 
     @Override
