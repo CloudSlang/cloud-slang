@@ -24,15 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.commons.collections4.CollectionUtils;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_OUTPUT_ROBOT_KEY;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.SPACE;
 
 
 public abstract class AbstractOutputsTransformer extends InOutTransformer {
@@ -101,15 +98,8 @@ public abstract class AbstractOutputsTransformer extends InOutTransformer {
         if (CollectionUtils.isEmpty(validationErrors)) {
             outputs.add(element);
         } else {
-            errors.addAll(validationErrors.stream()
-                    .map(this::getOutputsRuntimeException)
-                    .collect(Collectors.toList()));
+            errors.addAll(validationErrors);
         }
-    }
-
-    private RuntimeException getOutputsRuntimeException(RuntimeException e) {
-        String errorMessage = PreCompileValidator.OUTPUTS_VALIDATION_ERROR + SPACE + e.getMessage();
-        return new RuntimeException(errorMessage, e);
     }
 
     Output createOutput(String outputName, Serializable outputExpression, boolean sensitive,
