@@ -15,9 +15,11 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.CompilerConstants;
+import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidator;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SensitivityLevel;
 
 import java.io.Serializable;
@@ -78,13 +80,16 @@ public class PythonActionTransformer extends AbstractTransformer
                 }
 
                 if (isExternalPythonExecution(rawData)) {
+                    // snake_case -> camelCase
+                    rawData.put(ScoreLangConstants.PYTHON_ACTION_USE_JYTHON_KEY,
+                            rawData.remove(SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY));
                     // validate script
                     String script = (String) rawData.get(PYTHON_ACTION_SCRIPT_KEY);
                     List<String> inputs = getInputs(rawData);
                     externalPythonScriptValidator.validateExecutionMethodAndInputs(script, inputs);
                 } else {
                     //backwards compatibility
-                    rawData.put(PYTHON_ACTION_USE_JYTHON_KEY, true);
+                    rawData.put(ScoreLangConstants.PYTHON_ACTION_USE_JYTHON_KEY, true);
                 }
                 transformedData = rawData;
             }

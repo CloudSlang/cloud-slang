@@ -33,6 +33,7 @@ import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidator;
 import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
+import io.cloudslang.lang.entities.ScoreLangConstants;
 import junit.framework.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -81,7 +82,6 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         initialPythonActionSimple = loadPythonActionData("/python_action_simple.sl");
         initialPythonActionWithDependencies = loadPythonActionData("/python_action_with_dependencies.sl");
         initialPythonActionInvalidKey = loadPythonActionData("/corrupted/python_action_invalid_key.sl");
-        initialPythonActionSimple = loadPythonActionData("/python_action_simple.sl");
         initialExternalPythonAction1 = loadPythonActionData("/python_external_valid_action1.sl", "a,b,c");
         initialExternalPythonAction2 = loadPythonActionData("/python_external_valid_action2.sl");
         initialExternalPythonInvalidAction = loadPythonActionData("/python_external_invalid_action1.sl");
@@ -93,7 +93,7 @@ public class PythonActionTransformerTest extends TransformersTestParent {
         expectedPythonActionSimple = new LinkedHashMap<>();
         expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY, "pass");
         expectedPythonActionSimple.put(SlangTextualKeys.INPUTS_KEY, new ArrayList<>());
-        expectedPythonActionSimple.put(SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY, true);
+        expectedPythonActionSimple.put(ScoreLangConstants.PYTHON_ACTION_USE_JYTHON_KEY, true);
     }
 
     @Test
