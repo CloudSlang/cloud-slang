@@ -57,6 +57,8 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 @Component
 public class StepExecutionData extends AbstractExecutionData {
 
+    private static final String DEFAULT_GROUP = "RAS_Operator_Path";
+    private static final String NO_WORKER = "workerGroupNotSet";
     private static final Logger logger = Logger.getLogger(StepExecutionData.class);
     @Autowired
     private ArgumentsBinding argumentsBinding;
@@ -92,30 +94,7 @@ public class StepExecutionData extends AbstractExecutionData {
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            String workerGroupVal = null;
-            boolean useParentWorker = false;
-            Stack<ParentFlowData> parentFlowStack = runEnv.getParentFlowStack().cloneParentStackData();
-            while (!parentFlowStack.isEmpty() && !useParentWorker) {
-                ParentFlowData parentFlowData = parentFlowStack.pop();
-                String workerGroupTemp = parentFlowData.getWorkerGroup();
-                if (!workerGroupTemp.equals("noWorker")) {
-                    useParentWorker = true;
-                    executionRuntimeServices.setWorkerGroupName(workerGroupTemp);
-                    workerGroupVal = workerGroupTemp;
-                }
-            }
-            if (!useParentWorker) {
-                if (workerGroup != null) {
-                    handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
-                    workerGroupVal = computeWorkerGroup(workerGroup, flowContext, runEnv,
-                            workerGroup.getExpression());
-                    flowContext.setWorkerGroup(workerGroupVal);
-                } else {
-                    executionRuntimeServices.setWorkerGroupName("RAS_Operator_Path");
-                    flowContext.setWorkerGroup("RAS_Operator_Path");
-                    workerGroupVal = "noWorker";
-                }
-            }
+            String workerGroupVal = handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
 
             fireEvent(
                     executionRuntimeServices,
@@ -292,12 +271,37 @@ public class StepExecutionData extends AbstractExecutionData {
         );
     }
 
-    private void handleWorkerGroup(WorkerGroupStatement workerGroup,
+    private String handleWorkerGroup(WorkerGroupStatement workerGroup,
                                    Context flowContext,
                                    RunEnvironment runEnv,
                                    ExecutionRuntimeServices execRuntimeServices) {
-        String workerGroupValue = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
-        execRuntimeServices.setWorkerGroupName(workerGroupValue);
+        String workerGroupVal = null;
+        boolean useParentWorker = false;
+        Stack<ParentFlowData> parentFlowStack = runEnv.getParentFlowStack().cloneParentStackData();
+        while (!parentFlowStack.isEmpty() && !useParentWorker) {
+            ParentFlowData parentFlowData = parentFlowStack.pop();
+            String workerGroupTemp = parentFlowData.getWorkerGroup();
+            if (!workerGroupTemp.equals(NO_WORKER)) {
+                // if parent has a worker group set then it will be used on child steps
+                useParentWorker = true;
+                execRuntimeServices.setWorkerGroupName(workerGroupTemp);
+                workerGroupVal = workerGroupTemp;
+            }
+        }
+        if (!useParentWorker) {
+            if (workerGroup != null) {
+                // if parent doesn't have a set worker group, but the current step has one then we use it
+                workerGroupVal = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
+                execRuntimeServices.setWorkerGroupName(workerGroupVal);
+                flowContext.setWorkerGroup(workerGroupVal);
+            } else {
+                // otherwise we use the default worker "RAS_Operator_Path"
+                execRuntimeServices.setWorkerGroupName(DEFAULT_GROUP);
+                flowContext.setWorkerGroup(DEFAULT_GROUP);
+                workerGroupVal = NO_WORKER;
+            }
+        }
+        return workerGroupVal;
     }
 
     private String computeWorkerGroup(WorkerGroupStatement workerGroup,
