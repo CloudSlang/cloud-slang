@@ -102,7 +102,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         boolean defaultSpecified = defaultKeyFound && value != null && !StringUtils.EMPTY.equals(value);
 
         if (privateInput && required && !defaultSpecified) {
-            throw new RuntimeException(
+            throw new RuntimeException(PreCompileValidator.VALIDATION_ERROR +
                     "Input: '" + inputName + "' is private and required but no default value was specified");
         }
 

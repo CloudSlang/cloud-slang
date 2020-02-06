@@ -131,12 +131,20 @@ public class ExecutableValidatorImpl extends AbstractValidator implements Execut
 
     @Override
     public void validateInputName(String name) {
-        validateVariableNameRules(name);
+        validateInOutName(name);
     }
 
     @Override
     public void validateOutputName(String name) {
-        validateVariableNameRules(name);
+        validateInOutName(name);
+    }
+
+    private void validateInOutName(String name) {
+        try {
+            validateVariableNameRules(name);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(PreCompileValidator.VALIDATION_ERROR + e.getMessage(), e);
+        }
     }
 
     @Override
