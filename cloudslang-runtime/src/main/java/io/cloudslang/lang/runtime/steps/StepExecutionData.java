@@ -94,7 +94,7 @@ public class StepExecutionData extends AbstractExecutionData {
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            String workerGroupVal = handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            final String workerGroupVal = handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
 
             fireEvent(
                     executionRuntimeServices,
