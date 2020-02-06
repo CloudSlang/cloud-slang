@@ -11,6 +11,7 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Result;
 
@@ -67,7 +68,8 @@ public class CompileResultsTest {
 
     @Test
     public void testOpDefaultResultNotLastPosition() throws Exception {
-        expectMessage("Flow: 'op_2' syntax is illegal. Error compiling result: 'CUSTOM_2'." +
+        expectMessage(PreCompileValidator.VALIDATION_ERROR +
+                "Flow: 'op_2' syntax is illegal. Error compiling result: 'CUSTOM_2'." +
                 " Default result should be on last position.");
         preCompileExecutable("/results/op_2.sl");
     }
@@ -96,7 +98,8 @@ public class CompileResultsTest {
 
     @Test
     public void testDecisionMultipleDefaultResults() throws Exception {
-        expectMessage("Flow: 'decision_1' syntax is illegal. Error compiling result: 'LESS_THAN'." +
+        expectMessage(PreCompileValidator.VALIDATION_ERROR +
+                "Flow: 'decision_1' syntax is illegal. Error compiling result: 'LESS_THAN'." +
                 " Default result should be on last position.");
         preCompileExecutable("/results/decision_2.sl");
     }
