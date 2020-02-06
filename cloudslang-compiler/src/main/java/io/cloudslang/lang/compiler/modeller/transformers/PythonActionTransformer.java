@@ -84,7 +84,7 @@ public class PythonActionTransformer extends AbstractTransformer
                     rawData.put(ScoreLangConstants.PYTHON_ACTION_USE_JYTHON_KEY,
                             rawData.remove(SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY));
                     // validate script
-                    String script = (String) rawData.get(PYTHON_ACTION_SCRIPT_KEY);
+                    String script = (String) rawData.get(SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY);
                     List<String> inputs = getInputs(rawData);
                     externalPythonScriptValidator.validateExecutionMethodAndInputs(script, inputs);
                 } else {
