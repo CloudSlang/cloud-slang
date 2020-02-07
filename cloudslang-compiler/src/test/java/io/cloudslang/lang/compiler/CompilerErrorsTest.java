@@ -12,6 +12,7 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.CompilationModellingResult;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
+import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -454,6 +455,7 @@ public class CompilerErrorsTest {
         final Set<SlangSource> path = new HashSet<>();
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'private_input_without_default' syntax is illegal.\n" +
+                PreCompileValidator.VALIDATION_ERROR +
                 "Input: 'input_without_default' is private and required but no default value was specified");
         compiler.compile(SlangSource.fromFile(resource), path);
     }

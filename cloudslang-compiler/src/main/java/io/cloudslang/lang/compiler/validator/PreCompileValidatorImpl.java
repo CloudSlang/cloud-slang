@@ -347,8 +347,8 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         for (int i = 0; i < results.size() - 1; i++) {
             Result currentResult = results.get(i);
             if (ResultUtils.isDefaultResult(currentResult)) {
-                errors.add(new RuntimeException(
-                        "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
+                errors.add(new RuntimeException(PreCompileValidator.VALIDATION_ERROR +
+                                "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
                                 currentResult.getName() + "'. Default result should be on last position."
                 ));
             }
@@ -356,9 +356,9 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
         if (results.size() > 0) {
             Result lastResult = results.get(results.size() - 1);
             if (!ResultUtils.isDefaultResult(lastResult)) {
-                errors.add(new RuntimeException(
+                errors.add(new RuntimeException(PreCompileValidator.VALIDATION_ERROR +
                         "Flow: '" + artifactName + "' syntax is illegal. Error compiling result: '" +
-                                lastResult.getName() + "'. Last result should be default result."
+                        lastResult.getName() + "'. Last result should be default result."
                 ));
             }
         }
@@ -578,7 +578,7 @@ public class PreCompileValidatorImpl extends AbstractValidator implements PreCom
     private void validateNotDuplicateInOutParam(Collection<InOutParam> inOutParams, InOutParam element,
                                                 String message, List<RuntimeException> errors) {
         if (SetUtils.containsIgnoreCaseBasedOnName(inOutParams, element)) {
-            errors.add(new RuntimeException(message));
+            errors.add(new RuntimeException(PreCompileValidator.VALIDATION_ERROR + message));
         } else {
             inOutParams.add(element);
         }

@@ -49,7 +49,7 @@ public interface SlangTextualKeys {
     String PYTHON_ACTION_KEY = "python_action";
     String PYTHON_ACTION_SCRIPT_KEY = "script";
     String PYTHON_ACTION_VERSION_KEY = "version";
-    String PYTHON_ACTION_USE_JYTHON_KEY = "useJython";
+    String PYTHON_ACTION_USE_JYTHON_KEY = "use_jython";
     String PYTHON_ACTION_DEPENDENCIES_KEY = "dependencies";
     String SEQ_ACTION_KEY = "sequential_action";
     String SEQ_STEPS_KEY = "steps";

@@ -10,7 +10,7 @@ namespace: user.ops
 operation:
   name: external_python_action_simple
   python_action:
-    useJython: false
+    use_jython: false
     script: "def execute():\n    a = 2 \n    b= \"ceva\" \nreturn {\"a\": 2}"
 
   results:
