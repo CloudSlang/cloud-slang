@@ -149,8 +149,8 @@ public class InputsBindingTest {
             public boolean matches(Object o) {
                 String message = o.toString();
                 return message.contains("Error binding input: 'input1'") &&
-                        message.contains("Error is: Error in running script expression: 'input1'") &&
-                        message.contains("Exception is: name 'input1' is not defined");
+                        message.contains("Error in evaluating expression: 'input1'") &&
+                        message.contains("name 'input1' is not defined");
             }
         });
         bindInputs(inputs);
@@ -171,8 +171,8 @@ public class InputsBindingTest {
             public boolean matches(Object o) {
                 String message = o.toString();
                 return message.contains("Error binding input: 'input1'") &&
-                        message.contains("Error is: Error in running script expression: 'input1'") &&
-                        message.contains("Exception is: name 'input1' is not defined");
+                        message.contains("Error in evaluating expression: 'input1'") &&
+                        message.contains("name 'input1' is not defined");
             }
         });
         bindInputs(inputs);
