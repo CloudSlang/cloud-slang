@@ -21,11 +21,12 @@ public class Context implements Serializable {
 
     private final Map<String, Value> variables;
     private final Map<String, Value> langVariables;
-    private String workerGroup;
+    private final Map<String, String> arguments;
 
     public Context(Map<String, Value> variables) {
         this.variables = variables;
         langVariables = new HashMap<>();
+        arguments = new HashMap<>();
     }
 
     public Value getVariable(String name) {
@@ -60,12 +61,16 @@ public class Context implements Serializable {
         return langVariables.remove(key);
     }
 
-    public String getWorkerGroup() {
-        return workerGroup;
+    public String getArgument(String key) {
+        return arguments.get(key);
     }
 
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
+    public void putArgument(String key, String value) {
+        arguments.put(key, value);
+    }
+
+    public String removeArgument(String key) {
+        return arguments.remove(key);
     }
 
     @Override

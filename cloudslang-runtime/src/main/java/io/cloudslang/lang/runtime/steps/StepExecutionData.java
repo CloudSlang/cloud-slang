@@ -34,7 +34,6 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +41,16 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * User: stoneo
@@ -58,7 +61,6 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 public class StepExecutionData extends AbstractExecutionData {
 
     private static final String DEFAULT_GROUP = "RAS_Operator_Path";
-    private static final String NO_WORKER = "workerGroupNotSet";
     private static final Logger logger = Logger.getLogger(StepExecutionData.class);
     @Autowired
     private ArgumentsBinding argumentsBinding;
@@ -174,9 +176,11 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
             Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
-            if (flowContext.getWorkerGroup() != null) {
-                executionRuntimeServices.setWorkerGroupName(flowContext.getWorkerGroup());
-                flowContext.setWorkerGroup(null);
+
+            String workerGroup = flowContext.getArgument(WORKER_GROUP);
+            if (workerGroup != null) {
+                executionRuntimeServices.setWorkerGroupName(workerGroup);
+                //flowContext.removeArgument(WORKER_GROUP);
             }
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
@@ -272,36 +276,45 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     private String handleWorkerGroup(WorkerGroupStatement workerGroup,
-                                   Context flowContext,
-                                   RunEnvironment runEnv,
-                                   ExecutionRuntimeServices execRuntimeServices) {
-        String workerGroupVal = null;
-        boolean useParentWorker = false;
-        Stack<ParentFlowData> parentFlowStack = runEnv.getParentFlowStack().cloneParentStackData();
-        while (!parentFlowStack.isEmpty() && !useParentWorker) {
-            ParentFlowData parentFlowData = parentFlowStack.pop();
-            String workerGroupTemp = parentFlowData.getWorkerGroup();
-            if (!workerGroupTemp.equals(NO_WORKER)) {
-                // if parent has a worker group set then it will be used on child steps
-                useParentWorker = true;
-                execRuntimeServices.setWorkerGroupName(workerGroupTemp);
-                workerGroupVal = workerGroupTemp;
-            }
-        }
-        if (!useParentWorker) {
+                                     Context flowContext,
+                                     RunEnvironment runEnv,
+                                     ExecutionRuntimeServices execRuntimeServices) {
+        String workerGroupVal = computeParentWorkerGroup(runEnv);
+
+        if (workerGroupVal != null) {
+            execRuntimeServices.setWorkerGroupName(workerGroupVal);
+        } else {
             if (workerGroup != null) {
-                // if parent doesn't have a set worker group, but the current step has one then we use it
                 workerGroupVal = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
-                execRuntimeServices.setWorkerGroupName(workerGroupVal);
-                flowContext.setWorkerGroup(workerGroupVal);
+                setWorkerGroupOnContexts(flowContext, execRuntimeServices, workerGroupVal);
             } else {
-                // otherwise we use the default worker "RAS_Operator_Path"
-                execRuntimeServices.setWorkerGroupName(DEFAULT_GROUP);
-                flowContext.setWorkerGroup(DEFAULT_GROUP);
-                workerGroupVal = NO_WORKER;
+                setWorkerGroupOnContexts(flowContext, execRuntimeServices, DEFAULT_GROUP);
             }
         }
         return workerGroupVal;
+    }
+
+    private String computeParentWorkerGroup(RunEnvironment runEnv) {
+        String workerGroupVal = null;
+        Stack<ParentFlowData> parentFlowStack = runEnv.getParentFlowStack().cloneParentStackData();
+
+        Iterator iterator = parentFlowStack.iterator();
+        while (iterator.hasNext()) {
+            ParentFlowData parentFlowData = (ParentFlowData) iterator.next();
+            String workerGroupTemp = parentFlowData.getWorkerGroup();
+            if (workerGroupTemp != null) {
+                workerGroupVal = workerGroupTemp;
+                break;
+            }
+        }
+        return workerGroupVal;
+    }
+
+    private void setWorkerGroupOnContexts(Context flowContext,
+                                          ExecutionRuntimeServices execRuntimeServices,
+                                          String workerGroupVal) {
+        execRuntimeServices.setWorkerGroupName(workerGroupVal);
+        flowContext.putArgument(WORKER_GROUP, workerGroupVal);
     }
 
     private String computeWorkerGroup(WorkerGroupStatement workerGroup,
@@ -328,13 +341,13 @@ public class StepExecutionData extends AbstractExecutionData {
 
     private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions,
                                Map<String, Value> flowVariables) {
-        if (StringUtils.isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
+        if (isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
             for (NavigationOptions navigationOptions: stepNavigationOptions) {
                 if (navigationOptions.getName().equals(stepExecutableResult)) {
                     Serializable roi = navigationOptions.getOptions().get(LanguageEventData.ROI);
                     if (roi instanceof String) {
                         String expr = ExpressionUtils.extractExpression(roi);
-                        if (StringUtils.isNotEmpty(expr) && flowVariables.containsKey(expr)) {
+                        if (isNotEmpty(expr) && flowVariables.containsKey(expr)) {
                             roi = flowVariables.get(expr).get();
                         }
                     }

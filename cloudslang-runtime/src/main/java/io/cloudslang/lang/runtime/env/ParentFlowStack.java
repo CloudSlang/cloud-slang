@@ -9,6 +9,8 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.Serializable;
 import java.util.Stack;
 
@@ -41,6 +43,6 @@ public class ParentFlowStack implements Serializable {
     }
 
     public Stack<ParentFlowData> cloneParentStackData() {
-        return (Stack<ParentFlowData>) stack.clone();
+        return SerializationUtils.clone(stack);
     }
 }
