@@ -85,8 +85,8 @@ public class BindingScopeTest extends SystemsTestsParent {
                 String message = o.toString();
                 return message.contains("Error running: 'check_weather_missing_input'") &&
                         message.contains("Error binding input: 'input_get_missing_input'") &&
-                        message.contains("Error is: Error in running script expression: 'missing_input'") &&
-                        message.contains("Exception is: name 'missing_input' is not defined");
+                        message.contains("Error in evaluating expression: 'missing_input'") &&
+                        message.contains("name 'missing_input' is not defined");
             }
         });
         triggerWithData(compilationArtifact, userInputs, systemProperties);

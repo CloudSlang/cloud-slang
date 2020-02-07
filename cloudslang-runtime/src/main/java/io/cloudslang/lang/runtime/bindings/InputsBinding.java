@@ -72,7 +72,7 @@ public class InputsBinding extends AbstractBinding {
         try {
             value = resolveValue(input, context, targetContext, systemProperties);
         } catch (Throwable t) {
-            throw new RuntimeException(errorMessagePrefix + "', \n\tError is: " + t.getMessage(), t);
+            throw new RuntimeException(errorMessagePrefix + "', \n\t" + t.getMessage(), t);
         }
 
         if (input.isRequired() && isEmpty(value)) {

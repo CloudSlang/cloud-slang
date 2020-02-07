@@ -92,8 +92,8 @@ public class ScriptEvaluator extends ScriptProcessor {
                         functionDependencies);
             }
         } catch (Exception exception) {
-            throw new RuntimeException("Error in running script expression: '" +
-                    getTruncatedExpression(expr) + "',\n\tException is: " +
+            throw new RuntimeException("Error in evaluating expression: '" +
+                    getTruncatedExpression(expr) + "',\n\t" +
                     handleExceptionSpecialCases(exception.getMessage()), exception);
         }
     }
