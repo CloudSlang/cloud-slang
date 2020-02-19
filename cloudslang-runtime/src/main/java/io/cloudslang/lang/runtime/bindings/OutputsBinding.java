@@ -49,7 +49,7 @@ public class OutputsBinding extends AbstractBinding {
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {
                 String outputKey = output.getName();
-                String errorMessagePrefix = "Error binding output: '" + output.getName();
+                String errorMessagePrefix = "Binding output: '" + output.getName() + " failed";
                 Value rawValue = output.getValue();
                 Value valueToAssign = rawValue;
                 String expressionToEvaluate = extractExpression(rawValue == null ? null : rawValue.get());
@@ -62,7 +62,7 @@ public class OutputsBinding extends AbstractBinding {
                                 systemProperties, output.getFunctionDependencies());
                         valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive());
                     } catch (Throwable t) {
-                        throw new RuntimeException(errorMessagePrefix + "',\n\tError is: " + t.getMessage(), t);
+                        throw new RuntimeException(errorMessagePrefix + "',\n\t" + t.getMessage(), t);
                     }
                 }
                 validateStringValue(errorMessagePrefix, valueToAssign);
