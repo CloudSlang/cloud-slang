@@ -28,6 +28,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ACTION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ARGS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_COMMENT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_DEFAULT_ARGS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_HIGHLIGHT_ID_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ID_KEY;
@@ -53,7 +54,7 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
     private static final Set<String> WAIT_OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY, SEQ_STEP_HIGHLIGHT_ID_KEY,
-            SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY);
+            SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY, SEQ_STEP_COMMENT_KEY);
 
     private static final String FOUND_DUPLICATE_STEP_WITH_ID =
             "Found duplicate step with id '%s' for sequential operation step.";
@@ -168,6 +169,7 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
         seqStep.setName(stepProps.get(SEQ_STEP_NAME_KEY));
         seqStep.setSnapshot(stepProps.get(SEQ_STEP_SNAPSHOT_KEY));
         seqStep.setHighlightId(stepProps.get(SEQ_STEP_HIGHLIGHT_ID_KEY));
+        seqStep.setComment(stepProps.get(SEQ_STEP_COMMENT_KEY));
 
         Accumulator accumulator = extractFunctionData(stepProps.get(SEQ_STEP_ARGS_KEY));
         seqStep.setSystemPropertyDependencies(accumulator.getSystemPropertyDependencies());
