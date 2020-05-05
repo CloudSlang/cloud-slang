@@ -51,7 +51,7 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
             SEQ_STEP_PATH_KEY, SEQ_STEP_ACTION_KEY);
     private static final Set<String> WAIT_MANDATORY_KEYS = newHashSet(SEQ_STEP_ID_KEY, SEQ_STEP_ACTION_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY);
-    private static final Set<String> WAIT_OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY);
+    private static final Set<String> WAIT_OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY, SEQ_STEP_COMMENT_KEY);
     private static final Set<String> OPTIONAL_KEY_SET = newHashSet(SEQ_STEP_ARGS_KEY,
             SEQ_STEP_DEFAULT_ARGS_KEY, SEQ_STEP_HIGHLIGHT_ID_KEY,
             SEQ_STEP_SNAPSHOT_KEY, SEQ_STEP_NAME_KEY, SEQ_STEP_COMMENT_KEY);
