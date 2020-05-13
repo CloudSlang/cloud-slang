@@ -255,8 +255,7 @@ public class ExecutionPlanBuilder {
             return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
                     step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
         }
-        return stepFactory.changeWorkerForStepStep(id, step.getArguments(),
-                step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
+        return stepFactory.changeWorkerForStepStep(id, step.getPreStepActionData(), step.getName(), workerGroup);
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {
