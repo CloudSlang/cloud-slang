@@ -77,6 +77,7 @@ public interface SlangTextualKeys {
     String SEQ_STEP_DEFAULT_ARGS_KEY = "default_args";
     String SEQ_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
     String SEQ_STEP_SNAPSHOT_KEY = "snapshot";
+    String SEQ_STEP_COMMENT_KEY = "comment";
 
     //inputs
     String VALUE_KEY = "value";
