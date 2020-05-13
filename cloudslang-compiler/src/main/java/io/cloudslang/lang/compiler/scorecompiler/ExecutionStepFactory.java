@@ -58,6 +58,20 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "beginStep", actionData);
     }
 
+    public ExecutionStep changeWorkerForStepStep(Long index, Map<String, Serializable> preStepData, String stepName,
+                                             String workerGroup) {
+        Validate.notNull(preStepData, "preStepData is null");
+        Map<String, Serializable> actionData = new HashMap<>();
+        actionData.put(ScoreLangConstants.HOOKS, "TBD");
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+
+        if (workerGroup != null) {
+            actionData.put(ScoreLangConstants.WORKER_GROUP, preStepData.get(SlangTextualKeys.WORKER_GROUP));
+        }
+        return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "changeWorkerForStep", actionData);
+    }
+
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
                                               Map<String, ResultNavigation> navigationValues,
                                               String stepName, String workerGroup, boolean parallelLoop) {

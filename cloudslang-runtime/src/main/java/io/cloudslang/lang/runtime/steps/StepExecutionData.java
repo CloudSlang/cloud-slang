@@ -90,10 +90,6 @@ public class StepExecutionData extends AbstractExecutionData {
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            if (workerGroup != null) {
-                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
-            }
-
             fireEvent(
                     executionRuntimeServices,
                     runEnv,
@@ -245,6 +241,29 @@ public class StepExecutionData extends AbstractExecutionData {
             logger.error("There was an error running the endStep execution step of: \'" + nodeName +
                     "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void changeWorkerForStep(
+            @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
+            @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+            @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+            @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+        try {
+            Context flowContext = runEnv.getStack().popContext();
+            runEnv.getStack().pushContext(flowContext);
+
+            if (workerGroup != null) {
+                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            }
+
+            runEnv.putNextStepPosition(nextStepId);
+        } catch (RuntimeException e) {
+            logger.error("There was an error running the changeWokerForStep execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
+            throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
     }
 

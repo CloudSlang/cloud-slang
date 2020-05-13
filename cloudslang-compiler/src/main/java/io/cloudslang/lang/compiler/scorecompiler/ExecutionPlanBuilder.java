@@ -47,8 +47,8 @@ public class ExecutionPlanBuilder {
     private ExternalExecutionStepFactory externalStepFactory;
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
-    private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 2;
-    private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 2;
+    private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 3;
+    private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 3;
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_PRECONDITION_STEP_ID = 1L;
     private static final long FLOW_START_STEP_ID = 2L;
@@ -153,6 +153,9 @@ public class ExecutionPlanBuilder {
             );
         }
 
+        ExecutionStep workerStep = changeWorkerForStep(currentId++, step, inheritWorkerGroupFromFlow(
+                step, compiledFlow));
+        stepExecutionSteps.add(workerStep);
         ExecutionStep executionStep = createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(
                 step, compiledFlow));
         stepExecutionSteps.add(executionStep);
@@ -244,6 +247,15 @@ public class ExecutionPlanBuilder {
                     step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
         }
         return stepFactory.createBeginStepStep(id, step.getArguments(),
+                step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
+    }
+
+    private ExecutionStep changeWorkerForStep(Long id, Step step, String workerGroup) {
+        if (step instanceof ExternalStep) {
+            return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
+                    step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
+        }
+        return stepFactory.changeWorkerForStepStep(id, step.getArguments(),
                 step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
     }
 
