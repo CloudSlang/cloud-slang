@@ -252,8 +252,7 @@ public class StepExecutionData extends AbstractExecutionData {
             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
             @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
-            Context flowContext = runEnv.getStack().popContext();
-            runEnv.getStack().pushContext(flowContext);
+            Context flowContext = runEnv.getStack().peekContext();
 
             if (workerGroup != null) {
                 handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
@@ -262,7 +261,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
-            logger.error("There was an error running the changeWokerForStep execution step of: \'" + nodeName +
+            logger.error("There was an error running the setWorkerGroupStep execution step of: \'" + nodeName +
                     "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
