@@ -245,7 +245,7 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     @SuppressWarnings("unused")
-    public void changeWorkerForStep(
+    public void setWorkerGroupStep(
             @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
@@ -257,6 +257,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
             if (workerGroup != null) {
                 handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+                executionRuntimeServices.setShouldCheckGroup();
             }
 
             runEnv.putNextStepPosition(nextStepId);

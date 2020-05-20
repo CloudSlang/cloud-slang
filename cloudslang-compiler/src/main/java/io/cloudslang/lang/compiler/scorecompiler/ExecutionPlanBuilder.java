@@ -47,8 +47,8 @@ public class ExecutionPlanBuilder {
     private ExternalExecutionStepFactory externalStepFactory;
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
-    private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 3;
-    private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 3;
+    private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 3; // setWorkerGroupStep + beginStep + endStep
+    private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 3; // setWorkerGroupStep + beginStep + endStep
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_PRECONDITION_STEP_ID = 1L;
     private static final long FLOW_START_STEP_ID = 2L;
@@ -153,7 +153,7 @@ public class ExecutionPlanBuilder {
             );
         }
 
-        ExecutionStep workerStep = changeWorkerForStep(currentId++, step, inheritWorkerGroupFromFlow(
+        ExecutionStep workerStep = createSetWorkerGroupStep(currentId++, step, inheritWorkerGroupFromFlow(
                 step, compiledFlow));
         stepExecutionSteps.add(workerStep);
         ExecutionStep executionStep = createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(
@@ -225,7 +225,8 @@ public class ExecutionPlanBuilder {
             currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS;
         } else {
             //async step
-            currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS;
+            //the -1 is needed because setWorkerGroupStep is taken into consideration for both parallel and normal steps
+            currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS - 1;
         }
 
         return currentId;
@@ -250,12 +251,12 @@ public class ExecutionPlanBuilder {
                 step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
     }
 
-    private ExecutionStep changeWorkerForStep(Long id, Step step, String workerGroup) {
+    private ExecutionStep createSetWorkerGroupStep(Long id, Step step, String workerGroup) {
         if (step instanceof ExternalStep) {
-            return externalStepFactory.createBeginExternalFlowStep(id, step.getArguments(),
-                    step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
+            return externalStepFactory.createSetWorkerGroupExternalFlowStep(id, step.getPreStepActionData(),
+                    step.getName(), workerGroup);
         }
-        return stepFactory.changeWorkerForStepStep(id, step.getPreStepActionData(), step.getName(), workerGroup);
+        return stepFactory.createSetWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup);
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {

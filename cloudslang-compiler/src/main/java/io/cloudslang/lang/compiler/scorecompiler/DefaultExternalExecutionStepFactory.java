@@ -40,4 +40,12 @@ public class DefaultExternalExecutionStepFactory implements ExternalExecutionSte
                                                       boolean parallelLoop) {
         throw new UnsupportedOperationException(EXTERNAL_STEPS_NOT_SUPPORTED);
     }
+
+    @Override
+    public ExecutionStep createSetWorkerGroupExternalFlowStep(Long index,
+                                                              Map<String, Serializable> preStepData,
+                                                              String stepName,
+                                                              String workerGroup) {
+        throw new UnsupportedOperationException(EXTERNAL_STEPS_NOT_SUPPORTED);
+    }
 }
