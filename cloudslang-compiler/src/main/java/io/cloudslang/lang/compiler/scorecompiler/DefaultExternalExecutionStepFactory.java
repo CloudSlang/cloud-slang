@@ -42,7 +42,7 @@ public class DefaultExternalExecutionStepFactory implements ExternalExecutionSte
     }
 
     @Override
-    public ExecutionStep createSetWorkerGroupExternalFlowStep(Long index,
+    public ExecutionStep createWorkerGroupExternalFlowStep(Long index,
                                                               Map<String, Serializable> preStepData,
                                                               String stepName,
                                                               String workerGroup) {

@@ -58,7 +58,7 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "beginStep", actionData);
     }
 
-    public ExecutionStep createSetWorkerGroupStep(Long index, Map<String, Serializable> preStepData, String stepName,
+    public ExecutionStep createWorkerGroupStep(Long index, Map<String, Serializable> preStepData, String stepName,
                                                   String workerGroup) {
         Validate.notNull(preStepData, "preStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();

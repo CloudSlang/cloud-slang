@@ -181,7 +181,7 @@ public class ExecutionPlanBuilderTest {
         String name = step.getName();
         String group = step.getWorkerGroup();
         when(stepFactory
-                .createSetWorkerGroupStep(eq(stepId),
+                .createWorkerGroupStep(eq(stepId),
                         eq(preStepActionData), eq(name), eq(group))).thenReturn(new ExecutionStep(stepId));
     }
 

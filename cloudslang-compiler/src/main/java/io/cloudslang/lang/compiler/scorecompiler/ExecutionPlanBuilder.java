@@ -153,7 +153,7 @@ public class ExecutionPlanBuilder {
             );
         }
 
-        ExecutionStep workerStep = createSetWorkerGroupStep(currentId++, step, inheritWorkerGroupFromFlow(
+        ExecutionStep workerStep = createWorkerGroupStep(currentId++, step, inheritWorkerGroupFromFlow(
                 step, compiledFlow));
         stepExecutionSteps.add(workerStep);
         ExecutionStep executionStep = createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(
@@ -251,12 +251,12 @@ public class ExecutionPlanBuilder {
                 step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
     }
 
-    private ExecutionStep createSetWorkerGroupStep(Long id, Step step, String workerGroup) {
+    private ExecutionStep createWorkerGroupStep(Long id, Step step, String workerGroup) {
         if (step instanceof ExternalStep) {
-            return externalStepFactory.createSetWorkerGroupExternalFlowStep(id, step.getPreStepActionData(),
+            return externalStepFactory.createWorkerGroupExternalFlowStep(id, step.getPreStepActionData(),
                     step.getName(), workerGroup);
         }
-        return stepFactory.createSetWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup);
+        return stepFactory.createWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup);
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {
