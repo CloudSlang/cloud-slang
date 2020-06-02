@@ -146,6 +146,10 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
 
     private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args,
                                               String parameterName, ClassLoader classLoader) {
+        // cloudslang list iterator fix
+        if (this.nodeNameWithDepth.startsWith("list_iterator")) {
+            parameterName = this.nodeNameWithDepth;
+        }
         Object sessionContextObject = sessionData.get(parameterName);
         if (sessionContextObject == null) {
             try {
