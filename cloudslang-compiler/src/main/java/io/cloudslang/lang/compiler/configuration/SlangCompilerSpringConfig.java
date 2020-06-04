@@ -44,6 +44,7 @@ import io.cloudslang.lang.compiler.modeller.transformers.ParallelLoopForTransfor
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PythonActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.RobotGroupTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.SeqActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.SeqStepsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
@@ -404,6 +405,11 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public RobotGroupTransformer robotGroupTransformer() {
+        return new RobotGroupTransformer();
+    }
+
+    @Bean
     public ExecutableBuilder executableBuilder() {
         ExecutableBuilder executableBuilder = new ExecutableBuilder();
         executableBuilder.setTransformers(transformers());
@@ -447,7 +453,8 @@ public class SlangCompilerSpringConfig {
                 forTransformer(),
                 breakTransformer(),
                 seqActionTransformer(),
-                workerGroupTransformer());
+                workerGroupTransformer(),
+                robotGroupTransformer());
     }
 
     private Constructor getConstructor() {

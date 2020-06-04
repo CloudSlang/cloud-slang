@@ -21,6 +21,7 @@ import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.RobotGroupStatement;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
@@ -178,7 +179,7 @@ public class DependenciesHelper {
         List<Transformer> relevantTransformers = new ArrayList<>();
         relevantTransformers.add(publishTransformer);
 
-        result.addAll(getSystemPropertiesFromLoopAndWorkerGroupStatement(step.getPreStepActionData()));
+        result.addAll(getSystemPropertiesFromLoopAndWorkersGroupStatement(step.getPreStepActionData()));
         result.addAll(getSystemPropertiesFromInOutParam(step.getArguments()));
         result.addAll(
                 getSystemPropertiesFromPostStepActionData(
@@ -191,7 +192,7 @@ public class DependenciesHelper {
         return result;
     }
 
-    private Set<String> getSystemPropertiesFromLoopAndWorkerGroupStatement(
+    private Set<String> getSystemPropertiesFromLoopAndWorkersGroupStatement(
             Map<String, Serializable> preStepActionData) {
         Set<String> result = new HashSet<>();
         for (Map.Entry<String, Serializable> entry : preStepActionData.entrySet()) {
@@ -202,6 +203,12 @@ public class DependenciesHelper {
                 Set<String> sysPropDep = ((WorkerGroupStatement) entry.getValue()).getSystemPropertyDependencies();
                 if (sysPropDep != null) {
                     result.addAll(sysPropDep);
+                }
+            }
+            if (entry.getValue() instanceof RobotGroupStatement) {
+                Set<String> systemProperties = ((RobotGroupStatement) entry.getValue()).getSystemPropertyDependencies();
+                if (isNotEmpty(systemProperties)) {
+                    result.addAll(systemProperties);
                 }
             }
         }

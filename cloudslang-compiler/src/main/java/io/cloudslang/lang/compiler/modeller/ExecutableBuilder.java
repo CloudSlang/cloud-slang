@@ -64,6 +64,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.ROBOT_GROUP;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_SETTINGS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKER_GROUP;
@@ -120,7 +121,7 @@ public class ExecutableBuilder {
     private List<Transformer> externalPostStepTransformers;
 
     private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY,
-            WORKER_GROUP);
+            WORKER_GROUP, ROBOT_GROUP);
     private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY, WORKER_GROUP);
 
     private List<String> seqSupportedResults = asList(SUCCESS_RESULT, WARNING_RESULT, FAILURE_RESULT);
@@ -646,6 +647,7 @@ public class ExecutableBuilder {
         replaceOnFailureReference(postStepData, onFailureStepName);
 
         String workerGroup = (String)stepRawData.get(SlangTextualKeys.WORKER_GROUP);
+        String robotGroup = (String)stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
 
         String refId = "";
         final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
@@ -664,13 +666,14 @@ public class ExecutableBuilder {
                 getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
         Step step = createStep(stepName, onFailureSection, preStepData, postStepData,
-                arguments, workerGroup, refId, navigationStrings);
+                arguments, workerGroup, robotGroup, refId, navigationStrings);
         return new StepModellingResult(step, errors);
     }
 
     private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,
                             Map<String, Serializable> postStepData, List<Argument> arguments,
-                            String workerGroup, String refId, List<Map<String, Serializable>> navigationStrings) {
+                            String workerGroup, String robotGroup, String refId,
+                            List<Map<String, Serializable>> navigationStrings) {
         if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
             return new ExternalStep(stepName,
                     preStepData,
@@ -690,6 +693,7 @@ public class ExecutableBuilder {
                     navigationStrings,
                     refId,
                     workerGroup,
+                    robotGroup,
                     preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
                     onFailureSection);
         }
