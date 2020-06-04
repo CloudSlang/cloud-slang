@@ -646,8 +646,8 @@ public class ExecutableBuilder {
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
-        String workerGroup = (String)stepRawData.get(SlangTextualKeys.WORKER_GROUP);
-        String robotGroup = (String)stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
+        String workerGroup = (String) stepRawData.get(SlangTextualKeys.WORKER_GROUP);
+        String robotGroup = (String) stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
 
         String refId = "";
         final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
