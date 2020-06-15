@@ -32,4 +32,11 @@ public class ContextStack implements Serializable {
         return stack.pop();
     }
 
+    public Context peekContext() {
+        if (stack.empty()) {
+            return null;
+        }
+        return stack.peek();
+    }
+
 }

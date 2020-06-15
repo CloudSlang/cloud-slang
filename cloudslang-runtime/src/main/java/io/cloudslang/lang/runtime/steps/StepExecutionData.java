@@ -34,6 +34,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -253,6 +254,29 @@ public class StepExecutionData extends AbstractExecutionData {
             logger.error("There was an error running the endStep execution step of: \'" + nodeName +
                     "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\': " + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void setWorkerGroupStep(
+            @Param(ScoreLangConstants.WORKER_GROUP) WorkerGroupStatement workerGroup,
+            @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+            @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+            @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+        try {
+            Context flowContext = runEnv.getStack().peekContext();
+
+            if (workerGroup != null) {
+                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+                executionRuntimeServices.setShouldCheckGroup();
+            }
+
+            runEnv.putNextStepPosition(nextStepId);
+        } catch (RuntimeException e) {
+            logger.error("There was an error running the setWorkerGroupStep execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
+            throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
     }
 

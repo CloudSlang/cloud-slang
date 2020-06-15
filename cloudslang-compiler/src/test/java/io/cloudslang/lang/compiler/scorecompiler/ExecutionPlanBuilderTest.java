@@ -109,6 +109,7 @@ public class ExecutionPlanBuilderTest {
                 navigationStrings,
                 refId,
                 null,
+                null,
                 isParallelLoop,
                 false);
     }
@@ -174,6 +175,15 @@ public class ExecutionPlanBuilderTest {
         when(stepFactory
                 .createBeginStepStep(eq(stepId), anyListOf(Argument.class),
                         eq(preStepActionData), eq(refId), eq(name), eq(group))).thenReturn(new ExecutionStep(stepId));
+    }
+
+    private void mockWorkerStep(Long stepId, Step step) {
+        Map<String, Serializable> preStepActionData = step.getPreStepActionData();
+        String name = step.getName();
+        String group = step.getWorkerGroup();
+        when(stepFactory
+                .createWorkerGroupStep(eq(stepId),
+                        eq(preStepActionData), eq(name), eq(group))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepId, Long branchBeginStepId, Step step, Flow flow) {
@@ -242,11 +252,12 @@ public class ExecutionPlanBuilderTest {
         mockStartStep(compiledFlow);
         mockPreconditionStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
-        mockBeginStep(3L, step);
-        mockFinishStep(4L, step);
+        mockWorkerStep(3L, step);
+        mockBeginStep(4L, step);
+        mockFinishStep(5L, step);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
-        assertEquals("different number of execution steps than expected", 5, executionPlan.getSteps().size());
+        assertEquals("different number of execution steps than expected", 6, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
         assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", Long.valueOf(1), executionPlan.getBeginStep());
@@ -273,31 +284,32 @@ public class ExecutionPlanBuilderTest {
         mockPreconditionStep(compiledFlow);
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
-        mockAddBranchesStep(3L, 6L, 4L, step, compiledFlow);
-        mockBeginStep(4L, step);
-        mockFinishParallelLoopStep(5L, step);
-        mockJoinBranchesStep(6L, step);
+        mockAddBranchesStep(3L, 7L, 4L, step, compiledFlow);
+        mockWorkerStep(4L, step);
+        mockBeginStep(5L, step);
+        mockFinishParallelLoopStep(6L, step);
+        mockJoinBranchesStep(7L, step);
         final ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         verify(stepFactory).createAddBranchesStep(
                 eq(3L),
-                eq(6L),
+                eq(7L),
                 eq(4L),
                 eq(step.getPreStepActionData()),
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
         verify(stepFactory)
-                .createBeginStepStep(eq(4L), anyListOf(Argument.class), eq(step.getPreStepActionData()),
+                .createBeginStepStep(eq(5L), anyListOf(Argument.class), eq(step.getPreStepActionData()),
                         eq(step.getRefId()), eq(step.getName()), eq(step.getWorkerGroup()));
         verify(stepFactory)
-                .createFinishStepStep(eq(5L), eq(step.getPostStepActionData()),
+                .createFinishStepStep(eq(6L), eq(step.getPostStepActionData()),
                         anyMapOf(String.class, ResultNavigation.class), eq(step.getName()),
                         eq(step.getWorkerGroup()), eq(step.isParallelLoop()));
         verify(stepFactory)
-                .createJoinBranchesStep(eq(6L), eq(step.getPostStepActionData()),
+                .createJoinBranchesStep(eq(7L), eq(step.getPostStepActionData()),
                         anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
 
-        assertEquals("different number of execution steps than expected", 7, executionPlan.getSteps().size());
+        assertEquals("different number of execution steps than expected", 8, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
         assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", Long.valueOf(1), executionPlan.getBeginStep());
@@ -337,13 +349,15 @@ public class ExecutionPlanBuilderTest {
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
 
-        mockBeginStep(3L, firstStep);
-        mockFinishStep(4L, firstStep);
-        mockBeginStep(5L, secondStep);
-        mockFinishStep(6L, secondStep);
+        mockWorkerStep(3L, firstStep);
+        mockBeginStep(4L, firstStep);
+        mockFinishStep(5L, firstStep);
+        mockWorkerStep(6L, secondStep);
+        mockBeginStep(7L, secondStep);
+        mockFinishStep(8L, secondStep);
         ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
-        assertEquals("different number of execution steps than expected", 7, executionPlan.getSteps().size());
+        assertEquals("different number of execution steps than expected", 9, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());
         assertEquals("language name is different than expected", "CloudSlang", executionPlan.getLanguage());
         assertEquals("begin step is different than expected", Long.valueOf(1), executionPlan.getBeginStep());
