@@ -34,7 +34,6 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,8 +96,6 @@ public class StepExecutionData extends AbstractExecutionData {
             Context flowContext = runEnv.getStack().popContext();
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
-            final String workerGroupVal = handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
-
             fireEvent(
                     executionRuntimeServices,
                     runEnv,
@@ -142,7 +139,7 @@ public class StepExecutionData extends AbstractExecutionData {
             // request the score engine to switch to the execution plan of the given ref
             //CHECKSTYLE:OFF
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices,
-                    RUNNING_EXECUTION_PLAN_ID, refId, nextStepId, workerGroupVal);
+                    RUNNING_EXECUTION_PLAN_ID, refId, nextStepId, executionRuntimeServices.getWorkerGroupName());
             //CHECKSTYLE:ON
 
             // set the start step of the given ref as the next step to execute
@@ -181,8 +178,10 @@ public class StepExecutionData extends AbstractExecutionData {
             String workerGroup = flowContext.getArgument(WORKER_GROUP);
             if (workerGroup != null) {
                 executionRuntimeServices.setWorkerGroupName(workerGroup);
-                //flowContext.removeArgument(WORKER_GROUP);
+                executionRuntimeServices.setShouldCheckGroup();
+                flowContext.removeArgument(WORKER_GROUP);
             }
+
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
                     outputsBindingContext,
@@ -246,7 +245,6 @@ public class StepExecutionData extends AbstractExecutionData {
             );
 
             executionRuntimeServices.addRoiValue(roiValue);
-            executionRuntimeServices.setShouldCheckGroup();
 
             runEnv.getStack().pushContext(flowContext);
             runEnv.getExecutionPath().forward();
@@ -267,8 +265,8 @@ public class StepExecutionData extends AbstractExecutionData {
         try {
             Context flowContext = runEnv.getStack().peekContext();
 
-            if (workerGroup != null) {
-                handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            final String workerGroupVal = handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+            if (workerGroupVal != null) {
                 executionRuntimeServices.setShouldCheckGroup();
             }
 
