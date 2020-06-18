@@ -48,21 +48,21 @@ public class InputsBinding extends AbstractBinding {
      * @return : a new map with all inputs resolved (does not include initial context)
      */
     public Map<String, Value> bindInputs(List<Input> inputs, Map<String, ? extends Value> context,
-                                         Set<SystemProperty> systemProperties) {
+                                         Set<SystemProperty> systemProperties, List<Input> missingInputs) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
 
         //we do not want to change original context map
         Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
         for (Input input : inputs) {
-            bindInput(input, srcContext, resultContext, systemProperties);
+            bindInput(input, srcContext, resultContext, systemProperties, missingInputs);
         }
 
         return resultContext;
     }
 
     private void bindInput(Input input, Map<String, ? extends Value> context, Map<String, Value> targetContext,
-                           Set<SystemProperty> systemProperties) {
+                            Set<SystemProperty> systemProperties, List<Input> missingInputs) {
         Value value;
 
         String inputName = input.getName();
@@ -76,7 +76,8 @@ public class InputsBinding extends AbstractBinding {
         }
 
         if (input.isRequired() && isEmpty(value)) {
-            throw new RuntimeException("Input with name: \'" + inputName + "\' is Required, but value is empty");
+            missingInputs.add(input);
+            return;
         }
 
         validateStringValue(errorMessagePrefix, value);

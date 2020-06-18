@@ -12,10 +12,10 @@ package io.cloudslang.lang.runtime.navigations;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.score.events.ScoreEvent;
-import io.cloudslang.score.lang.ExecutionRuntimeServices;
 
 import java.util.Collection;
 
+import io.cloudslang.score.lang.SystemContext;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +44,7 @@ public class NavigationsTest {
         RunEnvironment runEnv = new RunEnvironment();
         Long nextStepId = 2L;
         runEnv.putNextStepPosition(nextStepId);
-        Long nextPosition = navigations.navigate(runEnv, new ExecutionRuntimeServices());
+        Long nextPosition = navigations.navigate(runEnv, new SystemContext(), 1L);
 
         Assert.assertEquals(nextStepId, nextPosition);
     }
@@ -55,13 +55,13 @@ public class NavigationsTest {
         RunEnvironment runEnv = new RunEnvironment();
         Long nextStepId = 2L;
         runEnv.putNextStepPosition(nextStepId);
-        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
-        runtimeServices.setStepErrorKey("Error");
+        SystemContext systemContext = new SystemContext();
+        systemContext.setStepErrorKey("Error");
         try {
-            navigations.navigate(runEnv, runtimeServices);
+            navigations.navigate(runEnv, systemContext, 1L);
 
         } catch (RuntimeException e) {
-            Collection<ScoreEvent> events = runtimeServices.getEvents();
+            Collection<ScoreEvent> events = systemContext.getEvents();
 
             Assert.assertFalse(events.isEmpty());
             ScoreEvent stepErrorEvent = null;
