@@ -30,7 +30,7 @@ public class Regex {
     public static final String NAMESPACE_CHARS = "([\\w\\-" + NAMESPACE_PROPERTY_DELIMITER + "]+)";
     public static final String SIMPLE_NAME_CHARS = "([\\w]+)";
     public static final String RESULT_NAME_CHARS = "([\\w]+)";
-    public static final String VARIABLE_NAME_CHARS = "(([A-Za-z][\\w]*)|([_][\\w]+))";
+    public static final String VARIABLE_NAME_CHARS = "([\\w]*)|([_][\\w]+)";
     // match get_sp(key) function
     public static final String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'" + NAMESPACE_CHARS + "'\\s*\\)";
     public static final String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + NAMESPACE_CHARS + "\"\\s*\\)";
