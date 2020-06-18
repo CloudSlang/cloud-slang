@@ -56,7 +56,8 @@ public class ScriptEvaluator extends ScriptProcessor {
                     "  return default_value if value_to_check is None else value_to_check";
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def " + ACCESS_MONITORING_METHOD_NAME + "(key):" +
             LINE_SEPARATOR + "  pass";
-    private static final boolean EXTERNAL_PYTHON = true;
+    private static final boolean EXTERNAL_PYTHON = !Boolean.valueOf(
+            System.getProperty("use.jython.expressions", "true"));
 
 
     public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
