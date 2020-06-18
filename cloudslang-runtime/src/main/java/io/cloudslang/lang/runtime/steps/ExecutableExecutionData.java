@@ -20,7 +20,7 @@ import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
-import io.cloudslang.lang.runtime.bindings.strategies.MissingInputStrategy;
+import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
@@ -66,18 +66,18 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     private final ExecutionPreconditionService executionPreconditionService;
 
-    private final MissingInputStrategy missingInputStrategy;
+    private final MissingInputHandler missingInputHandler;
 
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
-                                   MissingInputStrategy missingInputStrategy) {
+                                   MissingInputHandler missingInputHandler) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
         this.executionPreconditionService = preconditionService;
-        this.missingInputStrategy = missingInputStrategy;
+        this.missingInputHandler = missingInputHandler;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
@@ -113,7 +113,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
 
             //might put some additional values to callArguments
-            missingInputStrategy.applyUserInputs(systemContext, callArguments);
+            missingInputHandler.applyPromptInputValues(systemContext, callArguments);
 
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
@@ -130,8 +130,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Map<String, Value> boundInputValues = inputsBinding
                     .bindInputs(executableInputs, callArguments, runEnv.getSystemProperties(), missingInputs);
 
+            //if there are any missing required input after binding
+            // try to resolve it using provided missing input handler
             if (CollectionUtils.isNotEmpty(missingInputs)) {
-                boolean canContinue = missingInputStrategy.resolveMissingInputs(
+                boolean canContinue = missingInputHandler.resolveMissingInputs(
                         missingInputs,
                         systemContext,
                         runEnv,

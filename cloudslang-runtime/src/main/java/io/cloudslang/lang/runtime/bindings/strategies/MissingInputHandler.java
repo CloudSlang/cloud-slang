@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Service to be implemented to customize behavior when some of step inputs is missing
  */
-public interface MissingInputStrategy {
+public interface MissingInputHandler {
 
     /**
      * @param missingInputs     the list of inputs for
@@ -44,7 +44,7 @@ public interface MissingInputStrategy {
      * @param systemContext the system context
      * @param callArguments list of call arguments that could get enhanced in this call
      */
-    default void applyUserInputs(SystemContext systemContext, Map<String, Value> callArguments) {
+    default void applyPromptInputValues(SystemContext systemContext, Map<String, Value> callArguments) {
 
     }
 }

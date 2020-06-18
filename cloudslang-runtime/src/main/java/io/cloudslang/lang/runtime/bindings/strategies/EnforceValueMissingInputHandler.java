@@ -14,15 +14,17 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Default strategy to keep existing behavior
  */
 @Component
-public class DefaultMissingInputStrategy implements MissingInputStrategy {
+public class EnforceValueMissingInputHandler implements MissingInputHandler {
 
     @Override
     public boolean resolveMissingInputs(List<Input> missingInputs,
@@ -31,13 +33,15 @@ public class DefaultMissingInputStrategy implements MissingInputStrategy {
                                         ExecutionRuntimeServices runtimeServices,
                                         LanguageEventData.StepType stepType,
                                         String stepName) {
-        missingInputs
-                .stream()
-                .findFirst()
-                .map(Input::getName)
-                .ifPresent(inputName -> {
-                    throw new RuntimeException("Input with name: '" + inputName + "' is Required, but value is empty");
-                });
+        if (CollectionUtils.isNotEmpty(missingInputs)) {
+            String exceptionMessage = missingInputs
+                    .stream()
+                    .map(Input::getName)
+                    .map(inputName -> "Input with name: '" + inputName + "' is Required, but value is empty")
+                    .collect(Collectors.joining(System.lineSeparator()));
+
+            throw new RuntimeException(exceptionMessage);
+        }
 
         return false;
     }

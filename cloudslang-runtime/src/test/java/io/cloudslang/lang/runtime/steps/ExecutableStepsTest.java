@@ -26,8 +26,8 @@ import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
-import io.cloudslang.lang.runtime.bindings.strategies.DefaultMissingInputStrategy;
-import io.cloudslang.lang.runtime.bindings.strategies.MissingInputStrategy;
+import io.cloudslang.lang.runtime.bindings.strategies.EnforceValueMissingInputHandler;
+import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -401,12 +401,12 @@ public class ExecutableStepsTest {
         @Bean
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
-                    executionPreconditionService(), missingInputStrategy());
+                    executionPreconditionService(), missingInputHandler());
         }
 
         @Bean
-        public MissingInputStrategy missingInputStrategy() {
-            return new DefaultMissingInputStrategy();
+        public MissingInputHandler missingInputHandler() {
+            return new EnforceValueMissingInputHandler();
         }
 
         @Bean
