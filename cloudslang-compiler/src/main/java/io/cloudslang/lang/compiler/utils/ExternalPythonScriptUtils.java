@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class ExternalPythonScriptUtils {
     private static final String METHOD_SIGNATURE_REGEX = "^def\\s+execute\\((([a-zA-Z0-9_]+,?\\s*)*)\\):\\s*\\R";
     private static final Pattern methodSignaturePattern = Pattern.compile(METHOD_SIGNATURE_REGEX,
-            Pattern.DOTALL | Pattern.MULTILINE);
+            Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL | Pattern.MULTILINE);
 
     public static String[] getScriptParams(String script) {
         Matcher matcher = methodSignaturePattern.matcher(script);
