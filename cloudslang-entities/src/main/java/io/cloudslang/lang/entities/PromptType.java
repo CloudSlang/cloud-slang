@@ -12,7 +12,7 @@ package io.cloudslang.lang.entities;
 import java.util.Objects;
 
 public enum PromptType {
-    TEXT("text"), SINGLE_CHOICE("single_choice"), MULTI_CHOICE("multi_choice");
+    TEXT("text"), SINGLE_CHOICE("single-choice"), MULTI_CHOICE("multi-choice");
 
     private final String name;
 

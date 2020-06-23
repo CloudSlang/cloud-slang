@@ -24,6 +24,12 @@ flow:
     - flow_input_2:
         prompt:
           type: "text"
+    - flow_input_3:
+        prompt:
+          type: "single-choice"
+    - flow_input_4:
+        prompt:
+          type: "multi-choice"
   workflow:
     - bootstrap_node:
         do:

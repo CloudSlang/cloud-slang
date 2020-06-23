@@ -243,6 +243,12 @@ public class PreCompileTransformersTest {
         assertEquals(flowInput2.getPromptMessage(), "Enter a value for 'flow_input_2'");
         assertNull(flowInput2.getPromptOptions());
         assertEquals(flowInput2.getPromptDelimiter(), ",");
+
+        Input flowInput3 = inputs.get(2);
+        assertEquals(flowInput3.getPromptType(), PromptType.SINGLE_CHOICE);
+
+        Input flowInput4 = inputs.get(3);
+        assertEquals(flowInput4.getPromptType(), PromptType.MULTI_CHOICE);
     }
 
 }
