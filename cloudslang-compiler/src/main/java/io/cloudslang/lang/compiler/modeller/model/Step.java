@@ -26,6 +26,7 @@ public class Step {
     private final List<Map<String, Serializable>> navigationStrings;
     private final String refId;
     private final String workerGroup;
+    private final String robotGroup;
     private final boolean parallelLoop;
     private final boolean onFailureStep;
 
@@ -37,6 +38,7 @@ public class Step {
             List<Map<String, Serializable>> navigationStrings,
             String refId,
             String workerGroup,
+            String robotGroup,
             boolean parallelLoop,
             boolean onFailureStep) {
         this.name = name;
@@ -46,6 +48,7 @@ public class Step {
         this.navigationStrings = navigationStrings;
         this.refId = refId;
         this.workerGroup = workerGroup;
+        this.robotGroup = robotGroup;
         this.parallelLoop = parallelLoop;
         this.onFailureStep = onFailureStep;
     }
@@ -88,5 +91,9 @@ public class Step {
 
     public String getWorkerGroup() {
         return workerGroup;
+    }
+
+    public String getRobotGroup() {
+        return robotGroup;
     }
 }

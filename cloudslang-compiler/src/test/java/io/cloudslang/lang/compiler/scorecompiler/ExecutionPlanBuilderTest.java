@@ -109,6 +109,7 @@ public class ExecutionPlanBuilderTest {
                 navigationStrings,
                 refId,
                 null,
+                null,
                 isParallelLoop,
                 false);
     }

@@ -210,7 +210,11 @@ public class ExecutionStepFactory {
         step.setActionData(actionData);
 
         step.setNavigation(new ControlActionMetadata(NAVIGATION_ACTIONS_CLASS, SIMPLE_NAVIGATION_METHOD));
-        step.setNavigationData(new HashMap<>());
+
+        //this is needed in case if we're going to pause navigation
+        Map<String, Object> navigationData = new HashMap<>();
+        navigationData.put(ScoreLangConstants.CURRENT_STEP_ID_KEY, stepId);
+        step.setNavigationData(navigationData);
 
         return step;
     }
