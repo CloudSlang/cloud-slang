@@ -87,6 +87,11 @@ public interface SlangTextualKeys {
     String SENSITIVE_KEY = "sensitive";
     String PRIVATE_INPUT_KEY = "private";
     String SEQ_OUTPUT_ROBOT_KEY = "robot";
+    String PROMPT_KEY = "prompt";
+    String PROMPT_TYPE_KEY = "type";
+    String PROMPT_MESSAGE_KEY = "message";
+    String PROMPT_OPTIONS_KEY = "options";
+    String PROMPT_DELIMITER_KEY = "delimiter";
 
     // system properties
     String SYSTEM_PROPERTY_KEY = "properties";

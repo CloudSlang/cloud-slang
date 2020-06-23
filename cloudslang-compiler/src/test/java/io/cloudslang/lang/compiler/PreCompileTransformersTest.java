@@ -12,15 +12,16 @@ package io.cloudslang.lang.compiler;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
+import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,6 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 
 /**
  * @author Bonczidai Levente
@@ -50,16 +56,16 @@ public class PreCompileTransformersTest {
         URI resource = getClass().getResource("/corrupted/transformers/operation_input_private_no_default.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
 
-        Assert.assertNotNull(result);
+        assertNotNull(result);
 
         Executable executable = result.getExecutable();
-        Assert.assertNotNull(executable);
+        assertNotNull(executable);
         List<Input> inputs = executable.getInputs();
-        Assert.assertEquals(6, inputs.size());
+        assertEquals(6, inputs.size());
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'operation_input_private_no_default' syntax is illegal.");
         exception.expectMessage("Input: 'input_private_no_default' is private " +
@@ -72,32 +78,32 @@ public class PreCompileTransformersTest {
         URI resource = getClass().getResource("/check_weather_flow_sensitive_inputs_outputs.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
 
-        Assert.assertNotNull(result);
+        assertNotNull(result);
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() == 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() == 0);
         Executable executable = result.getExecutable();
-        Assert.assertNotNull(executable);
+        assertNotNull(executable);
         List<Input> inputs = executable.getInputs();
-        Assert.assertEquals(3, inputs.size());
-        Assert.assertEquals("flow_input_1", inputs.get(0).getName());
-        Assert.assertEquals("defaultValue", inputs.get(0).getValue().get());
-        Assert.assertEquals(false, inputs.get(0).getValue().isSensitive());
-        Assert.assertEquals("flow_input_0", inputs.get(1).getName());
-        Assert.assertEquals("${flow_input_1}", inputs.get(1).getValue().get());
-        Assert.assertEquals(true, inputs.get(1).getValue().isSensitive());
-        Assert.assertEquals("flow_input_sensitive", inputs.get(2).getName());
-        Assert.assertEquals(null, inputs.get(2).getValue().get());
-        Assert.assertEquals(true, inputs.get(2).getValue().isSensitive());
+        assertEquals(3, inputs.size());
+        assertEquals("flow_input_1", inputs.get(0).getName());
+        assertEquals("defaultValue", inputs.get(0).getValue().get());
+        assertEquals(false, inputs.get(0).getValue().isSensitive());
+        assertEquals("flow_input_0", inputs.get(1).getName());
+        assertEquals("${flow_input_1}", inputs.get(1).getValue().get());
+        assertEquals(true, inputs.get(1).getValue().isSensitive());
+        assertEquals("flow_input_sensitive", inputs.get(2).getName());
+        assertEquals(null, inputs.get(2).getValue().get());
+        assertEquals(true, inputs.get(2).getValue().isSensitive());
         List<Output> outputs = executable.getOutputs();
-        Assert.assertEquals(2, outputs.size());
-        Assert.assertEquals("flow_output_0", outputs.get(0).getName());
-        Assert.assertEquals("${flow_input_1}", outputs.get(0).getValue().get());
-        Assert.assertEquals(true, outputs.get(0).getValue().isSensitive());
-        Assert.assertEquals("flow_output_1", outputs.get(1).getName());
-        Assert.assertEquals("${flow_output_1}", outputs.get(1).getValue().get());
-        Assert.assertEquals(true, outputs.get(1).getValue().isSensitive());
+        assertEquals(2, outputs.size());
+        assertEquals("flow_output_0", outputs.get(0).getName());
+        assertEquals("${flow_input_1}", outputs.get(0).getValue().get());
+        assertEquals(true, outputs.get(0).getValue().isSensitive());
+        assertEquals("flow_output_1", outputs.get(1).getName());
+        assertEquals("${flow_output_1}", outputs.get(1).getValue().get());
+        assertEquals(true, outputs.get(1).getValue().isSensitive());
     }
 
     @Test
@@ -105,8 +111,8 @@ public class PreCompileTransformersTest {
         URI flow = getClass().getResource("/check_weather_flow_sensitive.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(flow));
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertEquals(0, errors.size());
+        assertNotNull(errors);
+        assertEquals(0, errors.size());
     }
 
     @Test
@@ -115,8 +121,8 @@ public class PreCompileTransformersTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() > 0);
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'check_weather_optional_input_boolean' syntax is illegal.");
@@ -131,8 +137,8 @@ public class PreCompileTransformersTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'check_weather_optional_input_default_integer' syntax is illegal.");
         exception.expectMessage("Input: 'input_with_default_value' should have a String value, but got value '2' " +
@@ -147,8 +153,8 @@ public class PreCompileTransformersTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For step 'bootstrap_node' syntax is illegal.");
         exception.expectMessage("Step input: 'input_with_sensitive_no_default' should have a String value, " +
@@ -163,8 +169,8 @@ public class PreCompileTransformersTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For flow 'check_weather_flow_output_default_double' syntax is illegal.");
         exception.expectMessage("Output / publish value: 'flow_output_0' should have a String value, " +
@@ -177,16 +183,16 @@ public class PreCompileTransformersTest {
         URI resource = getClass().getResource("/corrupted/transformers/operation_output_wrong_property.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
 
-        Assert.assertNotNull(result);
+        assertNotNull(result);
 
         Executable executable = result.getExecutable();
-        Assert.assertNotNull(executable);
+        assertNotNull(executable);
         List<Output> outputs = executable.getOutputs();
-        Assert.assertEquals(2, outputs.size());
+        assertEquals(2, outputs.size());
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'operation_output_wrong_property' syntax is illegal.");
         exception.expectMessage("Key: wrong_key in output: output_wrong_key is not a known property");
@@ -198,20 +204,45 @@ public class PreCompileTransformersTest {
         URI resource = getClass().getResource("/corrupted/transformers/operation_duplicate_result.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
 
-        Assert.assertNotNull(result);
+        assertNotNull(result);
 
         Executable executable = result.getExecutable();
-        Assert.assertNotNull(executable);
+        assertNotNull(executable);
         List<Result> results = executable.getResults();
-        Assert.assertEquals(2, results.size());
+        assertEquals(2, results.size());
 
         List<RuntimeException> errors = result.getErrors();
-        Assert.assertNotNull(errors);
-        Assert.assertTrue(errors.size() > 0);
+        assertNotNull(errors);
+        assertTrue(errors.size() > 0);
         exception.expect(RuntimeException.class);
         exception.expectMessage("For operation 'operation_duplicate_result' syntax is illegal.");
         exception.expectMessage("Duplicate result found: SUCCESS");
         throw errors.get(0);
+    }
+
+    @Test
+    public void testStepInputWithPrompt() throws URISyntaxException {
+        URI resource = getClass().getResource("/corrupted/transformers/check_flow_input_prompt.sl").toURI();
+        ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
+
+        assertNotNull(result);
+
+        Executable executable = result.getExecutable();
+        assertNotNull(executable);
+
+        List<Input> inputs = executable.getInputs();
+
+        Input flowInput1 = inputs.get(0);
+        assertEquals(flowInput1.getPromptType(), PromptType.TEXT);
+        assertEquals(flowInput1.getPromptMessage(), "non-default-message");
+        assertEquals(flowInput1.getPromptOptions(), "opts");
+        assertEquals(flowInput1.getPromptDelimiter(), "|");
+
+        Input flowInput2 = inputs.get(1);
+        assertEquals(flowInput2.getPromptType(), PromptType.TEXT);
+        assertEquals(flowInput2.getPromptMessage(), "Enter a value for 'flow_input_2'");
+        assertNull(flowInput2.getPromptOptions());
+        assertEquals(flowInput2.getPromptDelimiter(), ",");
     }
 
 }
