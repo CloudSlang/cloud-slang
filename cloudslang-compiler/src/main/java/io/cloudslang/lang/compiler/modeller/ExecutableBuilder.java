@@ -646,7 +646,13 @@ public class ExecutableBuilder {
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
-        String workerGroup = (String) stepRawData.get(SlangTextualKeys.WORKER_GROUP);
+        String workerGroup = null;
+        if (stepRawData.get(SlangTextualKeys.WORKER_GROUP) instanceof String) {
+            workerGroup = (String) stepRawData.get(SlangTextualKeys.WORKER_GROUP);
+        } else if (stepRawData.get(SlangTextualKeys.WORKER_GROUP) instanceof Map) {
+            workerGroup = String.valueOf(
+                    ((Map<String, Object>)stepRawData.get(SlangTextualKeys.WORKER_GROUP)).get("value"));
+        }
         String robotGroup = (String) stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
 
         String refId = "";

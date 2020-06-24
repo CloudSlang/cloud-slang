@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.WorkerGroupType;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -92,8 +93,8 @@ public abstract class AbstractExecutionData {
         runtimeServices.addEvent(type, eventData);
     }
 
-    private static void pushParentFlowDataOnStack(RunEnvironment runEnv, Long runningExecutionPlanId,
-                                                  Long nextStepId, String workerGroup) {
+    protected static void pushParentFlowDataOnStack(RunEnvironment runEnv, Long runningExecutionPlanId,
+                                                  Long nextStepId, WorkerGroupType workerGroup) {
         // create ParentFlowData object containing the current running execution plan id and
         // the next step id to navigate to in the current execution plan,
         // and push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
@@ -213,8 +214,11 @@ public abstract class AbstractExecutionData {
                                                                     ExecutionRuntimeServices executionRuntimeServices,
                                                                     Long runningExecutionPlanId,
                                                                     String refId,
-                                                                    Long nextStepId, String workerGroup) {
-        pushParentFlowDataOnStack(runEnv, runningExecutionPlanId, nextStepId, workerGroup);
+                                                                    Long nextStepId,
+                                                                    String workerGroup,
+                                                                    boolean overrideWorkerGroup) {
+        pushParentFlowDataOnStack(runEnv, runningExecutionPlanId, nextStepId,
+                new WorkerGroupType(workerGroup, overrideWorkerGroup));
         executionRuntimeServices.setParentRunningId(runningExecutionPlanId);
         // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);

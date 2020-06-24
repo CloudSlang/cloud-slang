@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
+import io.cloudslang.lang.entities.WorkerGroupType;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -48,8 +49,9 @@ import java.util.Stack;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
+import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_VALUE;
+import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_OVERRIDE;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
@@ -139,7 +141,9 @@ public class StepExecutionData extends AbstractExecutionData {
             // request the score engine to switch to the execution plan of the given ref
             //CHECKSTYLE:OFF
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices,
-                    RUNNING_EXECUTION_PLAN_ID, refId, nextStepId, executionRuntimeServices.getWorkerGroupName());
+                    RUNNING_EXECUTION_PLAN_ID, refId, nextStepId,
+                    flowContext.removeArgument(WORKER_GROUP_VALUE),
+                    Boolean.parseBoolean(flowContext.removeArgument(WORKER_GROUP_OVERRIDE)));
             //CHECKSTYLE:ON
 
             // set the start step of the given ref as the next step to execute
@@ -265,11 +269,13 @@ public class StepExecutionData extends AbstractExecutionData {
         try {
             Context flowContext = runEnv.getStack().peekContext();
 
-            final String workerGroupVal = handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
-            if (workerGroupVal != null) {
+            final WorkerGroupType workerGroupVal = handleWorkerGroup(workerGroup, flowContext, runEnv,
+                    executionRuntimeServices);
+            if (workerGroupVal.getValue() != null) {
                 executionRuntimeServices.setShouldCheckGroup();
             }
-
+            flowContext.putArgument(WORKER_GROUP_VALUE, workerGroupVal.getValue());
+            flowContext.putArgument(WORKER_GROUP_OVERRIDE, String.valueOf(workerGroupVal.isOverride()));
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
             logger.error("There was an error running the setWorkerGroupStep execution step of: \'" + nodeName +
@@ -297,36 +303,39 @@ public class StepExecutionData extends AbstractExecutionData {
         );
     }
 
-    private String handleWorkerGroup(WorkerGroupStatement workerGroup,
+    private WorkerGroupType handleWorkerGroup(WorkerGroupStatement workerGroup,
                                      Context flowContext,
                                      RunEnvironment runEnv,
                                      ExecutionRuntimeServices execRuntimeServices) {
-        String workerGroupVal = computeParentWorkerGroup(runEnv);
+        WorkerGroupType workerGroupVal = computeParentWorkerGroup(runEnv);
 
-        if (workerGroupVal != null) {
-            execRuntimeServices.setWorkerGroupName(workerGroupVal);
+        if (workerGroupVal.getValue() != null && workerGroupVal.isOverride()) {
+            execRuntimeServices.setWorkerGroupName(workerGroupVal.getValue());
         } else {
             if (workerGroup != null) {
                 workerGroupVal = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
-                setWorkerGroupOnContexts(flowContext, execRuntimeServices, workerGroupVal);
+                setWorkerGroupOnContexts(flowContext, execRuntimeServices, workerGroupVal.getValue());
             } else {
-                setWorkerGroupOnContexts(flowContext, execRuntimeServices, DEFAULT_GROUP);
+                setWorkerGroupOnContexts(flowContext, execRuntimeServices,
+                        workerGroupVal.getValue() != null ? workerGroupVal.getValue() : DEFAULT_GROUP);
             }
         }
         return workerGroupVal;
     }
 
-    private String computeParentWorkerGroup(RunEnvironment runEnv) {
-        String workerGroupVal = null;
+    private WorkerGroupType computeParentWorkerGroup(RunEnvironment runEnv) {
+        WorkerGroupType workerGroupVal = new WorkerGroupType();
         Stack<ParentFlowData> parentFlowStack = runEnv.getParentFlowStack().cloneParentStackData();
 
         Iterator iterator = parentFlowStack.iterator();
         while (iterator.hasNext()) {
             ParentFlowData parentFlowData = (ParentFlowData) iterator.next();
-            String workerGroupTemp = parentFlowData.getWorkerGroup();
-            if (workerGroupTemp != null) {
+            WorkerGroupType workerGroupTemp = parentFlowData.getWorkerGroup();
+            if (workerGroupTemp.getValue() != null) {
                 workerGroupVal = workerGroupTemp;
-                break;
+                if (workerGroupTemp.isOverride()) {
+                    break;
+                }
             }
         }
         return workerGroupVal;
@@ -339,7 +348,7 @@ public class StepExecutionData extends AbstractExecutionData {
         flowContext.putArgument(WORKER_GROUP, workerGroupVal);
     }
 
-    private String computeWorkerGroup(WorkerGroupStatement workerGroup,
+    private WorkerGroupType computeWorkerGroup(WorkerGroupStatement workerGroup,
                                       Context flowContext,
                                       RunEnvironment runEnv,
                                       String expression) {
@@ -350,7 +359,7 @@ public class StepExecutionData extends AbstractExecutionData {
             workerGroupValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
                     runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
         }
-        return workerGroupValue.toString();
+        return new WorkerGroupType(workerGroupValue.toString(), workerGroup.isOverride());
     }
 
     private void putStepNavigationOptions(RunEnvironment runEnv, List<NavigationOptions> stepNavigationOptions,
