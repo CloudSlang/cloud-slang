@@ -42,10 +42,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -87,7 +89,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                                 @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                                 @Param(ScoreLangConstants.EXECUTABLE_TYPE) ExecutableType executableType,
-                                @Param(SYSTEM_CONTEXT) SystemContext systemContext) {
+                                @Param(SYSTEM_CONTEXT) SystemContext systemContext,
+                                @Param(USE_EMPTY_VALUES_FOR_PROMPTS_KEY) Boolean useEmptyValuesForPrompts) {
         try {
             Map<String, Value> callArguments = runEnv.removeCallArguments();
 
@@ -127,8 +130,12 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             );
 
             List<Input> missingInputs = new ArrayList<>();
-            Map<String, Value> boundInputValues = inputsBinding
-                    .bindInputs(executableInputs, callArguments, runEnv.getSystemProperties(), missingInputs);
+            Map<String, Value> boundInputValues = inputsBinding.bindInputs(
+                    executableInputs,
+                    callArguments,
+                    runEnv.getSystemProperties(),
+                    missingInputs,
+                    isTrue(useEmptyValuesForPrompts));
 
             //if there are any missing required input after binding
             // try to resolve it using provided missing input handler
@@ -139,7 +146,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         runEnv,
                         executionRuntimeServices,
                         stepType,
-                        nodeName);
+                        nodeName,
+                        isTrue(useEmptyValuesForPrompts));
 
                 if (!canContinue) {
                     return;
