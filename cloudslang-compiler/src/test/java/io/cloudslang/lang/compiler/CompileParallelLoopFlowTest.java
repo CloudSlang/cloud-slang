@@ -167,7 +167,7 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(4L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
         verifyParallelLoopStatement(addBranchesActionData);
@@ -189,7 +189,7 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(4L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
@@ -221,7 +221,7 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(4L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
@@ -250,7 +250,7 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(4L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
@@ -299,7 +299,7 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(4L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
@@ -348,7 +348,7 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(4L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
@@ -395,7 +395,7 @@ public class CompileParallelLoopFlowTest {
         ExecutionPlan executionPlan = artifact.getExecutionPlan();
         assertNotNull("executionPlan is null", executionPlan);
 
-        ExecutionStep addBranchesStep = executionPlan.getStep(3L);
+        ExecutionStep addBranchesStep = executionPlan.getStep(4L);
         assertTrue("add branches step is not marked as split step", addBranchesStep.isSplitStep());
         Map<String, ?> addBranchesActionData = addBranchesStep.getActionData();
 
