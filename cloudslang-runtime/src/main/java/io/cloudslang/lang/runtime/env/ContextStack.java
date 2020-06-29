@@ -10,6 +10,8 @@
 package io.cloudslang.lang.runtime.env;
 
 import java.io.Serializable;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Stack;
 
 /**
@@ -19,24 +21,25 @@ import java.util.Stack;
  */
 public class ContextStack implements Serializable {
 
-    private Stack<Context> stack = new Stack<>();
+    private Deque<Context> stack;
+
+    public ContextStack() {
+        stack = new ArrayDeque<>();
+    }
 
     public void pushContext(Context newContext) {
         stack.push(newContext);
     }
 
     public Context popContext() {
-        if (stack.empty()) {
+        if (stack.isEmpty()) {
             return null;
+        } else {
+            return stack.pop();
         }
-        return stack.pop();
     }
 
     public Context peekContext() {
-        if (stack.empty()) {
-            return null;
-        }
         return stack.peek();
     }
-
 }
