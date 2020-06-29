@@ -88,6 +88,8 @@ public class StepExecutionData extends AbstractExecutionData {
             prepareNodeName(executionRuntimeServices, nodeName, flowDepth);
 
             Context flowContext = runEnv.getStack().popContext();
+            String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
+            flowContext.putVariable("run_id", ValueFactory.create(executionId));
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
             if (workerGroup != null) {
@@ -172,6 +174,9 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
             Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
+            //Adding run_id to binding context so that it can be resolved during output binding
+            String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
+            outputsBindingContext.put("run_id", ValueFactory.create(executionId));
 
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
