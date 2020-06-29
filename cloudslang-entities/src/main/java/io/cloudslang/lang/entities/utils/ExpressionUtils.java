@@ -34,19 +34,22 @@ public final class ExpressionUtils {
     private ExpressionUtils() {
     }
 
-    private static final Pattern EXPRESSION_PATTERN = compile(EXPRESSION_REGEX, Pattern.DOTALL);
-    private static final Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
+    private static final Pattern EXPRESSION_PATTERN = compile(EXPRESSION_REGEX,
+            Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE,
+            Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE =
-            compile(SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE);
+            compile(SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
 
     private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE =
-            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
+            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE =
-            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
+            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
 
-    private static final Pattern GET_PATTERN = compile(GET_REGEX);
-    private static final Pattern GET_PATTERN_WITH_DEFAULT = compile(GET_REGEX_WITH_DEFAULT);
-    private static final Pattern CHECK_EMPTY_PATTERN = compile(CHECK_EMPTY_REGEX);
+    private static final Pattern GET_PATTERN = compile(GET_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern GET_PATTERN_WITH_DEFAULT = compile(GET_REGEX_WITH_DEFAULT,
+            Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern CHECK_EMPTY_PATTERN = compile(CHECK_EMPTY_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
 
     public static String extractExpression(Serializable value) {
         String expression = null;

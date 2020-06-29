@@ -36,6 +36,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -65,20 +66,20 @@ public class CompileFlowWithOnFailureTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 9, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 12, executionPlan.getSteps().size());
         assertEquals("execution plan name is different than expected", "flow_with_on_failure", executionPlan.getName());
         assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
         assertEquals("the inputs size is not as expected", 1, compilationArtifact.getInputs().size());
 
-        long firstOnFailureStep = 7L;
+        long firstOnFailureStep = 9L;
         long endFlowStep = 0L;
 
-        ExecutionStep firstStep = executionPlan.getStep(4L);
+        ExecutionStep firstStep = executionPlan.getStep(5L);
         assertEquals("first step didn't navigate to on failure",
                 firstOnFailureStep, getFailureNavigationStepId(firstStep));
-        ExecutionStep secondStep = executionPlan.getStep(6L);
+        ExecutionStep secondStep = executionPlan.getStep(8L);
         assertEquals(endFlowStep, getFailureNavigationStepId(secondStep));
-        ExecutionStep firstOnFailStep = executionPlan.getStep(8L);
+        ExecutionStep firstOnFailStep = executionPlan.getStep(11L);
         assertEquals(endFlowStep, getFailureNavigationStepId(firstOnFailStep));
     }
 
@@ -136,18 +137,17 @@ public class CompileFlowWithOnFailureTest {
         CompilationArtifact compilationArtifact = compiler.compile(SlangSource.fromFile(flow), path);
         ExecutionPlan executionPlan = compilationArtifact.getExecutionPlan();
         assertNotNull("execution plan is null", executionPlan);
-        assertEquals("there is a different number of steps than expected", 7, executionPlan.getSteps().size());
+        assertEquals("there is a different number of steps than expected", 9, executionPlan.getSteps().size());
         assertEquals("execution plan name is different than expected", "flow_with_roi", executionPlan.getName());
         assertEquals("the dependencies size is not as expected", 1, compilationArtifact.getDependencies().size());
 
         final long step1 = 1;
-        final long step3 = 3;
+        final long step4 = 4;
 
         ExecutionStep firstStep = executionPlan.getStep(step1);
-        assertTrue("navigation data is not empty", firstStep.getNavigationData() == null ||
-                firstStep.getNavigationData().isEmpty());
+        assertTrue("navigation data is empty", isNotEmpty(firstStep.getNavigationData()));
 
-        ExecutionStep thirdStep = executionPlan.getStep(step3);
+        ExecutionStep thirdStep = executionPlan.getStep(step4);
         assertTrue("navigation data is empty", thirdStep.getNavigationData() != null &&
                 !thirdStep.getNavigationData().isEmpty());
         List<NavigationOptions> optionsList = (List<NavigationOptions>) thirdStep.getNavigationData()

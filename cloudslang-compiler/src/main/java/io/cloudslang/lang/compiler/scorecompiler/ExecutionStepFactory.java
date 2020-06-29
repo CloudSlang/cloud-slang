@@ -58,6 +58,20 @@ public class ExecutionStepFactory {
         return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "beginStep", actionData);
     }
 
+    public ExecutionStep createWorkerGroupStep(Long index, Map<String, Serializable> preStepData, String stepName,
+                                                  String workerGroup) {
+        Validate.notNull(preStepData, "preStepData is null");
+        Map<String, Serializable> actionData = new HashMap<>();
+        actionData.put(ScoreLangConstants.HOOKS, "TBD");
+        actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
+        actionData.put(ScoreLangConstants.NEXT_STEP_ID_KEY, index + 1);
+
+        if (workerGroup != null) {
+            actionData.put(ScoreLangConstants.WORKER_GROUP, preStepData.get(SlangTextualKeys.WORKER_GROUP));
+        }
+        return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "setWorkerGroupStep", actionData);
+    }
+
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
                                               Map<String, ResultNavigation> navigationValues,
                                               String stepName, String workerGroup, boolean parallelLoop) {
@@ -196,7 +210,11 @@ public class ExecutionStepFactory {
         step.setActionData(actionData);
 
         step.setNavigation(new ControlActionMetadata(NAVIGATION_ACTIONS_CLASS, SIMPLE_NAVIGATION_METHOD));
-        step.setNavigationData(new HashMap<>());
+
+        //this is needed in case if we're going to pause navigation
+        Map<String, Object> navigationData = new HashMap<>();
+        navigationData.put(ScoreLangConstants.CURRENT_STEP_ID_KEY, stepId);
+        step.setNavigationData(navigationData);
 
         return step;
     }

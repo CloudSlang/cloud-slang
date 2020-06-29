@@ -9,25 +9,44 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+
+
+import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_DELIMITER_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_MESSAGE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_OPTIONS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_TYPE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 public abstract class AbstractInputsTransformer extends InOutTransformer {
+
+    private static final String DEFAULT_PROMPT_MESSAGE = "Enter a value for '%s'";
+    private static final HashSet<String> KNOWN_KEYS = newHashSet(
+            REQUIRED_KEY,
+            SENSITIVE_KEY,
+            PRIVATE_INPUT_KEY,
+            DEFAULT_KEY,
+            PROMPT_KEY);
+    private static final String DEFAULT_DELIMITER = ",";
 
     protected PreCompileValidator preCompileValidator;
 
@@ -78,28 +97,42 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
     private Input createPropInput(Map.Entry<String, Map<String, Serializable>> entry,
                                   SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> props = entry.getValue();
-        List<String> knownKeys = Arrays.asList(REQUIRED_KEY, SENSITIVE_KEY, PRIVATE_INPUT_KEY, DEFAULT_KEY);
 
         for (String key : props.keySet()) {
-            if (!knownKeys.contains(key)) {
+            if (!KNOWN_KEYS.contains(key)) {
                 throw new RuntimeException(format("key: %s in input: %s is not a known property",
                         key, entry.getKey()));
             }
         }
 
         // default is required=true
-        boolean required = !props.containsKey(REQUIRED_KEY) ||
-                (boolean) props.get(REQUIRED_KEY);
+        boolean required = (boolean) props.getOrDefault(REQUIRED_KEY, true);
         // default is sensitive=false
-        boolean sensitive = props.containsKey(SENSITIVE_KEY) &&
-                (boolean) props.get(SENSITIVE_KEY);
+        boolean sensitive = (boolean) props.getOrDefault(SENSITIVE_KEY, false);
         // default is private=false
-        boolean privateInput = props.containsKey(PRIVATE_INPUT_KEY) &&
-                (boolean) props.get(PRIVATE_INPUT_KEY);
+        boolean privateInput = (boolean) props.getOrDefault(PRIVATE_INPUT_KEY, false);
+
         boolean defaultKeyFound = props.containsKey(DEFAULT_KEY);
-        String inputName = entry.getKey();
-        Serializable value = defaultKeyFound ? props.get(DEFAULT_KEY) : null;
+        final String inputName = entry.getKey();
+        final Serializable value = defaultKeyFound ? props.get(DEFAULT_KEY) : null;
         boolean defaultSpecified = defaultKeyFound && value != null && !StringUtils.EMPTY.equals(value);
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> promptSettings = (Map<String, String>) props.get(PROMPT_KEY);
+        if (!privateInput && isNotEmpty(promptSettings)) {
+            final PromptType type = ofNullable(promptSettings.get(PROMPT_TYPE_KEY))
+                    .map(PromptType::fromString)
+                    .orElse(PromptType.TEXT);
+
+            final String message = ofNullable(promptSettings.get(PROMPT_MESSAGE_KEY))
+                    .orElseGet(() -> String.format(DEFAULT_PROMPT_MESSAGE, inputName));
+
+            final String options = promptSettings.get(PROMPT_OPTIONS_KEY);
+            final String delimiter = promptSettings.getOrDefault(PROMPT_DELIMITER_KEY, DEFAULT_DELIMITER);
+
+            return createInput(inputName, value, sensitive, required, privateInput, sensitivityLevel,
+                    type, message, options, delimiter);
+        }
 
         if (privateInput && required && !defaultSpecified) {
             throw new RuntimeException(PreCompileValidator.VALIDATION_ERROR +
@@ -121,6 +154,16 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             boolean sensitive,
             boolean required,
             boolean privateInput, SensitivityLevel sensitivityLevel) {
+        return createInput(name, value, sensitive, required, privateInput, sensitivityLevel, null, null, null, null);
+    }
+
+    private Input createInput(
+            String name,
+            Serializable value,
+            boolean sensitive,
+            boolean required,
+            boolean privateInput, SensitivityLevel sensitivityLevel,
+            PromptType promptType, String message, String options, String delimiter) {
         executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
         Accumulator dependencyAccumulator = extractFunctionData(value);
@@ -129,6 +172,10 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
                 .withPrivateInput(privateInput)
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
                 .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
+                .withPrompt(promptType)
+                .withPromptMessage(message)
+                .withPromptOptions(options)
+                .withPromptDelimiter(delimiter)
                 .build();
     }
 

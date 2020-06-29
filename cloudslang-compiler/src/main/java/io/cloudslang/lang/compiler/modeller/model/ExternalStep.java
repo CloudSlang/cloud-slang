@@ -29,14 +29,14 @@ public class ExternalStep extends Step {
             boolean parallelLoop,
             boolean onFailureStep
     ) {
-        super(
-                name,
+        super(name,
                 preStepActionData,
                 postStepActionData,
                 arguments,
                 navigationStrings,
                 refId,
                 workerGroup,
+                null,
                 parallelLoop,
                 onFailureStep
         );

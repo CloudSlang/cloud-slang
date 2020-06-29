@@ -25,4 +25,7 @@ public interface ExternalExecutionStepFactory {
     ExecutionStep createFinishExternalFlowStep(Long index, Map<String, Serializable> postStepData,
                                                Map<String, ResultNavigation> navigationValues,
                                                String stepName, String workerGroup, boolean parallelLoop);
+
+    ExecutionStep createWorkerGroupExternalFlowStep(Long index, Map<String, Serializable> preStepData,
+                                                       String stepName, String workerGroup);
 }

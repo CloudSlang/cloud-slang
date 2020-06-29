@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
+import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -30,6 +31,10 @@ public class Input extends InOutParam {
 
     private boolean required;
     private boolean privateInput;
+    private PromptType promptType;
+    private String promptMessage;
+    private String promptOptions;
+    private String promptDelimiter;
 
     private Input(InputBuilder inputBuilder) {
         super(inputBuilder.name,
@@ -39,6 +44,10 @@ public class Input extends InOutParam {
         );
         this.required = inputBuilder.required;
         this.privateInput = inputBuilder.privateInput;
+        this.promptType = inputBuilder.promptType;
+        this.promptMessage = inputBuilder.promptMessage;
+        this.promptOptions = inputBuilder.promptOptions;
+        this.promptDelimiter = inputBuilder.promptDelimiter;
     }
 
     /**
@@ -56,12 +65,32 @@ public class Input extends InOutParam {
         return privateInput;
     }
 
+    public PromptType getPromptType() {
+        return promptType;
+    }
+
+    public String getPromptMessage() {
+        return promptMessage;
+    }
+
+    public String getPromptOptions() {
+        return promptOptions;
+    }
+
+    public String getPromptDelimiter() {
+        return promptDelimiter;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("required", required)
                 .append("privateInput", privateInput)
+                .append("promptType", promptType)
+                .append("promptMessage", promptMessage)
+                .append("promptOptions", promptOptions)
+                .append("promptDelimiter", promptDelimiter)
                 .toString();
     }
 
@@ -81,6 +110,10 @@ public class Input extends InOutParam {
                 .appendSuper(super.equals(o))
                 .append(required, input.required)
                 .append(privateInput, input.privateInput)
+                .append(promptType, input.promptType)
+                .append(promptMessage, input.promptMessage)
+                .append(promptOptions, input.promptOptions)
+                .append(promptDelimiter, input.promptDelimiter)
                 .isEquals();
     }
 
@@ -90,6 +123,10 @@ public class Input extends InOutParam {
                 .appendSuper(super.hashCode())
                 .append(required)
                 .append(privateInput)
+                .append(promptType)
+                .append(promptMessage)
+                .append(promptOptions)
+                .append(promptDelimiter)
                 .toHashCode();
     }
 
@@ -100,6 +137,10 @@ public class Input extends InOutParam {
         private boolean privateInput;
         private Set<ScriptFunction> functionDependencies;
         private Set<String> systemPropertyDependencies;
+        private PromptType promptType;
+        private String promptMessage;
+        private String promptOptions;
+        private String promptDelimiter;
 
         public InputBuilder(String name, Serializable serializable) {
             this(name, serializable, false);
@@ -150,6 +191,26 @@ public class Input extends InOutParam {
 
         public InputBuilder withSystemPropertyDependencies(Set<String> systemPropertyDependencies) {
             this.systemPropertyDependencies = systemPropertyDependencies;
+            return this;
+        }
+
+        public InputBuilder withPrompt(PromptType promptType) {
+            this.promptType = promptType;
+            return this;
+        }
+
+        public InputBuilder withPromptMessage(String promptMessage) {
+            this.promptMessage = promptMessage;
+            return this;
+        }
+
+        public InputBuilder withPromptOptions(String promptOptions) {
+            this.promptOptions = promptOptions;
+            return this;
+        }
+
+        public InputBuilder withPromptDelimiter(String promptDelimiter) {
+            this.promptDelimiter = promptDelimiter;
             return this;
         }
 

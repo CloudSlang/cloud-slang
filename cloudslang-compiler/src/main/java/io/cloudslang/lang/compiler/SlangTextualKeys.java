@@ -67,6 +67,7 @@ public interface SlangTextualKeys {
     String NAVIGATION_KEY = "navigate";
     String PARALLEL_LOOP_KEY = "parallel_loop";
     String WORKER_GROUP = "worker_group"; //&& flow
+    String ROBOT_GROUP = "robot_group";
 
     //seq step
     String SEQ_STEP_ID_KEY = "id";
@@ -77,6 +78,7 @@ public interface SlangTextualKeys {
     String SEQ_STEP_DEFAULT_ARGS_KEY = "default_args";
     String SEQ_STEP_HIGHLIGHT_ID_KEY = "highlight_id";
     String SEQ_STEP_SNAPSHOT_KEY = "snapshot";
+    String SEQ_STEP_COMMENT_KEY = "comment";
 
     //inputs
     String VALUE_KEY = "value";
@@ -85,6 +87,11 @@ public interface SlangTextualKeys {
     String SENSITIVE_KEY = "sensitive";
     String PRIVATE_INPUT_KEY = "private";
     String SEQ_OUTPUT_ROBOT_KEY = "robot";
+    String PROMPT_KEY = "prompt";
+    String PROMPT_TYPE_KEY = "type";
+    String PROMPT_MESSAGE_KEY = "message";
+    String PROMPT_OPTIONS_KEY = "options";
+    String PROMPT_DELIMITER_KEY = "delimiter";
 
     // system properties
     String SYSTEM_PROPERTY_KEY = "properties";

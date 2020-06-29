@@ -23,6 +23,7 @@ public class SeqStep implements Serializable {
     private String defaultArgs;
     private String highlightId;
     private String snapshot;
+    private String comment;
     private Set<String> systemPropertyDependencies;
 
     public String getName() {
@@ -87,6 +88,14 @@ public class SeqStep implements Serializable {
 
     public void setDefaultArgs(String defaultArgs) {
         this.defaultArgs = defaultArgs;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public Set<String> getSystemPropertyDependencies() {

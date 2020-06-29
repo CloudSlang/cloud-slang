@@ -15,7 +15,7 @@ import io.cloudslang.runtime.impl.RuntimeManagementConfiguration;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Options;
-import org.python.core.PySystemState;
+import org.python.core.RegistryKey;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -35,6 +35,6 @@ public class SlangRuntimeSpringConfig {
         if (StringUtils.isEmpty(encodingValue)) {
             encodingValue = StandardCharsets.UTF_8.name();
         }
-        System.getProperties().setProperty(PySystemState.PYTHON_IO_ENCODING, encodingValue);
+        System.getProperties().setProperty(RegistryKey.PYTHON_IO_ENCODING, encodingValue);
     }
 }
