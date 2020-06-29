@@ -34,6 +34,8 @@ import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.nonNull;
+
 @Component
 public class InputsBinding extends AbstractBinding {
 
@@ -75,7 +77,7 @@ public class InputsBinding extends AbstractBinding {
             throw new RuntimeException(errorMessagePrefix + "', \n\t" + t.getMessage(), t);
         }
 
-        if (input.isRequired() && isEmpty(value)) {
+        if (input.isRequired() && isEmpty(value) || nonNull(input.getPromptType())) {
             missingInputs.add(input);
             return;
         }
