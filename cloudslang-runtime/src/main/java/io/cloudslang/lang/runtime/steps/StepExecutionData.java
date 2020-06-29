@@ -22,6 +22,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
+import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -88,8 +89,10 @@ public class StepExecutionData extends AbstractExecutionData {
             prepareNodeName(executionRuntimeServices, nodeName, flowDepth);
 
             Context flowContext = runEnv.getStack().popContext();
+            //Adding run_id to binding context so that it can be resolved during input binding
             String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
-            flowContext.putVariable("run_id", ValueFactory.create(executionId));
+            flowContext.putVariable(RuntimeConstants.EXECUTION_ID, ValueFactory.create(executionId));
+
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
             if (workerGroup != null) {
@@ -176,7 +179,7 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
             //Adding run_id to binding context so that it can be resolved during output binding
             String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
-            outputsBindingContext.put("run_id", ValueFactory.create(executionId));
+            outputsBindingContext.put(RuntimeConstants.EXECUTION_ID, ValueFactory.create(executionId));
 
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
