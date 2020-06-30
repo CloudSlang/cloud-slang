@@ -61,6 +61,7 @@ public final class ExpressionUtils {
     private static final Pattern GET_PATTERN = compile(GET_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern GET_PATTERN_WITH_DEFAULT = compile(GET_REGEX_WITH_DEFAULT,
             Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern CHECK_EMPTY_PATTERN = compile(CHECK_EMPTY_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
 
     private static final Map<ScriptFunction, Pattern> patternsMap = new HashMap<>();
 
@@ -102,6 +103,10 @@ public final class ExpressionUtils {
 
     public static boolean matchGetFunction(String text) {
         return matchPattern(GET_PATTERN_WITH_DEFAULT, text) || matchPattern(GET_PATTERN, text);
+    }
+
+    public static boolean matchCheckEmptyFunction(String text) {
+        return matchPattern(CHECK_EMPTY_PATTERN, text);
     }
 
     private static boolean matchPattern(Pattern pattern, String text) {
