@@ -459,7 +459,7 @@ public class InputsBindingTest {
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context,
                                           Set<SystemProperty> systemProperties, List<Input> missingInputs) {
-        return inputsBinding.bindInputs(inputs, context, systemProperties, missingInputs);
+        return inputsBinding.bindInputs(inputs, context, systemProperties, missingInputs, false);
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context) {
