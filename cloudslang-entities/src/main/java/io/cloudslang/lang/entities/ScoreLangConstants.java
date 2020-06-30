@@ -100,4 +100,5 @@ public interface ScoreLangConstants {
 
     //prompting
     String PROMPTED_USER_INPUTS_KEY = "PROMPTED_USER_INPUTS_KEY";
+    String USE_EMPTY_VALUES_FOR_PROMPTS_KEY = "useEmptyValuesForPrompts";
 }
