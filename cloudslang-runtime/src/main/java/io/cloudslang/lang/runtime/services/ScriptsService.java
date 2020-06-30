@@ -31,7 +31,7 @@ public class ScriptsService {
     private Map<ScriptFunction, String> scriptsMap = new HashMap<>();
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         List<ScriptFunction> list = Arrays.asList(
                 ScriptFunction.GET,
                 ScriptFunction.GET_SYSTEM_PROPERTY,
@@ -52,7 +52,7 @@ public class ScriptsService {
         }
     }
 
-    private String loadScript(String script) {
+    private String loadScript(String script) throws IOException {
         String resourceFilePath = "/scripts/" + script + ".py";
 
         try (InputStream inputStream = this.getClass().getResourceAsStream(resourceFilePath)) {
@@ -60,9 +60,8 @@ public class ScriptsService {
 
         } catch (IOException e) {
             logger.error("Unable to read properties from " + resourceFilePath, e);
+            throw e;
         }
-
-        return "";
     }
 
     public String getScript(ScriptFunction function) {

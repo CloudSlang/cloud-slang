@@ -1,5 +1,8 @@
-def cs_extract_number(str, count = 1):
-  nums = str.split()
+def cs_extract_number(string, count = 1):
+  if type(string).__name__ != 'str' and type(string).__name__ != 'unicode':
+    raise Exception("Expected a string for parameter 'string', got " + str(string))
+
+  nums = string.split()
   n = count
   result = None
   for x in nums:
