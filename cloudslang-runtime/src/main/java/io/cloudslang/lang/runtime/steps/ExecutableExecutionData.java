@@ -47,7 +47,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang.BooleanUtils.isTrue;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
