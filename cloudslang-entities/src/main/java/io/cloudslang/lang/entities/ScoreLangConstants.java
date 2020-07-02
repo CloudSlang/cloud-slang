@@ -47,6 +47,7 @@ public interface ScoreLangConstants {
     //navigation
     String NEXT_STEP_ID_KEY = "nextStepId";
     String PREVIOUS_STEP_ID_KEY = "previousStepId";
+    String CURRENT_STEP_ID_KEY = "currentStepId";
 
     //operation scope
     String EXECUTABLE_INPUTS_KEY = "executableInputs";
@@ -97,4 +98,7 @@ public interface ScoreLangConstants {
 
     String SEQ_ASSIGNMENT_ACTION = "=";
 
+    //prompting
+    String PROMPTED_USER_INPUTS_KEY = "PROMPTED_USER_INPUTS_KEY";
+    String USE_EMPTY_VALUES_FOR_PROMPTS_KEY = "useEmptyValuesForPrompts";
 }

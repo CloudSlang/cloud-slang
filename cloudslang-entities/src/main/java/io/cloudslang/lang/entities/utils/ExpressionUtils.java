@@ -9,13 +9,25 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.utils;
 
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
+
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.cloudslang.lang.entities.constants.Regex.CHECK_EMPTY_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_APPEND_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_EXTRACT_NUMBER_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_PREPEND_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_REPLACE_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_ROUND_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_SUBSTRING_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_TO_LOWER_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_TO_UPPER_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.EXPRESSION_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX_WITH_DEFAULT;
@@ -34,19 +46,40 @@ public final class ExpressionUtils {
     private ExpressionUtils() {
     }
 
-    private static final Pattern EXPRESSION_PATTERN = compile(EXPRESSION_REGEX, Pattern.DOTALL);
-    private static final Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE);
+    private static final Pattern EXPRESSION_PATTERN = compile(EXPRESSION_REGEX,
+            Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE = compile(SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE,
+            Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE =
-            compile(SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE);
+            compile(SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
 
     private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE =
-            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE);
+            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE =
-            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE);
+            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
 
-    private static final Pattern GET_PATTERN = compile(GET_REGEX);
-    private static final Pattern GET_PATTERN_WITH_DEFAULT = compile(GET_REGEX_WITH_DEFAULT);
-    private static final Pattern CHECK_EMPTY_PATTERN = compile(CHECK_EMPTY_REGEX);
+    private static final Pattern GET_PATTERN = compile(GET_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern GET_PATTERN_WITH_DEFAULT = compile(GET_REGEX_WITH_DEFAULT,
+            Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern CHECK_EMPTY_PATTERN = compile(CHECK_EMPTY_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
+
+    private static final Map<ScriptFunction, Pattern> patternsMap = new HashMap<>();
+
+    static {
+        addPattern(ScriptFunction.CHECK_EMPTY, CHECK_EMPTY_REGEX);
+        addPattern(ScriptFunction.CS_APPEND, CS_APPEND_REGEX);
+        addPattern(ScriptFunction.CS_PREPEND, CS_PREPEND_REGEX);
+        addPattern(ScriptFunction.CS_EXTRACT_NUMBER, CS_EXTRACT_NUMBER_REGEX);
+        addPattern(ScriptFunction.CS_REPLACE, CS_REPLACE_REGEX);
+        addPattern(ScriptFunction.CS_ROUND, CS_ROUND_REGEX);
+        addPattern(ScriptFunction.CS_SUBSTRING, CS_SUBSTRING_REGEX);
+        addPattern(ScriptFunction.CS_TO_LOWER, CS_TO_LOWER_REGEX);
+        addPattern(ScriptFunction.CS_TO_UPPER, CS_TO_UPPER_REGEX);
+    }
+
+    private static void addPattern(ScriptFunction function, String regex) {
+        patternsMap.put(function, compile(regex, Pattern.UNICODE_CHARACTER_CLASS));
+    }
 
     public static String extractExpression(Serializable value) {
         String expression = null;
@@ -90,4 +123,12 @@ public final class ExpressionUtils {
         return parameters;
     }
 
+    public static boolean matchesFunction(ScriptFunction function, String expression) {
+        Pattern pattern = patternsMap.get(function);
+        if (pattern != null) {
+            return matchPattern(pattern, expression);
+        }
+
+        return false;
+    }
 }

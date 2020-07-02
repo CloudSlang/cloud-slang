@@ -18,6 +18,6 @@ import java.util.regex.Pattern;
  */
 public class NamespacePatternMatcher extends PatternMatcher {
     public NamespacePatternMatcher() {
-        super(Pattern.compile(Regex.NAMESPACE_CHARS));
+        super(Pattern.compile(Regex.NAMESPACE_CHARS, Pattern.UNICODE_CHARACTER_CLASS));
     }
 }

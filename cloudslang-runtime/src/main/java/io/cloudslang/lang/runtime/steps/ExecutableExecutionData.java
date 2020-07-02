@@ -20,6 +20,7 @@ import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
+import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
@@ -27,20 +28,26 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.lang.SystemContext;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -61,14 +68,18 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     private final ExecutionPreconditionService executionPreconditionService;
 
+    private final MissingInputHandler missingInputHandler;
+
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
-                                   OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService) {
+                                   OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
+                                   MissingInputHandler missingInputHandler) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
         this.executionPreconditionService = preconditionService;
+        this.missingInputHandler = missingInputHandler;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
@@ -77,7 +88,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                                 @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                                 @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
-                                @Param(ScoreLangConstants.EXECUTABLE_TYPE) ExecutableType executableType) {
+                                @Param(ScoreLangConstants.EXECUTABLE_TYPE) ExecutableType executableType,
+                                @Param(SYSTEM_CONTEXT) SystemContext systemContext,
+                                @Param(USE_EMPTY_VALUES_FOR_PROMPTS_KEY) Boolean useEmptyValuesForPrompts) {
         try {
             Map<String, Value> callArguments = runEnv.removeCallArguments();
 
@@ -102,6 +115,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
+            //might put some additional values to callArguments
+            missingInputHandler.applyPromptInputValues(systemContext, callArguments);
+
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
                     executableInputs,
@@ -113,8 +129,30 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     callArguments
             );
 
-            Map<String, Value> boundInputValues = inputsBinding
-                    .bindInputs(executableInputs, callArguments, runEnv.getSystemProperties());
+            List<Input> missingInputs = new ArrayList<>();
+            Map<String, Value> boundInputValues = inputsBinding.bindInputs(
+                    executableInputs,
+                    callArguments,
+                    runEnv.getSystemProperties(),
+                    missingInputs,
+                    isTrue(useEmptyValuesForPrompts));
+
+            //if there are any missing required input after binding
+            // try to resolve it using provided missing input handler
+            if (CollectionUtils.isNotEmpty(missingInputs)) {
+                boolean canContinue = missingInputHandler.resolveMissingInputs(
+                        missingInputs,
+                        systemContext,
+                        runEnv,
+                        executionRuntimeServices,
+                        stepType,
+                        nodeName,
+                        isTrue(useEmptyValuesForPrompts));
+
+                if (!canContinue) {
+                    return;
+                }
+            }
 
             Map<String, Value> actionArguments = new HashMap<>();
 

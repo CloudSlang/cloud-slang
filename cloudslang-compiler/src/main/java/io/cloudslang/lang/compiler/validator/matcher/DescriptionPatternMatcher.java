@@ -18,6 +18,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import static java.util.regex.Pattern.UNICODE_CHARACTER_CLASS;
+
 /**
  * @author Bonczidai Levente
  * @since 3/20/2017
@@ -36,18 +38,20 @@ public class DescriptionPatternMatcher {
     private final Pattern descriptionVariableLineDeclarationOnlyPattern;
 
     public DescriptionPatternMatcher() {
-        descriptionStartPattern = Pattern.compile(Regex.DESCRIPTION_START_LINE);
-        descriptionVariableLinePattern = Pattern.compile(Regex.DESCRIPTION_VARIABLE_LINE);
-        descriptionGeneralLinePattern = Pattern.compile(Regex.DESCRIPTION_GENERAL_LINE);
-        descriptionComplementaryLinePattern = Pattern.compile(Regex.DESCRIPTION_COMPLEMENTARY_LINE);
-        descriptionEndPattern = Pattern.compile(Regex.DESCRIPTION_END_LINE);
-        commentLinePattern = Pattern.compile(Regex.COMMENT_LINE);
-        stepStartLinePattern = Pattern.compile(Regex.STEP_START_LINE);
-        executableDelimiterLinePattern = Pattern.compile(Regex.EXECUTABLE_DESCRIPTION_DELIMITER_LINE);
-        stepDelimiterLinePattern = Pattern.compile(Regex.STEP_DESCRIPTION_DELIMITER_LINE);
-        emptyLinePattern = Pattern.compile(Regex.DESCRIPTION_EMPTY_LINE);
+        descriptionStartPattern = Pattern.compile(Regex.DESCRIPTION_START_LINE, UNICODE_CHARACTER_CLASS);
+        descriptionVariableLinePattern = Pattern.compile(Regex.DESCRIPTION_VARIABLE_LINE, UNICODE_CHARACTER_CLASS);
+        descriptionGeneralLinePattern = Pattern.compile(Regex.DESCRIPTION_GENERAL_LINE, UNICODE_CHARACTER_CLASS);
+        descriptionComplementaryLinePattern = Pattern.compile(Regex.DESCRIPTION_COMPLEMENTARY_LINE,
+                UNICODE_CHARACTER_CLASS);
+        descriptionEndPattern = Pattern.compile(Regex.DESCRIPTION_END_LINE, UNICODE_CHARACTER_CLASS);
+        commentLinePattern = Pattern.compile(Regex.COMMENT_LINE, UNICODE_CHARACTER_CLASS);
+        stepStartLinePattern = Pattern.compile(Regex.STEP_START_LINE, UNICODE_CHARACTER_CLASS);
+        executableDelimiterLinePattern = Pattern.compile(Regex.EXECUTABLE_DESCRIPTION_DELIMITER_LINE,
+                UNICODE_CHARACTER_CLASS);
+        stepDelimiterLinePattern = Pattern.compile(Regex.STEP_DESCRIPTION_DELIMITER_LINE, UNICODE_CHARACTER_CLASS);
+        emptyLinePattern = Pattern.compile(Regex.DESCRIPTION_EMPTY_LINE, UNICODE_CHARACTER_CLASS);
         descriptionVariableLineDeclarationOnlyPattern =
-                Pattern.compile(Regex.DESCRIPTION_VARIABLE_LINE_DECLARATION_ONLY);
+                Pattern.compile(Regex.DESCRIPTION_VARIABLE_LINE_DECLARATION_ONLY, UNICODE_CHARACTER_CLASS);
     }
 
     public boolean matchesDescriptionStart(String input) {

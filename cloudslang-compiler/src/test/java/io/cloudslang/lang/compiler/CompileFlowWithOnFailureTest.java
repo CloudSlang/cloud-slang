@@ -36,6 +36,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -144,8 +145,7 @@ public class CompileFlowWithOnFailureTest {
         final long step4 = 4;
 
         ExecutionStep firstStep = executionPlan.getStep(step1);
-        assertTrue("navigation data is not empty", firstStep.getNavigationData() == null ||
-                firstStep.getNavigationData().isEmpty());
+        assertTrue("navigation data is empty", isNotEmpty(firstStep.getNavigationData()));
 
         ExecutionStep thirdStep = executionPlan.getStep(step4);
         assertTrue("navigation data is empty", thirdStep.getNavigationData() != null &&

@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -40,9 +41,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -185,9 +188,10 @@ public class InputsBindingTest {
                 .withPrivateInput(false)
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Input with name: 'input1' is Required, but value is empty");
-        bindInputs(inputs);
+        List<Input> missingInputs = new ArrayList<>();
+        bindInputs(inputs, new HashMap<>(), new HashSet<>(), missingInputs);
+
+        Assert.assertEquals(inputs, missingInputs);
     }
 
     @Test
@@ -455,12 +459,12 @@ public class InputsBindingTest {
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context,
-                                          Set<SystemProperty> systemProperties) {
-        return inputsBinding.bindInputs(inputs, context, systemProperties);
+                                          Set<SystemProperty> systemProperties, List<Input> missingInputs) {
+        return inputsBinding.bindInputs(inputs, context, systemProperties, missingInputs, false);
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context) {
-        return bindInputs(inputs, context, null);
+        return bindInputs(inputs, context, null, null);
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs) {
@@ -478,6 +482,11 @@ public class InputsBindingTest {
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
+        }
+
+        @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
         }
 
         @Bean

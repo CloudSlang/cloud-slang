@@ -34,6 +34,9 @@ import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+
 @Component
 public class InputsBinding extends AbstractBinding {
 
@@ -48,21 +51,23 @@ public class InputsBinding extends AbstractBinding {
      * @return : a new map with all inputs resolved (does not include initial context)
      */
     public Map<String, Value> bindInputs(List<Input> inputs, Map<String, ? extends Value> context,
-                                         Set<SystemProperty> systemProperties) {
+                                         Set<SystemProperty> systemProperties, List<Input> missingInputs,
+                                         boolean useEmptyValuesForPrompts) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
 
         //we do not want to change original context map
         Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
         for (Input input : inputs) {
-            bindInput(input, srcContext, resultContext, systemProperties);
+            bindInput(input, srcContext, resultContext, systemProperties, missingInputs, useEmptyValuesForPrompts);
         }
 
         return resultContext;
     }
 
     private void bindInput(Input input, Map<String, ? extends Value> context, Map<String, Value> targetContext,
-                           Set<SystemProperty> systemProperties) {
+                           Set<SystemProperty> systemProperties, List<Input> missingInputs,
+                           boolean useEmptyValuesForPrompts) {
         Value value;
 
         String inputName = input.getName();
@@ -76,7 +81,17 @@ public class InputsBinding extends AbstractBinding {
         }
 
         if (input.isRequired() && isEmpty(value)) {
-            throw new RuntimeException("Input with name: \'" + inputName + "\' is Required, but value is empty");
+            missingInputs.add(input);
+            return;
+        }
+
+        if (nonNull(input.getPromptType())) {
+            if (useEmptyValuesForPrompts) {
+                value = ValueFactory.create(EMPTY, input.isSensitive());
+            } else {
+                missingInputs.add(input);
+                return;
+            }
         }
 
         validateStringValue(errorMessagePrefix, value);

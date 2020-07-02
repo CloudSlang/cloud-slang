@@ -23,16 +23,19 @@ public class ExternalPythonScriptValidatorImpl implements ExternalPythonScriptVa
 
     private static final String METHOD_SIGNATURE_REGEX = "^def\\s+execute\\((([a-zA-Z0-9_]+,?\\s*)*)\\):\\s*\\R";
     private Pattern methodSignaturePattern = Pattern.compile(METHOD_SIGNATURE_REGEX,
-            Pattern.DOTALL | Pattern.MULTILINE);
+            Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String METHOD_CONTENT_REGEX = METHOD_SIGNATURE_REGEX + "(.*)";
-    private Pattern methodContentPattern = Pattern.compile(METHOD_CONTENT_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
+    private Pattern methodContentPattern = Pattern.compile(METHOD_CONTENT_REGEX,
+            Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String SINGLE_COMMENT_REGEX = "#.*?\n";
-    private Pattern singleCommentPattern = Pattern.compile(SINGLE_COMMENT_REGEX, Pattern.DOTALL | Pattern.MULTILINE);
+    private Pattern singleCommentPattern = Pattern.compile(SINGLE_COMMENT_REGEX,
+            Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL | Pattern.MULTILINE);
 
     private static final String MULTILINE_COMMENT_REGEX = "'''.*?'''";
-    private Pattern multilineCommentPattern = Pattern.compile(MULTILINE_COMMENT_REGEX, Pattern.DOTALL);
+    private Pattern multilineCommentPattern = Pattern.compile(MULTILINE_COMMENT_REGEX,
+            Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL);
 
     private static final String INPUTS_ARE_MISSING_ERROR = "Inputs are not defined for all execute method parameters.";
 

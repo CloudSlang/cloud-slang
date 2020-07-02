@@ -26,10 +26,13 @@ import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.bindings.strategies.EnforceValueMissingInputHandler;
+import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -41,6 +44,7 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import io.cloudslang.score.lang.SystemContext;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,6 +66,8 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import static java.util.Collections.singletonList;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySet;
@@ -92,7 +98,8 @@ public class ExecutableStepsTest {
     @Test
     public void testStart() throws Exception {
         executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(),
-            new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW);
+            new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW,
+                new SystemContext(), false);
     }
 
     @Test
@@ -103,9 +110,9 @@ public class ExecutableStepsTest {
         Map<String, Value> resultMap = new HashMap<>();
         resultMap.put("input1", ValueFactory.create(5));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList(), anyBoolean())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
-            new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW);
+            new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext(), false);
 
         Map<String, Value> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         Assert.assertTrue(opVars.containsKey("input1"));
@@ -132,9 +139,9 @@ public class ExecutableStepsTest {
         resultMap.put("input1", ValueFactory.create(inputs.get(0).getValue()));
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList(), anyBoolean())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
-            runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW);
+            runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
         Assert.assertFalse(events.isEmpty());
@@ -180,7 +187,8 @@ public class ExecutableStepsTest {
 
         Long nextStepPosition = 2L;
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
-            new ExecutionRuntimeServices(), "", nextStepPosition, ExecutableType.FLOW);
+                new ExecutionRuntimeServices(), "", nextStepPosition, ExecutableType.FLOW,
+                new SystemContext(), false);
 
         Assert.assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
     }
@@ -363,6 +371,11 @@ public class ExecutableStepsTest {
         }
 
         @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
+        }
+
+        @Bean
         public DependencyService mavenRepositoryService() {
             return new DependencyServiceImpl();
         }
@@ -395,7 +408,12 @@ public class ExecutableStepsTest {
         @Bean
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
-                    executionPreconditionService());
+                    executionPreconditionService(), missingInputHandler());
+        }
+
+        @Bean
+        public MissingInputHandler missingInputHandler() {
+            return new EnforceValueMissingInputHandler();
         }
 
         @Bean
