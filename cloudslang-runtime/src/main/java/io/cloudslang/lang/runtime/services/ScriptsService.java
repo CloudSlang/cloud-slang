@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.services;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,7 @@ public class ScriptsService {
         );
 
         for (ScriptFunction function: list) {
-            String script = loadScript(function.getValue());
+            String script = StringUtils.trim(loadScript(function.getValue()));
             scriptsMap.put(function, script);
         }
     }
