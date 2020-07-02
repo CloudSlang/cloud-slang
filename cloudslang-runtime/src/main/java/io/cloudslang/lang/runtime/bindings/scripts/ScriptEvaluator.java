@@ -40,7 +40,7 @@ import java.util.stream.Stream;
  */
 @Component
 public class ScriptEvaluator extends ScriptProcessor {
-    private static String LINE_SEPARATOR = System.lineSeparator();
+    private static String LINE_SEPARATOR = "\n";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
     private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
