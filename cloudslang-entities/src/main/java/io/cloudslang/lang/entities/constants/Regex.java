@@ -43,6 +43,14 @@ public class Regex {
     public static final String GET_REGEX = "get\\((.+)\\)";
     public static final String GET_REGEX_WITH_DEFAULT = "get\\((.+?),(.+?)\\)";
     public static final String CHECK_EMPTY_REGEX = "check_empty\\((.+?),(.+?)\\)";
+    public static final String CS_APPEND_REGEX = "cs_append\\((.+?),(.+?)\\)";
+    public static final String CS_PREPEND_REGEX = "cs_prepend\\((.+?),(.+?)\\)";
+    public static final String CS_EXTRACT_NUMBER_REGEX = "cs_extract_number\\((.+?)(,(.+?))?\\)";
+    public static final String CS_REPLACE_REGEX = "cs_replace\\((.+?),(.+?),(.+?)(,(.+?))?\\)";
+    public static final String CS_ROUND_REGEX = "cs_round\\((.+?)\\)";
+    public static final String CS_SUBSTRING_REGEX = "cs_substring\\((.+?),(.+?)(,(.+?))?\\)";
+    public static final String CS_TO_UPPER_REGEX = "cs_to_upper\\((.+?)\\)";
+    public static final String CS_TO_LOWER_REGEX = "cs_to_lower\\((.+?)\\)";
 
     //////////////// description
     public static final String DESCRIPTION_START_LINE = "(\\s*)(#!!)(([^#])(.*))*";
