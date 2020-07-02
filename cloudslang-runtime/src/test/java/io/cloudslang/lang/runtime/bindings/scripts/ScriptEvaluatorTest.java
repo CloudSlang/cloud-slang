@@ -27,7 +27,6 @@ import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
-import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -42,6 +41,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +50,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.anyString;
@@ -67,7 +70,7 @@ public class ScriptEvaluatorTest {
         System.setProperty("use.jython.expressions", "true");
     }
 
-    private static String LINE_SEPARATOR = System.lineSeparator();
+    private static String LINE_SEPARATOR = "\n";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
     private static final String GET_FUNCTION_DEFINITION =
@@ -148,13 +151,11 @@ public class ScriptEvaluatorTest {
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
         Set<String> actualFunctions = new HashSet<>();
         Collections.addAll(actualFunctions, actualFunctionsArray);
-        Set<String> expectedFunctions = newHashSet(
-                GET_FUNCTION_DEFINITION,
+        assertThat(actualFunctions.size(), is(4));
+        assertThat(actualFunctions, containsInAnyOrder(GET_FUNCTION_DEFINITION,
                 GET_SP_FUNCTION_DEFINITION,
                 CHECK_EMPTY_FUNCTION_DEFINITION,
-                BACKWARD_COMPATIBLE_ACCESS_METHOD
-        );
-        Assert.assertEquals(expectedFunctions, actualFunctions);
+                BACKWARD_COMPATIBLE_ACCESS_METHOD));
     }
 
     @Configuration
