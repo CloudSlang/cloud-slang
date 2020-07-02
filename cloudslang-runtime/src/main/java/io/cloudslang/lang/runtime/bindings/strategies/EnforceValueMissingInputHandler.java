@@ -32,7 +32,8 @@ public class EnforceValueMissingInputHandler implements MissingInputHandler {
                                         RunEnvironment runEnv,
                                         ExecutionRuntimeServices runtimeServices,
                                         LanguageEventData.StepType stepType,
-                                        String stepName) {
+                                        String stepName,
+                                        boolean emptyValuesForPrompts) {
         if (CollectionUtils.isNotEmpty(missingInputs)) {
             String exceptionMessage = missingInputs
                     .stream()

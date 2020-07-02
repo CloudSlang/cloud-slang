@@ -14,7 +14,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>1.0.138-SNAPSHOT</version>
+        <version>1.0.140-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -87,6 +87,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
         </dependency>
 
         <!--Test dependencies-->

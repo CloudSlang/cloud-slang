@@ -33,6 +33,7 @@ import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -66,6 +67,7 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import static java.util.Collections.singletonList;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
@@ -99,7 +101,7 @@ public class ExecutableStepsTest {
     public void testStart() throws Exception {
         executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(),
             new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW,
-                new SystemContext());
+                new SystemContext(), false);
     }
 
     @Test
@@ -110,9 +112,9 @@ public class ExecutableStepsTest {
         Map<String, Value> resultMap = new HashMap<>();
         resultMap.put("input1", ValueFactory.create(5));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList(), anyBoolean())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
-            new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext());
+            new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext(), false);
 
         Map<String, Value> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         Assert.assertTrue(opVars.containsKey("input1"));
@@ -139,9 +141,9 @@ public class ExecutableStepsTest {
         resultMap.put("input1", ValueFactory.create(inputs.get(0).getValue()));
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList(), anyBoolean())).thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
-            runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext());
+            runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
         Assert.assertFalse(events.isEmpty());
@@ -188,7 +190,7 @@ public class ExecutableStepsTest {
         Long nextStepPosition = 2L;
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
                 new ExecutionRuntimeServices(), "", nextStepPosition, ExecutableType.FLOW,
-                new SystemContext());
+                new SystemContext(), false);
 
         Assert.assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
     }
@@ -369,6 +371,11 @@ public class ExecutableStepsTest {
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return mock(ScriptEvaluator.class);
+        }
+
+        @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
         }
 
         @Bean
