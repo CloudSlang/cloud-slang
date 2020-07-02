@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
@@ -198,6 +199,15 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Context operationContext = runEnv.getStack().popContext();
             Map<String, Value> operationVariables = operationContext == null ?
                     null : operationContext.getImmutableViewOfVariables();
+
+            Context flowContext = runEnv.getStack().peekContext();
+            if (executableType == ExecutableType.FLOW && flowContext != null) {
+                String workerGroup = flowContext.removeArgument(WORKER_GROUP);
+                if (workerGroup != null) {
+                    executionRuntimeServices.setWorkerGroupName(workerGroup);
+                    executionRuntimeServices.setShouldCheckGroup();
+                }
+            }
 
             ReturnValues actionReturnValues = buildReturnValues(runEnv, executableType);
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);

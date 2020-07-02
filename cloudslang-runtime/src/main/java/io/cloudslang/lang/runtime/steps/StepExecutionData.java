@@ -179,13 +179,6 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
             Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
 
-            String workerGroup = flowContext.getArgument(WORKER_GROUP);
-            if (workerGroup != null) {
-                executionRuntimeServices.setWorkerGroupName(workerGroup);
-                executionRuntimeServices.setShouldCheckGroup();
-                flowContext.removeArgument(WORKER_GROUP);
-            }
-
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
                     outputsBindingContext,
