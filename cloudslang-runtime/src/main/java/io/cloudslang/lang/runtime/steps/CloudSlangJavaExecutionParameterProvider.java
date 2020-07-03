@@ -146,7 +146,11 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
 
     private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args,
                                               String parameterName, ClassLoader classLoader) {
-        Object sessionContextObject = sessionData.get(parameterName);
+        // cloudslang list iterator fix
+        final String parameter = this.nodeNameWithDepth.startsWith("list_iterator") ?
+                                                     this.nodeNameWithDepth : parameterName ;
+
+        Object sessionContextObject = sessionData.get(parameter);
         if (sessionContextObject == null) {
             try {
                 sessionContextObject = Class.forName(objectClassName, true, classLoader).newInstance();
@@ -154,7 +158,7 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                 throw new RuntimeException("Failed to create instance of [" + objectClassName + "] class", e);
             }
             //noinspection unchecked
-            sessionData.put(parameterName, sessionContextObject);
+            sessionData.put(parameter, sessionContextObject);
         }
         args.add(sessionContextObject);
     }
