@@ -10,20 +10,30 @@
 package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.entities.utils.MapUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Context implements Serializable {
 
     private final Map<String, Value> variables;
     private final Map<String, Value> langVariables;
+    private final Map<String, Value> magicVariables;
+
+    public Context(Map<String, Value> variables, Map<String, Value> magicVariables) {
+        this.variables = variables;
+        this.magicVariables = magicVariables;
+        langVariables = new HashMap<>();
+    }
 
     public Context(Map<String, Value> variables) {
         this.variables = variables;
+        this.magicVariables = new HashMap<>();
         langVariables = new HashMap<>();
     }
 
@@ -73,6 +83,7 @@ public class Context implements Serializable {
         return new EqualsBuilder()
                 .append(variables, that.variables)
                 .append(langVariables, that.langVariables)
+                .append(magicVariables,that.magicVariables)
                 .isEquals();
     }
 
@@ -81,6 +92,11 @@ public class Context implements Serializable {
         return new HashCodeBuilder()
                 .append(variables)
                 .append(langVariables)
+                .append(magicVariables)
                 .toHashCode();
+    }
+
+    public Map<String, Value> getGlobalVariables() {
+        return magicVariables;
     }
 }

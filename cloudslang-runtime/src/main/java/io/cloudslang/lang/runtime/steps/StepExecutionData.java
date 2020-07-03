@@ -89,9 +89,6 @@ public class StepExecutionData extends AbstractExecutionData {
             prepareNodeName(executionRuntimeServices, nodeName, flowDepth);
 
             Context flowContext = runEnv.getStack().popContext();
-            //Adding run_id to binding context so that it can be resolved during input binding
-            String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
-            flowContext.putVariable(RuntimeConstants.EXECUTION_ID, ValueFactory.create(executionId));
 
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
 
@@ -118,9 +115,10 @@ public class StepExecutionData extends AbstractExecutionData {
                     nodeName,
                     flowVariables
             );
-
+            Map<String,Value> globalVariables = flowContext.getGlobalVariables();
             Map<String, Value> boundInputs = argumentsBinding
-                    .bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
+                    .bindArguments(stepInputs, MapUtils.mergeMaps(flowVariables,globalVariables),
+                                    runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 
             sendEndBindingArgumentsEvent(
@@ -172,10 +170,9 @@ public class StepExecutionData extends AbstractExecutionData {
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
-            Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
-            //Adding run_id to binding context so that it can be resolved during output binding
-            String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
-            outputsBindingContext.put(RuntimeConstants.EXECUTION_ID, ValueFactory.create(executionId));
+            Map<String,Value> globalContext = flowContext.getGlobalVariables();
+            Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(
+                    argumentsResultContext, executableOutputs,globalContext);
 
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,

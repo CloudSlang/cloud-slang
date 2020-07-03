@@ -154,8 +154,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             if (userInputs != null) {
                 userInputs.clear();
             }
-
-            updateCallArgumentsAndPushContextToStack(runEnv, new Context(boundInputValues), actionArguments);
+            Map<String,Value> magicVariables = MagicVariableHelper.getGlobalContext(executionRuntimeServices);
+            updateCallArgumentsAndPushContextToStack(runEnv,
+                    new Context(boundInputValues,magicVariables), actionArguments);
 
             sendEndBindingInputsEvent(
                     executableInputs,

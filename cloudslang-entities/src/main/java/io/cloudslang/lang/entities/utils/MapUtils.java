@@ -25,11 +25,12 @@ public final class MapUtils {
     }
 
     public static Map<String, Value> mergeMaps(
-            Map<String, Value> map1,
-            Map<String, Value> map2) {
+            Map<String, Value> ... maps) {
         Map<String, Value> result = new HashMap<>();
-        putAllIfNotEmpty(result, map1);
-        putAllIfNotEmpty(result, map2);
+        for (Map<String, Value> map:maps
+        ) {
+            putAllIfNotEmpty(result, map);
+        }
         return result;
     }
 
