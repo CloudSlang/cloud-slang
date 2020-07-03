@@ -15,6 +15,7 @@ import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionObject;
 import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.runtime.api.java.JavaExecutionParametersProvider;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -147,10 +148,8 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
     private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args,
                                               String parameterName, ClassLoader classLoader) {
         // cloudslang list iterator fix
-        String parameter = parameterName;
-        if (this.nodeNameWithDepth != null) {
-            parameter = this.nodeNameWithDepth.startsWith("list_iterator") ? this.nodeNameWithDepth : parameterName;
-        }
+        final String parameter = StringUtils.startsWith(this.nodeNameWithDepth, "list_iterator") ?
+                                                   this.nodeNameWithDepth : parameterName;
 
         Object sessionContextObject = sessionData.get(parameter);
         if (sessionContextObject == null) {
