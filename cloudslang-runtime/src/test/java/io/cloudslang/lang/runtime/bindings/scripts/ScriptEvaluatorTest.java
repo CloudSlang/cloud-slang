@@ -74,16 +74,16 @@ public class ScriptEvaluatorTest {
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
     private static final String GET_FUNCTION_DEFINITION =
-            "def get(key, default_value=None):" + LINE_SEPARATOR +
-                    "  value = globals().get(key)" + LINE_SEPARATOR +
+            "def get(key, default_value=None):" + "\r" + LINE_SEPARATOR +
+                    "  value = globals().get(key)" + "\r" + LINE_SEPARATOR +
                     "  return default_value if value is None else value";
     private static final String GET_SP_FUNCTION_DEFINITION =
-            "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
-                    "  " + ACCESS_MONITORING_METHOD_NAME + "(key)" + LINE_SEPARATOR +
-                    "  property_value = " + SYSTEM_PROPERTIES_MAP + ".get(key)" + LINE_SEPARATOR +
+            "def get_sp(key, default_value=None):" + "\r" + LINE_SEPARATOR +
+                    "  " + ACCESS_MONITORING_METHOD_NAME + "(key)" + "\r" + LINE_SEPARATOR +
+                    "  property_value = " + SYSTEM_PROPERTIES_MAP + ".get(key)" + "\r" + LINE_SEPARATOR +
                     "  return default_value if property_value is None else property_value";
     private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
-            "def check_empty(value_to_check, default_value=None):" + LINE_SEPARATOR +
+            "def check_empty(value_to_check, default_value=None):" + "\r" + LINE_SEPARATOR +
                     "  return default_value if value_to_check is None else value_to_check";
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def " + ACCESS_MONITORING_METHOD_NAME + "(key):" +
             LINE_SEPARATOR + "  pass";

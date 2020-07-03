@@ -42,10 +42,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Iterator;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
@@ -318,9 +317,8 @@ public class StepExecutionData extends AbstractExecutionData {
 
     private WorkerGroupType computeParentWorkerGroup(RunEnvironment runEnv) {
         WorkerGroupType workerGroupVal = new WorkerGroupType();
-        Stack<ParentFlowData> parentFlowStack = runEnv.getParentFlowStack().cloneParentStackData();
 
-        Iterator iterator = parentFlowStack.iterator();
+        Iterator iterator = runEnv.getParentFlowStack().descendingIteratorParentStackData();
         while (iterator.hasNext()) {
             ParentFlowData parentFlowData = (ParentFlowData) iterator.next();
             WorkerGroupType workerGroupTemp = parentFlowData.getWorkerGroup();

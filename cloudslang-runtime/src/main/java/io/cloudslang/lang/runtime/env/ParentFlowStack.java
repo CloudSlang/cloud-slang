@@ -14,6 +14,8 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
+
 
 /**
  * User: stoneo
@@ -48,7 +50,7 @@ public class ParentFlowStack implements Serializable {
         return stack.size();
     }
 
-    public Stack<ParentFlowData> cloneParentStackData() {
-        return SerializationUtils.clone(stack);
+    public Iterator<ParentFlowData> descendingIteratorParentStackData() {
+        return stack.descendingIterator();
     }
 }
