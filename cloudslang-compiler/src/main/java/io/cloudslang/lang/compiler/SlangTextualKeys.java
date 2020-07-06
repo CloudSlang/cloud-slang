@@ -40,6 +40,8 @@ public interface SlangTextualKeys {
     String WORKFLOW_KEY = "workflow";
     String ON_FAILURE_KEY = "on_failure";
     String NEXT_STEP = "next_step";
+    String OVERRIDE = "override";
+    String VALUE = "value";
 
     //action
     String JAVA_ACTION_KEY = "java_action";

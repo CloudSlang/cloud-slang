@@ -37,8 +37,8 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
         if (rawData instanceof String) {
             value = (String) rawData;
         } else if (rawData instanceof Map) {
-            value = String.valueOf(((Map<String, Object>) rawData).get("value"));
-            override = (boolean) ((Map<String, Object>) rawData).get("override");
+            value = String.valueOf(((Map<String, Object>) rawData).get(SlangTextualKeys.VALUE));
+            override = (boolean) ((Map<String, Object>) rawData).get(SlangTextualKeys.OVERRIDE);
         }
         if (StringUtils.isBlank(value)) {
             return new BasicTransformModellingResult<>(null, Collections.emptyList());

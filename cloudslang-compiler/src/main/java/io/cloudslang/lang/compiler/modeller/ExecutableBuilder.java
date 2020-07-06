@@ -651,7 +651,7 @@ public class ExecutableBuilder {
             workerGroup = (String) stepRawData.get(SlangTextualKeys.WORKER_GROUP);
         } else if (stepRawData.get(SlangTextualKeys.WORKER_GROUP) instanceof Map) {
             workerGroup = String.valueOf(
-                    ((Map<String, Object>)stepRawData.get(SlangTextualKeys.WORKER_GROUP)).get("value"));
+                    ((Map<String, Object>)stepRawData.get(SlangTextualKeys.WORKER_GROUP)).get(SlangTextualKeys.VALUE));
         }
         String robotGroup = (String) stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
 
