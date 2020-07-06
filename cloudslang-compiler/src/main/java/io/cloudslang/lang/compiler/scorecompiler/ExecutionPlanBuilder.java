@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.scorecompiler;
 
-import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
 import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -24,6 +23,7 @@ import io.cloudslang.score.api.ExecutionStep;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -205,10 +205,9 @@ public class ExecutionPlanBuilder {
     private long getCurrentId(Map<String, Long> stepReferences, Deque<Step> steps) {
         Long currentId;
 
-        long max = Lambda.max(stepReferences);
-        Map.Entry maxEntry = selectFirst(stepReferences.entrySet(),
-                having(on(Map.Entry.class).getValue(), equalTo(max)));
-        String referenceKey = (String) (maxEntry).getKey();
+        Map.Entry maxEntry = Collections.max(stepReferences.entrySet(), Map.Entry.comparingByValue());
+        long max = (long) maxEntry.getValue();
+        String referenceKey = (String) maxEntry.getKey();
         Step step = null;
         for (Step stepItem : steps) {
             if (stepItem.getName().equals(referenceKey)) {

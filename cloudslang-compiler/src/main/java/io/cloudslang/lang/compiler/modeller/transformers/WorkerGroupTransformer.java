@@ -16,6 +16,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
@@ -38,7 +39,7 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
             value = (String) rawData;
         } else if (rawData instanceof Map) {
             value = String.valueOf(((Map<String, Object>) rawData).get(SlangTextualKeys.VALUE));
-            override = (boolean) ((Map<String, Object>) rawData).get(SlangTextualKeys.OVERRIDE);
+            override = BooleanUtils.isTrue((Boolean)((Map<String, Object>) rawData).get(SlangTextualKeys.OVERRIDE));
         }
         if (StringUtils.isBlank(value)) {
             return new BasicTransformModellingResult<>(null, Collections.emptyList());
@@ -47,21 +48,12 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
         WorkerGroupStatement workerGroupStatement;
         Accumulator dependencyAccumulator;
         String expression;
-        try {
-            dependencyAccumulator = extractFunctionData(value);
-            expression = ExpressionUtils.extractExpression(value);
-        } catch (IllegalStateException | IndexOutOfBoundsException e) {
-            return new BasicTransformModellingResult<>(null, Collections.singletonList(e));
-        }
-
-        if (expression != null) {
-            workerGroupStatement = new WorkerGroupStatement(expression,
+        dependencyAccumulator = extractFunctionData(value);
+        expression = ExpressionUtils.extractExpression(value);
+        workerGroupStatement = new WorkerGroupStatement(expression != null ? expression : value,
                     override,
                     dependencyAccumulator.getFunctionDependencies(),
                     dependencyAccumulator.getSystemPropertyDependencies());
-        } else {
-            workerGroupStatement = new WorkerGroupStatement(value, override,null, null);
-        }
 
         return new BasicTransformModellingResult<>(workerGroupStatement, Collections.emptyList());
     }

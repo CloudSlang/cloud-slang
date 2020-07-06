@@ -15,7 +15,7 @@ import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.WorkerGroupType;
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -72,7 +72,6 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -248,7 +247,7 @@ public class ExecutableStepsTest {
         runEnv.getExecutionPath().down();
         Long parentFirstStepPosition = 2L;
         runEnv.getParentFlowStack().pushParentFlowData(new ParentFlowData(111L, parentFirstStepPosition,
-                new WorkerGroupType("", false)));
+                new WorkerGroupMetadata("", false)));
 
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(),
             new ExecutionRuntimeServices(), "", ExecutableType.FLOW);

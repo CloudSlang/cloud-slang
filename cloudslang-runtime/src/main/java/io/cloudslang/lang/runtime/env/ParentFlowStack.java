@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
-import org.apache.commons.lang3.SerializationUtils;
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
 
 import java.io.Serializable;
 import java.util.ArrayDeque;
@@ -50,7 +50,20 @@ public class ParentFlowStack implements Serializable {
         return stack.size();
     }
 
-    public Iterator<ParentFlowData> descendingIteratorParentStackData() {
-        return stack.descendingIterator();
+    public WorkerGroupMetadata computeParentWorkerGroup() {
+        WorkerGroupMetadata workerGroupVal = new WorkerGroupMetadata();
+
+        Iterator iterator = stack.descendingIterator();
+        while (iterator.hasNext()) {
+            ParentFlowData parentFlowData = (ParentFlowData) iterator.next();
+            WorkerGroupMetadata workerGroupTemp = parentFlowData.getWorkerGroup();
+            if (workerGroupTemp.getValue() != null) {
+                workerGroupVal = workerGroupTemp;
+                if (workerGroupTemp.isOverride()) {
+                    break;
+                }
+            }
+        }
+        return workerGroupVal;
     }
 }

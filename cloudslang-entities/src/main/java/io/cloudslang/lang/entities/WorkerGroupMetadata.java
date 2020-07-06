@@ -12,15 +12,15 @@ package io.cloudslang.lang.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class WorkerGroupType implements Serializable {
+public class WorkerGroupMetadata implements Serializable {
 
     private String value;
     private boolean override;
 
-    public  WorkerGroupType() {
+    public WorkerGroupMetadata() {
     }
 
-    public WorkerGroupType(String value, boolean override) {
+    public WorkerGroupMetadata(String value, boolean override) {
         this.value = value;
         this.override = override;
     }
@@ -49,7 +49,7 @@ public class WorkerGroupType implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WorkerGroupType that = (WorkerGroupType) o;
+        WorkerGroupMetadata that = (WorkerGroupMetadata) o;
         return override == that.override &&
                 Objects.equals(value, that.value);
     }

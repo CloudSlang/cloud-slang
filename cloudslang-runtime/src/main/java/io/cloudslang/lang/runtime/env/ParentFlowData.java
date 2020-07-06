@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
-import io.cloudslang.lang.entities.WorkerGroupType;
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
 
 import java.io.Serializable;
 
@@ -24,9 +24,9 @@ public class ParentFlowData implements Serializable {
 
     private final Long position;
 
-    private final WorkerGroupType workerGroup;
+    private final WorkerGroupMetadata workerGroup;
 
-    public ParentFlowData(Long runningExecutionPlanId, Long position, WorkerGroupType workerGroup) {
+    public ParentFlowData(Long runningExecutionPlanId, Long position, WorkerGroupMetadata workerGroup) {
         this.runningExecutionPlanId = runningExecutionPlanId;
         this.position = position;
         this.workerGroup = workerGroup;
@@ -40,7 +40,7 @@ public class ParentFlowData implements Serializable {
         return position;
     }
 
-    public WorkerGroupType getWorkerGroup() {
+    public WorkerGroupMetadata getWorkerGroup() {
         return workerGroup;
     }
 }
