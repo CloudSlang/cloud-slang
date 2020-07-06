@@ -210,7 +210,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Context flowContext = runEnv.getStack().peekContext();
             if (executableType == ExecutableType.FLOW && flowContext != null) {
-                String workerGroup = flowContext.getLanguageVariable(WORKER_GROUP) != null ?
+                String workerGroup = flowContext.getLanguageVariable(WORKER_GROUP) != null &&
+                        flowContext.getLanguageVariable(WORKER_GROUP).get() != null ?
                         String.valueOf(flowContext.removeLanguageVariable(WORKER_GROUP).get()) : null;
                 if (workerGroup != null) {
                     executionRuntimeServices.setWorkerGroupName(workerGroup);
