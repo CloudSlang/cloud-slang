@@ -141,9 +141,9 @@ public class StepExecutionData extends AbstractExecutionData {
             //CHECKSTYLE:OFF
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices,
                     RUNNING_EXECUTION_PLAN_ID, refId, nextStepId,
-                    flowContext.removeLanguageVariable(WORKER_GROUP_VALUE) != null ?
+                    flowContext.getLanguageVariable(WORKER_GROUP_VALUE) != null ?
                     String.valueOf(flowContext.removeLanguageVariable(WORKER_GROUP_VALUE).get()) : null,
-                    flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE) != null
+                    flowContext.getLanguageVariable(WORKER_GROUP_OVERRIDE) != null
                             && isTrue((Boolean) flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE).get()));
             //CHECKSTYLE:ON
 
