@@ -117,7 +117,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
 
             //might put some additional values to callArguments
-            missingInputHandler.applyPromptInputValues(systemContext, callArguments);
+            missingInputHandler.applyPromptInputValues(systemContext, callArguments, executableInputs);
 
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
@@ -151,6 +151,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         isTrue(useEmptyValuesForPrompts));
 
                 if (!canContinue) {
+                    //we must keep the state unchanged
+                    runEnv.putCallArguments(callArguments);
                     return;
                 }
             }
@@ -319,7 +321,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
             logger.error("There was an error running the finish executable execution step of: \'" + nodeName +
-                "\'.\n\tError is: " + e.getMessage());
+                    "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t" + e.getMessage(), e);
         }
     }

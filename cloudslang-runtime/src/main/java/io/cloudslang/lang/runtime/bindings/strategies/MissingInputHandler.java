@@ -16,6 +16,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData.StepType;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,8 @@ public interface MissingInputHandler {
      * @param systemContext the system context
      * @param callArguments list of call arguments that could get enhanced in this call
      */
-    default void applyPromptInputValues(SystemContext systemContext, Map<String, Value> callArguments) {
+    default void applyPromptInputValues(SystemContext systemContext, Map<String, Value> callArguments,
+                                        Collection<Input> inputs) {
 
     }
 }
