@@ -149,10 +149,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         nodeName,
                         isTrue(useEmptyValuesForPrompts));
 
-                //we must keep the state unchanged
-                runEnv.putCallArguments(callArguments);
-
                 if (!canContinue) {
+                    //we must keep the state unchanged
+                    runEnv.putCallArguments(callArguments);
                     return;
                 }
             }
