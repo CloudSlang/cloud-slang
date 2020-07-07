@@ -47,7 +47,7 @@ public class ValueUtils {
 
     private static void flattenMap(Map<String, Value> valueMap, Map<String, Serializable> result) {
         for (Map.Entry<String, Value> entry : valueMap.entrySet()) {
-            result.put(entry.getKey(), entry.getValue()== null ? null:entry.getValue().toString());
+            result.put(entry.getKey(), entry.getValue() == null ? null : entry.getValue().toString());
         }
     }
 

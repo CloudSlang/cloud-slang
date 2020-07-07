@@ -212,9 +212,9 @@ public class EventDataTest extends SystemsTestsParent {
         validateSensitiveDataNotReveiledInContext(events);
     }
 
-    private void populateRunId(String runID) {
-        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runID);
-        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runID);
+    private void populateRunId(String runId) {
+        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runId);
+        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runId);
     }
 
     private void validateSensitiveDataNotReveiledInContext(List<ScoreEvent> events) {
