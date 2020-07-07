@@ -47,7 +47,7 @@ public class ScriptsService {
                 ScriptFunction.CS_TO_LOWER
         );
 
-        for (ScriptFunction function : list) {
+        for (ScriptFunction function: list) {
             String script = StringUtils.trim(loadScript(function.getValue()));
             scriptsMap.put(function, script);
         }

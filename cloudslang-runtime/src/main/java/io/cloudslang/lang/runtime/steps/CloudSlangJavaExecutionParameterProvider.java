@@ -149,7 +149,7 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                                               String parameterName, ClassLoader classLoader) {
         // cloudslang list iterator fix
         final String parameter = StringUtils.startsWith(this.nodeNameWithDepth, "list_iterator") ?
-                this.nodeNameWithDepth : parameterName;
+                                                   this.nodeNameWithDepth : parameterName;
 
         Object sessionContextObject = sessionData.get(parameter);
         if (sessionContextObject == null) {

@@ -33,7 +33,7 @@ public class AbstractInOutForTransformer {
                 functionDependencies.add(ScriptFunction.GET);
             }
 
-            for (ScriptFunction function : ScriptFunction.values()) {
+            for (ScriptFunction function: ScriptFunction.values()) {
                 if (ExpressionUtils.matchesFunction(function, expression)) {
                     functionDependencies.add(function);
                 }
