@@ -34,6 +34,7 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +49,9 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPT
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_VALUE;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_OVERRIDE;
+import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.apache.commons.lang.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
@@ -137,15 +138,14 @@ public class StepExecutionData extends AbstractExecutionData {
 
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, boundInputs);
 
+            Value workerGroupValue = flowContext.removeLanguageVariable(WORKER_GROUP_VALUE);
+            Value workerGroupOverride = flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE);
             // request the score engine to switch to the execution plan of the given ref
             //CHECKSTYLE:OFF
             requestSwitchToRefExecutableExecutionPlan(runEnv, executionRuntimeServices,
                     RUNNING_EXECUTION_PLAN_ID, refId, nextStepId,
-                    flowContext.getLanguageVariable(WORKER_GROUP_VALUE) != null &&
-                            flowContext.getLanguageVariable(WORKER_GROUP_VALUE).get() != null ?
-                            String.valueOf(flowContext.removeLanguageVariable(WORKER_GROUP_VALUE).get()) : null,
-                    flowContext.getLanguageVariable(WORKER_GROUP_OVERRIDE) != null
-                            && isTrue((Boolean) flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE).get()));
+                    toStringSafe(workerGroupValue),
+                    BooleanUtils.toBoolean(toStringSafe(workerGroupOverride)));
             //CHECKSTYLE:ON
 
             // set the start step of the given ref as the next step to execute

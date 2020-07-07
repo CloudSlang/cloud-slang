@@ -30,4 +30,8 @@ public interface Value extends Serializable {
 
     @Override
     String toString();
+
+    static String toStringSafe(Value value) {
+        return value != null && value.get() != null ? value.toString() : null;
+    }
 }

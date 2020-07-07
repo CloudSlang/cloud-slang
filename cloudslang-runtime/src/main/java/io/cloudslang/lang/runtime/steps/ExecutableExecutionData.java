@@ -44,6 +44,7 @@ import java.util.function.Function;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
+import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
@@ -212,9 +213,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Context flowContext = runEnv.getStack().peekContext();
             if (executableType == ExecutableType.FLOW && flowContext != null) {
-                String workerGroup = flowContext.getLanguageVariable(WORKER_GROUP) != null &&
-                        flowContext.getLanguageVariable(WORKER_GROUP).get() != null ?
-                        String.valueOf(flowContext.removeLanguageVariable(WORKER_GROUP).get()) : null;
+                String workerGroup = toStringSafe(flowContext.removeLanguageVariable(WORKER_GROUP));
                 if (workerGroup != null) {
                     executionRuntimeServices.setWorkerGroupName(workerGroup);
                     executionRuntimeServices.setShouldCheckGroup();
