@@ -67,6 +67,26 @@ public abstract class AbstractExecutionData {
 
     @SafeVarargs
     public static void fireEvent(ExecutionRuntimeServices runtimeServices,
+                                 RunEnvironment runEnvironment,
+                                 String type,
+                                 String description,
+                                 LanguageEventData.StepType stepType,
+                                 String stepName,
+                                 ReadOnlyContextAccessor context,
+                                 Map.Entry<String, ? extends Serializable>... fields) {
+
+        LanguageEventData eventData = getLanguageEventData(runtimeServices, type, description,
+                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName);
+
+        setContext(eventData, ValueUtils.flatten(context.getContextHolder()));
+
+        addEventToRuntime(runtimeServices, type, eventData, fields);
+
+    }
+
+
+    @SafeVarargs
+    public static void fireEvent(ExecutionRuntimeServices runtimeServices,
                                  String type,
                                  String description,
                                  String path,
@@ -74,6 +94,31 @@ public abstract class AbstractExecutionData {
                                  String stepName,
                                  Map<String, Value> context,
                                  Map.Entry<String, ? extends Serializable>... fields) {
+        LanguageEventData eventData = getLanguageEventData(runtimeServices, type,
+                description, path, stepType, stepName);
+
+        setContext(eventData, ValueUtils.flatten(context));
+
+        addEventToRuntime(runtimeServices, type, eventData, fields);
+    }
+
+    private static void addEventToRuntime(ExecutionRuntimeServices runtimeServices,
+                                          String type,
+                                          LanguageEventData eventData,
+                                          Entry<String, ? extends Serializable>[] fields) {
+        for (Entry<String, ? extends Serializable> field : fields) {
+            //noinspection unchecked
+            eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
+        }
+        runtimeServices.addEvent(type, eventData);
+    }
+
+    private static LanguageEventData getLanguageEventData(ExecutionRuntimeServices runtimeServices,
+                                                          String type,
+                                                          String description,
+                                                          String path,
+                                                          LanguageEventData.StepType stepType,
+                                                          String stepName) {
         LanguageEventData eventData = new LanguageEventData();
         eventData.setStepType(stepType);
         eventData.setStepName(stepName);
@@ -82,14 +127,7 @@ public abstract class AbstractExecutionData {
         eventData.setTimeStamp(new Date());
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
-
-        setContext(eventData, context);
-
-        for (Entry<String, ? extends Serializable> field : fields) {
-            //noinspection unchecked
-            eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
-        }
-        runtimeServices.addEvent(type, eventData);
+        return eventData;
     }
 
     private static void pushParentFlowDataOnStack(RunEnvironment runEnv, Long runningExecutionPlanId,
@@ -101,13 +139,13 @@ public abstract class AbstractExecutionData {
         stack.pushParentFlowData(new ParentFlowData(runningExecutionPlanId, nextStepId));
     }
 
-    private static void setContext(LanguageEventData eventData, Map<String, Value> context) {
+    private static void setContext(LanguageEventData eventData, Map<String, Serializable> flattenedContext) {
         String verbosityLevel = System.getProperty(
                 CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(),
                 EventVerbosityLevel.DEFAULT.getValue()
         );
-        if (EventVerbosityLevel.ALL.getValue().equals(verbosityLevel) && context != null) {
-            eventData.setContext(ValueUtils.flatten(context));
+        if (EventVerbosityLevel.ALL.getValue().equals(verbosityLevel) && flattenedContext != null) {
+            eventData.setContext(flattenedContext);
         }
     }
 
@@ -156,7 +194,7 @@ public abstract class AbstractExecutionData {
                                                     List<String> breakOn,
                                                     String nodeName,
                                                     Context flowContext, ReturnValues executableReturnValues,
-                                                    Map<String, Value> outputsBindingContext,
+                                                    ReadOnlyContextAccessor outputsBindingContext,
                                                     Map<String, Value> publishValues,
                                                     Map<String, Value> langVariables) {
         if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
@@ -190,7 +228,7 @@ public abstract class AbstractExecutionData {
                                               Long nextPosition,
                                               ReturnValues returnValues,
                                               Double roiValue,
-                                              Map<String, Value> context) {
+                                              ReadOnlyContextAccessor context) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
                 context,
@@ -243,7 +281,7 @@ public abstract class AbstractExecutionData {
     protected static Map<String, Value> publishValuesMap(Set<SystemProperty> systemProperties,
                                                          List<Output> stepPublishValues,
                                                          boolean parallelLoop, Map<String, Value> aflResultMap,
-                                                         Map<String, Value> outputsBindingContext,
+                                                         ReadOnlyContextAccessor outputsBindingContext,
                                                          OutputsBinding outputsBinding) {
         if (parallelLoop) {
             return new HashMap<>(aflResultMap);

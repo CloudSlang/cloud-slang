@@ -21,7 +21,6 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -242,34 +241,38 @@ public class ParallelLoopStepsTest {
         runtimeContext3.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
 
         List<Output> stepPublishValues =
-            newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
+                newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
         String nodeName = "nodeName";
         ExecutionRuntimeServices executionRuntimeServices =
-            createAndConfigureExecutionRuntimeServicesMock(runtimeContext1, runtimeContext2, runtimeContext3);
+                createAndConfigureExecutionRuntimeServicesMock(runtimeContext1, runtimeContext2, runtimeContext3);
 
         // call method
         parallelLoopSteps.joinBranches(runEnvironment, executionRuntimeServices,
-            stepPublishValues, stepNavigationValues, nodeName);
+                stepPublishValues, stepNavigationValues, nodeName);
 
         // verify expected behaviour
-        ArgumentCaptor<Map> aggregateContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+        ArgumentCaptor<ReadOnlyContextAccessor> aggregateContextArgumentCaptor =
+                ArgumentCaptor.forClass(ReadOnlyContextAccessor.class);
 
         //noinspection unchecked
         verify(outputsBinding).bindOutputs(
-            aggregateContextArgumentCaptor.capture(),
-            eq(runEnvironment.getSystemProperties()),
-            eq(stepPublishValues)
+                aggregateContextArgumentCaptor.capture(),
+                eq(runEnvironment.getSystemProperties()),
+                eq(stepPublishValues)
         );
 
         @SuppressWarnings("unchecked")
         List<Map<String, Serializable>> expectedBranchContexts =
-            newArrayList(runtimeContext1, runtimeContext2, runtimeContext3);
+                newArrayList(runtimeContext1, runtimeContext2, runtimeContext3);
         @SuppressWarnings("unchecked")
-        Map<String, Value> aggregateContext = aggregateContextArgumentCaptor.getValue();
-        assertTrue(aggregateContext.containsKey(RuntimeConstants.BRANCHES_CONTEXT_KEY));
+        ReadOnlyContextAccessor aggregateContext = aggregateContextArgumentCaptor.getValue();
+        assertTrue(aggregateContext.getAllContexts().containsKey(RuntimeConstants.BRANCHES_CONTEXT_KEY));
         @SuppressWarnings("unchecked")
         List<Map<String, Value>> actualBranchesContexts =
-            (List<Map<String, Value>>) aggregateContext.get(RuntimeConstants.BRANCHES_CONTEXT_KEY).get();
+                (List<Map<String, Value>>) aggregateContext
+                        .getAllContexts()
+                        .get(RuntimeConstants.BRANCHES_CONTEXT_KEY)
+                        .get();
         Assert.assertEquals(expectedBranchContexts, actualBranchesContexts);
     }
 

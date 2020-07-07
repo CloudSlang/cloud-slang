@@ -16,7 +16,6 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
@@ -162,9 +161,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             if (userInputs != null) {
                 userInputs.clear();
             }
-            Map<String,Value> magicVariables = MagicVariableHelper.getGlobalContext(executionRuntimeServices);
+            MagicVariableHelper globalContext = new MagicVariableHelper();
+            Map<String, Value> magicVariables = globalContext.getGlobalContext(executionRuntimeServices);
             updateCallArgumentsAndPushContextToStack(runEnv,
-                    new Context(boundInputValues,magicVariables), actionArguments);
+                    new Context(boundInputValues, magicVariables), actionArguments);
 
             sendEndBindingInputsEvent(
                     executableInputs,
@@ -235,8 +235,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     actionReturnValues.getResult()
             );
 
-            Map<String, Value> outputsBindingContext =
-                    MapUtils.mergeMaps(operationVariables, actionReturnValues.getOutputs());
+            ReadOnlyContextAccessor outputsBindingContext = new ReadOnlyContextAccessor(operationVariables,
+                    actionReturnValues.getOutputs());
             Map<String, Value> operationReturnOutputs =
                     outputsBinding.bindOutputs(
                             outputsBindingContext,

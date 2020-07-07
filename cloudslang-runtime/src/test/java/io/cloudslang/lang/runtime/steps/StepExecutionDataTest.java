@@ -71,7 +71,7 @@ import java.util.concurrent.Semaphore;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyListOf;
@@ -158,9 +158,9 @@ public class StepExecutionDataTest {
         resultMap.put("input2", ValueFactory.create(3));
 
         when(argumentsBinding.bindArguments(
-            eq(arguments),
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties())
+                eq(arguments),
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties())
         )).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
@@ -223,9 +223,9 @@ public class StepExecutionDataTest {
         runEnv.getStack().pushContext(context);
 
         when(outputsBinding.bindOutputs(
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            anyListOf(Output.class)))
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties()),
+                anyListOf(Output.class)))
             .thenReturn(new HashMap<String, Value>());
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
@@ -266,9 +266,9 @@ public class StepExecutionDataTest {
         boundPublish.put("name", ValueFactory.create("John"));
 
         when(outputsBinding.bindOutputs(
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            eq(possiblePublishValues)))
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possiblePublishValues)))
             .thenReturn(boundPublish);
         HashMap<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         stepNavigationValues

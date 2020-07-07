@@ -20,14 +20,10 @@ import java.util.Map;
 
 public class MagicVariableHelper {
 
-    static Map<String, Value> globalContext;
-
-    public static Map<String, Value> getGlobalContext(ExecutionRuntimeServices executionRuntimeServices) {
-        if (globalContext == null) {
-            globalContext = new HashMap<>();
-            String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
-            globalContext.put(RuntimeConstants.EXECUTION_ID, ValueFactory.create(executionId));
-        }
+    public Map<String, Value> getGlobalContext(ExecutionRuntimeServices executionRuntimeServices) {
+        Map<String, Value> globalContext = new HashMap<>();
+        String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
+        globalContext.put(RuntimeConstants.EXECUTION_ID, ValueFactory.create(executionId));
         return Collections.unmodifiableMap(globalContext);
     }
 }

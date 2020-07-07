@@ -65,6 +65,7 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import static java.util.Collections.singletonList;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
@@ -225,9 +226,9 @@ public class ExecutableStepsTest {
         boundOutputs.put("name", ValueFactory.create("John"));
 
         when(outputsBinding.bindOutputs(
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            eq(possibleOutputs)
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possibleOutputs)
         )).thenReturn(boundOutputs);
         executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(),
             new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
@@ -278,9 +279,9 @@ public class ExecutableStepsTest {
         String boundResult = ScoreLangConstants.SUCCESS_RESULT;
 
         when(outputsBinding.bindOutputs(
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            eq(possibleOutputs)
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possibleOutputs)
         )).thenReturn(boundOutputs);
         when(resultsBinding.resolveResult(
             isNull(Map.class),
