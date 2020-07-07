@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.lang.runtime.steps.ReadOnlyContextAccessor;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
@@ -235,6 +236,11 @@ public class OutputsBindingTest {
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
+        }
+
+        @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
         }
 
         @Bean
