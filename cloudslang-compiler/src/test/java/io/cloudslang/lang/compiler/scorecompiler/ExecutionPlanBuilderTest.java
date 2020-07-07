@@ -284,17 +284,17 @@ public class ExecutionPlanBuilderTest {
         mockPreconditionStep(compiledFlow);
         mockStartStep(compiledFlow);
         mockEndStep(0L, compiledFlow, ExecutableType.FLOW);
-        mockAddBranchesStep(3L, 7L, 4L, step, compiledFlow);
-        mockWorkerStep(4L, step);
+        mockWorkerStep(3L, step);
+        mockAddBranchesStep(4L, 7L, 5L, step, compiledFlow);
         mockBeginStep(5L, step);
         mockFinishParallelLoopStep(6L, step);
         mockJoinBranchesStep(7L, step);
         final ExecutionPlan executionPlan = executionPlanBuilder.createFlowExecutionPlan(compiledFlow);
 
         verify(stepFactory).createAddBranchesStep(
-                eq(3L),
-                eq(7L),
                 eq(4L),
+                eq(7L),
+                eq(5L),
                 eq(step.getPreStepActionData()),
                 eq(compiledFlow.getId()),
                 eq(step.getName()));

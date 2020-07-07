@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.MapLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -93,12 +94,12 @@ public abstract class AbstractExecutionData {
     }
 
     private static void pushParentFlowDataOnStack(RunEnvironment runEnv, Long runningExecutionPlanId,
-                                                  Long nextStepId) {
+                                                  Long nextStepId, WorkerGroupMetadata workerGroup) {
         // create ParentFlowData object containing the current running execution plan id and
         // the next step id to navigate to in the current execution plan,
         // and push it to the ParentFlowStack for future use (once we finish running the ref operation/flow)
         ParentFlowStack stack = runEnv.getParentFlowStack();
-        stack.pushParentFlowData(new ParentFlowData(runningExecutionPlanId, nextStepId));
+        stack.pushParentFlowData(new ParentFlowData(runningExecutionPlanId, nextStepId, workerGroup));
     }
 
     private static void setContext(LanguageEventData eventData, Map<String, Value> context) {
@@ -213,8 +214,11 @@ public abstract class AbstractExecutionData {
                                                                     ExecutionRuntimeServices executionRuntimeServices,
                                                                     Long runningExecutionPlanId,
                                                                     String refId,
-                                                                    Long nextStepId) {
-        pushParentFlowDataOnStack(runEnv, runningExecutionPlanId, nextStepId);
+                                                                    Long nextStepId,
+                                                                    String workerGroup,
+                                                                    boolean overrideWorkerGroup) {
+        pushParentFlowDataOnStack(runEnv, runningExecutionPlanId, nextStepId,
+                new WorkerGroupMetadata(workerGroup, overrideWorkerGroup));
         executionRuntimeServices.setParentRunningId(runningExecutionPlanId);
         // request the score engine to switch the execution plan to the one with the given refId once it can
         Long subFlowRunningExecutionPlanId = executionRuntimeServices.getSubFlowRunningExecutionPlan(refId);

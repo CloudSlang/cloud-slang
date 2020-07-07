@@ -9,9 +9,13 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
+
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
+
 
 /**
  * User: stoneo
@@ -44,5 +48,22 @@ public class ParentFlowStack implements Serializable {
 
     public int size() {
         return stack.size();
+    }
+
+    public WorkerGroupMetadata computeParentWorkerGroup() {
+        WorkerGroupMetadata workerGroupVal = new WorkerGroupMetadata();
+
+        Iterator iterator = stack.descendingIterator();
+        while (iterator.hasNext()) {
+            ParentFlowData parentFlowData = (ParentFlowData) iterator.next();
+            WorkerGroupMetadata workerGroupTemp = parentFlowData.getWorkerGroup();
+            if (workerGroupTemp.getValue() != null) {
+                workerGroupVal = workerGroupTemp;
+                if (workerGroupTemp.isOverride()) {
+                    break;
+                }
+            }
+        }
+        return workerGroupVal;
     }
 }
