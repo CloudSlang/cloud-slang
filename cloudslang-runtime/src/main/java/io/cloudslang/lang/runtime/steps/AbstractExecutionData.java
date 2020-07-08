@@ -73,13 +73,13 @@ public abstract class AbstractExecutionData {
                                  String description,
                                  LanguageEventData.StepType stepType,
                                  String stepName,
-                                 ReadOnlyContextAccessor context,
+                                 ReadOnlyContextAccessor contextAccessor,
                                  Map.Entry<String, ? extends Serializable>... fields) {
 
         LanguageEventData eventData = getLanguageEventData(runtimeServices, type, description,
                 runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName);
 
-        setContext(eventData, ValueUtils.flatten(context.getContextHolder()));
+        setContext(eventData, ValueUtils.flatten(contextAccessor.getContextHolder()));
 
         addEventToRuntime(runtimeServices, type, eventData, fields);
 
@@ -195,7 +195,7 @@ public abstract class AbstractExecutionData {
                                                     List<String> breakOn,
                                                     String nodeName,
                                                     Context flowContext, ReturnValues executableReturnValues,
-                                                    ReadOnlyContextAccessor outputsBindingContext,
+                                                    ReadOnlyContextAccessor contextAccessor,
                                                     Map<String, Value> publishValues,
                                                     Map<String, Value> langVariables) {
         if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
@@ -211,7 +211,7 @@ public abstract class AbstractExecutionData {
                         previousStepId,
                         new ReturnValues(publishValues, executableReturnValues.getResult()),
                         ExecutionParametersConsts.DEFAULT_ROI_VALUE,
-                        outputsBindingContext
+                        contextAccessor
                 );
                 runEnv.getExecutionPath().forward();
                 return true;
@@ -229,10 +229,10 @@ public abstract class AbstractExecutionData {
                                               Long nextPosition,
                                               ReturnValues returnValues,
                                               Double roiValue,
-                                              ReadOnlyContextAccessor context) {
+                                              ReadOnlyContextAccessor contextAccessor) {
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
-                context,
+                contextAccessor,
                 Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
                 Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
                 Pair.of(LanguageEventData.ROI, roiValue),
@@ -285,12 +285,12 @@ public abstract class AbstractExecutionData {
     protected static Map<String, Value> publishValuesMap(Set<SystemProperty> systemProperties,
                                                          List<Output> stepPublishValues,
                                                          boolean parallelLoop, Map<String, Value> aflResultMap,
-                                                         ReadOnlyContextAccessor outputsBindingContext,
+                                                         ReadOnlyContextAccessor contextAccessor,
                                                          OutputsBinding outputsBinding) {
         if (parallelLoop) {
             return new HashMap<>(aflResultMap);
         }
-        return outputsBinding.bindOutputs(outputsBindingContext, systemProperties, stepPublishValues);
+        return outputsBinding.bindOutputs(contextAccessor, systemProperties, stepPublishValues);
     }
 
     public void sendStartBindingInputsEvent(List<Input> inputs,

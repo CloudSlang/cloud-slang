@@ -24,23 +24,19 @@ public class Context implements Serializable {
     private final Map<String, Value> variables;
     private final Map<String, Value> langVariables;
     private final Map<String, Value> magicVariables;
-    ReadOnlyContextAccessor readOnlyContextAccessor = new ReadOnlyContextAccessor();
 
     public Context(Map<String, Value> variables, Map<String, Value> magicVariables) {
         this.variables = variables;
         this.magicVariables = magicVariables;
         langVariables = new HashMap<>();
-        readOnlyContextAccessor.addContext(variables);
-        readOnlyContextAccessor.addContext(magicVariables);
 
     }
 
-    public Context(Map<String, Value> variables) {
+    /*public Context(Map<String, Value> variables) {
         this.variables = variables;
         this.magicVariables = new HashMap<>();
         langVariables = new HashMap<>();
-        readOnlyContextAccessor.addContext(variables);
-    }
+    }*/
 
     public Value getVariable(String name) {
         return variables.get(name);
@@ -58,8 +54,8 @@ public class Context implements Serializable {
         return Collections.unmodifiableMap(langVariables);
     }
 
-    public ReadOnlyContextAccessor getContext() {
-        return readOnlyContextAccessor;
+    public ReadOnlyContextAccessor getContextAccessor() {
+        return new ReadOnlyContextAccessor(variables, magicVariables);
     }
 
     public Value getLanguageVariable(String name) {

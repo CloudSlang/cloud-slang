@@ -37,12 +37,12 @@ public class OutputsBinding extends AbstractBinding {
     ScriptEvaluator scriptEvaluator;
 
     public Map<String, Value> bindOutputs(
-            ReadOnlyContextAccessor initialContext,
+            ReadOnlyContextAccessor contextAccessor,
             Set<SystemProperty> systemProperties,
             List<Output> possibleOutputs) {
 
         Map<String, Value> outputs = new LinkedHashMap<>();
-        Map<String, Value> context = initialContext.getAllContexts();
+        Map<String, Value> context = contextAccessor.getMergedContexts();
 
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {

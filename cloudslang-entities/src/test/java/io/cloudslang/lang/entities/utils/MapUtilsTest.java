@@ -29,9 +29,7 @@ public class MapUtilsTest {
     private static Map<String, Value> EMPTY_MAP = Collections.emptyMap();
     private static Map<String, Value> map1;
     private static Map<String, Value> map2;
-    private static Map<String, Value> map3;
     private static Map<String, Value> map_1_2;
-    private static Map<String, Value> map_1_3;
 
     @BeforeClass
     public static void setUpClass() {
@@ -43,18 +41,9 @@ public class MapUtilsTest {
         map2.put("key1", ValueFactory.create(2));
         map2.put("key3", ValueFactory.create("value3"));
 
-        map3 = new HashMap<>();
-        map3.put("key4", ValueFactory.create(3));
-        map3.put("key5", ValueFactory.create("value5"));
-
         map_1_2 = new HashMap<>();
         map_1_2.putAll(map1);
         map_1_2.putAll(map2);
-
-        map_1_3 = new HashMap<>();
-        map_1_3.putAll(map1);
-        map_1_3.putAll(map2);
-        map_1_3.putAll(map3);
     }
 
 
@@ -76,11 +65,6 @@ public class MapUtilsTest {
     @Test
     public void testTwoMaps() throws Exception {
         Assert.assertEquals(map_1_2, MapUtils.mergeMaps(map1, map2));
-    }
-
-    @Test
-    public void testThreeMaps() throws Exception {
-        Assert.assertEquals(map_1_3, MapUtils.mergeMaps(map1, map2,map3));
     }
 
 }

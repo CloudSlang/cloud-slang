@@ -42,12 +42,6 @@ public class ReadOnlyContextAccessor implements Serializable {
         return holder;
     }
 
-    public void addContext(Map<String, Value> context) {
-        if (context != null) {
-            holder.add(context);
-        }
-    }
-
     public Value getValue(String key) {
         // Reversed order traversal to simulate putAll
         ListIterator<Map<String, Value>> listIterator = this.holder.listIterator(this.holder.size());
@@ -61,10 +55,9 @@ public class ReadOnlyContextAccessor implements Serializable {
     }
 
 
-    public Map<String, Value> getAllContexts() {
+    public Map<String, Value> getMergedContexts() {
         Map<String, Value> context = new HashMap<>();
-        for (Map<String, Value> map : holder
-        ) {
+        for (Map<String, Value> map : holder) {
             context.putAll(map);
         }
         return context;

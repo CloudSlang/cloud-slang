@@ -121,7 +121,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     flowVariables
             );
             Map<String, Value> boundInputs = argumentsBinding
-                    .bindArguments(stepInputs, flowContext.getContext(),
+                    .bindArguments(stepInputs, flowContext.getContextAccessor(),
                             runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 
@@ -179,14 +179,14 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
             Map<String, Value> globalContext = flowContext.getGlobalVariables();
-            ReadOnlyContextAccessor outputsBindingContext = new ReadOnlyContextAccessor(
+            ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(
                     argumentsResultContext,
                     executableOutputs,
                     globalContext);
 
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
-                    outputsBindingContext,
+                    outputsBindingAccessor,
                     Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                     Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
                     Pair.of("executableReturnValues", executableReturnValues),
@@ -194,14 +194,14 @@ public class StepExecutionData extends AbstractExecutionData {
             );
 
             final Map<String, Value> publishValues = publishValuesMap(runEnv.getSystemProperties(), stepPublishValues,
-                    parallelLoop, executableOutputs, outputsBindingContext, outputsBinding);
+                    parallelLoop, executableOutputs, outputsBindingAccessor, outputsBinding);
             flowContext.putVariables(publishValues);
 
             //loops
             Map<String, Value> langVariables = flowContext.getImmutableViewOfLanguageVariables();
 
             if (handleEndLoopCondition(runEnv, executionRuntimeServices, previousStepId, breakOn, nodeName, flowContext,
-                    executableReturnValues, outputsBindingContext, publishValues, langVariables)) {
+                    executableReturnValues, outputsBindingAccessor, publishValues, langVariables)) {
                 return;
             }
 
@@ -243,7 +243,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     nextPosition,
                     returnValues,
                     roiValue,
-                    outputsBindingContext
+                    outputsBindingAccessor
             );
 
             executionRuntimeServices.addRoiValue(roiValue);

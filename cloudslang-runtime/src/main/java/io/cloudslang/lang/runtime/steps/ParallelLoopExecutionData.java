@@ -268,9 +268,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
             Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
-        ReadOnlyContextAccessor outputsBindingContext = new ReadOnlyContextAccessor(publishContext);
+        ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(publishContext);
         return outputsBinding.bindOutputs(
-            outputsBindingContext,
+            outputsBindingAccessor,
             runEnv.getSystemProperties(),
             stepPublishValues
         );

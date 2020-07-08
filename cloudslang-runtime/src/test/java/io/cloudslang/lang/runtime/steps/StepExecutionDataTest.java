@@ -62,6 +62,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -102,7 +103,9 @@ public class StepExecutionDataTest {
 
     private RunEnvironment createRunEnvironment() {
         RunEnvironment runEnvironment = new RunEnvironment();
-        runEnvironment.getStack().pushContext(new Context(new HashMap<String, Value>()));
+        runEnvironment.getStack().pushContext(new Context(
+                new HashMap<String, Value>(),
+                Collections.<String,Value>emptyMap()));
         return runEnvironment;
     }
 
@@ -220,7 +223,7 @@ public class StepExecutionDataTest {
     public void testEndStepEvents() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
 
         when(outputsBinding.bindOutputs(
@@ -260,7 +263,7 @@ public class StepExecutionDataTest {
         final List<Output> possiblePublishValues = singletonList(new Output("name", ValueFactory.create("name")));
         RunEnvironment runEnv = createRunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
 
         Map<String, Value> boundPublish = new HashMap<>();
@@ -286,7 +289,7 @@ public class StepExecutionDataTest {
     public void testEndStepSetNextPosition() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         String result = ScoreLangConstants.SUCCESS_RESULT;
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), result));
 
@@ -307,7 +310,7 @@ public class StepExecutionDataTest {
     public void testEndStepMissingNavigationForExecutableResult() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         String result = "CUSTOM";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(), Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), result));
 
@@ -330,7 +333,7 @@ public class StepExecutionDataTest {
     public void testEndStepParallelLoopReturnValues() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         String result = ScoreLangConstants.SUCCESS_RESULT;
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), result));
         Long nextStepPosition = 5L;
@@ -364,7 +367,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         RunEnvironment runEnv = new RunEnvironment();
         when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
             .thenReturn(new ForLoopCondition(Arrays.asList(ValueFactory.create("1"), ValueFactory.create("2"))));
@@ -379,7 +382,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         RunEnvironment runEnv = new RunEnvironment();
         when(mockLoopCondition.hasMore()).thenReturn(false);
@@ -400,7 +403,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         RunEnvironment runEnv = new RunEnvironment();
         when(mockLoopCondition.hasMore()).thenReturn(true);
@@ -423,7 +426,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
         RunEnvironment runEnv = new RunEnvironment();
         when(mockLoopCondition.hasMore()).thenReturn(true);
@@ -441,7 +444,7 @@ public class StepExecutionDataTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), "SUCCESS"));
         HashMap<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         stepNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(mockLoopCondition));
@@ -463,7 +466,7 @@ public class StepExecutionDataTest {
         Long nextStepId = 3L;
         stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT,
             new ResultNavigation(nextStepId, ScoreLangConstants.SUCCESS_RESULT));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(mockLoopCondition));
@@ -486,7 +489,7 @@ public class StepExecutionDataTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), "SUCCESS"));
         HashMap<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         stepNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(mockLoopCondition));

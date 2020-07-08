@@ -53,12 +53,12 @@ public class ArgumentsBinding extends AbstractBinding {
 
     public Map<String, Value> bindArguments(
             List<Argument> arguments,
-            ReadOnlyContextAccessor context,
+            ReadOnlyContextAccessor contextAccessor,
             Set<SystemProperty> systemProperties) {
         Map<String, Value> resultContext = new HashMap<>();
 
         //we do not want to change original context map
-        Map<String, Value> srcContext = context.getAllContexts();
+        Map<String, Value> srcContext = contextAccessor.getMergedContexts();
 
         for (Argument argument : arguments) {
             bindArgument(argument, srcContext, systemProperties, resultContext);

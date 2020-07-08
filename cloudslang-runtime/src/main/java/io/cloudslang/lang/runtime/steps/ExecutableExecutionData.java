@@ -248,11 +248,11 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     actionReturnValues.getResult()
             );
 
-            ReadOnlyContextAccessor outputsBindingContext = new ReadOnlyContextAccessor(operationVariables,
+            ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(operationVariables,
                     actionReturnValues.getOutputs());
             Map<String, Value> operationReturnOutputs =
                     outputsBinding.bindOutputs(
-                            outputsBindingContext,
+                            outputsBindingAccessor,
                             runEnv.getSystemProperties(),
                             executableOutputs
                     );
