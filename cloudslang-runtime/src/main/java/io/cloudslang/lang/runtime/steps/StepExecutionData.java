@@ -120,8 +120,11 @@ public class StepExecutionData extends AbstractExecutionData {
                     nodeName,
                     flowVariables
             );
+            ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
+                    flowVariables,
+                    flowContext.getGlobalVariables());
             Map<String, Value> boundInputs = argumentsBinding
-                    .bindArguments(stepInputs, flowContext.getContextAccessor(),
+                    .bindArguments(stepInputs, contextAccessor,
                             runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 

@@ -32,12 +32,6 @@ public class Context implements Serializable {
 
     }
 
-    /*public Context(Map<String, Value> variables) {
-        this.variables = variables;
-        this.magicVariables = new HashMap<>();
-        langVariables = new HashMap<>();
-    }*/
-
     public Value getVariable(String name) {
         return variables.get(name);
     }
@@ -52,10 +46,6 @@ public class Context implements Serializable {
 
     public Map<String, Value> getImmutableViewOfLanguageVariables() {
         return Collections.unmodifiableMap(langVariables);
-    }
-
-    public ReadOnlyContextAccessor getContextAccessor() {
-        return new ReadOnlyContextAccessor(variables, magicVariables);
     }
 
     public Value getLanguageVariable(String name) {
