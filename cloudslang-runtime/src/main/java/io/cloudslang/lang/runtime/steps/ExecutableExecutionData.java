@@ -31,6 +31,7 @@ import io.cloudslang.score.lang.SystemContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -72,6 +73,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private final MissingInputHandler missingInputHandler;
 
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
+
+    @Autowired
+    MagicVariableHelper magicVariableHelper;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
@@ -165,8 +169,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             if (userInputs != null) {
                 userInputs.clear();
             }
-            MagicVariableHelper globalContext = new MagicVariableHelper();
-            Map<String, Value> magicVariables = globalContext.getGlobalContext(executionRuntimeServices);
+            Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
             updateCallArgumentsAndPushContextToStack(runEnv,
                     new Context(boundInputValues, magicVariables), actionArguments);
 

@@ -13,11 +13,13 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class MagicVariableHelper {
 
     public Map<String, Value> getGlobalContext(ExecutionRuntimeServices executionRuntimeServices) {

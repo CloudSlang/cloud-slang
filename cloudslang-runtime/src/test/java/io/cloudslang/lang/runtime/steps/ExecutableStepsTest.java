@@ -428,5 +428,10 @@ public class ExecutableStepsTest {
         public EventBus eventBus() {
             return new EventBusImpl();
         }
+
+        @Bean
+        public MagicVariableHelper magicVariableHelper() {
+            return new MagicVariableHelper();
+        }
     }
 }
