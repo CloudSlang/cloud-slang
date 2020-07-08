@@ -26,6 +26,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.EndBranchDataContainer;
+import io.cloudslang.score.api.StatefulSessionStack;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
@@ -80,6 +81,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
+            int levelParallelism = executionRuntimeServices.getLevelParallelism() != null ?
+                    (int) executionRuntimeServices.getLevelParallelism() : 0;
+            executionRuntimeServices.setLevelParallelism(levelParallelism + 1);
 
             List<Value> splitData = parallelLoopBinding
                 .bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
@@ -116,6 +120,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
                 branchRuntimeEnvironment.resetStacks();
+                StatefulSessionStack statefulSessionStack = new StatefulSessionStack();
+                statefulSessionStack.pushSessionStack(new HashMap<>());
+                executionRuntimeServices.setStatefulStack(statefulSessionStack);
 
                 if (parallelLoopStatement instanceof ListLoopStatement) {
                     branchContext.putVariable(((ListLoopStatement) parallelLoopStatement).getVarName(), splitItem);
@@ -159,6 +166,10 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         try {
             runEnv.getExecutionPath().up();
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
+            if (executionRuntimeServices.getLevelParallelism() != null &&
+                    (int)executionRuntimeServices.getLevelParallelism() > 0) {
+                executionRuntimeServices.setLevelParallelism((int)executionRuntimeServices.getLevelParallelism() - 1);
+            }
             Context flowContext = runEnv.getStack().popContext();
 
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext);

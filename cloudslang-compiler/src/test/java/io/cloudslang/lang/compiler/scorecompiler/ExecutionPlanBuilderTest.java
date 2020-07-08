@@ -183,7 +183,7 @@ public class ExecutionPlanBuilderTest {
         String group = step.getWorkerGroup();
         when(stepFactory
                 .createWorkerGroupStep(eq(stepId),
-                        eq(preStepActionData), eq(name), eq(group))).thenReturn(new ExecutionStep(stepId));
+                        eq(preStepActionData), eq(name), eq(group), "")).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepId, Long branchBeginStepId, Step step, Flow flow) {
