@@ -172,6 +172,10 @@ public class Input extends InOutParam {
             this.privateInput = input.isPrivateInput();
             this.functionDependencies = input.getFunctionDependencies();
             this.systemPropertyDependencies = input.getSystemPropertyDependencies();
+            this.promptType = input.getPromptType();
+            this.promptOptions = input.getPromptOptions();
+            this.promptDelimiter = input.getPromptDelimiter();
+            this.promptMessage = input.getPromptMessage();
         }
 
         public InputBuilder withRequired(boolean required) {

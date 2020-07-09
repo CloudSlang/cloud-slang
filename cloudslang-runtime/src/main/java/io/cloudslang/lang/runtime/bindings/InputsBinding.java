@@ -28,6 +28,7 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.LinkedHashMap;
 import org.apache.commons.lang.Validate;
@@ -51,6 +52,7 @@ public class InputsBinding extends AbstractBinding {
      * @return : a new map with all inputs resolved (does not include initial context)
      */
     public Map<String, Value> bindInputs(List<Input> inputs, Map<String, ? extends Value> context,
+                                         Map<String, ? extends Value> parentContext,
                                          Set<SystemProperty> systemProperties, List<Input> missingInputs,
                                          boolean useEmptyValuesForPrompts) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
@@ -59,15 +61,16 @@ public class InputsBinding extends AbstractBinding {
         Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
         for (Input input : inputs) {
-            bindInput(input, srcContext, resultContext, systemProperties, missingInputs, useEmptyValuesForPrompts);
+            bindInput(input, srcContext, resultContext, parentContext, systemProperties, missingInputs,
+                    useEmptyValuesForPrompts);
         }
 
         return resultContext;
     }
 
     private void bindInput(Input input, Map<String, ? extends Value> context, Map<String, Value> targetContext,
-                           Set<SystemProperty> systemProperties, List<Input> missingInputs,
-                           boolean useEmptyValuesForPrompts) {
+                           Map<String, ? extends Value> parentContext, Set<SystemProperty> systemProperties,
+                           List<Input> missingInputs, boolean useEmptyValuesForPrompts) {
         Value value;
 
         String inputName = input.getName();
@@ -81,7 +84,7 @@ public class InputsBinding extends AbstractBinding {
         }
 
         if (input.isRequired() && isEmpty(value)) {
-            missingInputs.add(input);
+            missingInputs.add(preparePromptInput(input, parentContext, targetContext, systemProperties));
             return;
         }
 
@@ -89,7 +92,7 @@ public class InputsBinding extends AbstractBinding {
             if (useEmptyValuesForPrompts) {
                 value = ValueFactory.create(EMPTY, input.isSensitive());
             } else {
-                missingInputs.add(input);
+                missingInputs.add(preparePromptInput(input, parentContext, targetContext, systemProperties));
                 return;
             }
         }
@@ -132,6 +135,30 @@ public class InputsBinding extends AbstractBinding {
         }
 
         return value;
+    }
+
+    private Input preparePromptInput(Input input,
+                                     Map<String, ? extends Value> parentContext,
+                                     Map<String, ? extends Value> targetContext,
+                                     Set<SystemProperty> systemProperties) {
+        String expression = ExpressionUtils.extractExpression(input.getPromptMessage());
+        if (nonNull(expression)) {
+            Map<String, Value> evaluationContext = new HashMap<>();
+            evaluationContext.putAll(parentContext);
+            evaluationContext.putAll(targetContext);
+
+            String evaluatedPromptMessage = Optional.of(scriptEvaluator
+                    .evalExpr(expression, evaluationContext, systemProperties, input.getFunctionDependencies()))
+                    .map(Value::get)
+                    .map(String.class::cast)
+                    .orElse(EMPTY);
+
+            return new Input
+                    .InputBuilder(input, input.getValue())
+                    .withPromptMessage(evaluatedPromptMessage)
+                    .build();
+        }
+        return input;
     }
 
     private boolean containsEmptyStringOrNull(Value value) {

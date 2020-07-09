@@ -22,6 +22,7 @@ import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ContextStack;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
@@ -135,6 +137,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
                     executableInputs,
                     callArguments,
+                    getParentContext(runEnv),
                     runEnv.getSystemProperties(),
                     missingInputs,
                     isTrue(useEmptyValuesForPrompts));
@@ -345,6 +348,13 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 throw new RuntimeException("Unrecognized type: " + executableType);
         }
         return returnValues;
+    }
+
+    private Map<String, Value> getParentContext(RunEnvironment runEnvironment) {
+        return Optional.ofNullable(runEnvironment.getStack())
+                .map(ContextStack::peekContext)
+                .map(Context::getImmutableViewOfVariables)
+                .orElseGet(Collections::emptyMap);
     }
 
 }

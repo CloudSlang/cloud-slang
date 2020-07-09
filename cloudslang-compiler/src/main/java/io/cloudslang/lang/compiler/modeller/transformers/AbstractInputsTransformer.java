@@ -166,7 +166,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             PromptType promptType, String message, String options, String delimiter) {
         executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
-        Accumulator dependencyAccumulator = extractFunctionData(value);
+        Accumulator dependencyAccumulator = extractFunctionData(value, message);
         return new Input.InputBuilder(name, value, sensitive, sensitivityLevel)
                 .withRequired(required)
                 .withPrivateInput(privateInput)

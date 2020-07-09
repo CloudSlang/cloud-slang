@@ -111,7 +111,8 @@ public class ExecutableStepsTest {
         Map<String, Value> resultMap = new HashMap<>();
         resultMap.put("input1", ValueFactory.create(5));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList(), anyBoolean())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean()))
+                .thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
             new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext(), false);
 
@@ -140,7 +141,8 @@ public class ExecutableStepsTest {
         resultMap.put("input1", ValueFactory.create(inputs.get(0).getValue()));
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anySet(), anyList(), anyBoolean())).thenReturn(resultMap);
+        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean()))
+                .thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
             runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
         Collection<ScoreEvent> events = runtimeServices.getEvents();

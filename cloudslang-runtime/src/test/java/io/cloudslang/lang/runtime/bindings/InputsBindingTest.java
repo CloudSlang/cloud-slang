@@ -51,6 +51,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import static java.util.Collections.emptyMap;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
 public class InputsBindingTest {
@@ -460,7 +462,7 @@ public class InputsBindingTest {
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context,
                                           Set<SystemProperty> systemProperties, List<Input> missingInputs) {
-        return inputsBinding.bindInputs(inputs, context, systemProperties, missingInputs, false);
+        return inputsBinding.bindInputs(inputs, context, emptyMap(), systemProperties, missingInputs, false);
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context) {
