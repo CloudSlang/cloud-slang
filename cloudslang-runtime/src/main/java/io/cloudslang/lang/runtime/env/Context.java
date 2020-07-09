@@ -10,14 +10,14 @@
 package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.runtime.steps.ReadOnlyContextAccessor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Collections.unmodifiableMap;
 
 public class Context implements Serializable {
 
@@ -28,8 +28,7 @@ public class Context implements Serializable {
     public Context(Map<String, Value> variables, Map<String, Value> magicVariables) {
         this.variables = variables;
         this.magicVariables = magicVariables;
-        langVariables = new HashMap<>();
-
+        this.langVariables = new HashMap<>();
     }
 
     public Value getVariable(String name) {
@@ -45,7 +44,11 @@ public class Context implements Serializable {
     }
 
     public Map<String, Value> getImmutableViewOfLanguageVariables() {
-        return Collections.unmodifiableMap(langVariables);
+        return unmodifiableMap(langVariables);
+    }
+
+    public Map<String, Value> getImmutableViewOfMagicVariables() {
+        return unmodifiableMap(magicVariables);
     }
 
     public Value getLanguageVariable(String name) {
@@ -57,7 +60,7 @@ public class Context implements Serializable {
     }
 
     public Map<String, Value> getImmutableViewOfVariables() {
-        return Collections.unmodifiableMap(variables);
+        return unmodifiableMap(variables);
     }
 
     public Value removeLanguageVariable(String key) {
@@ -91,7 +94,4 @@ public class Context implements Serializable {
                 .toHashCode();
     }
 
-    public Map<String, Value> getGlobalVariables() {
-        return magicVariables;
-    }
 }

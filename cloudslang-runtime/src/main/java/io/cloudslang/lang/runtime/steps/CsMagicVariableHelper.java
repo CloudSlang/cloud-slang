@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
-public class MagicVariableHelper {
+@Component("csMagicVariableHelper")
+public class CsMagicVariableHelper {
 
     public Map<String, Value> getGlobalContext(ExecutionRuntimeServices executionRuntimeServices) {
         Map<String, Value> globalContext = new HashMap<>();

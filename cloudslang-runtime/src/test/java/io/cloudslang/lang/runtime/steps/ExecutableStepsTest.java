@@ -46,7 +46,6 @@ import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
-import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +66,10 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -98,14 +101,14 @@ public class ExecutableStepsTest {
     private ExecutionPreconditionService executionPreconditionService;
 
     @Test
-    public void testStart() throws Exception {
+    public void testStart() {
         executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(),
             new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW,
                 new SystemContext(), false);
     }
 
     @Test
-    public void testStartWithInput() throws Exception {
+    public void testStartWithInput() {
         List<Input> inputs = singletonList(new Input.InputBuilder("input1", "input1").build());
         RunEnvironment runEnv = new RunEnvironment();
 
@@ -117,13 +120,13 @@ public class ExecutableStepsTest {
             new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext(), false);
 
         Map<String, Value> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
-        Assert.assertTrue(opVars.containsKey("input1"));
-        Assert.assertEquals(5, opVars.get("input1").get());
+        assertTrue(opVars.containsKey("input1"));
+        assertEquals(5, opVars.get("input1").get());
 
         Map<String, Value> callArg = runEnv.removeCallArguments();
-        Assert.assertEquals(1, callArg.size());
-        Assert.assertTrue(callArg.containsKey("input1"));
-        Assert.assertEquals(5, callArg.get("input1").get());
+        assertEquals(1, callArg.size());
+        assertTrue(callArg.containsKey("input1"));
+        assertEquals(5, callArg.get("input1").get());
     }
 
     @Test
@@ -146,44 +149,41 @@ public class ExecutableStepsTest {
             runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
-        Assert.assertFalse(events.isEmpty());
+        assertFalse(events.isEmpty());
         ScoreEvent boundInputEvent = null;
         for (ScoreEvent event : events) {
             if (event.getEventType().equals(ScoreLangConstants.EVENT_INPUT_END)) {
                 boundInputEvent = event;
             }
         }
-        Assert.assertNotNull(boundInputEvent);
+        assertNotNull(boundInputEvent);
         LanguageEventData eventData = (LanguageEventData) boundInputEvent.getData();
-        Assert.assertTrue(eventData.containsKey(LanguageEventData.BOUND_INPUTS));
-        @SuppressWarnings("unchecked") Map<String, Serializable> inputsBounded =
-            (Map<String, Serializable>) eventData.get(LanguageEventData.BOUND_INPUTS);
+        assertTrue(eventData.containsKey(LanguageEventData.BOUND_INPUTS));
 
-        Assert.assertNotNull(eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.FLOW, eventData.getStepType());
-        Assert.assertEquals("dockerizeStep", eventData.getStepName());
+
+        assertNotNull(eventData.getStepName());
+        assertEquals(LanguageEventData.StepType.FLOW, eventData.getStepType());
+        assertEquals("dockerizeStep", eventData.getStepName());
 
         // verify input names are in defined order and have the expected value
+        @SuppressWarnings("unchecked") Map<String, Serializable> inputsBounded =
+                (Map<String, Serializable>) eventData.get(LanguageEventData.BOUND_INPUTS);
         Set<Map.Entry<String, Serializable>> inputEntries = inputsBounded.entrySet();
         Iterator<Map.Entry<String, Serializable>> inputNamesIterator = inputEntries.iterator();
 
         Map.Entry<String, Serializable> firstInput = inputNamesIterator.next();
-        org.junit.Assert
-            .assertEquals("Inputs are not in defined order in end inputs binding event",
+        assertEquals("Inputs are not in defined order in end inputs binding event",
                 "input1", firstInput.getKey());
-        org.junit.Assert
-            .assertEquals(5, firstInput.getValue());
+        assertEquals(5, firstInput.getValue());
 
         Map.Entry<String, Serializable> secondInput = inputNamesIterator.next();
-        org.junit.Assert
-            .assertEquals("Inputs are not in defined order in end inputs binding event",
+        assertEquals("Inputs are not in defined order in end inputs binding event",
                 "input2", secondInput.getKey());
-        org.junit.Assert
-            .assertEquals(SensitiveValue.SENSITIVE_VALUE_MASK, secondInput.getValue());
+        assertEquals(SensitiveValue.SENSITIVE_VALUE_MASK, secondInput.getValue());
     }
 
     @Test
-    public void testStartExecutableSetNextPosition() throws Exception {
+    public void testStartExecutableSetNextPosition() {
         List<Input> inputs = Arrays.asList();
         RunEnvironment runEnv = new RunEnvironment();
 
@@ -192,7 +192,7 @@ public class ExecutableStepsTest {
                 new ExecutionRuntimeServices(), "", nextStepPosition, ExecutableType.FLOW,
                 new SystemContext(), false);
 
-        Assert.assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
+        assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class ExecutableStepsTest {
             new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         ReturnValues returnValues = runEnv.removeReturnValues();
-        Assert.assertTrue(returnValues.getResult().equals(ScoreLangConstants.SUCCESS_RESULT));
+        assertTrue(returnValues.getResult().equals(ScoreLangConstants.SUCCESS_RESULT));
     }
 
     @Test
@@ -237,8 +237,8 @@ public class ExecutableStepsTest {
 
         ReturnValues returnValues = runEnv.removeReturnValues();
         Map<String, Value> outputs = returnValues.getOutputs();
-        Assert.assertEquals(1, outputs.size());
-        Assert.assertEquals("John", outputs.get("name").get());
+        assertEquals(1, outputs.size());
+        assertEquals("John", outputs.get("name").get());
     }
 
     @Test
@@ -253,7 +253,7 @@ public class ExecutableStepsTest {
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(),
             new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
-        Assert.assertEquals(parentFirstStepPosition, runEnv.removeNextStepPosition());
+        assertEquals(parentFirstStepPosition, runEnv.removeNextStepPosition());
     }
 
     @Test
@@ -265,7 +265,7 @@ public class ExecutableStepsTest {
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(),
             new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
-        Assert.assertEquals(null, runEnv.removeNextStepPosition());
+        assertEquals(null, runEnv.removeNextStepPosition());
     }
 
     @Test
@@ -300,7 +300,7 @@ public class ExecutableStepsTest {
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
-        Assert.assertFalse(events.isEmpty());
+        assertFalse(events.isEmpty());
         ScoreEvent boundOutputEvent = null;
         ScoreEvent startOutputEvent = null;
         ScoreEvent executableFinishedEvent = null;
@@ -313,34 +313,34 @@ public class ExecutableStepsTest {
                 executableFinishedEvent = event;
             }
         }
-        Assert.assertNotNull(startOutputEvent);
+        assertNotNull(startOutputEvent);
         LanguageEventData eventData = (LanguageEventData) startOutputEvent.getData();
-        Assert.assertTrue(eventData.containsKey(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
-        Assert.assertTrue(eventData.containsKey(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
+        assertTrue(eventData.containsKey(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY));
+        assertTrue(eventData.containsKey(ScoreLangConstants.EXECUTABLE_RESULTS_KEY));
         List<Output> outputs = (List<Output>) eventData.get(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY);
         List<Result> results = (List<Result>) eventData.get(ScoreLangConstants.EXECUTABLE_RESULTS_KEY);
-        Assert.assertEquals(possibleOutputs, outputs);
-        Assert.assertEquals(possibleResults, results);
+        assertEquals(possibleOutputs, outputs);
+        assertEquals(possibleResults, results);
 
-        Assert.assertNotNull(boundOutputEvent);
+        assertNotNull(boundOutputEvent);
         eventData = (LanguageEventData) boundOutputEvent.getData();
-        Assert.assertTrue(eventData.containsKey(LanguageEventData.OUTPUTS));
+        assertTrue(eventData.containsKey(LanguageEventData.OUTPUTS));
         Map<String, Serializable> returnOutputs = eventData.getOutputs();
+        assertEquals("step1", eventData.getStepName());
+        assertEquals(LanguageEventData.StepType.FLOW, eventData.getStepType());
+        assertEquals(1, returnOutputs.size());
+        assertEquals("John", returnOutputs.get("name"));
         String returnResult = (String) eventData.get(LanguageEventData.RESULT);
-        Assert.assertEquals("step1", eventData.getStepName());
-        Assert.assertEquals(LanguageEventData.StepType.FLOW, eventData.getStepType());
-        Assert.assertEquals(1, returnOutputs.size());
-        Assert.assertEquals("John", returnOutputs.get("name"));
-        Assert.assertTrue(returnResult.equals(ScoreLangConstants.SUCCESS_RESULT));
+        assertTrue(returnResult.equals(ScoreLangConstants.SUCCESS_RESULT));
 
-        Assert.assertNotNull(executableFinishedEvent);
+        assertNotNull(executableFinishedEvent);
         eventData = (LanguageEventData) executableFinishedEvent.getData();
         String result = (String) eventData.get(LanguageEventData.RESULT);
         Map<String, Serializable> eventOutputs = (Map<String, Serializable>) eventData.get(LanguageEventData.OUTPUTS);
-        Assert.assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
-        Assert.assertEquals(boundOutputs.size(), eventOutputs.size());
+        assertEquals(ScoreLangConstants.SUCCESS_RESULT, result);
+        assertEquals(boundOutputs.size(), eventOutputs.size());
         for (Map.Entry<String, Value> entry : boundOutputs.entrySet()) {
-            Assert.assertEquals(entry.getValue().get(), eventOutputs.get(entry.getKey()));
+            assertEquals(entry.getValue().get(), eventOutputs.get(entry.getKey()));
         }
 
     }
@@ -411,7 +411,7 @@ public class ExecutableStepsTest {
         @Bean
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
-                    executionPreconditionService(), missingInputHandler());
+                    executionPreconditionService(), missingInputHandler(), csMagicVariableHelper());
         }
 
         @Bean
@@ -430,8 +430,8 @@ public class ExecutableStepsTest {
         }
 
         @Bean
-        public MagicVariableHelper magicVariableHelper() {
-            return new MagicVariableHelper();
+        public CsMagicVariableHelper csMagicVariableHelper() {
+            return new CsMagicVariableHelper();
         }
     }
 }

@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import static java.util.Collections.addAll;
+
 public class ReadOnlyContextAccessor implements Serializable {
 
-    protected List<Map<String, Value>> holder = null;
+    private List<Map<String, Value>> holder;
 
     public ReadOnlyContextAccessor() {
         holder = new ArrayList<>();
@@ -28,10 +30,7 @@ public class ReadOnlyContextAccessor implements Serializable {
 
     public ReadOnlyContextAccessor(Map<String, Value>... publishContexts) {
         this();
-        for (Map<String, Value> publishContext : publishContexts) {
-            holder.add(publishContext);
-        }
-
+        addAll(holder, publishContexts);
     }
 
     public ReadOnlyContextAccessor(ReadOnlyContextAccessor accessor) {
@@ -53,7 +52,6 @@ public class ReadOnlyContextAccessor implements Serializable {
         }
         return null;
     }
-
 
     public Map<String, Value> getMergedContexts() {
         Map<String, Value> context = new HashMap<>();

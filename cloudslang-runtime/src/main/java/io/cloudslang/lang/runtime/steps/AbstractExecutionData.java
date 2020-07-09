@@ -21,8 +21,6 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.lang.entities.properties.EventVerbosityLevel;
-import io.cloudslang.lang.entities.utils.ValueUtils;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.env.Context;
@@ -49,9 +47,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import static io.cloudslang.lang.entities.properties.EventVerbosityLevel.ALL;
+import static io.cloudslang.lang.entities.properties.EventVerbosityLevel.DEFAULT;
 import static io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant.CSLANG_RUNTIME_EVENTS_VERBOSITY;
+import static io.cloudslang.lang.entities.utils.ValueUtils.flatten;
+import static java.lang.System.getProperty;
 
 public abstract class AbstractExecutionData {
+
+    private static final String VERBOSITY_LEVEL = getProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(),
+            DEFAULT.getValue());
 
     @SafeVarargs
     public static void fireEvent(ExecutionRuntimeServices runtimeServices,
@@ -62,29 +67,9 @@ public abstract class AbstractExecutionData {
                                  String stepName,
                                  Map<String, Value> context,
                                  Map.Entry<String, ? extends Serializable>... fields) {
-        fireEvent(runtimeServices, type, description,
-                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName, context, fields);
+        fireEvent(runtimeServices, type, description, runEnvironment.getExecutionPath().getCurrentPath(),
+                stepType, stepName, context, fields);
     }
-
-    @SafeVarargs
-    public static void fireEvent(ExecutionRuntimeServices runtimeServices,
-                                 RunEnvironment runEnvironment,
-                                 String type,
-                                 String description,
-                                 LanguageEventData.StepType stepType,
-                                 String stepName,
-                                 ReadOnlyContextAccessor contextAccessor,
-                                 Map.Entry<String, ? extends Serializable>... fields) {
-
-        LanguageEventData eventData = getLanguageEventData(runtimeServices, type, description,
-                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName);
-
-        setContext(eventData, ValueUtils.flatten(contextAccessor.getContextHolder()));
-
-        addEventToRuntime(runtimeServices, type, eventData, fields);
-
-    }
-
 
     @SafeVarargs
     public static void fireEvent(ExecutionRuntimeServices runtimeServices,
@@ -95,23 +80,26 @@ public abstract class AbstractExecutionData {
                                  String stepName,
                                  Map<String, Value> context,
                                  Map.Entry<String, ? extends Serializable>... fields) {
-        LanguageEventData eventData = getLanguageEventData(runtimeServices, type,
-                description, path, stepType, stepName);
-
-        setContext(eventData, ValueUtils.flatten(context));
-
+        LanguageEventData eventData = getLanguageEventData(runtimeServices, type, description,
+                path, stepType, stepName);
+        flattenAndSetContext(eventData, context);
         addEventToRuntime(runtimeServices, type, eventData, fields);
     }
 
-    private static void addEventToRuntime(ExecutionRuntimeServices runtimeServices,
-                                          String type,
-                                          LanguageEventData eventData,
-                                          Entry<String, ? extends Serializable>[] fields) {
-        for (Entry<String, ? extends Serializable> field : fields) {
-            //noinspection unchecked
-            eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
-        }
-        runtimeServices.addEvent(type, eventData);
+    @SafeVarargs
+    public static void fireEvent(ExecutionRuntimeServices runtimeServices,
+            RunEnvironment runEnvironment,
+            String type,
+            String description,
+            LanguageEventData.StepType stepType,
+            String stepName,
+            ReadOnlyContextAccessor contextAccessor,
+            Map.Entry<String, ? extends Serializable>... fields) {
+
+        LanguageEventData eventData = getLanguageEventData(runtimeServices, type, description,
+                runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName);
+        flattenAndSetContext(eventData, contextAccessor);
+        addEventToRuntime(runtimeServices, type, eventData, fields);
     }
 
     private static LanguageEventData getLanguageEventData(ExecutionRuntimeServices runtimeServices,
@@ -131,6 +119,28 @@ public abstract class AbstractExecutionData {
         return eventData;
     }
 
+    private static void flattenAndSetContext(LanguageEventData eventData, Map<String, Value> context) {
+        if (ALL.getValue().equals(VERBOSITY_LEVEL) && (context != null)) {
+            eventData.setContext(flatten(context));
+        }
+    }
+
+    private static void flattenAndSetContext(LanguageEventData eventData, ReadOnlyContextAccessor accessor) {
+        if (ALL.getValue().equals(VERBOSITY_LEVEL) && (accessor != null)) {
+            eventData.setContext(flatten(accessor.getContextHolder()));
+        }
+    }
+
+    private static void addEventToRuntime(ExecutionRuntimeServices runtimeServices,
+            String type,
+            LanguageEventData eventData,
+            Entry<String, ? extends Serializable>[] fields) {
+        for (Entry<String, ? extends Serializable> field : fields) {
+            eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
+        }
+        runtimeServices.addEvent(type, eventData);
+    }
+
     private static void pushParentFlowDataOnStack(RunEnvironment runEnv, Long runningExecutionPlanId,
                                                   Long nextStepId, WorkerGroupMetadata workerGroup) {
         // create ParentFlowData object containing the current running execution plan id and
@@ -140,18 +150,9 @@ public abstract class AbstractExecutionData {
         stack.pushParentFlowData(new ParentFlowData(runningExecutionPlanId, nextStepId, workerGroup));
     }
 
-    private static void setContext(LanguageEventData eventData, Map<String, Serializable> flattenedContext) {
-        String verbosityLevel = System.getProperty(
-                CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(),
-                EventVerbosityLevel.DEFAULT.getValue()
-        );
-        if (EventVerbosityLevel.ALL.getValue().equals(verbosityLevel) && flattenedContext != null) {
-            eventData.setContext(flattenedContext);
-        }
-    }
-
     protected static void prepareNodeName(ExecutionRuntimeServices executionRuntimeServices, String nodeName,
-                                          int flowDepth) {
+            int flowDepth) {
+
         executionRuntimeServices.setNodeName(nodeName);
         executionRuntimeServices.setNodeNameWithDepth(nodeName + "_" + flowDepth);
     }
@@ -230,7 +231,8 @@ public abstract class AbstractExecutionData {
                                               ReturnValues returnValues,
                                               Double roiValue,
                                               ReadOnlyContextAccessor contextAccessor) {
-        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END, "Output binding finished",
+        fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END,
+                "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
                 contextAccessor,
                 Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),

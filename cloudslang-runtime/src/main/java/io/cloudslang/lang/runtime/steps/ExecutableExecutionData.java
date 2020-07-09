@@ -31,7 +31,6 @@ import io.cloudslang.score.lang.SystemContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -60,31 +59,26 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 @Component
 public class ExecutableExecutionData extends AbstractExecutionData {
 
+    private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
     public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
 
     private final ResultsBinding resultsBinding;
-
     private final InputsBinding inputsBinding;
-
     private final OutputsBinding outputsBinding;
-
     private final ExecutionPreconditionService executionPreconditionService;
-
     private final MissingInputHandler missingInputHandler;
-
-    private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
-
-    @Autowired
-    MagicVariableHelper magicVariableHelper;
+    private final CsMagicVariableHelper magicVariableHelper;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
-                                   MissingInputHandler missingInputHandler) {
+                                   MissingInputHandler missingInputHandler,
+                                   CsMagicVariableHelper magicVariableHelper) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
         this.executionPreconditionService = preconditionService;
         this.missingInputHandler = missingInputHandler;
+        this.magicVariableHelper = magicVariableHelper;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
