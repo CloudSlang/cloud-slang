@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,10 +30,25 @@ public class ValueUtils {
         Map<String, Serializable> result = null;
         if (valueMap != null) {
             result = new LinkedHashMap<>();
-            for (Map.Entry<String, Value> entry : valueMap.entrySet()) {
-                result.put(entry.getKey(), entry.getValue().toString());
+            flattenMap(valueMap, result);
+        }
+        return result;
+    }
+
+    public static Map<String, Serializable> flatten(List<Map<String, Value>> valueMaps) {
+        Map<String, Serializable> result = new LinkedHashMap<>();
+        for (Map<String, Value> valueMap : valueMaps) {
+            if (valueMap != null) {
+                flattenMap(valueMap, result);
             }
         }
         return result;
     }
+
+    private static void flattenMap(Map<String, Value> valueMap, Map<String, Serializable> result) {
+        for (Map.Entry<String, Value> entry : valueMap.entrySet()) {
+            result.put(entry.getKey(), entry.getValue() == null ? null : entry.getValue().toString());
+        }
+    }
+
 }
