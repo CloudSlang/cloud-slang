@@ -55,9 +55,6 @@ import static java.lang.System.getProperty;
 
 public abstract class AbstractExecutionData {
 
-    private static final String VERBOSITY_LEVEL = getProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(),
-            DEFAULT.getValue());
-
     @SafeVarargs
     public static void fireEvent(ExecutionRuntimeServices runtimeServices,
                                  RunEnvironment runEnvironment,
@@ -120,13 +117,15 @@ public abstract class AbstractExecutionData {
     }
 
     private static void flattenAndSetContext(LanguageEventData eventData, Map<String, Value> context) {
-        if (ALL.getValue().equals(VERBOSITY_LEVEL) && (context != null)) {
+        if (ALL.getValue().equals(getProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(),
+                DEFAULT.getValue())) && (context != null)) {
             eventData.setContext(flatten(context));
         }
     }
 
     private static void flattenAndSetContext(LanguageEventData eventData, ReadOnlyContextAccessor accessor) {
-        if (ALL.getValue().equals(VERBOSITY_LEVEL) && (accessor != null)) {
+        if (ALL.getValue().equals(getProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(),
+                DEFAULT.getValue())) && (accessor != null)) {
             eventData.setContext(flatten(accessor.getContextHolder()));
         }
     }
