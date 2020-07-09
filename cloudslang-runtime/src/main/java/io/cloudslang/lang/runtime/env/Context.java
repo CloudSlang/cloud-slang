@@ -10,21 +10,25 @@
 package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Collections.unmodifiableMap;
 
 public class Context implements Serializable {
 
     private final Map<String, Value> variables;
     private final Map<String, Value> langVariables;
+    private final Map<String, Value> magicVariables;
 
-    public Context(Map<String, Value> variables) {
+    public Context(Map<String, Value> variables, Map<String, Value> magicVariables) {
         this.variables = variables;
-        langVariables = new HashMap<>();
+        this.magicVariables = magicVariables;
+        this.langVariables = new HashMap<>();
     }
 
     public Value getVariable(String name) {
@@ -40,7 +44,11 @@ public class Context implements Serializable {
     }
 
     public Map<String, Value> getImmutableViewOfLanguageVariables() {
-        return Collections.unmodifiableMap(langVariables);
+        return unmodifiableMap(langVariables);
+    }
+
+    public Map<String, Value> getImmutableViewOfMagicVariables() {
+        return unmodifiableMap(magicVariables);
     }
 
     public Value getLanguageVariable(String name) {
@@ -52,7 +60,7 @@ public class Context implements Serializable {
     }
 
     public Map<String, Value> getImmutableViewOfVariables() {
-        return Collections.unmodifiableMap(variables);
+        return unmodifiableMap(variables);
     }
 
     public Value removeLanguageVariable(String key) {
@@ -73,6 +81,7 @@ public class Context implements Serializable {
         return new EqualsBuilder()
                 .append(variables, that.variables)
                 .append(langVariables, that.langVariables)
+                .append(magicVariables,that.magicVariables)
                 .isEquals();
     }
 
@@ -81,6 +90,8 @@ public class Context implements Serializable {
         return new HashCodeBuilder()
                 .append(variables)
                 .append(langVariables)
+                .append(magicVariables)
                 .toHashCode();
     }
+
 }

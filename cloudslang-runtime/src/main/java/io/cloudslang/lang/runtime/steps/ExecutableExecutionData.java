@@ -16,7 +16,6 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
@@ -60,28 +59,26 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 @Component
 public class ExecutableExecutionData extends AbstractExecutionData {
 
+    private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
     public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
 
     private final ResultsBinding resultsBinding;
-
     private final InputsBinding inputsBinding;
-
     private final OutputsBinding outputsBinding;
-
     private final ExecutionPreconditionService executionPreconditionService;
-
     private final MissingInputHandler missingInputHandler;
-
-    private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
+    private final CsMagicVariableHelper magicVariableHelper;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
-                                   MissingInputHandler missingInputHandler) {
+                                   MissingInputHandler missingInputHandler,
+                                   CsMagicVariableHelper magicVariableHelper) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
         this.executionPreconditionService = preconditionService;
         this.missingInputHandler = missingInputHandler;
+        this.magicVariableHelper = magicVariableHelper;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
@@ -166,8 +163,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             if (userInputs != null) {
                 userInputs.clear();
             }
-
-            updateCallArgumentsAndPushContextToStack(runEnv, new Context(boundInputValues), actionArguments);
+            Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
+            updateCallArgumentsAndPushContextToStack(runEnv,
+                    new Context(boundInputValues, magicVariables), actionArguments);
 
             sendEndBindingInputsEvent(
                     executableInputs,
@@ -247,11 +245,11 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     actionReturnValues.getResult()
             );
 
-            Map<String, Value> outputsBindingContext =
-                    MapUtils.mergeMaps(operationVariables, actionReturnValues.getOutputs());
+            ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(operationVariables,
+                    actionReturnValues.getOutputs());
             Map<String, Value> operationReturnOutputs =
                     outputsBinding.bindOutputs(
-                            outputsBindingContext,
+                            outputsBindingAccessor,
                             runEnv.getSystemProperties(),
                             executableOutputs
                     );

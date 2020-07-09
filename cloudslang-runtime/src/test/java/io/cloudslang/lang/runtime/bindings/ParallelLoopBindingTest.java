@@ -65,7 +65,9 @@ public class ParallelLoopBindingTest {
     public void passingNullParallelLoopStatementThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
         parallelLoopBinding
-                .bindParallelLoopList(null, new Context(new HashMap<String, Value>()), EMPTY_SET, "nodeName");
+                .bindParallelLoopList(null, new Context(
+                        new HashMap<String, Value>(),
+                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName");
     }
 
     @Test
@@ -78,7 +80,9 @@ public class ParallelLoopBindingTest {
     public void passingNullNodeNameThrowsException() throws Exception {
         exception.expect(RuntimeException.class);
         parallelLoopBinding.bindParallelLoopList(
-                createBasicSyncLoopStatement(), new Context(new HashMap<String, Value>()), EMPTY_SET, null);
+                createBasicSyncLoopStatement(), new Context(
+                        new HashMap<String, Value>(),
+                        Collections.<String, Value>emptyMap()), EMPTY_SET, null);
     }
 
     @Test
@@ -86,7 +90,7 @@ public class ParallelLoopBindingTest {
         Map<String, Value> variables = new HashMap<>();
         variables.put("key1", ValueFactory.create("value1"));
         variables.put("key2", ValueFactory.create("value2"));
-        final Context context = new Context(variables);
+        final Context context = new Context(variables,Collections.<String, Value>emptyMap());
         List<Value> expectedList = newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
@@ -104,7 +108,7 @@ public class ParallelLoopBindingTest {
         Map<String, Value> variables = new HashMap<>();
         variables.put("key1", ValueFactory.create("value1"));
         variables.put("key2", ValueFactory.create("value2"));
-        final Context context = new Context(variables);
+        final Context context = new Context(variables,Collections.<String, Value>emptyMap());
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
                 .thenReturn(ValueFactory.create(newArrayList()));
@@ -126,7 +130,9 @@ public class ParallelLoopBindingTest {
         exception.expect(RuntimeException.class);
 
         parallelLoopBinding
-                .bindParallelLoopList(createBasicSyncLoopStatement(), new Context(variables), EMPTY_SET, "nodeName");
+                .bindParallelLoopList(createBasicSyncLoopStatement(), new Context(
+                        variables,
+                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName");
     }
 
     private ListLoopStatement createBasicSyncLoopStatement() {
