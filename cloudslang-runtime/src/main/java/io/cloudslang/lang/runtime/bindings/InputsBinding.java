@@ -84,7 +84,7 @@ public class InputsBinding extends AbstractBinding {
         }
 
         if (input.isRequired() && isEmpty(value)) {
-            missingInputs.add(preparePromptInput(input, parentContext, targetContext, systemProperties));
+            missingInputs.add(input);
             return;
         }
 
