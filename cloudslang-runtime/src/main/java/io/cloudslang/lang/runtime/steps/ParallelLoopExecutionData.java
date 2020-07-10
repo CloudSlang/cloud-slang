@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.apache.commons.lang3.Validate.notNull;
 
 /**
  * Date: 3/25/2015
