@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.properties.EventVerbosityLevel;
+import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.collections4.MapUtils;
@@ -149,6 +150,7 @@ public class EventDataTest extends SystemsTestsParent {
 
         List<ScoreEvent> events = compileAndRunExecutable(inputs, EMPTY_SP_SET);
         Map<String, List<LanguageEventData>> eventDataByPath = groupByPath(events);
+        populateRunId(eventDataByPath.get("0").get(0).get("EXECUTION_ID").toString());
 
         validateEventData(eventDataByPath,"0", ScoreLangConstants.EVENT_INPUT_START, CONTEXT_USER_INPUTS);
         validateEventData(eventDataByPath,"0", ScoreLangConstants.EVENT_INPUT_END, CONTEXT_USER_INPUTS);
@@ -200,14 +202,19 @@ public class EventDataTest extends SystemsTestsParent {
         List<ScoreEvent> events = compileAndRunExecutableWithException(inputs, EMPTY_SP_SET);
         Map<String, List<LanguageEventData>> eventDataByPath = groupByPath(events);
 
-        validateEventData(eventDataByPath,"0.0", ScoreLangConstants.EVENT_ACTION_ERROR, CONTEXT_OPERATION_01);
+        validateEventData(eventDataByPath, "0.0", ScoreLangConstants.EVENT_ACTION_ERROR, CONTEXT_OPERATION_01);
         validateEventData(
-            eventDataByPath,
-            "0.0.0",
-            ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, CONTEXT_OPERATION_01
+                eventDataByPath,
+                "0.0.0",
+                ScoreLangConstants.SLANG_EXECUTION_EXCEPTION, CONTEXT_OPERATION_01
         );
 
         validateSensitiveDataNotReveiledInContext(events);
+    }
+
+    private void populateRunId(String runId) {
+        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runId);
+        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runId);
     }
 
     private void validateSensitiveDataNotReveiledInContext(List<ScoreEvent> events) {

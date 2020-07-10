@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -269,10 +268,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
             Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
-        Map<String, Value> outputsBindingContext =
-            io.cloudslang.lang.entities.utils.MapUtils.mergeMaps(Collections.<String, Value>emptyMap(), publishContext);
+        ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(publishContext);
         return outputsBinding.bindOutputs(
-            outputsBindingContext,
+            outputsBindingAccessor,
             runEnv.getSystemProperties(),
             stepPublishValues
         );

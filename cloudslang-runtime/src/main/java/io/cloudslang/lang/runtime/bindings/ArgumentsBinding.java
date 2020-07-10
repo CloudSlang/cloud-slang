@@ -14,12 +14,14 @@ import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.steps.ReadOnlyContextAccessor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
 
@@ -41,6 +43,22 @@ public class ArgumentsBinding extends AbstractBinding {
 
         //we do not want to change original context map
         Map<String, Value> srcContext = new HashMap<>(context);
+
+        for (Argument argument : arguments) {
+            bindArgument(argument, srcContext, systemProperties, resultContext);
+        }
+
+        return resultContext;
+    }
+
+    public Map<String, Value> bindArguments(
+            List<Argument> arguments,
+            ReadOnlyContextAccessor contextAccessor,
+            Set<SystemProperty> systemProperties) {
+        Map<String, Value> resultContext = new HashMap<>();
+
+        //we do not want to change original context map
+        Map<String, Value> srcContext = contextAccessor.getMergedContexts();
 
         for (Argument argument : arguments) {
             bindArgument(argument, srcContext, systemProperties, resultContext);

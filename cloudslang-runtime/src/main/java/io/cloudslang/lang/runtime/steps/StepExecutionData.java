@@ -15,14 +15,13 @@ import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.WorkerGroupMetadata;
+import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -47,10 +46,11 @@ import java.util.Map;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
-import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_VALUE;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_OVERRIDE;
+import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_VALUE;
 import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static java.lang.Double.parseDouble;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -121,9 +121,12 @@ public class StepExecutionData extends AbstractExecutionData {
                     nodeName,
                     flowVariables
             );
-
+            ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
+                    flowVariables,
+                    flowContext.getImmutableViewOfMagicVariables());
             Map<String, Value> boundInputs = argumentsBinding
-                    .bindArguments(stepInputs, flowVariables, runEnv.getSystemProperties());
+                    .bindArguments(stepInputs, contextAccessor,
+                            runEnv.getSystemProperties());
             saveStepInputsResultContext(flowContext, boundInputs);
 
             sendEndBindingArgumentsEvent(
@@ -179,11 +182,15 @@ public class StepExecutionData extends AbstractExecutionData {
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
-            Map<String, Value> outputsBindingContext = MapUtils.mergeMaps(argumentsResultContext, executableOutputs);
+            Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
+            ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(
+                    argumentsResultContext,
+                    executableOutputs,
+                    globalContext);
 
             fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_START, "Output binding started",
                     LanguageEventData.StepType.STEP, nodeName,
-                    outputsBindingContext,
+                    outputsBindingAccessor,
                     Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
                     Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues),
                     Pair.of("executableReturnValues", executableReturnValues),
@@ -191,14 +198,14 @@ public class StepExecutionData extends AbstractExecutionData {
             );
 
             final Map<String, Value> publishValues = publishValuesMap(runEnv.getSystemProperties(), stepPublishValues,
-                    parallelLoop, executableOutputs, outputsBindingContext, outputsBinding);
+                    parallelLoop, executableOutputs, outputsBindingAccessor, outputsBinding);
             flowContext.putVariables(publishValues);
 
             //loops
             Map<String, Value> langVariables = flowContext.getImmutableViewOfLanguageVariables();
 
             if (handleEndLoopCondition(runEnv, executionRuntimeServices, previousStepId, breakOn, nodeName, flowContext,
-                    executableReturnValues, outputsBindingContext, publishValues, langVariables)) {
+                    executableReturnValues, outputsBindingAccessor, publishValues, langVariables)) {
                 return;
             }
 
@@ -240,7 +247,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     nextPosition,
                     returnValues,
                     roiValue,
-                    outputsBindingContext
+                    outputsBindingAccessor
             );
 
             executionRuntimeServices.addRoiValue(roiValue);
@@ -358,7 +365,7 @@ public class StepExecutionData extends AbstractExecutionData {
                             roi = flowVariables.get(expr).get();
                         }
                     }
-                    return roi != null ? Double.valueOf(roi.toString()) : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
+                    return roi != null ? parseDouble(roi.toString()) : ExecutionParametersConsts.DEFAULT_ROI_VALUE;
                 }
             }
         }
