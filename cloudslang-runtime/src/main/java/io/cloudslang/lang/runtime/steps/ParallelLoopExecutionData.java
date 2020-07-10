@@ -120,7 +120,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
                 branchRuntimeEnvironment.resetStacks();
                 StatefulSessionStack statefulSessionStack = new StatefulSessionStack();
-                statefulSessionStack.pushSessionStack(new HashMap<>());
+                statefulSessionStack.pushSessionsMap(new HashMap<>());
                 executionRuntimeServices.setStatefulStack(statefulSessionStack);
 
                 if (parallelLoopStatement instanceof ListLoopStatement) {
@@ -164,9 +164,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
             runEnv.getExecutionPath().up();
+            notNull(executionRuntimeServices.getLevelParallelism(), "Parallelism level can not be null");
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
-            if (executionRuntimeServices.getLevelParallelism() != null &&
-                    (int) executionRuntimeServices.getLevelParallelism() > 0) {
+            if ((int) executionRuntimeServices.getLevelParallelism() > 0) {
                 executionRuntimeServices.setLevelParallelism((int) executionRuntimeServices.getLevelParallelism() - 1);
             }
             Context flowContext = runEnv.getStack().popContext();
