@@ -80,9 +80,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
-            int levelParallelism = executionRuntimeServices.getLevelParallelism() != null ?
+            int parallelismLevel = executionRuntimeServices.getLevelParallelism() != null ?
                     (int) executionRuntimeServices.getLevelParallelism() : 0;
-            executionRuntimeServices.setLevelParallelism(levelParallelism + 1);
+            executionRuntimeServices.setLevelParallelism(parallelismLevel + 1);
 
             List<Value> splitData = parallelLoopBinding
                 .bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
@@ -166,8 +166,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             runEnv.getExecutionPath().up();
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
             if (executionRuntimeServices.getLevelParallelism() != null &&
-                    (int)executionRuntimeServices.getLevelParallelism() > 0) {
-                executionRuntimeServices.setLevelParallelism((int)executionRuntimeServices.getLevelParallelism() - 1);
+                    (int) executionRuntimeServices.getLevelParallelism() > 0) {
+                executionRuntimeServices.setLevelParallelism((int) executionRuntimeServices.getLevelParallelism() - 1);
             }
             Context flowContext = runEnv.getStack().popContext();
 
