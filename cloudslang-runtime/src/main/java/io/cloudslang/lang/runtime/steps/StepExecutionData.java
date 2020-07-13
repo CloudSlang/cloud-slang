@@ -361,7 +361,7 @@ public class StepExecutionData extends AbstractExecutionData {
                                       RunEnvironment runEnv,
                                       String expression) {
         Value resolvedValue;
-        if (isEmpty(scriptFunctionSet) && isEmpty(systemProperties )) {
+        if (isEmpty(scriptFunctionSet) && isEmpty(systemProperties)) {
             resolvedValue = ValueFactory.create(expression);
         } else {
             resolvedValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
