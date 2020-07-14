@@ -17,6 +17,8 @@ import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
+import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
@@ -71,8 +73,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -358,6 +362,84 @@ public class StepExecutionDataTest {
         );
     }
 
+    @Test
+    public void testSetWorkerGroupStepWithOverrideTrue() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue2",true));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue3", false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+
+        stepExecutionData.setWorkerGroupStep(null, runEnvironment,
+                executionRuntimeServices,"step1", 2L);
+        assertEquals("workerGroupValue2", executionRuntimeServices.getWorkerGroupName());
+    }
+
+    @Test
+    public void testSetWorkerGroupStepWithOverrideFalse() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue2",false));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue3",false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+
+        stepExecutionData.setWorkerGroupStep(null, runEnvironment,
+                executionRuntimeServices, "step1", 1L);
+        assertEquals("workerGroupValue3", executionRuntimeServices.getWorkerGroupName());
+    }
+
+    @Test
+    public void testSetWorkerGroup() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue2",false));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue3",false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+        WorkerGroupStatement workerGroupStatement =
+                new WorkerGroupStatement("workerValue", false, emptySet(), emptySet());
+
+        stepExecutionData.setWorkerGroupStep(workerGroupStatement, runEnvironment,
+                executionRuntimeServices, "step1", 2L);
+        assertEquals("workerValue", executionRuntimeServices.getWorkerGroupName());
+    }
+
+    @Test
+    public void testSetWorkerGroupWithNulls() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null,true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, false));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+
+        stepExecutionData.setWorkerGroupStep(null, runEnvironment,
+                executionRuntimeServices, "step1", 2L);
+        assertEquals("RAS_Operator_Path", executionRuntimeServices.getWorkerGroupName());
+    }
+
     /////////
     //loops//
     /////////
@@ -395,7 +477,7 @@ public class StepExecutionDataTest {
             runtimeServices, nodeName, 1L, nextStepId, "2", null);
         assertEquals(nextStepId, runEnv.removeNextStepPosition());
         assertEquals(context, runEnv.getStack().popContext());
-        Assert.assertNull(runtimeServices.pullRequestForChangingExecutionPlan());
+        assertNull(runtimeServices.pullRequestForChangingExecutionPlan());
     }
 
     @Test
@@ -426,7 +508,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
+        Context context = new Context(new HashMap<String, Value>(), Collections.<String,Value>emptyMap());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
         RunEnvironment runEnv = new RunEnvironment();
         when(mockLoopCondition.hasMore()).thenReturn(true);
