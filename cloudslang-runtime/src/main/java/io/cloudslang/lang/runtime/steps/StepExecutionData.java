@@ -34,7 +34,6 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -46,6 +45,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
@@ -349,6 +349,8 @@ public class StepExecutionData extends AbstractExecutionData {
             robotGroupValue = computeWorkerValue(robotGroup.getFunctionDependencies(),
                     robotGroup.getSystemPropertyDependencies(),
                     flowContext, runEnv, robotGroup.getExpression());
+        } else if (isNotEmpty(execRuntimeServices.getRobotGroupName())) {
+            robotGroupValue = execRuntimeServices.getRobotGroupName();
         }
         execRuntimeServices.setRobotGroupName(robotGroupValue);
     }
