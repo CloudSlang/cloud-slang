@@ -114,8 +114,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
-            //might put some additional values to callArguments
-            missingInputHandler.applyPromptInputValues(systemContext, callArguments, executableInputs);
+            Map<String, ? extends Value> promptedArguments =
+                    missingInputHandler.applyPromptInputValues(systemContext, executableInputs);
 
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
@@ -132,6 +132,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
                     executableInputs,
                     callArguments,
+                    promptedArguments,
                     runEnv.getSystemProperties(),
                     missingInputs,
                     isTrue(useEmptyValuesForPrompts));

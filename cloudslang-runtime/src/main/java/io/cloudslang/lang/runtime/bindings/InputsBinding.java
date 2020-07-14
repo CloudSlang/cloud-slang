@@ -25,6 +25,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,10 @@ import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 @Component
 public class InputsBinding extends AbstractBinding {
@@ -50,7 +53,9 @@ public class InputsBinding extends AbstractBinding {
      * @param context : initial context
      * @return : a new map with all inputs resolved (does not include initial context)
      */
-    public Map<String, Value> bindInputs(List<Input> inputs, Map<String, ? extends Value> context,
+    public Map<String, Value> bindInputs(List<Input> inputs,
+                                         Map<String, ? extends Value> context,
+                                         Map<String, ? extends Value> promptContext,
                                          Set<SystemProperty> systemProperties, List<Input> missingInputs,
                                          boolean useEmptyValuesForPrompts) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
@@ -59,13 +64,15 @@ public class InputsBinding extends AbstractBinding {
         Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
         for (Input input : inputs) {
-            bindInput(input, srcContext, resultContext, systemProperties, missingInputs, useEmptyValuesForPrompts);
+            bindInput(input, srcContext, firstNonNull(promptContext, emptyMap()), resultContext,
+                    systemProperties, missingInputs, useEmptyValuesForPrompts);
         }
 
         return resultContext;
     }
 
-    private void bindInput(Input input, Map<String, ? extends Value> context, Map<String, Value> targetContext,
+    private void bindInput(Input input, Map<String, ? extends Value> context,
+                           Map<String, ? extends Value> promptContext, Map<String, Value> targetContext,
                            Set<SystemProperty> systemProperties, List<Input> missingInputs,
                            boolean useEmptyValuesForPrompts) {
         Value value;
@@ -80,15 +87,19 @@ public class InputsBinding extends AbstractBinding {
             throw new RuntimeException(errorMessagePrefix + "', \n\t" + t.getMessage(), t);
         }
 
-        if (input.isRequired() && isEmpty(value)) {
-            missingInputs.add(input);
-            return;
-        }
+        if (isEmpty(value)) {
+            final Value promptedArg = promptContext.get(input.getName());
 
-        if (nonNull(input.getPromptType())) {
-            if (useEmptyValuesForPrompts) {
-                value = ValueFactory.create(EMPTY, input.isSensitive());
-            } else {
+            if (nonNull(promptedArg)) {
+                value = promptedArg;
+            } else if (nonNull(input.getPromptType())) {
+                if (useEmptyValuesForPrompts) {
+                    value = ValueFactory.create(EMPTY, input.isSensitive());
+                } else {
+                    missingInputs.add(input);
+                    return;
+                }
+            } else if (input.isRequired()) {
                 missingInputs.add(input);
                 return;
             }
