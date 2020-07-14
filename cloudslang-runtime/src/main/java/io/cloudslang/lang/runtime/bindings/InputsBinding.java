@@ -80,15 +80,17 @@ public class InputsBinding extends AbstractBinding {
             throw new RuntimeException(errorMessagePrefix + "', \n\t" + t.getMessage(), t);
         }
 
-        if (input.isRequired() && isEmpty(value)) {
-            missingInputs.add(input);
-            return;
-        }
+        if (isEmpty(value)) {
+            if (nonNull(input.getPromptType())) {
+                if (useEmptyValuesForPrompts) {
+                    value = ValueFactory.create(EMPTY, input.isSensitive());
+                } else {
+                    missingInputs.add(input);
+                    return;
+                }
+            }
 
-        if (nonNull(input.getPromptType())) {
-            if (useEmptyValuesForPrompts) {
-                value = ValueFactory.create(EMPTY, input.isSensitive());
-            } else {
+            if (input.isRequired()) {
                 missingInputs.add(input);
                 return;
             }
