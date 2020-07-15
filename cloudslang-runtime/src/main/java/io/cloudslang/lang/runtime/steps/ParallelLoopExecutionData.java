@@ -126,7 +126,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
                     branchContext, new HashMap<>(), new HashMap<>());
-
+              
                 createBranch(
                     branchRuntimeEnvironment,
                     executionRuntimeServices,
@@ -332,7 +332,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                               Long branchBeginStep) {
         Map<String, Serializable> branchContext = new HashMap<>();
         branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
-        executionRuntimeServices.addBranch(branchBeginStep, refId, branchContext);
+        executionRuntimeServices.addBranchForParallelLoop(branchBeginStep, refId, branchContext);
     }
 
     private Map<String, Serializable> convert(Map<String, Value> map) {
