@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -120,18 +121,9 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         @SuppressWarnings("unchecked")
         Map<String, String> promptSettings = (Map<String, String>) props.get(PROMPT_KEY);
         if (!privateInput && isNotEmpty(promptSettings)) {
-            final PromptType type = ofNullable(promptSettings.get(PROMPT_TYPE_KEY))
-                    .map(PromptType::fromString)
-                    .orElse(PromptType.TEXT);
+            Prompt prompt = extractPrompt(inputName, promptSettings);
 
-            final String message = ofNullable(promptSettings.get(PROMPT_MESSAGE_KEY))
-                    .orElseGet(() -> String.format(DEFAULT_PROMPT_MESSAGE, inputName));
-
-            final String options = promptSettings.get(PROMPT_OPTIONS_KEY);
-            final String delimiter = promptSettings.getOrDefault(PROMPT_DELIMITER_KEY, DEFAULT_DELIMITER);
-
-            return createInput(inputName, value, sensitive, required, privateInput, sensitivityLevel,
-                    type, message, options, delimiter);
+            return createInput(inputName, value, sensitive, required, privateInput, sensitivityLevel, prompt);
         }
 
         if (privateInput && required && !defaultSpecified) {
@@ -154,7 +146,7 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             boolean sensitive,
             boolean required,
             boolean privateInput, SensitivityLevel sensitivityLevel) {
-        return createInput(name, value, sensitive, required, privateInput, sensitivityLevel, null, null, null, null);
+        return createInput(name, value, sensitive, required, privateInput, sensitivityLevel, null);
     }
 
     private Input createInput(
@@ -163,19 +155,22 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
             boolean sensitive,
             boolean required,
             boolean privateInput, SensitivityLevel sensitivityLevel,
-            PromptType promptType, String message, String options, String delimiter) {
+            Prompt prompt) {
         executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
-        Accumulator dependencyAccumulator = extractFunctionData(value);
+
+        String messageValue = null;
+        if (prompt != null) {
+            messageValue = prompt.getPromptMessage();
+        }
+
+        Accumulator dependencyAccumulator = extractFunctionData(value, messageValue);
         return new Input.InputBuilder(name, value, sensitive, sensitivityLevel)
                 .withRequired(required)
                 .withPrivateInput(privateInput)
                 .withFunctionDependencies(dependencyAccumulator.getFunctionDependencies())
                 .withSystemPropertyDependencies(dependencyAccumulator.getSystemPropertyDependencies())
-                .withPrompt(promptType)
-                .withPromptMessage(message)
-                .withPromptOptions(options)
-                .withPromptDelimiter(delimiter)
+                .withPrompt(prompt)
                 .build();
     }
 

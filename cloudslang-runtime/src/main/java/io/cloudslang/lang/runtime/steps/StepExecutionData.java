@@ -18,7 +18,9 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.WorkerGroupMetadata;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
@@ -43,6 +45,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
@@ -51,6 +54,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_VALUE;
 import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.Double.parseDouble;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -139,7 +143,11 @@ public class StepExecutionData extends AbstractExecutionData {
                     flowVariables
             );
 
-            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, boundInputs);
+            updateCallArgumentsAndPushContextToStack(
+                    runEnv,
+                    flowContext,
+                    boundInputs,
+                    createPrompts(stepInputs));
 
             Value workerGroupValue = flowContext.removeLanguageVariable(WORKER_GROUP_VALUE);
             Value workerGroupOverride = flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE);
@@ -162,6 +170,7 @@ public class StepExecutionData extends AbstractExecutionData {
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
     }
+
 
     @SuppressWarnings("unused")
     public void endStep(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -370,6 +379,13 @@ public class StepExecutionData extends AbstractExecutionData {
             }
         }
         return ExecutionParametersConsts.DEFAULT_ROI_VALUE;
+    }
+
+    private Map<String, Prompt> createPrompts(List<Argument> stepInputs) {
+        return stepInputs
+                .stream()
+                .filter(Argument::hasPrompt)
+                .collect(toMap(InOutParam::getName, Argument::getPrompt));
     }
 
 
