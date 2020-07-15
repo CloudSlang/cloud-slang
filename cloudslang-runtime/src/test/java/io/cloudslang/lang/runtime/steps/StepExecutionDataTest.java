@@ -377,7 +377,7 @@ public class StepExecutionDataTest {
         ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
 
         stepExecutionData.setWorkerGroupStep(null, runEnvironment,
-                executionRuntimeServices,"step1", 2L);
+                executionRuntimeServices,"step1", 2L, null);
         assertEquals("workerGroupValue2", executionRuntimeServices.getWorkerGroupName());
     }
 
@@ -396,7 +396,7 @@ public class StepExecutionDataTest {
         ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
 
         stepExecutionData.setWorkerGroupStep(null, runEnvironment,
-                executionRuntimeServices, "step1", 1L);
+                executionRuntimeServices, "step1", 1L, null);
         assertEquals("workerGroupValue3", executionRuntimeServices.getWorkerGroupName());
     }
 
@@ -417,7 +417,7 @@ public class StepExecutionDataTest {
                 new WorkerGroupStatement("workerValue", false, emptySet(), emptySet());
 
         stepExecutionData.setWorkerGroupStep(workerGroupStatement, runEnvironment,
-                executionRuntimeServices, "step1", 2L);
+                executionRuntimeServices, "step1", 2L, null);
         assertEquals("workerValue", executionRuntimeServices.getWorkerGroupName());
     }
 
@@ -436,7 +436,7 @@ public class StepExecutionDataTest {
         ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
 
         stepExecutionData.setWorkerGroupStep(null, runEnvironment,
-                executionRuntimeServices, "step1", 2L);
+                executionRuntimeServices, "step1", 2L, null);
         assertEquals("RAS_Operator_Path", executionRuntimeServices.getWorkerGroupName());
     }
 

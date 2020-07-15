@@ -148,7 +148,6 @@ public class RunEnvironment implements Serializable {
     public void resetStacks() {
         contextStack = new ContextStack();
         parentFlowStack = new ParentFlowStack();
-        statefulSessionStack = new StatefulSessionStack();
     }
 
     public boolean containsSensitiveData() {

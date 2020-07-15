@@ -119,16 +119,10 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 runEnv.getExecutionPath().down();
 
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
-
-                Map<String, String> parentStackMap = new HashMap<>();
-                if (!branchRuntimeEnvironment.getStatefulSessionsStack().isEmpty()) {
-                    parentStackMap = branchRuntimeEnvironment.getStatefulSessionsStack().peakSessionMap();
-                }
                 branchRuntimeEnvironment.resetStacks();
+
                 StatefulSessionStack branchStack = branchRuntimeEnvironment.getStatefulSessionsStack();
-                branchStack.pushSessionsMap(parentStackMap);
                 branchStack.pushSessionsMap(new HashMap<>());
-                branchRuntimeEnvironment.setStatefulSessionsStack(branchStack);
 
                 if (parallelLoopStatement instanceof ListLoopStatement) {
                     branchContext.putVariable(((ListLoopStatement) parallelLoopStatement).getVarName(), splitItem);
