@@ -237,23 +237,25 @@ public class PreCompileTransformersTest {
         Prompt prompt = flowInput1.getPrompt();
         assertEquals(prompt.getPromptType(), PromptType.TEXT);
         assertEquals(prompt.getPromptMessage(), "non-default-message");
-        assertEquals(prompt.getPromptOptions(), "opts");
-        assertEquals(prompt.getPromptDelimiter(), "|");
 
         Input flowInput2 = inputs.get(1);
         Prompt prompt2 = flowInput2.getPrompt();
         assertEquals(prompt2.getPromptType(), PromptType.TEXT);
         assertEquals(prompt2.getPromptMessage(), "Enter a value for 'flow_input_2'");
         assertNull(prompt2.getPromptOptions());
-        assertEquals(prompt2.getPromptDelimiter(), ",");
+        assertNull(prompt2.getPromptDelimiter());
 
         Input flowInput3 = inputs.get(2);
         Prompt prompt3 = flowInput3.getPrompt();
         assertEquals(prompt3.getPromptType(), PromptType.SINGLE_CHOICE);
+        assertEquals(prompt3.getPromptOptions(), "opts");
+        assertEquals(prompt3.getPromptDelimiter(), "|");
 
         Input flowInput4 = inputs.get(3);
         Prompt prompt4 = flowInput4.getPrompt();
         assertEquals(prompt4.getPromptType(), PromptType.MULTI_CHOICE);
+        assertEquals(prompt4.getPromptOptions(), "opts");
+        assertEquals(prompt4.getPromptDelimiter(), ",");
     }
 
 }

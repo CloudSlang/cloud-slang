@@ -22,9 +22,12 @@ flow:
               prompt:
                 type: "text"
                 message: "non-default-message"
+          - country:
+              value: 'Israel'
+              prompt:
+                type: "single-choice"
                 options: "opts"
                 delimiter: "|"
-          - country: 'Israel'
           - alla: 'walla'
         publish:
           - weather

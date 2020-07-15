@@ -349,7 +349,10 @@ public class ArgumentsBindingTest {
         Map<String, Value> context = new HashMap<>();
         context.put("messageContainer", ValueFactory.create("(What's the story?)"));
 
-        Prompt prompt = new Prompt(PromptType.TEXT, "${messageContainer + ' Morning glory'}", null, null);
+        Prompt prompt = new Prompt.PromptBuilder()
+                .setPromptType(PromptType.TEXT)
+                .setPromptMessage("${messageContainer + ' Morning glory'}")
+                .build();
 
         Argument argument = new Argument("argument1",
                 null,
@@ -361,7 +364,7 @@ public class ArgumentsBindingTest {
         Map<String, Value> result = bindArguments(Collections.singletonList(argument), context);
         assertFalse(result.isEmpty());
         assertTrue(result.containsKey("argument1"));
-        assertEquals("(What's the story?) Morning glory",argument.getPrompt().getPromptMessage());
+        assertEquals("(What's the story?) Morning glory", argument.getPrompt().getPromptMessage());
     }
 
     private Map<String, Value> bindArguments(
