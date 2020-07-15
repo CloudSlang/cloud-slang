@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -92,6 +93,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(USE_EMPTY_VALUES_FOR_PROMPTS_KEY) Boolean useEmptyValuesForPrompts) {
         try {
             Map<String, Value> callArguments = runEnv.removeCallArguments();
+            Map<String, Prompt> prompts = runEnv.removePromptArguments();
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
@@ -135,7 +137,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     promptedArguments,
                     runEnv.getSystemProperties(),
                     missingInputs,
-                    isTrue(useEmptyValuesForPrompts));
+                    isTrue(useEmptyValuesForPrompts),
+                    prompts);
 
             //if there are any missing required input after binding
             // try to resolve it using provided missing input handler
@@ -152,6 +155,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 if (!canContinue) {
                     //we must keep the state unchanged
                     runEnv.putCallArguments(callArguments);
+                    runEnv.putPromptArguments(prompts);
                     return;
                 }
             }
@@ -166,7 +170,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
             Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
             updateCallArgumentsAndPushContextToStack(runEnv,
-                    new Context(boundInputValues, magicVariables), actionArguments);
+                    new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>());
 
             sendEndBindingInputsEvent(
                     executableInputs,

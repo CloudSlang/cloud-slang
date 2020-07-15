@@ -14,6 +14,7 @@ import com.google.common.collect.Collections2;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import java.io.Serializable;
@@ -59,6 +60,9 @@ public class RunEnvironment implements Serializable {
     // This is data that should be shared between different actions with the ability to change the data
     private Map<String, SerializableSessionObject> serializableDataMap;
 
+    //prompt args for current step
+    private Map<String, Prompt> promptArguments;
+
 
     public RunEnvironment(Set<SystemProperty> systemProperties) {
         Validate.notNull(systemProperties, "system properties cannot be null");
@@ -68,6 +72,7 @@ public class RunEnvironment implements Serializable {
         executionPath = new ExecutionPath();
         serializableDataMap = new HashMap<>();
         this.systemProperties = systemProperties;
+        promptArguments = new HashMap<>();
     }
 
     public RunEnvironment() {
@@ -90,6 +95,20 @@ public class RunEnvironment implements Serializable {
 
     public void putCallArguments(Map<String, Value> callArguments) {
         this.callArguments.putAll(callArguments);
+    }
+
+    public void putPromptArguments(Map<String, Prompt> prompts) {
+        this.promptArguments.putAll(prompts);
+    }
+
+    public Map<String, Prompt> getPromptArguments() {
+        return promptArguments;
+    }
+
+    public Map<String, Prompt> removePromptArguments() {
+        Map<String, Prompt> promptArguments = this.promptArguments;
+        this.promptArguments = new HashMap<>();
+        return promptArguments;
     }
 
     public Map<String, Value> getCallArguments() {

@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -233,22 +234,28 @@ public class PreCompileTransformersTest {
         List<Input> inputs = executable.getInputs();
 
         Input flowInput1 = inputs.get(0);
-        assertEquals(flowInput1.getPromptType(), PromptType.TEXT);
-        assertEquals(flowInput1.getPromptMessage(), "non-default-message");
-        assertEquals(flowInput1.getPromptOptions(), "opts");
-        assertEquals(flowInput1.getPromptDelimiter(), "|");
+        Prompt prompt = flowInput1.getPrompt();
+        assertEquals(prompt.getPromptType(), PromptType.TEXT);
+        assertEquals(prompt.getPromptMessage(), "non-default-message");
 
         Input flowInput2 = inputs.get(1);
-        assertEquals(flowInput2.getPromptType(), PromptType.TEXT);
-        assertEquals(flowInput2.getPromptMessage(), "Enter a value for 'flow_input_2'");
-        assertNull(flowInput2.getPromptOptions());
-        assertEquals(flowInput2.getPromptDelimiter(), ",");
+        Prompt prompt2 = flowInput2.getPrompt();
+        assertEquals(prompt2.getPromptType(), PromptType.TEXT);
+        assertEquals(prompt2.getPromptMessage(), "Enter a value for 'flow_input_2'");
+        assertNull(prompt2.getPromptOptions());
+        assertNull(prompt2.getPromptDelimiter());
 
         Input flowInput3 = inputs.get(2);
-        assertEquals(flowInput3.getPromptType(), PromptType.SINGLE_CHOICE);
+        Prompt prompt3 = flowInput3.getPrompt();
+        assertEquals(prompt3.getPromptType(), PromptType.SINGLE_CHOICE);
+        assertEquals(prompt3.getPromptOptions(), "opts");
+        assertEquals(prompt3.getPromptDelimiter(), "|");
 
         Input flowInput4 = inputs.get(3);
-        assertEquals(flowInput4.getPromptType(), PromptType.MULTI_CHOICE);
+        Prompt prompt4 = flowInput4.getPrompt();
+        assertEquals(prompt4.getPromptType(), PromptType.MULTI_CHOICE);
+        assertEquals(prompt4.getPromptOptions(), "opts");
+        assertEquals(prompt4.getPromptDelimiter(), ",");
     }
 
 }
