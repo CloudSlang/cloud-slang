@@ -130,6 +130,8 @@ public class Prompt implements Serializable {
                         promptDelimiter = DEFAULT_DELIMITER;
                     }
                     break;
+                default:
+                    break;
             }
 
         }
