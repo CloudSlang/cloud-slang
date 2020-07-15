@@ -143,7 +143,7 @@ public class ParallelLoopStepsTest {
         ArgumentCaptor<Map> branchContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
         //noinspection unchecked
         verify(executionRuntimeServices, times(3))
-            .addBranch(eq(branchBeginStepId), eq(refId), branchContextArgumentCaptor.capture());
+            .addBranchForParallelLoop(eq(branchBeginStepId), eq(refId), branchContextArgumentCaptor.capture());
 
         List<Map> branchContexts = branchContextArgumentCaptor.getAllValues();
         List<Value> actualSplitData = newArrayList();
