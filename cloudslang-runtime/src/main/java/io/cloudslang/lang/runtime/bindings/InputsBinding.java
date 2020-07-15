@@ -130,24 +130,26 @@ public class InputsBinding extends AbstractBinding {
                                 Set<SystemProperty> systemProperties) {
         if (input.hasPrompt()) {
             //we do not want to change original context map
-            Map<String, Value> scriptContext = new HashMap<>(context);
+            Map<String, Value> evaluationContext = new HashMap<>(context);
             String inputName = input.getName();
             Value valueFromContext = input.getValue();
-
             Prompt prompt = input.getPrompt();
+
             String expressionToEvaluate = ExpressionUtils.extractExpression(prompt.getPromptMessage());
             if (expressionToEvaluate != null) {
                 if (context.containsKey(inputName)) {
-                    scriptContext.put(inputName, valueFromContext);
+                    evaluationContext.put(inputName, valueFromContext);
                 }
                 //so you can resolve previous inputs already bound
-                scriptContext.putAll(targetContext);
+                evaluationContext.putAll(targetContext);
 
-                Optional.ofNullable(scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
-                        input.getFunctionDependencies()))
-                        .map(Value::get)
-                        .filter(value -> value instanceof String)
-                        .map(String.class::cast)
+                Value result = scriptEvaluator.evalExpr(expressionToEvaluate,
+                        evaluationContext,
+                        systemProperties,
+                        input.getFunctionDependencies());
+
+                Optional.ofNullable(result)
+                        .map(Value::toStringSafe)
                         .ifPresent(prompt::setPromptMessage);
             }
         }

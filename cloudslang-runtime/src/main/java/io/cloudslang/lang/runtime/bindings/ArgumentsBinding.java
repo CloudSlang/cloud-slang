@@ -99,14 +99,16 @@ public class ArgumentsBinding extends AbstractBinding {
                 String expressionToEvaluate = extractExpression(prompt.getPromptMessage());
                 if (expressionToEvaluate != null) {
                     //we do not want to change original context map
-                    Map<String, Value> scriptContext =
+                    Map<String, Value> evaluationContext =
                             createEvaluationContext(srcContext, targetContext, inputValue, inputName);
 
-                    Optional.ofNullable(scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
-                            argument.getFunctionDependencies()))
-                            .map(Value::get)
-                            .filter(value -> value instanceof String)
-                            .map(String.class::cast)
+                    Value result = scriptEvaluator.evalExpr(expressionToEvaluate,
+                            evaluationContext,
+                            systemProperties,
+                            argument.getFunctionDependencies());
+
+                    Optional.ofNullable(result)
+                            .map(Value::toStringSafe)
                             .ifPresent(prompt::setPromptMessage);
                 }
             }
@@ -123,11 +125,11 @@ public class ArgumentsBinding extends AbstractBinding {
                                                        Map<String, Value> targetContext,
                                                        Value inputValue,
                                                        String inputName) {
-        Map<String, Value> scriptContext = new HashMap<>(srcContext);
-        scriptContext.put(inputName, inputValue);
+        Map<String, Value> evaluationContext = new HashMap<>(srcContext);
+        evaluationContext.put(inputName, inputValue);
         //so you can resolve previous arguments already bound
-        scriptContext.putAll(targetContext);
-        return scriptContext;
+        evaluationContext.putAll(targetContext);
+        return evaluationContext;
     }
 
     private Value handleSensitiveModifier(Value initialValue, boolean sensitive) {

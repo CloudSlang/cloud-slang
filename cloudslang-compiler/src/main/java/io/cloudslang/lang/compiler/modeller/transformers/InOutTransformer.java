@@ -28,7 +28,6 @@ import static java.util.Optional.ofNullable;
 public abstract class InOutTransformer extends AbstractInOutForTransformer {
 
     private static final String DEFAULT_PROMPT_MESSAGE = "Enter a value for '%s'";
-    private static final String DEFAULT_DELIMITER = ",";
 
     public abstract Class<? extends InOutParam> getTransformedObjectsClass();
 
@@ -40,10 +39,12 @@ public abstract class InOutTransformer extends AbstractInOutForTransformer {
         final String message = ofNullable(promptSettings.get(PROMPT_MESSAGE_KEY))
                 .orElseGet(() -> String.format(DEFAULT_PROMPT_MESSAGE, inputName));
 
-        final String options = promptSettings.get(PROMPT_OPTIONS_KEY);
-        final String delimiter = promptSettings.getOrDefault(PROMPT_DELIMITER_KEY, DEFAULT_DELIMITER);
-
-        return new Prompt(type, message, options, delimiter);
+        return new Prompt.PromptBuilder()
+                .setPromptType(type)
+                .setPromptMessage(message)
+                .setPromptOptions(promptSettings.get(PROMPT_OPTIONS_KEY))
+                .setPromptDelimiter(promptSettings.get(PROMPT_DELIMITER_KEY))
+                .build();
     }
 
 }
