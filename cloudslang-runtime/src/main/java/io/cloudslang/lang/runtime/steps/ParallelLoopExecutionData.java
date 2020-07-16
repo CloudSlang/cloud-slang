@@ -133,8 +133,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                         (Value) ((ImmutablePair) splitItem.get()).getRight());
                 }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
-                    branchContext, new HashMap<>());
-
+                    branchContext, new HashMap<>(), new HashMap<>());
+              
                 createBranch(
                     branchRuntimeEnvironment,
                     executionRuntimeServices,
@@ -148,7 +148,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 runEnv.getExecutionPath().forward();
             }
 
-            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Value>());
+            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<>(), new HashMap<>());
         } catch (RuntimeException e) {
             logger.error("There was an error running the add branches execution step of: \'" + nodeName +
                 "\'. Error is: " + e.getMessage());

@@ -19,17 +19,18 @@ flow:
         prompt:
           type: "text"
           message: "non-default-message"
-          options: "opts"
-          delimiter: "|"
     - flow_input_2:
         prompt:
           type: "text"
     - flow_input_3:
         prompt:
           type: "single-choice"
+          options: "opts"
+          delimiter: "|"
     - flow_input_4:
         prompt:
           type: "multi-choice"
+          options: "opts"
   workflow:
     - bootstrap_node:
         do:

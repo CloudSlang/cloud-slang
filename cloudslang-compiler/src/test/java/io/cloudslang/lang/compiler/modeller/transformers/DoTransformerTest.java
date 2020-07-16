@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import com.google.common.collect.ImmutableMap;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
@@ -145,6 +146,13 @@ public class DoTransformerTest extends TransformersTestParent {
         transformAndThrowFirstException(doTransformer, doArgumentsMap);
     }
 
+    @Test
+    public void testTransformArgumentsWithPrompts() throws URISyntaxException {
+        Map doArgumentsMap = loadFirstStepFromFile("/step-args-in-list/flow_arguments_with_prompts.yaml");
+
+        transformAndAssertNoErrorsTransformer(doTransformer, doArgumentsMap);
+    }
+
     private Map loadFirstStepFromFile(String path) throws URISyntaxException {
         Map doArgumentsMap = new LinkedHashMap();
         URL resource = getClass().getResource(path);
@@ -154,7 +162,12 @@ public class DoTransformerTest extends TransformersTestParent {
         List<Map<String, Map>> flow = (List<Map<String, Map>>) parsedSlang.getFlow().get(SlangTextualKeys.WORKFLOW_KEY);
         for (Map<String, Map> step : flow) {
             if (step.keySet().iterator().next().equals("CheckWeather")) {
-                doArgumentsMap = (Map) step.values().iterator().next().get(SlangTextualKeys.DO_KEY);
+                Object doValue = step.values().iterator().next().get(SlangTextualKeys.DO_KEY);
+                if (doValue instanceof Map) {
+                    doArgumentsMap = (Map) doValue;
+                } else if (doValue instanceof List) {
+                    doArgumentsMap = ImmutableMap.of(SlangTextualKeys.DO_KEY, doValue);
+                }
                 return doArgumentsMap;
             }
         }

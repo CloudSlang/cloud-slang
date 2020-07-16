@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
@@ -83,22 +85,51 @@ public class ArgumentsBinding extends AbstractBinding {
                 String expressionToEvaluate = extractExpression(rawValue == null ? null : rawValue.get());
                 if (expressionToEvaluate != null) {
                     //we do not want to change original context map
-                    Map<String, Value> scriptContext = new HashMap<>(srcContext);
-                    scriptContext.put(inputName, inputValue);
-                    //so you can resolve previous arguments already bound
-                    scriptContext.putAll(targetContext);
+                    Map<String, Value> scriptContext =
+                            createEvaluationContext(srcContext, targetContext, inputValue, inputName);
                     inputValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
                             argument.getFunctionDependencies());
                 } else {
                     inputValue = rawValue;
                 }
             }
+
+            if (argument.hasPrompt()) {
+                Prompt prompt = argument.getPrompt();
+                String expressionToEvaluate = extractExpression(prompt.getPromptMessage());
+                if (expressionToEvaluate != null) {
+                    //we do not want to change original context map
+                    Map<String, Value> evaluationContext =
+                            createEvaluationContext(srcContext, targetContext, inputValue, inputName);
+
+                    Value result = scriptEvaluator.evalExpr(expressionToEvaluate,
+                            evaluationContext,
+                            systemProperties,
+                            argument.getFunctionDependencies());
+
+                    Optional.ofNullable(result)
+                            .map(Value::toStringSafe)
+                            .ifPresent(prompt::setPromptMessage);
+                }
+            }
+
             inputValue = handleSensitiveModifier(inputValue, argument.isSensitive());
         } catch (Throwable t) {
             throw new RuntimeException(errorMessagePrefix + "', \n\tError is: " + t.getMessage(), t);
         }
         validateStringValue(errorMessagePrefix, inputValue);
         targetContext.put(inputName, inputValue);
+    }
+
+    private Map<String, Value> createEvaluationContext(Map<String, ? extends Value> srcContext,
+                                                       Map<String, Value> targetContext,
+                                                       Value inputValue,
+                                                       String inputName) {
+        Map<String, Value> evaluationContext = new HashMap<>(srcContext);
+        evaluationContext.put(inputName, inputValue);
+        //so you can resolve previous arguments already bound
+        evaluationContext.putAll(targetContext);
+        return evaluationContext;
     }
 
     private Value handleSensitiveModifier(Value initialValue, boolean sensitive) {
