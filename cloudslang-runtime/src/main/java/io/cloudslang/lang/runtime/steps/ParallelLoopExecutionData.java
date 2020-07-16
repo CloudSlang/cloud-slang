@@ -132,7 +132,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                             (Value) ((ImmutablePair) splitItem.get()).getRight());
                 }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
-                    branchContext, new HashMap<>(), new HashMap<>());
+                        branchContext, new HashMap<>(), new HashMap<>());
 
                 createBranch(
                         branchRuntimeEnvironment,
