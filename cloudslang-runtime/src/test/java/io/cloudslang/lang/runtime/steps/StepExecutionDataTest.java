@@ -73,7 +73,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -414,7 +413,7 @@ public class StepExecutionDataTest {
         runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
         ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
         WorkerGroupStatement workerGroupStatement =
-                new WorkerGroupStatement("workerValue", false, emptySet(), emptySet());
+                new WorkerGroupStatement("workerValue", false, null, null);
 
         stepExecutionData.setWorkerGroupStep(workerGroupStatement, runEnvironment,
                 executionRuntimeServices, "step1", 2L);
