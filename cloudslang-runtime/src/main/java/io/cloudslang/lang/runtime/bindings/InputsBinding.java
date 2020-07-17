@@ -109,9 +109,7 @@ public class InputsBinding extends AbstractBinding {
                     missingInputs.add(createMissingInput(input, value));
                     return;
                 }
-            }
-
-            if (input.isRequired() && isEmpty(value)) {
+            } else if (input.isRequired() && isEmpty(value)) {
                 missingInputs.add(input);
                 return;
             }
