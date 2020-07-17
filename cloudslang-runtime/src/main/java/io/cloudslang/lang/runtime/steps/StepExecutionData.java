@@ -345,7 +345,7 @@ public class StepExecutionData extends AbstractExecutionData {
                                                    RunEnvironment runEnv,
                                                    String expression) {
         Value workerGroupValue;
-        if (isEmpty(workerGroup.getFunctionDependencies()) && isEmpty(workerGroup.getSystemPropertyDependencies())) {
+        if (workerGroup.getFunctionDependencies() == null && workerGroup.getSystemPropertyDependencies() == null) {
             workerGroupValue = ValueFactory.create(expression);
         } else {
             workerGroupValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),

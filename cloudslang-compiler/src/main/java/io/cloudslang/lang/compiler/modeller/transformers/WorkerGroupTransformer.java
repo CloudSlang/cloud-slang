@@ -50,10 +50,17 @@ public class WorkerGroupTransformer extends AbstractInOutForTransformer
         String expression;
         dependencyAccumulator = extractFunctionData(value);
         expression = ExpressionUtils.extractExpression(value);
-        workerGroupStatement = new WorkerGroupStatement(expression != null ? expression : value,
+        if (expression != null) {
+            workerGroupStatement = new WorkerGroupStatement(expression,
                     override,
                     dependencyAccumulator.getFunctionDependencies(),
                     dependencyAccumulator.getSystemPropertyDependencies());
+        } else {
+            workerGroupStatement = new WorkerGroupStatement(value,
+                    override,
+                    null,
+                    null);
+        }
 
         return new BasicTransformModellingResult<>(workerGroupStatement, Collections.emptyList());
     }
