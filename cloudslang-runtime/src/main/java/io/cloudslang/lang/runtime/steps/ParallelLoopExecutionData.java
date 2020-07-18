@@ -43,11 +43,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
-import static io.cloudslang.score.events.EventConstants.BRANCH_ID;
-import static io.cloudslang.score.events.EventConstants.SPLIT_ID;
 
 /**
  * Date: 3/25/2015
@@ -99,13 +96,10 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             runEnv.putNextStepPosition(nextStepId);
             runEnv.getExecutionPath().down();
 
-            String splitId = UUID.randomUUID().toString();
-            int count = 1;
             for (Value splitItem : splitData) {
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
 
                 // first fire event
-                String branchId = splitId + ":" + count++;
                 fireEvent(
                     executionRuntimeServices,
                     ScoreLangConstants.EVENT_BRANCH_START,
@@ -115,8 +109,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     nodeName,
                     branchContext.getImmutableViewOfVariables(),
                     Pair.of(ScoreLangConstants.REF_ID, refId),
-                    Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem),
-                    Pair.of(BRANCH_ID, branchId));
+                    Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
                 // take path down one level
                 runEnv.getExecutionPath().down();
 
@@ -138,9 +131,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     branchRuntimeEnvironment,
                     executionRuntimeServices,
                     refId,
-                    branchBeginStep,
-                    branchId,
-                    splitId);
+                    branchBeginStep);
 
                 // take path up level
                 runEnv.getExecutionPath().up();
@@ -307,9 +298,6 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             // up branch path
             branchRuntimeEnvironment.getExecutionPath().up();
 
-            String branchId = branch.getSystemContext() != null ?
-                    branch.getSystemContext().get(BRANCH_ID).toString() : "UNDEFINED";
-
             fireEvent(
                 executionRuntimeServices,
                 branchRuntimeEnvironment,
@@ -318,8 +306,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 LanguageEventData.StepType.STEP,
                 nodeName,
                 initialBranchContext,
-                Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues),
-                Pair.of(BRANCH_ID, branchId)
+                Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
             );
         }
     }
@@ -342,13 +329,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
     private void createBranch(RunEnvironment runEnv,
                               ExecutionRuntimeServices executionRuntimeServices,
                               String refId,
-                              Long branchBeginStep,
-                              String branchId,
-                              String splitId) {
+                              Long branchBeginStep) {
         Map<String, Serializable> branchContext = new HashMap<>();
         branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
-        branchContext.put(BRANCH_ID, branchId);
-        branchContext.put(SPLIT_ID, splitId);
         executionRuntimeServices.addBranchForParallelLoop(branchBeginStep, refId, branchContext);
     }
 
