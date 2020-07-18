@@ -93,7 +93,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(USE_EMPTY_VALUES_FOR_PROMPTS_KEY) Boolean useEmptyValuesForPrompts) {
         try {
             Map<String, Value> callArguments = runEnv.removeCallArguments();
-            Map<String, Prompt> prompts = runEnv.removePromptArguments();
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
@@ -116,8 +115,11 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
-            Map<String, ? extends Value> promptedArguments =
-                    missingInputHandler.applyPromptInputValues(systemContext, executableInputs);
+            //restore what was already prompted and add newly prompted values
+            Map<String, Value> promptedValues = runEnv.removePromptedValues();
+            promptedValues.putAll(missingInputHandler.applyPromptInputValues(systemContext, executableInputs));
+
+            Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
@@ -134,11 +136,11 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
                     executableInputs,
                     callArguments,
-                    promptedArguments,
+                    promptedValues,
                     runEnv.getSystemProperties(),
                     missingInputs,
                     isTrue(useEmptyValuesForPrompts),
-                    prompts);
+                    promptArguments);
 
             //if there are any missing required input after binding
             // try to resolve it using provided missing input handler
@@ -153,9 +155,11 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         isTrue(useEmptyValuesForPrompts));
 
                 if (!canContinue) {
-                    //we must keep the state unchanged
+                    //we must keep the state unchanged}
                     runEnv.putCallArguments(callArguments);
-                    runEnv.putPromptArguments(prompts);
+                    runEnv.putPromptArguments(promptArguments);
+                    //keep what was already prompted
+                    runEnv.keepPromptedValues(promptedValues);
                     return;
                 }
             }

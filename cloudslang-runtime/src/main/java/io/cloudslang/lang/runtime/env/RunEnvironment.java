@@ -63,6 +63,8 @@ public class RunEnvironment implements Serializable {
     //prompt args for current step
     private Map<String, Prompt> promptArguments;
 
+    //Map holding already prompted values
+    private Map<String, Value> promptedValues;
 
     public RunEnvironment(Set<SystemProperty> systemProperties) {
         Validate.notNull(systemProperties, "system properties cannot be null");
@@ -73,6 +75,7 @@ public class RunEnvironment implements Serializable {
         serializableDataMap = new HashMap<>();
         this.systemProperties = systemProperties;
         promptArguments = new HashMap<>();
+        promptedValues = new HashMap<>();
     }
 
     public RunEnvironment() {
@@ -109,6 +112,16 @@ public class RunEnvironment implements Serializable {
         Map<String, Prompt> promptArguments = this.promptArguments;
         this.promptArguments = new HashMap<>();
         return promptArguments;
+    }
+
+    public void keepPromptedValues(Map<String, Value> promptedValues) {
+        this.promptedValues.putAll(promptedValues);
+    }
+
+    public Map<String, Value> removePromptedValues() {
+        Map<String, Value> promptedValues = this.promptedValues;
+        this.promptedValues = new HashMap<>();
+        return promptedValues;
     }
 
     public Map<String, Value> getCallArguments() {
