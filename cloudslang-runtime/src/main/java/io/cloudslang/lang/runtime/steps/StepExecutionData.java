@@ -47,6 +47,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
@@ -367,7 +368,7 @@ public class StepExecutionData extends AbstractExecutionData {
                                       RunEnvironment runEnv,
                                       String expression) {
         Value resolvedValue;
-        if (isEmpty(scriptFunctionSet) && isEmpty(systemProperties)) {
+        if (scriptFunctionSet == null && systemProperties == null) {
             resolvedValue = ValueFactory.create(expression);
         } else {
             resolvedValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
