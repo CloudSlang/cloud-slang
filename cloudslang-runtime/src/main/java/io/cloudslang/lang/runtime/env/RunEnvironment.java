@@ -17,6 +17,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.score.api.StatefulSessionStack;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -60,6 +61,8 @@ public class RunEnvironment implements Serializable {
     // This is data that should be shared between different actions with the ability to change the data
     private Map<String, SerializableSessionObject> serializableDataMap;
 
+    private StatefulSessionStack statefulSessionStack;
+
     //prompt args for current step
     private Map<String, Prompt> promptArguments;
 
@@ -73,6 +76,7 @@ public class RunEnvironment implements Serializable {
         callArguments = new HashMap<>();
         executionPath = new ExecutionPath();
         serializableDataMap = new HashMap<>();
+        statefulSessionStack = new StatefulSessionStack();
         this.systemProperties = systemProperties;
         promptArguments = new HashMap<>();
         promptedValues = new HashMap<>();
@@ -278,4 +282,11 @@ public class RunEnvironment implements Serializable {
         return valuesToCheck;
     }
 
+    public StatefulSessionStack getStatefulSessionsStack() {
+        return statefulSessionStack;
+    }
+
+    public void setStatefulSessionsStack(StatefulSessionStack statefulSessionsStack) {
+        this.statefulSessionStack = statefulSessionsStack;
+    }
 }
