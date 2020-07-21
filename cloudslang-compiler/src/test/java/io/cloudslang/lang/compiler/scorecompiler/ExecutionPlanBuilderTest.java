@@ -181,9 +181,11 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> preStepActionData = step.getPreStepActionData();
         String name = step.getName();
         String group = step.getWorkerGroup();
+        String robotGroup = step.getRobotGroup();
         when(stepFactory
                 .createWorkerGroupStep(eq(stepId),
-                        eq(preStepActionData), eq(name), eq(group))).thenReturn(new ExecutionStep(stepId));
+                        eq(preStepActionData), eq(name), eq(group),
+                        eq(robotGroup))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepId, Long branchBeginStepId, Step step, Flow flow) {

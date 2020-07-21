@@ -26,6 +26,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.EndBranchDataContainer;
+import io.cloudslang.score.api.StatefulSessionStack;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.apache.commons.lang3.Validate.notNull;
 
 /**
  * Date: 3/25/2015
@@ -79,6 +81,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
+            int parallelismLevel = executionRuntimeServices.getLevelParallelism() != null ?
+                    (int) executionRuntimeServices.getLevelParallelism() : 0;
+            executionRuntimeServices.setLevelParallelism(parallelismLevel + 1);
 
             List<Value> splitData = parallelLoopBinding
                 .bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
@@ -115,6 +120,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
                 branchRuntimeEnvironment.resetStacks();
+
+                StatefulSessionStack branchStack = branchRuntimeEnvironment.getStatefulSessionsStack();
+                branchStack.pushSessionsMap(new HashMap<>());
 
                 if (parallelLoopStatement instanceof ListLoopStatement) {
                     branchContext.putVariable(((ListLoopStatement) parallelLoopStatement).getVarName(), splitItem);
@@ -157,7 +165,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
             runEnv.getExecutionPath().up();
+            notNull(executionRuntimeServices.getLevelParallelism(), "Parallelism level can not be null");
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
+            if ((int) executionRuntimeServices.getLevelParallelism() > 0) {
+                executionRuntimeServices.setLevelParallelism((int) executionRuntimeServices.getLevelParallelism() - 1);
+            }
             Context flowContext = runEnv.getStack().popContext();
 
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext);
