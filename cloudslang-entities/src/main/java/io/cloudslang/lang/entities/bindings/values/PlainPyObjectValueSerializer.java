@@ -31,6 +31,6 @@ public class PlainPyObjectValueSerializer extends StdSerializer<PlainPyObjectVal
     public void serialize(PlainPyObjectValue plainPyObjectValue, JsonGenerator jsonGenerator,
                           SerializerProvider serializerProvider) throws IOException {
         Serializable content = plainPyObjectValue.get();
-        jsonGenerator.writeString(content == null ? null : content.toString());
+        jsonGenerator.writeObject(content);
     }
 }
