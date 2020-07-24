@@ -1,3 +1,3 @@
 def get(key, default_value=None):
-  value = globals().get(key)
+  value = get_from_smaller_context(key)
   return default_value if value is None else value
