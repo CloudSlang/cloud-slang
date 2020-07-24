@@ -75,7 +75,10 @@ public class ScriptEvaluatorTest {
     private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
     private static final String GET_FUNCTION_DEFINITION =
             "def get(key, default_value=None):" + LINE_SEPARATOR +
-                    "  value = get_from_smaller_context(key)" + LINE_SEPARATOR +
+                    "  try:" + LINE_SEPARATOR +
+                    "    value = get_from_smaller_context(key)" + LINE_SEPARATOR +
+                    "  except NameError:" + LINE_SEPARATOR +
+                    "    value = globals().get(key)" + LINE_SEPARATOR +
                     "  return default_value if value is None else value";
     private static final String GET_SP_FUNCTION_DEFINITION =
             "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
