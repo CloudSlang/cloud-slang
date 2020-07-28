@@ -19,6 +19,7 @@ import static io.cloudslang.lang.entities.utils.ValueUtils.isEmpty;
  */
 public class InputUtils {
     public static boolean isMandatory(Input input) {
-        return !input.isPrivateInput() && input.isRequired() && isEmpty(input.getValue());
+        return !input.isPrivateInput() && (input.isRequired() && !input.hasPrompt()) &&
+                ValueUtils.isEmpty(input.getValue());
     }
 }
