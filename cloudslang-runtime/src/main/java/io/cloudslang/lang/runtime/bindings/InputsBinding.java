@@ -30,7 +30,6 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.LinkedHashMap;
 import org.apache.commons.lang.Validate;
@@ -146,9 +145,13 @@ public class InputsBinding extends AbstractBinding {
                         systemProperties,
                         input.getFunctionDependencies());
 
-                Optional.ofNullable(result)
-                        .map(Value::toStringSafe)
-                        .ifPresent(prompt::setPromptMessage);
+                String resultString = Value.toStringSafe(result);
+                if (resultString == null) {
+                    prompt.setPromptMessage(EMPTY);
+                } else {
+                    prompt.setPromptMessage(resultString);
+                }
+
             }
         }
 
