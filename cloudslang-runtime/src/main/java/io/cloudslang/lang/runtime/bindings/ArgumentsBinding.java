@@ -22,10 +22,10 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * @author Bonczidai Levente
@@ -107,12 +107,9 @@ public class ArgumentsBinding extends AbstractBinding {
                             systemProperties,
                             argument.getFunctionDependencies());
 
-                    String resultString = Value.toStringSafe(result);
-                    if (resultString == null) {
-                        prompt.setPromptMessage(EMPTY);
-                    } else {
-                        prompt.setPromptMessage(resultString);
-                    }
+                    Optional.ofNullable(result)
+                            .map(Value::toStringSafe)
+                            .ifPresent(prompt::setPromptMessage);
                 }
             }
 
