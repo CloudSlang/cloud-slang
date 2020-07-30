@@ -41,6 +41,6 @@ public class PlainPyObjectValue implements PyObjectValue {
 
     @Override
     public String toString() {
-        return String.valueOf(value);
+        return value == null ? "" : value.toString();
     }
 }

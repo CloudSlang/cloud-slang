@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
@@ -107,9 +106,7 @@ public class ArgumentsBinding extends AbstractBinding {
                             systemProperties,
                             argument.getFunctionDependencies());
 
-                    Optional.ofNullable(result)
-                            .map(Value::toStringSafe)
-                            .ifPresent(prompt::setPromptMessage);
+                    prompt.setPromptMessage(Value.toStringSafeEmpty(result));
                 }
             }
 
