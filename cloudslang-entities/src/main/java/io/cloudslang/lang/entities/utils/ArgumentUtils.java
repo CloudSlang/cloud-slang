@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.Argument;
 public class ArgumentUtils {
     public static boolean isDefined(Argument argument) {
         return !(argument.isPrivateArgument() && // - step_input
-                ValueUtils.isEmpty(argument.getValue())); // - step_input: non_empty_value
+                ValueUtils.isEmpty(argument.getValue()) && // - step_input: non_empty_value
+                !argument.hasPrompt());
     }
 }
