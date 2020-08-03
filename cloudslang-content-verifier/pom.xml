@@ -6,7 +6,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>1.0.171</version>
+        <version>1.0.172-SNAPSHOT</version>
     </parent>
 
     <artifactId>cloudslang-content-verifier</artifactId>
