@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
+import com.google.common.collect.Sets;
 import com.hp.oo.sdk.content.annotations.Param;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
@@ -48,7 +50,9 @@ import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -121,6 +125,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
+            executableInputs.addAll(extractUserDefinedStepInputs(executableInputs, promptArguments, callArguments));
+
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
                     executableInputs,
@@ -164,9 +170,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
-            Map<String, Value> actionArguments = new HashMap<>();
+            Map<String, Value> actionArguments = new HashMap<>(boundInputValues);
 
-            actionArguments.putAll(boundInputValues);
+            //updated stored input arguments to be later used for output binding
+            saveStepInputsResultContext(runEnv, callArguments, promptedValues);
 
             //done with the user inputs, don't want it to be available in next startExecutable steps..
             if (userInputs != null) {
@@ -352,6 +359,36 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 throw new RuntimeException("Unrecognized type: " + executableType);
         }
         return returnValues;
+    }
+
+    private List<Input> extractUserDefinedStepInputs(List<Input> inputs,
+                                              Map<String, Prompt> prompts,
+                                              Map<String, Value> callArguments) {
+        Set<String> inputNames = inputs.stream().map(Input::getName).collect(toSet());
+        Set<String> promptInputNames = prompts.keySet();
+
+        return Sets
+                .difference(promptInputNames, inputNames)
+                .stream()
+                .map(additionalInputName ->
+                        new Input
+                                .InputBuilder(additionalInputName, callArguments.get(additionalInputName))
+                                .withPrompt(prompts.get(additionalInputName))
+                                .build()
+                )
+                .collect(toList());
+
+    }
+
+    public void saveStepInputsResultContext(RunEnvironment runEnv,
+                                            Map<String, Value> originalCallArguments,
+                                            Map<String, Value> promptedValues) {
+        Context flowContext = runEnv.getStack().peekContext();
+        if (flowContext != null) {
+            Map<String, Value> finalActionArguments = new HashMap<>(originalCallArguments);
+            finalActionArguments.putAll(promptedValues);
+            saveStepInputsResultContext(flowContext, finalActionArguments);
+        }
     }
 
 }
