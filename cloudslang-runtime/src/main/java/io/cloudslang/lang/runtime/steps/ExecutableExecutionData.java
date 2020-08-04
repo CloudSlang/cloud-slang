@@ -170,12 +170,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
-            Map<String, Value> actionArguments = new HashMap<>();
-
-            actionArguments.putAll(boundInputValues);
+            Map<String, Value> actionArguments = new HashMap<>(boundInputValues);
 
             //updated stored input arguments to be later used for output binding
-            updateStoredStepArguments(runEnv, promptedValues);
+            saveStepInputsResultContext(runEnv, callArguments, promptedValues);
 
             //done with the user inputs, don't want it to be available in next startExecutable steps..
             if (userInputs != null) {
@@ -382,12 +380,14 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     }
 
-    public void updateStoredStepArguments(RunEnvironment runEnv, Map<String, Value> promptedValues) {
-        Context context = runEnv.getStack().peekContext();
-        if (context != null) {
-            Map<String, Value> originalStepArguments = removeStepInputsResultContext(context);
-            originalStepArguments.putAll(promptedValues);
-            saveStepInputsResultContext(context, originalStepArguments);
+    public void saveStepInputsResultContext(RunEnvironment runEnv,
+                                            Map<String, Value> originalCallArguments,
+                                            Map<String, Value> promptedValues) {
+        Context flowContext = runEnv.getStack().peekContext();
+        if (flowContext != null) {
+            Map<String, Value> finalActionArguments = new HashMap<>(originalCallArguments);
+            finalActionArguments.putAll(promptedValues);
+            saveStepInputsResultContext(flowContext, finalActionArguments);
         }
     }
 
