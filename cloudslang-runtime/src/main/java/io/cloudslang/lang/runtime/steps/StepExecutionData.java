@@ -133,7 +133,6 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> boundInputs = argumentsBinding
                     .bindArguments(stepInputs, contextAccessor,
                             runEnv.getSystemProperties());
-            saveStepInputsResultContext(flowContext, boundInputs);
 
             sendEndBindingArgumentsEvent(
                     stepInputs,
