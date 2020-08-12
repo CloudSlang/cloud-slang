@@ -125,11 +125,12 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
-            executableInputs.addAll(extractUserDefinedStepInputs(executableInputs, promptArguments, callArguments));
+            List<Input> newExecutableInputs =
+                    addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
 
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
-                    executableInputs,
+                    newExecutableInputs,
                     runEnv,
                     executionRuntimeServices,
                     "Pre Input binding for " + stepType,
@@ -140,7 +141,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             List<Input> missingInputs = new ArrayList<>();
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
-                    executableInputs,
+                    newExecutableInputs,
                     callArguments,
                     promptedValues,
                     runEnv.getSystemProperties(),
@@ -184,7 +185,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>());
 
             sendEndBindingInputsEvent(
-                    executableInputs,
+                    newExecutableInputs,
                     boundInputValues,
                     runEnv,
                     executionRuntimeServices,
@@ -203,6 +204,22 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
+    }
+
+    private List<Input> addUserDefinedStepInputs(List<Input> executableInputs,
+                                                 Map<String, Value> callArguments,
+                                                 Map<String, Prompt> promptArguments) {
+        final List<Input> inputs = extractUserDefinedStepInputs(executableInputs, promptArguments, callArguments);
+
+        if (inputs.size() == 0) {
+            return executableInputs;
+        }
+
+        List<Input> newExecutableInputs = new ArrayList<>(executableInputs.size() + inputs.size());
+        newExecutableInputs.addAll(executableInputs);
+        newExecutableInputs.addAll(inputs);
+
+        return newExecutableInputs;
     }
 
     /**
