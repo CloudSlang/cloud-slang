@@ -18,6 +18,7 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -30,9 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 import static java.lang.String.format;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -147,7 +150,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
     private Argument createArgumentWithProperties(Map.Entry<String, Map<String, Serializable>> entry,
                                                   SensitivityLevel sensitivityLevel) {
         Map<String, Serializable> props = entry.getValue();
-        List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY);
+        List<String> knownKeys = Arrays.asList(SENSITIVE_KEY, VALUE_KEY, PROMPT_KEY);
 
         String entryKey = entry.getKey();
 
@@ -164,6 +167,14 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         boolean valueKeyFound = props.containsKey(VALUE_KEY);
         Serializable value = valueKeyFound ? props.get(VALUE_KEY) : null;
 
+        @SuppressWarnings("unchecked")
+        Map<String, String> promptSettings = (Map<String, String>) props.get(PROMPT_KEY);
+        if (isNotEmpty(promptSettings)) {
+            Prompt prompt = extractPrompt(entryKey, promptSettings);
+
+            return createArgument(entryKey, value, sensitive, valueKeyFound, sensitivityLevel, prompt);
+        }
+
         return createArgument(entryKey, value, sensitive, valueKeyFound, sensitivityLevel);
     }
 
@@ -177,15 +188,32 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
             boolean sensitive,
             boolean privateArgument,
             SensitivityLevel sensitivityLevel) {
+        return createArgument(entryName, entryValue, sensitive, privateArgument, sensitivityLevel, null);
+    }
+
+    private Argument createArgument(
+            String entryName,
+            Serializable entryValue,
+            boolean sensitive,
+            boolean privateArgument,
+            SensitivityLevel sensitivityLevel,
+            Prompt prompt) {
         executableValidator.validateInputName(entryName);
         preCompileValidator.validateStringValue(entryName, entryValue, this);
-        Accumulator accumulator = extractFunctionData(entryValue);
+
+        String messageValue = null;
+        if (prompt != null) {
+            messageValue = prompt.getPromptMessage();
+        }
+
+        Accumulator accumulator = extractFunctionData(entryValue, messageValue);
         return new Argument(
                 entryName,
                 ValueFactory.create(entryValue, sensitive, sensitivityLevel),
-                privateArgument,
                 accumulator.getFunctionDependencies(),
-                accumulator.getSystemPropertyDependencies()
+                accumulator.getSystemPropertyDependencies(),
+                privateArgument,
+                prompt
         );
     }
 

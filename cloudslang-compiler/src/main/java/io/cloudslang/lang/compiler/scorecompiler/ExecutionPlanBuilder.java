@@ -146,7 +146,7 @@ public class ExecutionPlanBuilder {
         stepReferences.put(stepName, currentId);
 
         ExecutionStep workerStep = createWorkerGroupStep(currentId++, step, inheritWorkerGroupFromFlow(
-                step, compiledFlow));
+                step, compiledFlow), step.getRobotGroup());
         stepExecutionSteps.add(workerStep);
         if (parallelLoop) {
             Long joinStepId = currentId + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS + 1;
@@ -249,12 +249,13 @@ public class ExecutionPlanBuilder {
                 step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
     }
 
-    private ExecutionStep createWorkerGroupStep(Long id, Step step, String workerGroup) {
+    private ExecutionStep createWorkerGroupStep(Long id, Step step, String workerGroup, String robotGroup) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createWorkerGroupExternalFlowStep(id, step.getPreStepActionData(),
                     step.getName(), workerGroup);
         }
-        return stepFactory.createWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup);
+        return stepFactory.createWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup,
+                robotGroup);
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {

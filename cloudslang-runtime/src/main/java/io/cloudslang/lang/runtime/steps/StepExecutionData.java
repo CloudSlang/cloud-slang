@@ -14,11 +14,15 @@ import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
+import io.cloudslang.lang.entities.RobotGroupStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.WorkerGroupMetadata;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
@@ -43,6 +47,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
@@ -51,7 +56,7 @@ import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP_VALUE;
 import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static java.lang.Double.parseDouble;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
@@ -63,6 +68,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 public class StepExecutionData extends AbstractExecutionData {
 
     private static final String DEFAULT_GROUP = "RAS_Operator_Path";
+    private static final String DEFAULT_ROBOT_GROUP = "Default";
     private static final Logger logger = Logger.getLogger(StepExecutionData.class);
     @Autowired
     private ArgumentsBinding argumentsBinding;
@@ -127,7 +133,6 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> boundInputs = argumentsBinding
                     .bindArguments(stepInputs, contextAccessor,
                             runEnv.getSystemProperties());
-            saveStepInputsResultContext(flowContext, boundInputs);
 
             sendEndBindingArgumentsEvent(
                     stepInputs,
@@ -139,7 +144,11 @@ public class StepExecutionData extends AbstractExecutionData {
                     flowVariables
             );
 
-            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, boundInputs);
+            updateCallArgumentsAndPushContextToStack(
+                    runEnv,
+                    flowContext,
+                    boundInputs,
+                    createPrompts(stepInputs));
 
             Value workerGroupValue = flowContext.removeLanguageVariable(WORKER_GROUP_VALUE);
             Value workerGroupOverride = flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE);
@@ -162,6 +171,7 @@ public class StepExecutionData extends AbstractExecutionData {
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
     }
+
 
     @SuppressWarnings("unused")
     public void endStep(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
@@ -267,11 +277,14 @@ public class StepExecutionData extends AbstractExecutionData {
             @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
-            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
+            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
+            @Param(ScoreLangConstants.ROBOT_GROUP) RobotGroupStatement robotGroup) {
         try {
             Context flowContext = runEnv.getStack().peekContext();
 
             handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
+
+            handleRobotGroup(robotGroup, flowContext, runEnv, executionRuntimeServices);
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
             logger.error("There was an error running the setWorkerGroupStep execution step of: \'" + nodeName +
@@ -311,7 +324,9 @@ public class StepExecutionData extends AbstractExecutionData {
         } else {
             if (workerGroup != null) {
                 //use the step worker group
-                workerGroupVal = computeWorkerGroup(workerGroup, flowContext, runEnv, workerGroup.getExpression());
+                String resolvedWorkerGroupValue = computeWorkerValue(workerGroup.getFunctionDependencies(),
+                        workerGroup.getSystemPropertyDependencies(), flowContext, runEnv, workerGroup.getExpression());
+                workerGroupVal = new WorkerGroupMetadata(resolvedWorkerGroupValue, workerGroup.isOverride());
                 execRuntimeServices.setWorkerGroupName(workerGroupVal.getValue());
                 flowContext.putLanguageVariable(WORKER_GROUP, ValueFactory.create(workerGroupVal.getValue()));
             } else {
@@ -331,18 +346,34 @@ public class StepExecutionData extends AbstractExecutionData {
         return workerGroupVal;
     }
 
-    private WorkerGroupMetadata computeWorkerGroup(WorkerGroupStatement workerGroup,
-                                                   Context flowContext,
-                                                   RunEnvironment runEnv,
-                                                   String expression) {
-        Value workerGroupValue;
-        if (isEmpty(workerGroup.getFunctionDependencies()) && isEmpty(workerGroup.getSystemPropertyDependencies())) {
-            workerGroupValue = ValueFactory.create(expression);
-        } else {
-            workerGroupValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
-                    runEnv.getSystemProperties(), workerGroup.getFunctionDependencies());
+    private void handleRobotGroup(RobotGroupStatement robotGroup,
+            Context flowContext,
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices execRuntimeServices) {
+        String robotGroupValue = DEFAULT_ROBOT_GROUP;
+        if (robotGroup != null) {
+            robotGroupValue = computeWorkerValue(robotGroup.getFunctionDependencies(),
+                    robotGroup.getSystemPropertyDependencies(),
+                    flowContext, runEnv, robotGroup.getExpression());
+        } else if (isNotEmpty(execRuntimeServices.getRobotGroupName())) {
+            robotGroupValue = execRuntimeServices.getRobotGroupName();
         }
-        return new WorkerGroupMetadata(workerGroupValue.toString(), workerGroup.isOverride());
+        execRuntimeServices.setRobotGroupName(robotGroupValue);
+    }
+
+    private String computeWorkerValue(Set<ScriptFunction> scriptFunctionSet,
+                                      Set<String> systemProperties,
+                                      Context flowContext,
+                                      RunEnvironment runEnv,
+                                      String expression) {
+        Value resolvedValue;
+        if (scriptFunctionSet == null && systemProperties == null) {
+            resolvedValue = ValueFactory.create(expression);
+        } else {
+            resolvedValue = scriptEvaluator.evalExpr(expression, flowContext.getImmutableViewOfVariables(),
+                    runEnv.getSystemProperties(), scriptFunctionSet);
+        }
+        return resolvedValue.toString();
     }
 
     private void putStepNavigationOptions(RunEnvironment runEnv, List<NavigationOptions> stepNavigationOptions,
@@ -370,6 +401,13 @@ public class StepExecutionData extends AbstractExecutionData {
             }
         }
         return ExecutionParametersConsts.DEFAULT_ROI_VALUE;
+    }
+
+    private Map<String, Prompt> createPrompts(List<Argument> stepInputs) {
+        return stepInputs
+                .stream()
+                .filter(Argument::hasPrompt)
+                .collect(toMap(InOutParam::getName, Argument::getPrompt));
     }
 
 

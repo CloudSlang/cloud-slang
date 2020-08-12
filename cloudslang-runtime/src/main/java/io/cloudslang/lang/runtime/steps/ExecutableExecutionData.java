@@ -9,12 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
+import com.google.common.collect.Sets;
 import com.hp.oo.sdk.content.annotations.Param;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -39,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
@@ -47,7 +50,9 @@ import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -114,12 +119,18 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
-            //might put some additional values to callArguments
-            missingInputHandler.applyPromptInputValues(systemContext, callArguments, executableInputs);
+            //restore what was already prompted and add newly prompted values
+            Map<String, Value> promptedValues = runEnv.removePromptedValues();
+            promptedValues.putAll(missingInputHandler.applyPromptInputValues(systemContext, executableInputs));
+
+            Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
+
+            List<Input> newExecutableInputs =
+                    addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
 
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
-                    executableInputs,
+                    newExecutableInputs,
                     runEnv,
                     executionRuntimeServices,
                     "Pre Input binding for " + stepType,
@@ -130,11 +141,13 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             List<Input> missingInputs = new ArrayList<>();
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
-                    executableInputs,
+                    newExecutableInputs,
                     callArguments,
+                    promptedValues,
                     runEnv.getSystemProperties(),
                     missingInputs,
-                    isTrue(useEmptyValuesForPrompts));
+                    isTrue(useEmptyValuesForPrompts),
+                    promptArguments);
 
             //if there are any missing required input after binding
             // try to resolve it using provided missing input handler
@@ -149,15 +162,19 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         isTrue(useEmptyValuesForPrompts));
 
                 if (!canContinue) {
-                    //we must keep the state unchanged
+                    //we must keep the state unchanged}
                     runEnv.putCallArguments(callArguments);
+                    runEnv.putPromptArguments(promptArguments);
+                    //keep what was already prompted
+                    runEnv.keepPromptedValues(promptedValues);
                     return;
                 }
             }
 
-            Map<String, Value> actionArguments = new HashMap<>();
+            Map<String, Value> actionArguments = new HashMap<>(boundInputValues);
 
-            actionArguments.putAll(boundInputValues);
+            //updated stored input arguments to be later used for output binding
+            saveStepInputsResultContext(runEnv, callArguments, promptedValues);
 
             //done with the user inputs, don't want it to be available in next startExecutable steps..
             if (userInputs != null) {
@@ -165,10 +182,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
             Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
             updateCallArgumentsAndPushContextToStack(runEnv,
-                    new Context(boundInputValues, magicVariables), actionArguments);
+                    new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>());
 
             sendEndBindingInputsEvent(
-                    executableInputs,
+                    newExecutableInputs,
                     boundInputValues,
                     runEnv,
                     executionRuntimeServices,
@@ -187,6 +204,22 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
+    }
+
+    private List<Input> addUserDefinedStepInputs(List<Input> executableInputs,
+                                                 Map<String, Value> callArguments,
+                                                 Map<String, Prompt> promptArguments) {
+        final List<Input> inputs = extractUserDefinedStepInputs(executableInputs, promptArguments, callArguments);
+
+        if (inputs.size() == 0) {
+            return executableInputs;
+        }
+
+        List<Input> newExecutableInputs = new ArrayList<>(executableInputs.size() + inputs.size());
+        newExecutableInputs.addAll(executableInputs);
+        newExecutableInputs.addAll(inputs);
+
+        return newExecutableInputs;
     }
 
     /**
@@ -343,6 +376,36 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 throw new RuntimeException("Unrecognized type: " + executableType);
         }
         return returnValues;
+    }
+
+    private List<Input> extractUserDefinedStepInputs(List<Input> inputs,
+                                              Map<String, Prompt> prompts,
+                                              Map<String, Value> callArguments) {
+        Set<String> inputNames = inputs.stream().map(Input::getName).collect(toSet());
+        Set<String> promptInputNames = prompts.keySet();
+
+        return Sets
+                .difference(promptInputNames, inputNames)
+                .stream()
+                .map(additionalInputName ->
+                        new Input
+                                .InputBuilder(additionalInputName, callArguments.get(additionalInputName))
+                                .withPrompt(prompts.get(additionalInputName))
+                                .build()
+                )
+                .collect(toList());
+
+    }
+
+    public void saveStepInputsResultContext(RunEnvironment runEnv,
+                                            Map<String, Value> originalCallArguments,
+                                            Map<String, Value> promptedValues) {
+        Context flowContext = runEnv.getStack().peekContext();
+        if (flowContext != null) {
+            Map<String, Value> finalActionArguments = new HashMap<>(originalCallArguments);
+            finalActionArguments.putAll(promptedValues);
+            saveStepInputsResultContext(flowContext, finalActionArguments);
+        }
     }
 
 }

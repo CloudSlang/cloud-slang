@@ -143,7 +143,7 @@ public class ParallelLoopStepsTest {
         ArgumentCaptor<Map> branchContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
         //noinspection unchecked
         verify(executionRuntimeServices, times(3))
-            .addBranch(eq(branchBeginStepId), eq(refId), branchContextArgumentCaptor.capture());
+            .addBranchForParallelLoop(eq(branchBeginStepId), eq(refId), branchContextArgumentCaptor.capture());
 
         List<Map> branchContexts = branchContextArgumentCaptor.getAllValues();
         List<Value> actualSplitData = newArrayList();
@@ -526,6 +526,7 @@ public class ParallelLoopStepsTest {
             new EndBranchDataContainer(branchContext3, new HashMap<String, Serializable>(), null)
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
+        when(executionRuntimeServices.getLevelParallelism()).thenReturn(2);
         return executionRuntimeServices;
     }
 
@@ -546,6 +547,7 @@ public class ParallelLoopStepsTest {
                 BRANCH_EXCEPTION_MESSAGE)
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
+        when(executionRuntimeServices.getLevelParallelism()).thenReturn(1);
         return executionRuntimeServices;
     }
 

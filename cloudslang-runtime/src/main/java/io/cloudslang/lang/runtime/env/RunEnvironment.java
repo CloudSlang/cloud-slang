@@ -14,8 +14,10 @@ import com.google.common.collect.Collections2;
 import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.SystemProperty;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.score.api.StatefulSessionStack;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +61,13 @@ public class RunEnvironment implements Serializable {
     // This is data that should be shared between different actions with the ability to change the data
     private Map<String, SerializableSessionObject> serializableDataMap;
 
+    private StatefulSessionStack statefulSessionStack;
+
+    //prompt args for current step
+    private Map<String, Prompt> promptArguments;
+
+    //Map holding already prompted values
+    private Map<String, Value> promptedValues;
 
     public RunEnvironment(Set<SystemProperty> systemProperties) {
         Validate.notNull(systemProperties, "system properties cannot be null");
@@ -67,7 +76,10 @@ public class RunEnvironment implements Serializable {
         callArguments = new HashMap<>();
         executionPath = new ExecutionPath();
         serializableDataMap = new HashMap<>();
+        statefulSessionStack = new StatefulSessionStack();
         this.systemProperties = systemProperties;
+        promptArguments = new HashMap<>();
+        promptedValues = new HashMap<>();
     }
 
     public RunEnvironment() {
@@ -90,6 +102,30 @@ public class RunEnvironment implements Serializable {
 
     public void putCallArguments(Map<String, Value> callArguments) {
         this.callArguments.putAll(callArguments);
+    }
+
+    public void putPromptArguments(Map<String, Prompt> prompts) {
+        this.promptArguments.putAll(prompts);
+    }
+
+    public Map<String, Prompt> getPromptArguments() {
+        return promptArguments;
+    }
+
+    public Map<String, Prompt> removePromptArguments() {
+        Map<String, Prompt> promptArguments = this.promptArguments;
+        this.promptArguments = new HashMap<>();
+        return promptArguments;
+    }
+
+    public void keepPromptedValues(Map<String, Value> promptedValues) {
+        this.promptedValues.putAll(promptedValues);
+    }
+
+    public Map<String, Value> removePromptedValues() {
+        Map<String, Value> promptedValues = this.promptedValues;
+        this.promptedValues = new HashMap<>();
+        return promptedValues;
     }
 
     public Map<String, Value> getCallArguments() {
@@ -246,4 +282,11 @@ public class RunEnvironment implements Serializable {
         return valuesToCheck;
     }
 
+    public StatefulSessionStack getStatefulSessionsStack() {
+        return statefulSessionStack;
+    }
+
+    public void setStatefulSessionsStack(StatefulSessionStack statefulSessionsStack) {
+        this.statefulSessionStack = statefulSessionsStack;
+    }
 }

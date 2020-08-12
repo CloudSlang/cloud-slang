@@ -67,6 +67,7 @@ public interface ScoreLangConstants {
     String WORKER_GROUP = "workerGroup";
     String WORKER_GROUP_VALUE = "workerGroupValue";
     String WORKER_GROUP_OVERRIDE = "workerGroupOverride";
+    String ROBOT_GROUP = "robotGroup";
 
     // parallel loop
     String PARALLEL_LOOP_KEY = "parallelLoop";

@@ -19,6 +19,7 @@ import io.cloudslang.lang.entities.WorkerGroupMetadata;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
@@ -390,11 +391,14 @@ public abstract class AbstractExecutionData {
         );
     }
 
-    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment, Context currentContext,
-                                                            Map<String, Value> callArguments) {
+    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment,
+                                                            Context currentContext,
+                                                            Map<String, Value> callArguments,
+                                                            Map<String, Prompt> prompts) {
         ContextStack contextStack = runEnvironment.getStack();
         contextStack.pushContext(currentContext);
         runEnvironment.putCallArguments(callArguments);
+        runEnvironment.putPromptArguments(prompts);
     }
 
     protected ResultNavigation getResultNavigation(Map<String, ResultNavigation> stepNavigationValues,

@@ -9,7 +9,17 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.bindings.InOutParam;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
+
+import java.util.Map;
+
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_DELIMITER_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_MESSAGE_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_OPTIONS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_TYPE_KEY;
+import static java.util.Optional.ofNullable;
 
 /**
  * @author Bonczidai Levente
@@ -17,6 +27,24 @@ import io.cloudslang.lang.entities.bindings.InOutParam;
  */
 public abstract class InOutTransformer extends AbstractInOutForTransformer {
 
+    private static final String DEFAULT_PROMPT_MESSAGE = "Enter a value for '%s'";
+
     public abstract Class<? extends InOutParam> getTransformedObjectsClass();
+
+    protected Prompt extractPrompt(String inputName, Map<String, String> promptSettings) {
+        final PromptType type = ofNullable(promptSettings.get(PROMPT_TYPE_KEY))
+                .map(PromptType::fromString)
+                .orElse(PromptType.TEXT);
+
+        final String message = ofNullable(promptSettings.get(PROMPT_MESSAGE_KEY))
+                .orElseGet(() -> String.format(DEFAULT_PROMPT_MESSAGE, inputName));
+
+        return new Prompt.PromptBuilder()
+                .setPromptType(type)
+                .setPromptMessage(message)
+                .setPromptOptions(promptSettings.get(PROMPT_OPTIONS_KEY))
+                .setPromptDelimiter(promptSettings.get(PROMPT_DELIMITER_KEY))
+                .build();
+    }
 
 }
