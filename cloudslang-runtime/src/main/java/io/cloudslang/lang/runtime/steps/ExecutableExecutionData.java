@@ -138,11 +138,12 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     nodeName,
                     callArguments
             );
-
+            Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
             List<Input> missingInputs = new ArrayList<>();
+            ReadOnlyContextAccessor context = new ReadOnlyContextAccessor(callArguments,magicVariables);
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
                     newExecutableInputs,
-                    callArguments,
+                    context.getMergedContexts(),
                     promptedValues,
                     runEnv.getSystemProperties(),
                     missingInputs,
@@ -180,7 +181,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             if (userInputs != null) {
                 userInputs.clear();
             }
-            Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
+
             updateCallArgumentsAndPushContextToStack(runEnv,
                     new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>());
 
@@ -279,7 +280,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             );
 
             ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(operationVariables,
-                    actionReturnValues.getOutputs());
+                    actionReturnValues.getOutputs(),magicVariableHelper.getGlobalContext(executionRuntimeServices));
             Map<String, Value> operationReturnOutputs =
                     outputsBinding.bindOutputs(
                             outputsBindingAccessor,
