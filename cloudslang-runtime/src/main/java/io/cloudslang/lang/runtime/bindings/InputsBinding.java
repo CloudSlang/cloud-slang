@@ -94,7 +94,14 @@ public class InputsBinding extends AbstractBinding {
             final Value promptValue = promptContext.get(inputName);
 
             if (nonNull(promptValue)) {
-                value = promptValue;
+                Value valueFromContext = context.get(inputName);
+                boolean sensitive = input.getValue() != null && input.getValue().isSensitive() ||
+                        valueFromContext != null && valueFromContext.isSensitive();
+                if (!input.isPrivateInput() && sensitive) {
+                    value = ValueFactory.create(promptValue, true);
+                } else {
+                    value = promptValue;
+                }
             } else {
                 value = resolveValue(input, context, targetContext, systemProperties);
             }
