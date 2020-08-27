@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class RunEnvironment implements Serializable {
         serializableDataMap = new HashMap<>();
         statefulSessionStack = new StatefulSessionStack();
         this.systemProperties = systemProperties;
-        promptArguments = new HashMap<>();
+        promptArguments = new LinkedHashMap<>();
         promptedValues = new HashMap<>();
     }
 
@@ -114,7 +115,7 @@ public class RunEnvironment implements Serializable {
 
     public Map<String, Prompt> removePromptArguments() {
         Map<String, Prompt> promptArguments = this.promptArguments;
-        this.promptArguments = new HashMap<>();
+        this.promptArguments = new LinkedHashMap<>();
         return promptArguments;
     }
 

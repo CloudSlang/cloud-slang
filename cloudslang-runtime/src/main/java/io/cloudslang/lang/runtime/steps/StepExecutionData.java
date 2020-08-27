@@ -45,6 +45,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -407,7 +408,7 @@ public class StepExecutionData extends AbstractExecutionData {
         return stepInputs
                 .stream()
                 .filter(Argument::hasPrompt)
-                .collect(toMap(InOutParam::getName, Argument::getPrompt));
+                .collect(toMap(InOutParam::getName, Argument::getPrompt, (x, y) -> y, LinkedHashMap::new));
     }
 
 
