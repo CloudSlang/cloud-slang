@@ -39,6 +39,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,9 +51,9 @@ import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SYSTEM_CONTEXT;
 import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -382,7 +383,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private List<Input> extractUserDefinedStepInputs(List<Input> inputs,
                                               Map<String, Prompt> prompts,
                                               Map<String, Value> callArguments) {
-        Set<String> inputNames = inputs.stream().map(Input::getName).collect(toSet());
+        Set<String> inputNames = inputs.stream().map(Input::getName).collect(toCollection(LinkedHashSet::new));
         Set<String> promptInputNames = prompts.keySet();
 
         return Sets
