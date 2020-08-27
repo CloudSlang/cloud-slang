@@ -111,7 +111,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         if (inputToUpdate != null) {
                             Input updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
                                     .build();
-                            executableInputs.set(executableInputs.indexOf(inputToUpdate), updatedInput);
+                            executableInputs = updateExecutableInputs(executableInputs,
+                                    executableInputs.indexOf(inputToUpdate),
+                                    updatedInput);
                         } else {
                             Input toAddInput = new Input.InputBuilder(inputName, inputValue).build();
                             executableInputs.add(toAddInput);
@@ -381,8 +383,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     }
 
     private List<Input> extractUserDefinedStepInputs(List<Input> inputs,
-                                              Map<String, Prompt> prompts,
-                                              Map<String, Value> callArguments) {
+                                                     Map<String, Prompt> prompts,
+                                                     Map<String, Value> callArguments) {
         Set<String> inputNames = inputs.stream().map(Input::getName).collect(toCollection(LinkedHashSet::new));
         Set<String> promptInputNames = prompts.keySet();
 
@@ -408,6 +410,12 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             finalActionArguments.putAll(promptedValues);
             saveStepInputsResultContext(flowContext, finalActionArguments);
         }
+    }
+
+    private List<Input> updateExecutableInputs(List<Input> executableInputs, int updateIndex, Input updatedInput) {
+        List<Input> updatedExecutableInputsList = new ArrayList<>(executableInputs);
+        updatedExecutableInputsList.set(updateIndex, updatedInput);
+        return Collections.unmodifiableList(updatedExecutableInputsList);
     }
 
 }
