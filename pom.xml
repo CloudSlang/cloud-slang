@@ -43,7 +43,7 @@
         <!--Project dependencies-->
         <spring.version>4.3.17.RELEASE</spring.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <score.version>0.3.165</score.version>
+        <score.version>0.3.166</score.version>
         <h2.version>1.4.199</h2.version>
         <!--Project properties-->
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
