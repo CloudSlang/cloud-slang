@@ -78,7 +78,7 @@ public final class ExpressionUtils {
     }
 
     private static void addPattern(ScriptFunction function, String regex) {
-        patternsMap.put(function, compile(regex, Pattern.UNICODE_CHARACTER_CLASS));
+        patternsMap.put(function, compile(regex, Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL | Pattern.MULTILINE));
     }
 
     public static String extractExpression(Serializable value) {
