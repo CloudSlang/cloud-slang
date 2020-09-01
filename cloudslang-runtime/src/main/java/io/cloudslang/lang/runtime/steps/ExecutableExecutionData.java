@@ -98,12 +98,13 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(USE_EMPTY_VALUES_FOR_PROMPTS_KEY) Boolean useEmptyValuesForPrompts) {
         try {
             Map<String, Value> callArguments = runEnv.removeCallArguments();
+            List<Input> mutableInputList = new ArrayList<>(executableInputs);
 
             if (userInputs != null) {
                 callArguments.putAll(userInputs);
                 // merge is done only for flows that have extra inputs besides those defined as "flow inputs"
                 if (executionRuntimeServices.getMergeUserInputs()) {
-                    Map<String, Input> executableInputsMap = executableInputs.stream()
+                    Map<String, Input> executableInputsMap = mutableInputList.stream()
                             .collect(toMap(Input::getName, Function.identity()));
                     for (String inputName : userInputs.keySet()) {
                         Value inputValue = userInputs.get(inputName);
@@ -111,15 +112,15 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         if (inputToUpdate != null) {
                             Input updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
                                     .build();
-                            executableInputs.set(executableInputs.indexOf(inputToUpdate), updatedInput);
+                            mutableInputList.set(mutableInputList.indexOf(inputToUpdate), updatedInput);
                         } else {
                             Input toAddInput = new Input.InputBuilder(inputName, inputValue).build();
-                            executableInputs.add(toAddInput);
+                            mutableInputList.add(toAddInput);
                         }
                     }
                 }
             }
-
+            executableInputs = Collections.unmodifiableList(mutableInputList);
             //restore what was already prompted and add newly prompted values
             Map<String, Value> promptedValues = runEnv.removePromptedValues();
             promptedValues.putAll(missingInputHandler.applyPromptInputValues(systemContext, executableInputs));
@@ -381,8 +382,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     }
 
     private List<Input> extractUserDefinedStepInputs(List<Input> inputs,
-                                              Map<String, Prompt> prompts,
-                                              Map<String, Value> callArguments) {
+                                                     Map<String, Prompt> prompts,
+                                                     Map<String, Value> callArguments) {
         Set<String> inputNames = inputs.stream().map(Input::getName).collect(toCollection(LinkedHashSet::new));
         Set<String> promptInputNames = prompts.keySet();
 
@@ -409,5 +410,4 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             saveStepInputsResultContext(flowContext, finalActionArguments);
         }
     }
-
 }
