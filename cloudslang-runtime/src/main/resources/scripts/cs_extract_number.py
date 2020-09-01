@@ -2,14 +2,10 @@ def cs_extract_number(string, count = 1):
   if type(string).__name__ != 'str' and type(string).__name__ != 'unicode':
     raise Exception("Expected a string for parameter 'string', got " + str(string))
 
-  nums = string.split()
-  n = count
   result = None
-  for x in nums:
-    if x.isdigit():
-      if n == 1:
-        result = x
-        break
-      else:
-        n = n - 1
+  numbers = re.findall("[0-9]*\.?[0-9]+", string)
+
+  if len(numbers) >= count & count >= 1:
+    result = numbers[count - 1]
+
   return result
