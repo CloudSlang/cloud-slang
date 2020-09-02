@@ -37,7 +37,6 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +44,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SEQUENTIAL;
@@ -210,21 +208,17 @@ public class ActionExecutionData extends AbstractExecutionData {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
 
-        if (hasException(returnMap)) {
-            logException(returnMap);
+        final Serializable exception = returnMap.get(EXCEPTION);
+        if (exception != null) {
+            logException(exception.toString());
         }
 
         return handleSensitiveValues(returnMap, currentContext);
     }
 
-    private boolean hasException(Map<String, Serializable> returnMap) {
-        return returnMap.containsKey(RETURN_CODE) && !"0".equals(returnMap.get(RETURN_CODE)) &&
-            returnMap.get(EXCEPTION) != null;
-    }
+    private void logException(String exception) {
 
-    private void logException(Map<String, Serializable> returnMap) {
-
-        String stacktrace = (String) returnMap.get(EXCEPTION);
+        String stacktrace = exception;
 
         if (REMOVE_MESSAGE_FROM_LOGGED_EX) {
             StringWriter writer = new StringWriter();
@@ -304,7 +298,7 @@ public class ActionExecutionData extends AbstractExecutionData {
 
             final Value ex = returnedMap.get(EXCEPTION);
             if (ex != null) {
-                logger.error("Action's exception: " + ex);
+                logger.error("Python operation encountered an exception: " + ex.toString());
             }
 
             return returnedMap;
