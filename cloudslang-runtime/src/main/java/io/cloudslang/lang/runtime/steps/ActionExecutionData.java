@@ -241,7 +241,7 @@ public class ActionExecutionData extends AbstractExecutionData {
             stacktrace = writer.toString();
         }
 
-        logger.error("Action's stacktrace\n" + stacktrace);
+        logger.error("Java operation encountered an exception:\n" + stacktrace);
     }
 
     protected Map<String, Serializable> createActionContext(Map<String, Value> context) {
