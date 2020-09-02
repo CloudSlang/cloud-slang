@@ -37,11 +37,15 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SEQUENTIAL;
@@ -65,7 +69,7 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     private static final boolean REMOVE_MESSAGE_FROM_LOGGED_EX =
             Boolean.parseBoolean(
-                    System.getProperty("score.java.operation.remove.message.from.logged.exception","false"));
+                    System.getProperty("worker.execution.sanitizeOperationStacktrace","false"));
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -215,7 +219,7 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     private boolean hasException(Map<String, Serializable> returnMap) {
         return returnMap.containsKey(RETURN_CODE) && !"0".equals(returnMap.get(RETURN_CODE)) &&
-            returnMap.containsKey(EXCEPTION);
+            returnMap.get(EXCEPTION) != null;
     }
 
     private void logException(Map<String, Serializable> returnMap) {
@@ -228,19 +232,22 @@ public class ActionExecutionData extends AbstractExecutionData {
 
             BufferedReader reader = new BufferedReader(new StringReader(stacktrace));
 
-            reader.lines().forEach(line -> {
+            final ListIterator<String> iterator = reader.lines().collect(Collectors.toList()).listIterator();
+
+            while (iterator.hasNext()) {
+                String line = iterator.next();
                 int idx = line.indexOf(MARKER);
                 String str = idx == -1 ? line : line.substring(0, idx + MARKER.length());
 
                 printWriter.println(str);
-            });
+            }
 
             printWriter.close();
 
             stacktrace = writer.toString();
         }
 
-        logger.warn("Action's stacktrace\n" + stacktrace);
+        logger.error("Action's stacktrace\n" + stacktrace);
     }
 
     protected Map<String, Serializable> createActionContext(Map<String, Value> context) {
@@ -295,8 +302,9 @@ public class ActionExecutionData extends AbstractExecutionData {
             final Map<String, Value> returnedMap = scriptExecutor.executeScript(
                     normalizePythonDependencies(dependencies), pythonScript, callArguments, useJython);
 
-            if (returnedMap.containsKey(EXCEPTION)) {
-                logger.warn("Action's exception: " + returnedMap.get(EXCEPTION));
+            final Value ex = returnedMap.get(EXCEPTION);
+            if (ex != null) {
+                logger.error("Action's exception: " + ex);
             }
 
             return returnedMap;
