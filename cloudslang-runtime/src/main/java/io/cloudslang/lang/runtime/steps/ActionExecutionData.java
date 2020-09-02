@@ -24,14 +24,18 @@ import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.python.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +58,14 @@ public class ActionExecutionData extends AbstractExecutionData {
     public static final String PACKAGING_TYPE_JAR = "jar";
     public static final String PACKAGING_TYPE_ZIP = "zip";
     public static final int GAV_PARTS = 3;
+
+    private static final String RETURN_CODE = "returnCode";
+    private static final String EXCEPTION = "exception";
+    private static final String MARKER = "Exception: ";
+
+    private static final boolean REMOVE_MESSAGE_FROM_LOGGED_EX =
+            Boolean.parseBoolean(
+                    System.getProperty("score.java.operation.remove.message.from.logged.exception","false"));
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -193,7 +205,42 @@ public class ActionExecutionData extends AbstractExecutionData {
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
+
+        if (hasException(returnMap)) {
+            logException(returnMap);
+        }
+
         return handleSensitiveValues(returnMap, currentContext);
+    }
+
+    private boolean hasException(Map<String, Serializable> returnMap) {
+        return returnMap.containsKey(RETURN_CODE) && !"0".equals(returnMap.get(RETURN_CODE)) &&
+            returnMap.containsKey(EXCEPTION);
+    }
+
+    private void logException(Map<String, Serializable> returnMap) {
+
+        String stacktrace = (String) returnMap.get(EXCEPTION);
+
+        if (REMOVE_MESSAGE_FROM_LOGGED_EX) {
+            StringWriter writer = new StringWriter();
+            final PrintWriter printWriter = new PrintWriter(writer);
+
+            BufferedReader reader = new BufferedReader(new StringReader(stacktrace));
+
+            reader.lines().forEach(line -> {
+                int idx = line.indexOf(MARKER);
+                String str = idx == -1 ? line : line.substring(0, idx + MARKER.length());
+
+                printWriter.println(str);
+            });
+
+            printWriter.close();
+
+            stacktrace = writer.toString();
+        }
+
+        logger.warn("Action's stacktrace\n" + stacktrace);
     }
 
     protected Map<String, Serializable> createActionContext(Map<String, Value> context) {
@@ -245,8 +292,14 @@ public class ActionExecutionData extends AbstractExecutionData {
     private Map<String, Value> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript,
                                                          Map<String, Value> callArguments, boolean useJython) {
         if (StringUtils.isNotBlank(pythonScript)) {
-            return scriptExecutor.executeScript(
+            final Map<String, Value> returnedMap = scriptExecutor.executeScript(
                     normalizePythonDependencies(dependencies), pythonScript, callArguments, useJython);
+
+            if (returnedMap.containsKey(EXCEPTION)) {
+                logger.warn("Action's exception: " + returnedMap.get(EXCEPTION));
+            }
+
+            return returnedMap;
         }
 
         throw new RuntimeException("Python script not found in action data");
