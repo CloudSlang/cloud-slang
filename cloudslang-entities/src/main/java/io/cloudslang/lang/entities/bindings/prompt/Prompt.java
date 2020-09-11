@@ -61,8 +61,16 @@ public class Prompt implements Serializable {
         return promptOptions;
     }
 
+    public void setPromptOptions(String promptOptions) {
+        this.promptOptions = promptOptions;
+    }
+
     public String getPromptDelimiter() {
         return promptDelimiter;
+    }
+
+    public void setPromptDelimiter(String promptDelimiter) {
+        this.promptDelimiter = promptDelimiter;
     }
 
     public static class PromptBuilder {

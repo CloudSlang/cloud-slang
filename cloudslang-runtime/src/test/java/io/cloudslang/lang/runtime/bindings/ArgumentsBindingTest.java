@@ -345,26 +345,72 @@ public class ArgumentsBindingTest {
     }
 
     @Test
-    public void testArgumentWithPromptMessageWithExpression() {
+    public void testArgumentWithPromptExpressions() {
         Map<String, Value> context = new HashMap<>();
-        context.put("messageContainer", ValueFactory.create("(What's the story?)"));
+        context.put("messageContainer1", ValueFactory.create("(What's the story?)"));
+        context.put("messageContainer2", ValueFactory.create("Hey hey!"));
+        context.put("messageContainer3", ValueFactory.create("Rock 'n' Roll"));
+        context.put("singleChoiceDelimiter", ValueFactory.create("|"));
+        context.put("singleChoiceOptions", ValueFactory.create("1|2|3"));
+        context.put("multiChoiceDelimiter", ValueFactory.create("!"));
+        context.put("multiChoiceOptions", ValueFactory.create("x!y!z"));
 
-        Prompt prompt = new Prompt.PromptBuilder()
+        Prompt textPrompt = new Prompt.PromptBuilder()
                 .setPromptType(PromptType.TEXT)
-                .setPromptMessage("${messageContainer + ' Morning glory'}")
+                .setPromptMessage("${messageContainer1 + ' Morning glory'}")
                 .build();
 
-        Argument argument = new Argument("argument1",
+        Prompt singleChoicePrompt = new Prompt.PromptBuilder()
+                .setPromptType(PromptType.SINGLE_CHOICE)
+                .setPromptMessage("${messageContainer2 + ' My my!'}")
+                .setPromptOptions("${singleChoiceOptions}")
+                .setPromptDelimiter("${singleChoiceDelimiter}")
+                .build();
+
+        Prompt multiChoicePrompt = new Prompt.PromptBuilder()
+                .setPromptType(PromptType.MULTI_CHOICE)
+                .setPromptMessage("${messageContainer3 + ' will never die'}")
+                .setPromptOptions("${multiChoiceOptions}")
+                .setPromptDelimiter("${multiChoiceDelimiter}")
+                .build();
+
+        Argument argument1 = new Argument("argument1",
                 null,
                 Collections.emptySet(),
                 Collections.emptySet(),
                 false,
-                prompt);
+                textPrompt);
 
-        Map<String, Value> result = bindArguments(Collections.singletonList(argument), context);
+        Argument argument2 = new Argument("argument2",
+                null,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                false,
+                singleChoicePrompt);
+
+        Argument argument3 = new Argument("argument3",
+                null,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                false,
+                multiChoicePrompt);
+
+
+        Map<String, Value> result = bindArguments(Arrays.asList(argument1, argument2, argument3), context);
         assertFalse(result.isEmpty());
         assertTrue(result.containsKey("argument1"));
-        assertEquals("(What's the story?) Morning glory", argument.getPrompt().getPromptMessage());
+        assertTrue(result.containsKey("argument2"));
+        assertTrue(result.containsKey("argument3"));
+
+        assertEquals("(What's the story?) Morning glory", argument1.getPrompt().getPromptMessage());
+
+        assertEquals("Hey hey! My my!", argument2.getPrompt().getPromptMessage());
+        assertEquals("|", argument2.getPrompt().getPromptDelimiter());
+        assertEquals("1|2|3", argument2.getPrompt().getPromptOptions());
+
+        assertEquals("Rock 'n' Roll will never die", argument3.getPrompt().getPromptMessage());
+        assertEquals("!", argument3.getPrompt().getPromptDelimiter());
+        assertEquals("x!y!z", argument3.getPrompt().getPromptOptions());
     }
 
     private Map<String, Value> bindArguments(

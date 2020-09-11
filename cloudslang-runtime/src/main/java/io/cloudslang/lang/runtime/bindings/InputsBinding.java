@@ -25,7 +25,6 @@ import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.LinkedHashMap;
 import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static java.util.Collections.emptyMap;
@@ -44,9 +42,6 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 @Component
 public class InputsBinding extends AbstractBinding {
-
-    @Autowired
-    private ScriptEvaluator scriptEvaluator;
 
     /**
      * Binds the inputs to a new result map
@@ -110,7 +105,7 @@ public class InputsBinding extends AbstractBinding {
                 if (useEmptyValuesForPrompts) {
                     value = createEmptyValue(input);
                 } else if (isNull(promptValue)) {
-                    resolveMessage(input, context, targetContext, systemProperties);
+                    resolvePromptExpressions(input, context, targetContext, systemProperties);
 
                     missingInputs.add(createMissingInput(input, value));
                     return;
@@ -128,33 +123,20 @@ public class InputsBinding extends AbstractBinding {
         targetContext.put(inputName, value);
     }
 
-    private void resolveMessage(Input input,
-                                Map<String, ? extends Value> context,
-                                Map<String, Value> targetContext,
-                                Set<SystemProperty> systemProperties) {
+    private void resolvePromptExpressions(Input input,
+                                          Map<String, ? extends Value> context,
+                                          Map<String, Value> targetContext,
+                                          Set<SystemProperty> systemProperties) {
         if (input.hasPrompt()) {
-            //we do not want to change original context map
-            Map<String, Value> evaluationContext = new HashMap<>(context);
-            String inputName = input.getName();
-            Value valueFromContext = input.getValue();
-            Prompt prompt = input.getPrompt();
+            EvaluationContextHolder evaluationContextHolder =
+                    new EvaluationContextHolder(context,
+                            targetContext,
+                            systemProperties,
+                            input.getValue(),
+                            input.getName(),
+                            input.getFunctionDependencies());
 
-            String expressionToEvaluate = ExpressionUtils.extractExpression(prompt.getPromptMessage());
-            if (expressionToEvaluate != null) {
-                if (context.containsKey(inputName)) {
-                    evaluationContext.put(inputName, valueFromContext);
-                }
-                //so you can resolve previous inputs already bound
-                evaluationContext.putAll(targetContext);
-
-                Value result = scriptEvaluator.evalExpr(expressionToEvaluate,
-                        evaluationContext,
-                        systemProperties,
-                        input.getFunctionDependencies());
-
-                prompt.setPromptMessage(Value.toStringSafeEmpty(result));
-
-            }
+            resolvePromptExpressions(input.getPrompt(), evaluationContextHolder);
         }
 
     }

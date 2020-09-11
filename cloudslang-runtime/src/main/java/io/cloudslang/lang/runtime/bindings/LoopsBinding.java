@@ -13,7 +13,6 @@ import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import io.cloudslang.lang.runtime.env.LoopCondition;
@@ -23,7 +22,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
@@ -35,9 +33,6 @@ public class LoopsBinding extends AbstractBinding {
     public static final String INVALID_MAP_EXPRESSION_MESSAGE = "Invalid expression for iterating maps";
 
     private final Logger logger = Logger.getLogger(getClass());
-
-    @Autowired
-    private ScriptEvaluator scriptEvaluator;
 
     public LoopCondition getOrCreateLoopCondition(
             LoopStatement forLoopStatement,

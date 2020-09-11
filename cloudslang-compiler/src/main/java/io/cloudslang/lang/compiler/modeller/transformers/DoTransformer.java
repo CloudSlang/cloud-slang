@@ -201,12 +201,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
         executableValidator.validateInputName(entryName);
         preCompileValidator.validateStringValue(entryName, entryValue, this);
 
-        String messageValue = null;
-        if (prompt != null) {
-            messageValue = prompt.getPromptMessage();
-        }
-
-        Accumulator accumulator = extractFunctionData(entryValue, messageValue);
+        Accumulator accumulator = getDependencyAccumulator(entryValue, prompt);
         return new Argument(
                 entryName,
                 ValueFactory.create(entryValue, sensitive, sensitivityLevel),
