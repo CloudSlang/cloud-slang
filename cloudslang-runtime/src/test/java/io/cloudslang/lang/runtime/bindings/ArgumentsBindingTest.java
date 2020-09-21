@@ -14,11 +14,14 @@ import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.dependency.impl.services.utils.UnzipUtil;
+import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -49,7 +52,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ArgumentsBindingTest.Config.class)
@@ -338,6 +344,29 @@ public class ArgumentsBindingTest {
         Assert.assertEquals("orig context should not change", 1, context.size());
     }
 
+    @Test
+    public void testArgumentWithPromptMessageWithExpression() {
+        Map<String, Value> context = new HashMap<>();
+        context.put("messageContainer", ValueFactory.create("(What's the story?)"));
+
+        Prompt prompt = new Prompt.PromptBuilder()
+                .setPromptType(PromptType.TEXT)
+                .setPromptMessage("${messageContainer + ' Morning glory'}")
+                .build();
+
+        Argument argument = new Argument("argument1",
+                null,
+                Collections.emptySet(),
+                Collections.emptySet(),
+                false,
+                prompt);
+
+        Map<String, Value> result = bindArguments(Collections.singletonList(argument), context);
+        assertFalse(result.isEmpty());
+        assertTrue(result.containsKey("argument1"));
+        assertEquals("(What's the story?) Morning glory", argument.getPrompt().getPromptMessage());
+    }
+
     private Map<String, Value> bindArguments(
             List<Argument> arguments,
             Map<String, ? extends Value> context) {
@@ -359,6 +388,11 @@ public class ArgumentsBindingTest {
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
+        }
+
+        @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
         }
 
         @Bean

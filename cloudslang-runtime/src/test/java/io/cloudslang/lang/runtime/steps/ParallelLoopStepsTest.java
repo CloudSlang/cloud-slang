@@ -21,7 +21,6 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.RuntimeConstants;
 import io.cloudslang.lang.runtime.bindings.LoopsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
@@ -31,6 +30,7 @@ import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -54,6 +54,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -111,7 +112,7 @@ public class ParallelLoopStepsTest {
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();
-        Context context = new Context(variables);
+        Context context = new Context(variables,Collections.<String, Value>emptyMap());
         runEnvironment.getStack().pushContext(context);
 
         String nodeName = "nodeName";
@@ -142,7 +143,7 @@ public class ParallelLoopStepsTest {
         ArgumentCaptor<Map> branchContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
         //noinspection unchecked
         verify(executionRuntimeServices, times(3))
-            .addBranch(eq(branchBeginStepId), eq(refId), branchContextArgumentCaptor.capture());
+            .addBranchForParallelLoop(eq(branchBeginStepId), eq(refId), branchContextArgumentCaptor.capture());
 
         List<Map> branchContexts = branchContextArgumentCaptor.getAllValues();
         List<Value> actualSplitData = newArrayList();
@@ -167,7 +168,7 @@ public class ParallelLoopStepsTest {
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();
-        Context context = new Context(variables);
+        Context context = new Context(variables,Collections.<String, Value>emptyMap());
         runEnvironment.getStack().pushContext(context);
 
         String nodeName = "nodeName";
@@ -217,7 +218,7 @@ public class ParallelLoopStepsTest {
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
         Map<String, Value> variables = new HashMap<>();
-        Context context = new Context(variables);
+        Context context = new Context(variables,Collections.<String, Value>emptyMap());
         runEnvironment.getStack().pushContext(context);
 
 
@@ -242,34 +243,38 @@ public class ParallelLoopStepsTest {
         runtimeContext3.put(ScoreLangConstants.BRANCH_RESULT_KEY, SUCCESS_RESULT);
 
         List<Output> stepPublishValues =
-            newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
+                newArrayList(new Output("outputName", ValueFactory.create("outputExpression")));
         String nodeName = "nodeName";
         ExecutionRuntimeServices executionRuntimeServices =
-            createAndConfigureExecutionRuntimeServicesMock(runtimeContext1, runtimeContext2, runtimeContext3);
+                createAndConfigureExecutionRuntimeServicesMock(runtimeContext1, runtimeContext2, runtimeContext3);
 
         // call method
         parallelLoopSteps.joinBranches(runEnvironment, executionRuntimeServices,
-            stepPublishValues, stepNavigationValues, nodeName);
+                stepPublishValues, stepNavigationValues, nodeName);
 
         // verify expected behaviour
-        ArgumentCaptor<Map> aggregateContextArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+        ArgumentCaptor<ReadOnlyContextAccessor> aggregateContextArgumentCaptor =
+                ArgumentCaptor.forClass(ReadOnlyContextAccessor.class);
 
         //noinspection unchecked
         verify(outputsBinding).bindOutputs(
-            aggregateContextArgumentCaptor.capture(),
-            eq(runEnvironment.getSystemProperties()),
-            eq(stepPublishValues)
+                aggregateContextArgumentCaptor.capture(),
+                eq(runEnvironment.getSystemProperties()),
+                eq(stepPublishValues)
         );
 
         @SuppressWarnings("unchecked")
         List<Map<String, Serializable>> expectedBranchContexts =
-            newArrayList(runtimeContext1, runtimeContext2, runtimeContext3);
+                newArrayList(runtimeContext1, runtimeContext2, runtimeContext3);
         @SuppressWarnings("unchecked")
-        Map<String, Value> aggregateContext = aggregateContextArgumentCaptor.getValue();
-        assertTrue(aggregateContext.containsKey(RuntimeConstants.BRANCHES_CONTEXT_KEY));
+        ReadOnlyContextAccessor aggregateContext = aggregateContextArgumentCaptor.getValue();
+        assertTrue(aggregateContext.getMergedContexts().containsKey(RuntimeConstants.BRANCHES_CONTEXT_KEY));
         @SuppressWarnings("unchecked")
         List<Map<String, Value>> actualBranchesContexts =
-            (List<Map<String, Value>>) aggregateContext.get(RuntimeConstants.BRANCHES_CONTEXT_KEY).get();
+                (List<Map<String, Value>>) aggregateContext
+                        .getMergedContexts()
+                        .get(RuntimeConstants.BRANCHES_CONTEXT_KEY)
+                        .get();
         Assert.assertEquals(expectedBranchContexts, actualBranchesContexts);
     }
 
@@ -279,7 +284,7 @@ public class ParallelLoopStepsTest {
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
         Map<String, Value> variables = new HashMap<>();
-        Context context = new Context(variables);
+        Context context = new Context(variables,Collections.<String, Value>emptyMap());
         runEnvironment.getStack().pushContext(context);
 
         final List<Output> stepPublishValues =
@@ -330,7 +335,7 @@ public class ParallelLoopStepsTest {
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
         Map<String, Value> variables = new HashMap<>();
-        Context context = new Context(variables);
+        Context context = new Context(variables,Collections.<String, Value>emptyMap());
         runEnvironment.getStack().pushContext(context);
 
         final List<Output> stepPublishValues =
@@ -390,7 +395,7 @@ public class ParallelLoopStepsTest {
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
         Map<String, Value> variables = new HashMap<>();
-        Context context = new Context(variables);
+        Context context = new Context(variables,Collections.<String, Value>emptyMap());
         runEnvironment.getStack().pushContext(context);
 
         final List<Output> stepPublishValues =
@@ -449,7 +454,7 @@ public class ParallelLoopStepsTest {
         RunEnvironment runEnvironment = new RunEnvironment();
         runEnvironment.getExecutionPath().down();
         Map<String, Value> variables = new HashMap<>();
-        Context context = new Context(variables);
+        Context context = new Context(variables, Collections.<String, Value>emptyMap());
         runEnvironment.getStack().pushContext(context);
 
         ExecutionRuntimeServices executionRuntimeServices = createExecutionRuntimeServicesMockWithBranchException();
@@ -521,6 +526,7 @@ public class ParallelLoopStepsTest {
             new EndBranchDataContainer(branchContext3, new HashMap<String, Serializable>(), null)
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
+        when(executionRuntimeServices.getLevelParallelism()).thenReturn(2);
         return executionRuntimeServices;
     }
 
@@ -529,7 +535,7 @@ public class ParallelLoopStepsTest {
         for (Map.Entry<String, Serializable> entry : runtimeContext.entrySet()) {
             context.put(entry.getKey(), ValueFactory.create(entry.getValue()));
         }
-        return new Context(context);
+        return new Context(context,null);
     }
 
     private ExecutionRuntimeServices createExecutionRuntimeServicesMockWithBranchException() {
@@ -541,6 +547,7 @@ public class ParallelLoopStepsTest {
                 BRANCH_EXCEPTION_MESSAGE)
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
+        when(executionRuntimeServices.getLevelParallelism()).thenReturn(1);
         return executionRuntimeServices;
     }
 
@@ -570,6 +577,11 @@ public class ParallelLoopStepsTest {
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return mock(ScriptEvaluator.class);
+        }
+
+        @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
         }
 
         @Bean

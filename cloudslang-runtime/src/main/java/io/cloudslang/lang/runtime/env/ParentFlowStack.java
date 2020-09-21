@@ -9,8 +9,13 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
+
 import java.io.Serializable;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+
 
 /**
  * User: stoneo
@@ -19,17 +24,22 @@ import java.util.Stack;
  */
 public class ParentFlowStack implements Serializable {
 
-    private Stack<ParentFlowData> stack = new Stack<>();
+    private Deque<ParentFlowData> stack;
+
+    public ParentFlowStack() {
+        this.stack = new ArrayDeque<>();
+    }
 
     public void pushParentFlowData(ParentFlowData newContext) {
         stack.push(newContext);
     }
 
     public ParentFlowData popParentFlowData() {
-        if (stack.empty()) {
+        if (stack.isEmpty()) {
             return null;
+        } else {
+            return stack.pop();
         }
-        return stack.pop();
     }
 
     public boolean isEmpty() {
@@ -38,5 +48,22 @@ public class ParentFlowStack implements Serializable {
 
     public int size() {
         return stack.size();
+    }
+
+    public WorkerGroupMetadata computeParentWorkerGroup() {
+        WorkerGroupMetadata workerGroupVal = new WorkerGroupMetadata();
+
+        Iterator iterator = stack.descendingIterator();
+        while (iterator.hasNext()) {
+            ParentFlowData parentFlowData = (ParentFlowData) iterator.next();
+            WorkerGroupMetadata workerGroupTemp = parentFlowData.getWorkerGroup();
+            if (workerGroupTemp.getValue() != null) {
+                workerGroupVal = workerGroupTemp;
+                if (workerGroupTemp.isOverride()) {
+                    break;
+                }
+            }
+        }
+        return workerGroupVal;
     }
 }

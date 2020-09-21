@@ -16,41 +16,50 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class WorkerGroupTransformer extends AbstractInOutForTransformer
-        implements Transformer<String, WorkerGroupStatement> {
+        implements Transformer<Object, WorkerGroupStatement> {
 
     @Override
-    public TransformModellingResult<WorkerGroupStatement> transform(String rawData) {
+    public TransformModellingResult<WorkerGroupStatement> transform(Object rawData) {
         return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override
-    public TransformModellingResult<WorkerGroupStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        if (StringUtils.isBlank(rawData)) {
+    public TransformModellingResult<WorkerGroupStatement> transform(Object rawData, SensitivityLevel sensitivityLevel) {
+        String value = null;
+        boolean override = false;
+        if (rawData instanceof String) {
+            value = (String) rawData;
+        } else if (rawData instanceof Map) {
+            value = String.valueOf(((Map<String, Object>) rawData).get(SlangTextualKeys.VALUE));
+            override = BooleanUtils.isTrue((Boolean)((Map<String, Object>) rawData).get(SlangTextualKeys.OVERRIDE));
+        }
+        if (StringUtils.isBlank(value)) {
             return new BasicTransformModellingResult<>(null, Collections.emptyList());
         }
 
         WorkerGroupStatement workerGroupStatement;
         Accumulator dependencyAccumulator;
         String expression;
-        try {
-            dependencyAccumulator = extractFunctionData(rawData);
-            expression = ExpressionUtils.extractExpression(rawData);
-        } catch (IllegalStateException | IndexOutOfBoundsException e) {
-            return new BasicTransformModellingResult<>(null, Collections.singletonList(e));
-        }
-
+        dependencyAccumulator = extractFunctionData(value);
+        expression = ExpressionUtils.extractExpression(value);
         if (expression != null) {
             workerGroupStatement = new WorkerGroupStatement(expression,
+                    override,
                     dependencyAccumulator.getFunctionDependencies(),
                     dependencyAccumulator.getSystemPropertyDependencies());
         } else {
-            workerGroupStatement = new WorkerGroupStatement(rawData, null, null);
+            workerGroupStatement = new WorkerGroupStatement(value,
+                    override,
+                    null,
+                    null);
         }
 
         return new BasicTransformModellingResult<>(workerGroupStatement, Collections.emptyList());

@@ -30,7 +30,7 @@ public class Regex {
     public static final String NAMESPACE_CHARS = "([\\w\\-" + NAMESPACE_PROPERTY_DELIMITER + "]+)";
     public static final String SIMPLE_NAME_CHARS = "([\\w]+)";
     public static final String RESULT_NAME_CHARS = "([\\w]+)";
-    public static final String VARIABLE_NAME_CHARS = "(([A-Za-z][\\w]*)|([_][\\w]+))";
+    public static final String VARIABLE_NAME_CHARS = "(\\p{L}+[\\w]*)|([_][\\w]+)";
     // match get_sp(key) function
     public static final String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'" + NAMESPACE_CHARS + "'\\s*\\)";
     public static final String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + NAMESPACE_CHARS + "\"\\s*\\)";
@@ -43,6 +43,14 @@ public class Regex {
     public static final String GET_REGEX = "get\\((.+)\\)";
     public static final String GET_REGEX_WITH_DEFAULT = "get\\((.+?),(.+?)\\)";
     public static final String CHECK_EMPTY_REGEX = "check_empty\\((.+?),(.+?)\\)";
+    public static final String CS_APPEND_REGEX = "cs_append\\((.+?),(.+?)\\)";
+    public static final String CS_PREPEND_REGEX = "cs_prepend\\((.+?),(.+?)\\)";
+    public static final String CS_EXTRACT_NUMBER_REGEX = "cs_extract_number\\((.+?)(,(.+?))?\\)";
+    public static final String CS_REPLACE_REGEX = "cs_replace\\((.+?),(.+?),(.+?)(,(.+?))?\\)";
+    public static final String CS_ROUND_REGEX = "cs_round\\((.+?)\\)";
+    public static final String CS_SUBSTRING_REGEX = "cs_substring\\((.+?),(.+?)(,(.+?))?\\)";
+    public static final String CS_TO_UPPER_REGEX = "cs_to_upper\\((.+?)\\)";
+    public static final String CS_TO_LOWER_REGEX = "cs_to_lower\\((.+?)\\)";
 
     //////////////// description
     public static final String DESCRIPTION_START_LINE = "(\\s*)(#!!)(([^#])(.*))*";
@@ -72,7 +80,7 @@ public class Regex {
     public static final String COMMENT_LINE = "(\\s*)(#)(.*)";
 
     // - step_name: data
-    public static final String STEP_START_LINE = "(\\s*)-(\\s*)" + VARIABLE_NAME_CHARS + "(\\s*):(.*)";
+    public static final String STEP_START_LINE = "(\\s*)-(\\s*)(\\p{L}+[\\w]*):(.*)|([_][\\w]+)(\\s*):(.*)";
     public static final int STEP_START_LINE_DATA_GROUP_NR = 3;
 
     public static final String DESCRIPTION_DECLARATION_DELIMITER = "\\s+";

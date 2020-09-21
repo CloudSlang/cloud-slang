@@ -26,6 +26,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.EndBranchDataContainer;
+import io.cloudslang.score.api.StatefulSessionStack;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
@@ -40,12 +41,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static org.apache.commons.lang3.Validate.notNull;
 
 /**
  * Date: 3/25/2015
@@ -80,6 +81,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
+            int parallelismLevel = executionRuntimeServices.getLevelParallelism() != null ?
+                    (int) executionRuntimeServices.getLevelParallelism() : 0;
+            executionRuntimeServices.setLevelParallelism(parallelismLevel + 1);
 
             List<Value> splitData = parallelLoopBinding
                 .bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
@@ -117,6 +121,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 RunEnvironment branchRuntimeEnvironment = (RunEnvironment) SerializationUtils.clone(runEnv);
                 branchRuntimeEnvironment.resetStacks();
 
+                StatefulSessionStack branchStack = branchRuntimeEnvironment.getStatefulSessionsStack();
+                branchStack.pushSessionsMap(new HashMap<>());
+
                 if (parallelLoopStatement instanceof ListLoopStatement) {
                     branchContext.putVariable(((ListLoopStatement) parallelLoopStatement).getVarName(), splitItem);
                 } else if (parallelLoopStatement instanceof MapLoopStatement) {
@@ -126,8 +133,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                         (Value) ((ImmutablePair) splitItem.get()).getRight());
                 }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
-                    branchContext, new HashMap<String, Value>());
-
+                    branchContext, new HashMap<>(), new HashMap<>());
+              
                 createBranch(
                     branchRuntimeEnvironment,
                     executionRuntimeServices,
@@ -141,7 +148,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 runEnv.getExecutionPath().forward();
             }
 
-            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<String, Value>());
+            updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<>(), new HashMap<>());
         } catch (RuntimeException e) {
             logger.error("There was an error running the add branches execution step of: \'" + nodeName +
                 "\'. Error is: " + e.getMessage());
@@ -158,7 +165,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
             runEnv.getExecutionPath().up();
+            notNull(executionRuntimeServices.getLevelParallelism(), "Parallelism level can not be null");
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
+            if ((int) executionRuntimeServices.getLevelParallelism() > 0) {
+                executionRuntimeServices.setLevelParallelism((int) executionRuntimeServices.getLevelParallelism() - 1);
+            }
             Context flowContext = runEnv.getStack().popContext();
 
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext);
@@ -269,10 +280,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
             Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
-        Map<String, Value> outputsBindingContext =
-            io.cloudslang.lang.entities.utils.MapUtils.mergeMaps(Collections.<String, Value>emptyMap(), publishContext);
+        ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(publishContext);
         return outputsBinding.bindOutputs(
-            outputsBindingContext,
+            outputsBindingAccessor,
             runEnv.getSystemProperties(),
             stepPublishValues
         );
@@ -334,7 +344,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                               Long branchBeginStep) {
         Map<String, Serializable> branchContext = new HashMap<>();
         branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
-        executionRuntimeServices.addBranch(branchBeginStep, refId, branchContext);
+        executionRuntimeServices.addBranchForParallelLoop(branchBeginStep, refId, branchContext);
     }
 
     private Map<String, Serializable> convert(Map<String, Value> map) {

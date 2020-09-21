@@ -646,7 +646,7 @@ public class ExecutableBuilder {
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
-        String workerGroup = (String) stepRawData.get(SlangTextualKeys.WORKER_GROUP);
+        String workerGroup = computeWorkerGroupString(stepRawData);
         String robotGroup = (String) stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
 
         String refId = "";
@@ -668,6 +668,17 @@ public class ExecutableBuilder {
         Step step = createStep(stepName, onFailureSection, preStepData, postStepData,
                 arguments, workerGroup, robotGroup, refId, navigationStrings);
         return new StepModellingResult(step, errors);
+    }
+
+    private String computeWorkerGroupString(Map<String, Object> stepRawData) {
+        String workerGroup = null;
+        if (stepRawData.get(SlangTextualKeys.WORKER_GROUP) instanceof String) {
+            workerGroup = (String) stepRawData.get(SlangTextualKeys.WORKER_GROUP);
+        } else if (stepRawData.get(SlangTextualKeys.WORKER_GROUP) instanceof Map) {
+            workerGroup = String.valueOf(
+                    ((Map<String, Object>)stepRawData.get(SlangTextualKeys.WORKER_GROUP)).get(SlangTextualKeys.VALUE));
+        }
+        return workerGroup;
     }
 
     private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,

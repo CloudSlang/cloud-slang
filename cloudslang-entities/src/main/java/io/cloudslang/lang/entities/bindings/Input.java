@@ -9,7 +9,9 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
+import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
@@ -30,6 +32,7 @@ public class Input extends InOutParam {
 
     private boolean required;
     private boolean privateInput;
+    private Prompt prompt;
 
     private Input(InputBuilder inputBuilder) {
         super(inputBuilder.name,
@@ -39,6 +42,7 @@ public class Input extends InOutParam {
         );
         this.required = inputBuilder.required;
         this.privateInput = inputBuilder.privateInput;
+        this.prompt = inputBuilder.prompt;
     }
 
     /**
@@ -54,6 +58,14 @@ public class Input extends InOutParam {
 
     public boolean isPrivateInput() {
         return privateInput;
+    }
+
+    public boolean hasPrompt() {
+        return prompt != null;
+    }
+
+    public Prompt getPrompt() {
+        return prompt;
     }
 
     @Override
@@ -100,6 +112,7 @@ public class Input extends InOutParam {
         private boolean privateInput;
         private Set<ScriptFunction> functionDependencies;
         private Set<String> systemPropertyDependencies;
+        private Prompt prompt;
 
         public InputBuilder(String name, Serializable serializable) {
             this(name, serializable, false);
@@ -131,6 +144,7 @@ public class Input extends InOutParam {
             this.privateInput = input.isPrivateInput();
             this.functionDependencies = input.getFunctionDependencies();
             this.systemPropertyDependencies = input.getSystemPropertyDependencies();
+            this.prompt = input.prompt;
         }
 
         public InputBuilder withRequired(boolean required) {
@@ -150,6 +164,11 @@ public class Input extends InOutParam {
 
         public InputBuilder withSystemPropertyDependencies(Set<String> systemPropertyDependencies) {
             this.systemPropertyDependencies = systemPropertyDependencies;
+            return this;
+        }
+
+        public InputBuilder withPrompt(Prompt prompt) {
+            this.prompt = prompt;
             return this;
         }
 

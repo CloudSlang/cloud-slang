@@ -14,12 +14,14 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.PyObjectValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
 import org.python.core.PyObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -38,22 +40,11 @@ import java.util.stream.Stream;
  */
 @Component
 public class ScriptEvaluator extends ScriptProcessor {
-    private static String LINE_SEPARATOR = System.lineSeparator();
+    private static String LINE_SEPARATOR = "\n";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
     private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
-    private static final String GET_FUNCTION_DEFINITION =
-            "def get(key, default_value=None):" + LINE_SEPARATOR +
-                    "  value = globals().get(key)" + LINE_SEPARATOR +
-                    "  return default_value if value is None else value";
-    private static final String GET_SP_FUNCTION_DEFINITION =
-            "def get_sp(key, default_value=None):" + LINE_SEPARATOR +
-                    "  " + ACCESS_MONITORING_METHOD_NAME + "(key)" + LINE_SEPARATOR +
-                    "  property_value = " + SYSTEM_PROPERTIES_MAP + ".get(key)" + LINE_SEPARATOR +
-                    "  return default_value if property_value is None else property_value";
-    private static final String CHECK_EMPTY_FUNCTION_DEFINITION =
-            "def check_empty(value_to_check, default_value=None):" + LINE_SEPARATOR +
-                    "  return default_value if value_to_check is None else value_to_check";
+
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def " + ACCESS_MONITORING_METHOD_NAME + "(key):" +
             LINE_SEPARATOR + "  pass";
     private static final boolean EXTERNAL_PYTHON = !Boolean.valueOf(
@@ -67,6 +58,9 @@ public class ScriptEvaluator extends ScriptProcessor {
 
     @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService legacyJythonRuntimeService;
+
+    @Autowired
+    private ScriptsService scriptsService;
 
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
@@ -105,23 +99,9 @@ public class ScriptEvaluator extends ScriptProcessor {
     private String buildAddFunctionsScript(Set<ScriptFunction> functionDependencies) {
         String functions = "";
         for (ScriptFunction function : functionDependencies) {
-            switch (function) {
-                case GET:
-                    functions += GET_FUNCTION_DEFINITION;
-                    functions = appendDelimiterBetweenFunctions(functions);
-                    break;
-                case GET_SYSTEM_PROPERTY:
-                    functions += GET_SP_FUNCTION_DEFINITION;
-                    functions = appendDelimiterBetweenFunctions(functions);
-                    break;
-                case CHECK_EMPTY:
-                    functions += CHECK_EMPTY_FUNCTION_DEFINITION;
-                    functions = appendDelimiterBetweenFunctions(functions);
-                    break;
-                default:
-                    throw new RuntimeException("Error adding function to context: '" + function.getValue() +
-                            "' is not valid.");
-            }
+            functions += scriptsService.getScript(function);
+            functions = appendDelimiterBetweenFunctions(functions);
+
             if (!EXTERNAL_PYTHON) {
                 functions += BACKWARD_COMPATIBLE_ACCESS_METHOD;
                 functions = appendDelimiterBetweenFunctions(functions);

@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.scorecompiler;
 
-import ch.lambdaj.Lambda;
 import io.cloudslang.lang.compiler.modeller.model.Decision;
 import io.cloudslang.lang.compiler.modeller.model.ExternalStep;
 import io.cloudslang.lang.compiler.modeller.model.Flow;
@@ -24,6 +23,7 @@ import io.cloudslang.score.api.ExecutionStep;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ExecutionPlanBuilder {
 
     private static final String CLOUDSLANG_NAME = "CloudSlang";
     private static final int NUMBER_OF_STEP_EXECUTION_STEPS = 3; // setWorkerGroupStep + beginStep + endStep
-    private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 3; // setWorkerGroupStep + beginStep + endStep
+    private static final int NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS = 2; // beginStep + endStep
     private static final long FLOW_END_STEP_ID = 0L;
     private static final long FLOW_PRECONDITION_STEP_ID = 1L;
     private static final long FLOW_START_STEP_ID = 2L;
@@ -144,6 +144,10 @@ public class ExecutionPlanBuilder {
 
         //Begin Step
         stepReferences.put(stepName, currentId);
+
+        ExecutionStep workerStep = createWorkerGroupStep(currentId++, step, inheritWorkerGroupFromFlow(
+                step, compiledFlow), step.getRobotGroup());
+        stepExecutionSteps.add(workerStep);
         if (parallelLoop) {
             Long joinStepId = currentId + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS + 1;
             stepExecutionSteps.add(
@@ -152,10 +156,6 @@ public class ExecutionPlanBuilder {
                     )
             );
         }
-
-        ExecutionStep workerStep = createWorkerGroupStep(currentId++, step, inheritWorkerGroupFromFlow(
-                step, compiledFlow));
-        stepExecutionSteps.add(workerStep);
         ExecutionStep executionStep = createBeginStep(currentId++, step, inheritWorkerGroupFromFlow(
                 step, compiledFlow));
         stepExecutionSteps.add(executionStep);
@@ -205,10 +205,9 @@ public class ExecutionPlanBuilder {
     private long getCurrentId(Map<String, Long> stepReferences, Deque<Step> steps) {
         Long currentId;
 
-        long max = Lambda.max(stepReferences);
-        Map.Entry maxEntry = selectFirst(stepReferences.entrySet(),
-                having(on(Map.Entry.class).getValue(), equalTo(max)));
-        String referenceKey = (String) (maxEntry).getKey();
+        Map.Entry maxEntry = Collections.max(stepReferences.entrySet(), Map.Entry.comparingByValue());
+        long max = (long) maxEntry.getValue();
+        String referenceKey = (String) maxEntry.getKey();
         Step step = null;
         for (Step stepItem : steps) {
             if (stepItem.getName().equals(referenceKey)) {
@@ -225,8 +224,7 @@ public class ExecutionPlanBuilder {
             currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS;
         } else {
             //async step
-            //the -1 is needed because setWorkerGroupStep is taken into consideration for both parallel and normal steps
-            currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS - 1;
+            currentId = max + NUMBER_OF_STEP_EXECUTION_STEPS + NUMBER_OF_PARALLEL_LOOP_EXECUTION_STEPS;
         }
 
         return currentId;
@@ -251,12 +249,13 @@ public class ExecutionPlanBuilder {
                 step.getPreStepActionData(), step.getRefId(), step.getName(), workerGroup);
     }
 
-    private ExecutionStep createWorkerGroupStep(Long id, Step step, String workerGroup) {
+    private ExecutionStep createWorkerGroupStep(Long id, Step step, String workerGroup, String robotGroup) {
         if (step instanceof ExternalStep) {
             return externalStepFactory.createWorkerGroupExternalFlowStep(id, step.getPreStepActionData(),
                     step.getName(), workerGroup);
         }
-        return stepFactory.createWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup);
+        return stepFactory.createWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup,
+                robotGroup);
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {

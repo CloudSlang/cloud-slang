@@ -19,24 +19,32 @@ import java.util.Set;
 
 public class AbstractInOutForTransformer {
 
-    protected Accumulator extractFunctionData(Serializable value) {
-        String expression = ExpressionUtils.extractExpression(value);
-        Set<String> systemPropertyDependencies = new HashSet<>();
-        Set<ScriptFunction> functionDependencies = new HashSet<>();
-        if (expression != null) {
-            systemPropertyDependencies = ExpressionUtils.extractSystemProperties(expression);
-            if (CollectionUtils.isNotEmpty(systemPropertyDependencies)) {
-                functionDependencies.add(ScriptFunction.GET_SYSTEM_PROPERTY);
-            }
-            boolean getFunctionFound = ExpressionUtils.matchGetFunction(expression);
-            if (getFunctionFound) {
-                functionDependencies.add(ScriptFunction.GET);
-            }
-            boolean checkEmptyFunctionFound = ExpressionUtils.matchCheckEmptyFunction(expression);
-            if (checkEmptyFunctionFound) {
-                functionDependencies.add(ScriptFunction.CHECK_EMPTY);
+    protected Accumulator extractFunctionData(Serializable... values) {
+        final Set<String> systemPropertyDependencies = new HashSet<>();
+        final Set<ScriptFunction> functionDependencies = new HashSet<>();
+
+        for (Serializable value : values) {
+            String expression = ExpressionUtils.extractExpression(value);
+            if (expression != null) {
+                Set<String> propertyDependencies = ExpressionUtils.extractSystemProperties(expression);
+                if (CollectionUtils.isNotEmpty(propertyDependencies)) {
+                    functionDependencies.add(ScriptFunction.GET_SYSTEM_PROPERTY);
+                    systemPropertyDependencies.addAll(propertyDependencies);
+                }
+
+                boolean getFunctionFound = ExpressionUtils.matchGetFunction(expression);
+                if (getFunctionFound) {
+                    functionDependencies.add(ScriptFunction.GET);
+                }
+
+                for (ScriptFunction function : ScriptFunction.values()) {
+                    if (ExpressionUtils.matchesFunction(function, expression)) {
+                        functionDependencies.add(function);
+                    }
+                }
             }
         }
+
         return new Accumulator(functionDependencies, systemPropertyDependencies);
     }
 

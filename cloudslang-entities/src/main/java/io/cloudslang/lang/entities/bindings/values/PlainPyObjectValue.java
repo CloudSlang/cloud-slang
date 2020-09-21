@@ -16,10 +16,10 @@ import java.io.Serializable;
 @JsonSerialize(using = PlainPyObjectValueSerializer.class)
 public class PlainPyObjectValue implements PyObjectValue {
     private static final long serialVersionUID = -2981575572912695201L;
-    private final String value;
+    private final Serializable value;
     private final boolean sensitive;
 
-    public PlainPyObjectValue(String value, boolean sensitive) {
+    public PlainPyObjectValue(Serializable value, boolean sensitive) {
         this.value = value;
         this.sensitive = sensitive;
     }
@@ -41,6 +41,6 @@ public class PlainPyObjectValue implements PyObjectValue {
 
     @Override
     public String toString() {
-        return value;
+        return value == null ? "" : value.toString();
     }
 }

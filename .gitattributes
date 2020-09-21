@@ -1,0 +1,36 @@
+# Common files
+*.java text eol=lf
+*.md text eol=lf
+*.xml text eol=lf
+*.properties text eol=lf
+*.py text eol=lf
+*.pom text eol=lf
+*.template text eol=lf
+
+# Git
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+
+# Configuration
+*.wrong text eol=lf
+*.conf text eol=lf
+*.txt text eol=lf
+
+# Scripts
+*.sh text eol=lf
+
+# Slang files
+*.sl text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Web
+*.css text eol=lf
+*.js text eol=lf
+
+LICENSE text eol=lf
+
+# Binary types
+*.jar binary
+*.zip binary
+*.png binary

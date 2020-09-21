@@ -24,20 +24,26 @@ import io.cloudslang.runtime.api.java.JavaRuntimeService;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.python.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SEQUENTIAL;
@@ -54,6 +60,14 @@ public class ActionExecutionData extends AbstractExecutionData {
     public static final String PACKAGING_TYPE_JAR = "jar";
     public static final String PACKAGING_TYPE_ZIP = "zip";
     public static final int GAV_PARTS = 3;
+
+    private static final String RETURN_CODE = "returnCode";
+    private static final String EXCEPTION = "exception";
+    private static final String MARKER = "Exception: ";
+
+    private static final boolean REMOVE_MESSAGE_FROM_LOGGED_EX =
+            Boolean.parseBoolean(
+                    System.getProperty("worker.execution.sanitizeOperationStacktrace","false"));
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -193,7 +207,41 @@ public class ActionExecutionData extends AbstractExecutionData {
         if (returnMap == null) {
             throw new RuntimeException("Action method did not return Map<String,String>");
         }
+
+        final Serializable exception = returnMap.get(EXCEPTION);
+        if (exception != null) {
+            logException(exception.toString());
+        }
+
         return handleSensitiveValues(returnMap, currentContext);
+    }
+
+    private void logException(String exception) {
+
+        String stacktrace = exception;
+
+        if (REMOVE_MESSAGE_FROM_LOGGED_EX) {
+            StringWriter writer = new StringWriter();
+            final PrintWriter printWriter = new PrintWriter(writer);
+
+            BufferedReader reader = new BufferedReader(new StringReader(stacktrace));
+
+            final ListIterator<String> iterator = reader.lines().collect(Collectors.toList()).listIterator();
+
+            while (iterator.hasNext()) {
+                String line = iterator.next();
+                int idx = line.indexOf(MARKER);
+                String str = idx == -1 ? line : line.substring(0, idx + MARKER.length());
+
+                printWriter.println(str);
+            }
+
+            printWriter.close();
+
+            stacktrace = writer.toString();
+        }
+
+        logger.error("Java operation encountered an exception:\n" + stacktrace);
     }
 
     protected Map<String, Serializable> createActionContext(Map<String, Value> context) {
@@ -245,8 +293,15 @@ public class ActionExecutionData extends AbstractExecutionData {
     private Map<String, Value> prepareAndRunPythonAction(Collection<String> dependencies, String pythonScript,
                                                          Map<String, Value> callArguments, boolean useJython) {
         if (StringUtils.isNotBlank(pythonScript)) {
-            return scriptExecutor.executeScript(
+            final Map<String, Value> returnedMap = scriptExecutor.executeScript(
                     normalizePythonDependencies(dependencies), pythonScript, callArguments, useJython);
+
+            final Value ex = returnedMap.get(EXCEPTION);
+            if (ex != null) {
+                logger.error("Python operation encountered an exception: " + ex.toString());
+            }
+
+            return returnedMap;
         }
 
         throw new RuntimeException("Python script not found in action data");

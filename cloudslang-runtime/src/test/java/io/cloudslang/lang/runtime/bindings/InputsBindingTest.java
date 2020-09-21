@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -188,7 +189,7 @@ public class InputsBindingTest {
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
         List<Input> missingInputs = new ArrayList<>();
-        bindInputs(inputs, new HashMap<>(), new HashSet<>(), missingInputs);
+        bindInputs(inputs, new HashMap<>(), new HashMap<>(), new HashSet<>(), missingInputs);
 
         Assert.assertEquals(inputs, missingInputs);
     }
@@ -458,12 +459,14 @@ public class InputsBindingTest {
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context,
+                                          Map<String, Value> promptArgs,
                                           Set<SystemProperty> systemProperties, List<Input> missingInputs) {
-        return inputsBinding.bindInputs(inputs, context, systemProperties, missingInputs);
+        return inputsBinding.bindInputs(inputs, context, promptArgs, systemProperties, missingInputs,
+                false, new HashMap<>());
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context) {
-        return bindInputs(inputs, context, null, null);
+        return bindInputs(inputs, context, Collections.emptyMap(), null, null);
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs) {
@@ -481,6 +484,11 @@ public class InputsBindingTest {
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return new ScriptEvaluator();
+        }
+
+        @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
         }
 
         @Bean

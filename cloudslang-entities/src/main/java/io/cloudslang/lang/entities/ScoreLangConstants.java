@@ -65,6 +65,9 @@ public interface ScoreLangConstants {
     String BREAK_LOOP_KEY = "breakOn";
     String STEP_INPUTS_RESULT_CONTEXT = "stepInputsResultContext";
     String WORKER_GROUP = "workerGroup";
+    String WORKER_GROUP_VALUE = "workerGroupValue";
+    String WORKER_GROUP_OVERRIDE = "workerGroupOverride";
+    String ROBOT_GROUP = "robotGroup";
 
     // parallel loop
     String PARALLEL_LOOP_KEY = "parallelLoop";
@@ -100,4 +103,5 @@ public interface ScoreLangConstants {
 
     //prompting
     String PROMPTED_USER_INPUTS_KEY = "PROMPTED_USER_INPUTS_KEY";
+    String USE_EMPTY_VALUES_FOR_PROMPTS_KEY = "useEmptyValuesForPrompts";
 }

@@ -13,17 +13,15 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.steps.ReadOnlyContextAccessor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
 
@@ -39,12 +37,12 @@ public class OutputsBinding extends AbstractBinding {
     ScriptEvaluator scriptEvaluator;
 
     public Map<String, Value> bindOutputs(
-            Map<String, Value> initialContext,
+            ReadOnlyContextAccessor contextAccessor,
             Set<SystemProperty> systemProperties,
             List<Output> possibleOutputs) {
 
         Map<String, Value> outputs = new LinkedHashMap<>();
-        Map<String, Value> context = new HashMap<>(initialContext);
+        Map<String, Value> context = contextAccessor.getMergedContexts();
 
         if (possibleOutputs != null) {
             for (Output output : possibleOutputs) {

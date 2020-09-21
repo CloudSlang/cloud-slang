@@ -17,6 +17,8 @@ import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
+import io.cloudslang.lang.entities.WorkerGroupMetadata;
+import io.cloudslang.lang.entities.WorkerGroupStatement;
 import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
@@ -34,6 +36,7 @@ import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
@@ -61,6 +64,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -71,7 +75,8 @@ import java.util.concurrent.Semaphore;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyMapOf;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyListOf;
@@ -101,7 +106,9 @@ public class StepExecutionDataTest {
 
     private RunEnvironment createRunEnvironment() {
         RunEnvironment runEnvironment = new RunEnvironment();
-        runEnvironment.getStack().pushContext(new Context(new HashMap<String, Value>()));
+        runEnvironment.getStack().pushContext(new Context(
+                new HashMap<String, Value>(),
+                Collections.<String,Value>emptyMap()));
         return runEnvironment;
     }
 
@@ -158,9 +165,9 @@ public class StepExecutionDataTest {
         resultMap.put("input2", ValueFactory.create(3));
 
         when(argumentsBinding.bindArguments(
-            eq(arguments),
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties())
+                eq(arguments),
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties())
         )).thenReturn(resultMap);
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
@@ -219,13 +226,13 @@ public class StepExecutionDataTest {
     public void testEndStepEvents() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
 
         when(outputsBinding.bindOutputs(
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            anyListOf(Output.class)))
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties()),
+                anyListOf(Output.class)))
             .thenReturn(new HashMap<String, Value>());
 
         ExecutionRuntimeServices runtimeServices = createRuntimeServices();
@@ -259,16 +266,16 @@ public class StepExecutionDataTest {
         final List<Output> possiblePublishValues = singletonList(new Output("name", ValueFactory.create("name")));
         RunEnvironment runEnv = createRunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), ScoreLangConstants.SUCCESS_RESULT));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
 
         Map<String, Value> boundPublish = new HashMap<>();
         boundPublish.put("name", ValueFactory.create("John"));
 
         when(outputsBinding.bindOutputs(
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            eq(possiblePublishValues)))
+                any(ReadOnlyContextAccessor.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possiblePublishValues)))
             .thenReturn(boundPublish);
         HashMap<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         stepNavigationValues
@@ -285,7 +292,7 @@ public class StepExecutionDataTest {
     public void testEndStepSetNextPosition() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         String result = ScoreLangConstants.SUCCESS_RESULT;
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), result));
 
@@ -306,7 +313,7 @@ public class StepExecutionDataTest {
     public void testEndStepMissingNavigationForExecutableResult() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         String result = "CUSTOM";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(), Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), result));
 
@@ -329,7 +336,7 @@ public class StepExecutionDataTest {
     public void testEndStepParallelLoopReturnValues() throws Exception {
         RunEnvironment runEnv = createRunEnvironment();
         String result = ScoreLangConstants.SUCCESS_RESULT;
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), result));
         Long nextStepPosition = 5L;
@@ -354,6 +361,84 @@ public class StepExecutionDataTest {
         );
     }
 
+    @Test
+    public void testSetWorkerGroupStepWithOverrideTrue() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue2",true));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue3", false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+
+        stepExecutionData.setWorkerGroupStep(null, runEnvironment,
+                executionRuntimeServices,"step1", 2L, null);
+        assertEquals("workerGroupValue2", executionRuntimeServices.getWorkerGroupName());
+    }
+
+    @Test
+    public void testSetWorkerGroupStepWithOverrideFalse() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue2",false));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue3",false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+
+        stepExecutionData.setWorkerGroupStep(null, runEnvironment,
+                executionRuntimeServices, "step1", 1L, null);
+        assertEquals("workerGroupValue3", executionRuntimeServices.getWorkerGroupName());
+    }
+
+    @Test
+    public void testSetWorkerGroup() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue2",false));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata("workerGroupValue3",false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+        WorkerGroupStatement workerGroupStatement =
+                new WorkerGroupStatement("workerValue", false, null, null);
+
+        stepExecutionData.setWorkerGroupStep(workerGroupStatement, runEnvironment,
+                executionRuntimeServices, "step1", 2L, null);
+        assertEquals("workerValue", executionRuntimeServices.getWorkerGroupName());
+    }
+
+    @Test
+    public void testSetWorkerGroupWithNulls() {
+        RunEnvironment runEnvironment = createRunEnvironment();
+        ParentFlowData parentFlowData1 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null,true));
+        ParentFlowData parentFlowData2 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, false));
+        ParentFlowData parentFlowData3 = new ParentFlowData(1L, 1L,
+                new WorkerGroupMetadata(null, false));
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData1);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData2);
+        runEnvironment.getParentFlowStack().pushParentFlowData(parentFlowData3);
+        ExecutionRuntimeServices executionRuntimeServices = createRuntimeServices();
+
+        stepExecutionData.setWorkerGroupStep(null, runEnvironment,
+                executionRuntimeServices, "step1", 2L, null);
+        assertEquals("RAS_Operator_Path", executionRuntimeServices.getWorkerGroupName());
+    }
+
     /////////
     //loops//
     /////////
@@ -363,7 +448,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         RunEnvironment runEnv = new RunEnvironment();
         when(loopsBinding.getOrCreateLoopCondition(statement, context, runEnv.getSystemProperties(), nodeName))
             .thenReturn(new ForLoopCondition(Arrays.asList(ValueFactory.create("1"), ValueFactory.create("2"))));
@@ -378,7 +463,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         RunEnvironment runEnv = new RunEnvironment();
         when(mockLoopCondition.hasMore()).thenReturn(false);
@@ -391,7 +476,7 @@ public class StepExecutionDataTest {
             runtimeServices, nodeName, 1L, nextStepId, "2", null);
         assertEquals(nextStepId, runEnv.removeNextStepPosition());
         assertEquals(context, runEnv.getStack().popContext());
-        Assert.assertNull(runtimeServices.pullRequestForChangingExecutionPlan());
+        assertNull(runtimeServices.pullRequestForChangingExecutionPlan());
     }
 
     @Test
@@ -399,7 +484,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         RunEnvironment runEnv = new RunEnvironment();
         when(mockLoopCondition.hasMore()).thenReturn(true);
@@ -422,7 +507,7 @@ public class StepExecutionDataTest {
         String collectionExpression = "collection";
         LoopStatement statement = createBasicForStatement("x", collectionExpression);
         String nodeName = "step1";
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(), Collections.<String,Value>emptyMap());
         ForLoopCondition mockLoopCondition = mock(ForLoopCondition.class);
         RunEnvironment runEnv = new RunEnvironment();
         when(mockLoopCondition.hasMore()).thenReturn(true);
@@ -440,7 +525,7 @@ public class StepExecutionDataTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), "SUCCESS"));
         HashMap<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         stepNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(mockLoopCondition));
@@ -462,7 +547,7 @@ public class StepExecutionDataTest {
         Long nextStepId = 3L;
         stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT,
             new ResultNavigation(nextStepId, ScoreLangConstants.SUCCESS_RESULT));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(mockLoopCondition));
@@ -485,7 +570,7 @@ public class StepExecutionDataTest {
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), "SUCCESS"));
         HashMap<String, ResultNavigation> stepNavigationValues = new HashMap<>();
         stepNavigationValues.put("SUCCESS", new ResultNavigation(3L, "SUCCESS"));
-        Context context = new Context(new HashMap<String, Value>());
+        Context context = new Context(new HashMap<String, Value>(),Collections.<String,Value>emptyMap());
         runEnv.getStack().pushContext(context);
         LoopCondition mockLoopCondition = mock(LoopCondition.class);
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(mockLoopCondition));
@@ -532,6 +617,11 @@ public class StepExecutionDataTest {
         @Bean
         public ScriptEvaluator scriptEvaluator() {
             return mock(ScriptEvaluator.class);
+        }
+
+        @Bean
+        public ScriptsService scriptsService() {
+            return new ScriptsService();
         }
 
         @Bean

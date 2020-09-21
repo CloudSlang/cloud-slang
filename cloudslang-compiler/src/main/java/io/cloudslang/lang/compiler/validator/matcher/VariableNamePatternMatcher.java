@@ -18,6 +18,6 @@ import java.util.regex.Pattern;
  */
 public class VariableNamePatternMatcher extends PatternMatcher {
     public VariableNamePatternMatcher() {
-        super(Pattern.compile(Regex.VARIABLE_NAME_CHARS));
+        super(Pattern.compile(Regex.VARIABLE_NAME_CHARS, Pattern.UNICODE_CHARACTER_CLASS));
     }
 }

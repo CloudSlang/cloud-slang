@@ -16,6 +16,8 @@ import io.cloudslang.lang.runtime.events.LanguageEventData.StepType;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +27,13 @@ import java.util.Map;
 public interface MissingInputHandler {
 
     /**
-     * @param missingInputs     the list of inputs for
-     * @param systemContext     the system context
-     * @param runEnv            the run environment
-     * @param runtimeServices   the runtime services
-     * @param stepType          the step type
-     * @param stepName          the step name
+     * @param missingInputs           the list of inputs for
+     * @param systemContext           the system context
+     * @param runEnv                  the run environment
+     * @param runtimeServices         the runtime services
+     * @param stepType                the step type
+     * @param stepName                the step name
+     * @param emptyValuesForPrompts   the flag to force empty value for prompts
      * @return                  boolean flag to indicate if engine can continue
      */
     boolean resolveMissingInputs(List<Input> missingInputs,
@@ -38,13 +41,14 @@ public interface MissingInputHandler {
                                  RunEnvironment runEnv,
                                  ExecutionRuntimeServices runtimeServices,
                                  StepType stepType,
-                                 String stepName);
+                                 String stepName,
+                                 boolean emptyValuesForPrompts);
 
     /**
      * @param systemContext the system context
-     * @param callArguments list of call arguments that could get enhanced in this call
+     * @return map of values provided by user
      */
-    default void applyPromptInputValues(SystemContext systemContext, Map<String, Value> callArguments) {
-
+    default Map<String, ? extends Value> applyPromptInputValues(SystemContext systemContext, Collection<Input> inputs) {
+        return Collections.emptyMap();
     }
 }

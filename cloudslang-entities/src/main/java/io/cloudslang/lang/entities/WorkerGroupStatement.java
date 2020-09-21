@@ -21,28 +21,36 @@ import java.util.Set;
 public class WorkerGroupStatement implements Serializable {
 
     private final String expression;
+    private final boolean override;
     private final Set<ScriptFunction> functionDependencies;
     private final Set<String> systemPropertyDependencies;
 
     public WorkerGroupStatement(String expression,
+                                boolean override,
                                 Set<ScriptFunction> functionDependencies,
                                 Set<String> systemPropertyDependencies) {
 
         Validate.notBlank(expression, "worker group expression cannot be empty");
 
         this.expression = expression;
+        this.override = override;
         this.functionDependencies = functionDependencies;
         this.systemPropertyDependencies = systemPropertyDependencies;
     }
 
     protected WorkerGroupStatement() {
         expression = null;
+        override = false;
         functionDependencies = null;
         systemPropertyDependencies = null;
     }
 
     public String getExpression() {
         return expression;
+    }
+
+    public boolean isOverride() {
+        return override;
     }
 
     public Set<ScriptFunction> getFunctionDependencies() {

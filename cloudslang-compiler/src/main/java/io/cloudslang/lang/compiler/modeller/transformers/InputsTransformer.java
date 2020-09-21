@@ -57,7 +57,7 @@ public class InputsTransformer extends AbstractInputsTransformer implements Tran
                 errors.add(rex);
             }
         }
-        return new BasicTransformModellingResult<>(transformedData, errors);
+        return new BasicTransformModellingResult<>(Collections.unmodifiableList(transformedData), errors);
     }
 
     @Override

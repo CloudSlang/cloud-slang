@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.bindings;
 
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.util.Set;
@@ -20,6 +21,7 @@ import java.util.Set;
 public class Argument extends InOutParam {
 
     private boolean privateArgument;
+    private Prompt prompt;
 
     public Argument(String name, Value value) {
         super(name, value);
@@ -50,6 +52,17 @@ public class Argument extends InOutParam {
         privateArgument = false;
     }
 
+    public Argument(String name,
+                    Value value,
+                    Set<ScriptFunction> functionDependencies,
+                    Set<String> systemPropertyDependencies,
+                    boolean privateArgument,
+                    Prompt prompt) {
+        super(name, value, functionDependencies, systemPropertyDependencies);
+        this.privateArgument = privateArgument;
+        this.prompt = prompt;
+    }
+
     /**
      * only here to satisfy serialization libraries
      */
@@ -61,4 +74,11 @@ public class Argument extends InOutParam {
         return privateArgument;
     }
 
+    public boolean hasPrompt() {
+        return prompt != null;
+    }
+
+    public Prompt getPrompt() {
+        return prompt;
+    }
 }
