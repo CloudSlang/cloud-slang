@@ -13,9 +13,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.steps.ReadOnlyContextAccessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
@@ -32,9 +30,6 @@ import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpressio
  */
 @Component
 public class OutputsBinding extends AbstractBinding {
-
-    @Autowired
-    ScriptEvaluator scriptEvaluator;
 
     public Map<String, Value> bindOutputs(
             ReadOnlyContextAccessor contextAccessor,

@@ -13,8 +13,10 @@ import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
+import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Input;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
@@ -50,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
@@ -456,6 +460,68 @@ public class InputsBindingTest {
         Assert.assertEquals(1, result.size());
 
         Assert.assertEquals("orig context should not change", 1, context.size());
+    }
+
+    @Test
+    public void testInputsWithPromptExpressions() {
+        Map<String, Value> context = new HashMap<>();
+        context.put("messageContainer1", ValueFactory.create("(What's the story?)"));
+        context.put("messageContainer2", ValueFactory.create("Hey hey!"));
+        context.put("messageContainer3", ValueFactory.create("Rock 'n' Roll"));
+        context.put("singleChoiceDelimiter", ValueFactory.create("|"));
+        context.put("singleChoiceOptions", ValueFactory.create("1|2|3"));
+        context.put("multiChoiceDelimiter", ValueFactory.create("!"));
+        context.put("multiChoiceOptions", ValueFactory.create("x!y!z"));
+
+        Prompt textPrompt = new Prompt.PromptBuilder()
+                .setPromptType(PromptType.TEXT)
+                .setPromptMessage("${messageContainer1 + ' Morning glory'}")
+                .build();
+
+        Prompt singleChoicePrompt = new Prompt.PromptBuilder()
+                .setPromptType(PromptType.SINGLE_CHOICE)
+                .setPromptMessage("${messageContainer2 + ' My my!'}")
+                .setPromptOptions("${singleChoiceOptions}")
+                .setPromptDelimiter("${singleChoiceDelimiter}")
+                .build();
+
+        Prompt multiChoicePrompt = new Prompt.PromptBuilder()
+                .setPromptType(PromptType.MULTI_CHOICE)
+                .setPromptMessage("${messageContainer3 + ' will never die'}")
+                .setPromptOptions("${multiChoiceOptions}")
+                .setPromptDelimiter("${multiChoiceDelimiter}")
+                .build();
+
+        Input input1 = new Input.InputBuilder("input1", ValueFactory.create(""), false)
+                .withPrompt(textPrompt)
+                .build();
+
+        Input input2 = new Input.InputBuilder("input2", ValueFactory.create(""), false)
+                .withPrompt(singleChoicePrompt)
+                .build();
+
+        Input input3 = new Input.InputBuilder("input3", ValueFactory.create(""), false)
+                .withPrompt(multiChoicePrompt)
+                .build();
+
+
+        List<Input> result = new ArrayList<>();
+        bindInputs(Arrays.asList(input1, input2, input3), context, new HashMap<>(), new HashSet<>(), result);
+        assertEquals(3, result.size());
+
+        Input missingInput1 = result.get(0);
+        assertEquals("(What's the story?) Morning glory", missingInput1.getPrompt().getPromptMessage());
+
+        Input missingInput2 = result.get(1);
+        assertEquals("Hey hey! My my!", missingInput2.getPrompt().getPromptMessage());
+        assertEquals("|", missingInput2.getPrompt().getPromptDelimiter());
+        assertEquals("1|2|3", missingInput2.getPrompt().getPromptOptions());
+
+        Input missingInput3 = result.get(2);
+        assertEquals("Rock 'n' Roll will never die", missingInput3.getPrompt().getPromptMessage());
+        assertEquals("!", missingInput3.getPrompt().getPromptDelimiter());
+        assertEquals("x!y!z", missingInput3.getPrompt().getPromptOptions());
+
     }
 
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context,

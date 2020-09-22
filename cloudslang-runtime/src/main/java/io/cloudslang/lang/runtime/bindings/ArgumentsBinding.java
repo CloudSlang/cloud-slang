@@ -11,20 +11,16 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
-import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.steps.ReadOnlyContextAccessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
 
 /**
  * @author Bonczidai Levente
@@ -32,9 +28,6 @@ import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpressio
  */
 @Component
 public class ArgumentsBinding extends AbstractBinding {
-
-    @Autowired
-    private ScriptEvaluator scriptEvaluator;
 
     public Map<String, Value> bindArguments(
             List<Argument> arguments,
@@ -79,35 +72,25 @@ public class ArgumentsBinding extends AbstractBinding {
 
         try {
             inputValue = srcContext.get(inputName);
+
+            EvaluationContextHolder evaluationContextHolder =
+                    new EvaluationContextHolder(srcContext,
+                            targetContext,
+                            systemProperties,
+                            inputValue,
+                            inputName,
+                            argument.getFunctionDependencies());
+
             if (argument.isPrivateArgument()) {
                 Value rawValue = argument.getValue();
-                String expressionToEvaluate = extractExpression(rawValue == null ? null : rawValue.get());
-                if (expressionToEvaluate != null) {
-                    //we do not want to change original context map
-                    Map<String, Value> scriptContext =
-                            createEvaluationContext(srcContext, targetContext, inputValue, inputName);
-                    inputValue = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
-                            argument.getFunctionDependencies());
-                } else {
-                    inputValue = rawValue;
-                }
+
+                Serializable expression = rawValue == null ? null : rawValue.get();
+
+                inputValue = tryEvaluateExpression(expression, evaluationContextHolder).orElse(rawValue);
             }
 
             if (argument.hasPrompt()) {
-                Prompt prompt = argument.getPrompt();
-                String expressionToEvaluate = extractExpression(prompt.getPromptMessage());
-                if (expressionToEvaluate != null) {
-                    //we do not want to change original context map
-                    Map<String, Value> evaluationContext =
-                            createEvaluationContext(srcContext, targetContext, inputValue, inputName);
-
-                    Value result = scriptEvaluator.evalExpr(expressionToEvaluate,
-                            evaluationContext,
-                            systemProperties,
-                            argument.getFunctionDependencies());
-
-                    prompt.setPromptMessage(Value.toStringSafeEmpty(result));
-                }
+                resolvePromptExpressions(argument.getPrompt(), evaluationContextHolder.overrideInputValue(inputValue));
             }
 
             inputValue = handleSensitiveModifier(inputValue, argument.isSensitive());
@@ -118,16 +101,8 @@ public class ArgumentsBinding extends AbstractBinding {
         targetContext.put(inputName, inputValue);
     }
 
-    private Map<String, Value> createEvaluationContext(Map<String, ? extends Value> srcContext,
-                                                       Map<String, Value> targetContext,
-                                                       Value inputValue,
-                                                       String inputName) {
-        Map<String, Value> evaluationContext = new HashMap<>(srcContext);
-        evaluationContext.put(inputName, inputValue);
-        //so you can resolve previous arguments already bound
-        evaluationContext.putAll(targetContext);
-        return evaluationContext;
-    }
+
+
 
     private Value handleSensitiveModifier(Value initialValue, boolean sensitive) {
         return ValueFactory.create(initialValue, sensitive);

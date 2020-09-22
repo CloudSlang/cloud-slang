@@ -11,20 +11,31 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.utils.ValidationUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.python.core.PyObject;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpression;
 
 public class AbstractBinding {
+
+    @Autowired
+    protected ScriptEvaluator scriptEvaluator;
 
     protected void validateStringValue(String errorMessagePrefix, Value value) {
         if (value != null) {
@@ -77,4 +88,42 @@ public class AbstractBinding {
         }
         return values;
     }
+
+    protected Optional<Value> tryEvaluateExpression(Serializable expression,
+                                                    EvaluationContextHolder evaluationContextHolder) {
+        String expressionToEvaluate = extractExpression(expression);
+
+        if (expressionToEvaluate != null) {
+            Map<String, Value> evaluationContext = evaluationContextHolder.createEvaluationContext();
+
+            return Optional.of(scriptEvaluator.evalExpr(expressionToEvaluate,
+                    evaluationContext,
+                    evaluationContextHolder.getSystemProperties(),
+                    evaluationContextHolder.getFunctionDependencies()));
+        }
+
+        return Optional.empty();
+    }
+
+    protected void resolvePromptExpressions(Prompt prompt, EvaluationContextHolder evaluationContextHolder) {
+
+        //prompt message
+        tryEvaluateExpression(prompt.getPromptMessage(), evaluationContextHolder)
+                .map(Value::toStringSafeEmpty)
+                .ifPresent(prompt::setPromptMessage);
+
+        //in case of single/multi-choice
+        if (prompt.getPromptType().isChoiceLike()) {
+            //prompt options
+            tryEvaluateExpression(prompt.getPromptOptions(), evaluationContextHolder)
+                    .map(Value::toStringSafeEmpty)
+                    .ifPresent(prompt::setPromptOptions);
+
+            //prompt delimiter
+            tryEvaluateExpression(prompt.getPromptDelimiter(), evaluationContextHolder)
+                    .map(Value::toStringSafeEmpty)
+                    .ifPresent(prompt::setPromptDelimiter);
+        }
+    }
+
 }

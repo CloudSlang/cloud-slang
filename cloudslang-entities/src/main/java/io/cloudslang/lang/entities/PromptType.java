@@ -32,4 +32,8 @@ public enum PromptType {
         }
         return null;
     }
+
+    public boolean isChoiceLike() {
+        return this == SINGLE_CHOICE || this == MULTI_CHOICE;
+    }
 }

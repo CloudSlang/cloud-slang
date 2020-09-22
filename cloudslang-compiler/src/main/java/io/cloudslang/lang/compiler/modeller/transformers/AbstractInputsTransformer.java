@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
@@ -27,27 +26,20 @@ import java.util.Map;
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DEFAULT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PRIVATE_INPUT_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_DELIMITER_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_MESSAGE_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_OPTIONS_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_TYPE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.REQUIRED_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 public abstract class AbstractInputsTransformer extends InOutTransformer {
 
-    private static final String DEFAULT_PROMPT_MESSAGE = "Enter a value for '%s'";
     private static final HashSet<String> KNOWN_KEYS = newHashSet(
             REQUIRED_KEY,
             SENSITIVE_KEY,
             PRIVATE_INPUT_KEY,
             DEFAULT_KEY,
             PROMPT_KEY);
-    private static final String DEFAULT_DELIMITER = ",";
 
     protected PreCompileValidator preCompileValidator;
 
@@ -159,12 +151,8 @@ public abstract class AbstractInputsTransformer extends InOutTransformer {
         executableValidator.validateInputName(name);
         preCompileValidator.validateStringValue(name, value, this);
 
-        String messageValue = null;
-        if (prompt != null) {
-            messageValue = prompt.getPromptMessage();
-        }
+        Accumulator dependencyAccumulator = getDependencyAccumulator(value, prompt);
 
-        Accumulator dependencyAccumulator = extractFunctionData(value, messageValue);
         return new Input.InputBuilder(name, value, sensitive, sensitivityLevel)
                 .withRequired(required)
                 .withPrivateInput(privateInput)

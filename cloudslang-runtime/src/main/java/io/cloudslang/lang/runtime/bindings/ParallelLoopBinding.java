@@ -12,14 +12,12 @@ package io.cloudslang.lang.runtime.bindings;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
-import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,9 +30,6 @@ public class ParallelLoopBinding extends AbstractBinding {
 
     public static final String PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE =
             "Error evaluating parallel loop expression in step";
-
-    @Autowired
-    private ScriptEvaluator scriptEvaluator;
 
     public static String generateParallelLoopExpressionMessage(String nodeName, String message) {
         return PARALLEL_LOOP_EXPRESSION_ERROR_MESSAGE + " '" + nodeName + "', error is: \n" + message;

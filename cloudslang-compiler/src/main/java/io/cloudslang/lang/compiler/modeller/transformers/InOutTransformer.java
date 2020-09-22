@@ -13,6 +13,7 @@ import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.bindings.InOutParam;
 import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PROMPT_DELIMITER_KEY;
@@ -45,6 +46,19 @@ public abstract class InOutTransformer extends AbstractInOutForTransformer {
                 .setPromptOptions(promptSettings.get(PROMPT_OPTIONS_KEY))
                 .setPromptDelimiter(promptSettings.get(PROMPT_DELIMITER_KEY))
                 .build();
+    }
+
+    protected Accumulator getDependencyAccumulator(Serializable value, Prompt prompt) {
+        String messageValue = null;
+        String options = null;
+        String delimiter = null;
+        if (prompt != null) {
+            messageValue = prompt.getPromptMessage();
+            options = prompt.getPromptOptions();
+            delimiter = prompt.getPromptDelimiter();
+        }
+
+        return extractFunctionData(value, messageValue, options, delimiter);
     }
 
 }
