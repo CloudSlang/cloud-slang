@@ -415,7 +415,8 @@ public class ExecutableStepsTest {
         @Bean
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
-                    executionPreconditionService(), missingInputHandler(), csMagicVariableHelper(), debuggerBreakpointHandler());
+                    executionPreconditionService(), missingInputHandler(), csMagicVariableHelper(),
+                    debuggerBreakpointHandler());
         }
 
         @Bean
