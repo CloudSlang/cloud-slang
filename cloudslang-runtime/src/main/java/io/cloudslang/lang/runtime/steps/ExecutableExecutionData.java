@@ -21,6 +21,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
+import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
@@ -74,17 +75,20 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private final ExecutionPreconditionService executionPreconditionService;
     private final MissingInputHandler missingInputHandler;
     private final CsMagicVariableHelper magicVariableHelper;
+    private final DebuggerBreakpointsHandler debuggerBreakpointsHandler;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
                                    MissingInputHandler missingInputHandler,
-                                   CsMagicVariableHelper magicVariableHelper) {
+                                   CsMagicVariableHelper magicVariableHelper,
+                                   DebuggerBreakpointsHandler debuggerBreakpointsHandler) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
         this.executionPreconditionService = preconditionService;
         this.missingInputHandler = missingInputHandler;
         this.magicVariableHelper = magicVariableHelper;
+        this.debuggerBreakpointsHandler = debuggerBreakpointsHandler;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
@@ -172,6 +176,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     runEnv.keepPromptedValues(promptedValues);
                     return;
                 }
+            }
+
+            if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
+                this.debuggerBreakpointsHandler.handleBreakpoints(systemContext, nodeName);
             }
 
             Map<String, Value> actionArguments = new HashMap<>(boundInputValues);

@@ -27,6 +27,8 @@ import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandler;
+import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandlerStub;
 import io.cloudslang.lang.runtime.bindings.strategies.EnforceValueMissingInputHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
@@ -103,7 +105,7 @@ public class ExecutableStepsTest {
     @Test
     public void testStart() {
         executableSteps.startExecutable(new ArrayList<Input>(), new RunEnvironment(),
-            new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW,
+                new HashMap<String, Value>(), new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW,
                 new SystemContext(), false);
     }
 
@@ -118,7 +120,7 @@ public class ExecutableStepsTest {
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap()))
                 .thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
-            new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext(), false);
+                new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext(), false);
 
         Map<String, Value> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
         assertTrue(opVars.containsKey("input1"));
@@ -133,11 +135,11 @@ public class ExecutableStepsTest {
     @Test
     public void testBoundInputEvent() {
         List<Input> inputs = Arrays.asList(
-            new Input.InputBuilder("input1", 5).build(),
-            new Input.InputBuilder("input2", 3, true)
-                .withRequired(true)
-                .withPrivateInput(false)
-                .build()
+                new Input.InputBuilder("input1", 5).build(),
+                new Input.InputBuilder("input2", 3, true)
+                        .withRequired(true)
+                        .withPrivateInput(false)
+                        .build()
         );
         final RunEnvironment runEnv = new RunEnvironment();
         final ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
@@ -148,7 +150,7 @@ public class ExecutableStepsTest {
         when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap()))
                 .thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
-            runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
+                runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
         assertFalse(events.isEmpty());
@@ -200,20 +202,20 @@ public class ExecutableStepsTest {
     @Test
     public void testFinishExecutableWithResult() throws Exception {
         List<Result> results = singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT,
-            ValueFactory.create("true")));
+                ValueFactory.create("true")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();
 
         when(resultsBinding.resolveResult(
-            isNull(Map.class),
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            eq(results),
-            isNull(String.class)
+                isNull(Map.class),
+                anyMapOf(String.class, Value.class),
+                eq(runEnv.getSystemProperties()),
+                eq(results),
+                isNull(String.class)
         )).thenReturn(ScoreLangConstants.SUCCESS_RESULT);
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), results,
-            new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
+                new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         ReturnValues returnValues = runEnv.removeReturnValues();
         assertTrue(returnValues.getResult().equals(ScoreLangConstants.SUCCESS_RESULT));
@@ -235,7 +237,7 @@ public class ExecutableStepsTest {
                 eq(possibleOutputs)
         )).thenReturn(boundOutputs);
         executableSteps.finishExecutable(runEnv, possibleOutputs, new ArrayList<Result>(),
-            new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
+                new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         ReturnValues returnValues = runEnv.removeReturnValues();
         Map<String, Value> outputs = returnValues.getOutputs();
@@ -253,7 +255,7 @@ public class ExecutableStepsTest {
                 new WorkerGroupMetadata("", false)));
 
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(),
-            new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
+                new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         assertEquals(parentFirstStepPosition, runEnv.removeNextStepPosition());
     }
@@ -265,7 +267,7 @@ public class ExecutableStepsTest {
         runEnv.getExecutionPath().down();
 
         executableSteps.finishExecutable(runEnv, new ArrayList<Output>(), new ArrayList<Result>(),
-            new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
+                new ExecutionRuntimeServices(), "", ExecutableType.FLOW);
 
         assertEquals(null, runEnv.removeNextStepPosition());
     }
@@ -274,7 +276,7 @@ public class ExecutableStepsTest {
     public void testFinishExecutableEvents() {
         final List<Output> possibleOutputs = singletonList(new Output("name", ValueFactory.create("name", false)));
         final List<Result> possibleResults = singletonList(new Result(ScoreLangConstants.SUCCESS_RESULT,
-            ValueFactory.create("true")));
+                ValueFactory.create("true")));
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), null));
         runEnv.getExecutionPath().down();
@@ -289,16 +291,16 @@ public class ExecutableStepsTest {
                 eq(possibleOutputs)
         )).thenReturn(boundOutputs);
         when(resultsBinding.resolveResult(
-            isNull(Map.class),
-            anyMapOf(String.class, Value.class),
-            eq(runEnv.getSystemProperties()),
-            eq(possibleResults),
-            isNull(String.class)
+                isNull(Map.class),
+                anyMapOf(String.class, Value.class),
+                eq(runEnv.getSystemProperties()),
+                eq(possibleResults),
+                isNull(String.class)
         )).thenReturn(boundResult);
 
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
         executableSteps.finishExecutable(runEnv, possibleOutputs, possibleResults,
-            runtimeServices, "step1", ExecutableType.FLOW);
+                runtimeServices, "step1", ExecutableType.FLOW);
 
         Collection<ScoreEvent> events = runtimeServices.getEvents();
 
@@ -413,12 +415,17 @@ public class ExecutableStepsTest {
         @Bean
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
-                    executionPreconditionService(), missingInputHandler(), csMagicVariableHelper());
+                    executionPreconditionService(), missingInputHandler(), csMagicVariableHelper(), debuggerBreakpointHandler());
         }
 
         @Bean
         public MissingInputHandler missingInputHandler() {
             return new EnforceValueMissingInputHandler();
+        }
+
+        @Bean
+        public DebuggerBreakpointsHandler debuggerBreakpointHandler() {
+            return new DebuggerBreakpointsHandlerStub();
         }
 
         @Bean
