@@ -15,11 +15,13 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class DebuggerBreakpointsHandlerStub implements DebuggerBreakpointsHandler {
 
     @Override
