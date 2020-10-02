@@ -181,7 +181,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
 
             if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
-                Long parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
+                Long parentRid = null;
+                if (systemContext.containsKey(PARENT_RUNNING_ID)) {
+                    parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
+                }
                 this.debuggerBreakpointsHandler.handleBreakpoints(systemContext,
                         executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." + nodeName);
             }
