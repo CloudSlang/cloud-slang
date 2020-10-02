@@ -68,6 +68,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
     public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
+    private static final String PARENT_RUNNING_ID = "PARENT_RUNNING_ID";
+    private static final String RUNNING_PLANS_MAP = "RUNNING_PLANS_MAP";
 
     private final ResultsBinding resultsBinding;
     private final InputsBinding inputsBinding;
@@ -179,7 +181,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
 
             if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
-                this.debuggerBreakpointsHandler.handleBreakpoints(systemContext, nodeName);
+                Long parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
+                this.debuggerBreakpointsHandler.handleBreakpoints(systemContext,
+                        executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." + nodeName);
             }
 
             Map<String, Value> actionArguments = new HashMap<>(boundInputValues);

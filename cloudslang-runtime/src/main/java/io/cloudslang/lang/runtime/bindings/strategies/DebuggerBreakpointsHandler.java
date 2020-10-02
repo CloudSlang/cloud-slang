@@ -11,7 +11,6 @@ package io.cloudslang.lang.runtime.bindings.strategies;
  
 import io.cloudslang.score.lang.SystemContext;
 
-import java.util.ArrayList;
 
 
 public interface DebuggerBreakpointsHandler extends InputHandler {
