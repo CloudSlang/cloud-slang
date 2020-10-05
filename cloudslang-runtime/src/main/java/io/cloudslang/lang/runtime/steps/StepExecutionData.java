@@ -258,7 +258,8 @@ public class StepExecutionData extends AbstractExecutionData {
                     nextPosition,
                     returnValues,
                     roiValue,
-                    outputsBindingAccessor
+                    outputsBindingAccessor,
+                    true
             );
 
             executionRuntimeServices.addRoiValue(roiValue);
