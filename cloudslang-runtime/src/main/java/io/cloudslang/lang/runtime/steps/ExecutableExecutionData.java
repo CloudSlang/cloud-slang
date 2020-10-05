@@ -185,7 +185,12 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 if (systemContext.containsKey(PARENT_RUNNING_ID)) {
                     parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
                 }
-                this.debuggerBreakpointsHandler.handleBreakpoints(systemContext,
+                this.debuggerBreakpointsHandler.handleBreakpoints(
+                        systemContext,
+                        runEnv,
+                        executionRuntimeServices,
+                        stepType,
+                        nodeName,
                         executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." + nodeName);
             }
 

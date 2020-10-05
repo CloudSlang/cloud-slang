@@ -37,7 +37,9 @@ public class DebuggerBreakpointsHandlerStub implements DebuggerBreakpointsHandle
     }
 
     @Override
-    public boolean handleBreakpoints(SystemContext context, String stepId) {
+    public boolean handleBreakpoints(SystemContext systemContext, RunEnvironment runEnv,
+                                     ExecutionRuntimeServices runtimeServices, LanguageEventData.StepType stepType,
+                                     String stepName, String stepId) {
         return false;
     }
 }

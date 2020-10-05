@@ -8,13 +8,22 @@
  *
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings.strategies;
- 
+
+import io.cloudslang.lang.runtime.env.RunEnvironment;
+import io.cloudslang.lang.runtime.events.LanguageEventData;
+import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 
 
 
 public interface DebuggerBreakpointsHandler extends InputHandler {
 
-    boolean handleBreakpoints(SystemContext context, String stepId);
+    boolean handleBreakpoints(
+                              SystemContext systemContext,
+                              RunEnvironment runEnv,
+                              ExecutionRuntimeServices runtimeServices,
+                              LanguageEventData.StepType stepType,
+                              String stepName,
+                              String stepId);
 
 }
