@@ -212,7 +212,8 @@ public abstract class AbstractExecutionData {
                         previousStepId,
                         new ReturnValues(publishValues, executableReturnValues.getResult()),
                         ExecutionParametersConsts.DEFAULT_ROI_VALUE,
-                        contextAccessor
+                        contextAccessor,
+                        false
                 );
                 runEnv.getExecutionPath().forward();
                 return true;
@@ -230,7 +231,10 @@ public abstract class AbstractExecutionData {
                                               Long nextPosition,
                                               ReturnValues returnValues,
                                               Double roiValue,
-                                              ReadOnlyContextAccessor contextAccessor) {
+                                              ReadOnlyContextAccessor contextAccessor,
+                                              boolean shouldRemoveRobotGroup) {
+        String robotGroup = shouldRemoveRobotGroup ?
+                executionRuntimeServices.removeRobotGroupName() : executionRuntimeServices.getRobotGroupName();
         fireEvent(executionRuntimeServices, runEnv, ScoreLangConstants.EVENT_OUTPUT_END,
                 "Output binding finished",
                 LanguageEventData.StepType.STEP, nodeName,
@@ -243,7 +247,7 @@ public abstract class AbstractExecutionData {
                 Pair.of(LanguageEventData.CONSUMER_WORKER_UUID, executionRuntimeServices.removeConsumerWorkerId()),
                 Pair.of(LanguageEventData.PRODUCER_WORKER_UUID, executionRuntimeServices.removeProducerWorkerId()),
                 Pair.of(LanguageEventData.ROBOT_UUID, executionRuntimeServices.removeRobotId()),
-                Pair.of(LanguageEventData.ROBOT_GROUP_NAME, executionRuntimeServices.removeRobotGroupName()));
+                Pair.of(LanguageEventData.ROBOT_GROUP_NAME, robotGroup));
     }
 
     private static boolean shouldBreakLoop(List<String> breakOn, ReturnValues executableReturnValues) {
