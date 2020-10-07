@@ -22,6 +22,7 @@ import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
 import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandler;
+import io.cloudslang.lang.runtime.bindings.strategies.DebuggerInputHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
@@ -78,12 +79,14 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private final MissingInputHandler missingInputHandler;
     private final CsMagicVariableHelper magicVariableHelper;
     private final DebuggerBreakpointsHandler debuggerBreakpointsHandler;
+    private final DebuggerInputHandler debuggerInputHandler;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
                                    MissingInputHandler missingInputHandler,
                                    CsMagicVariableHelper magicVariableHelper,
-                                   DebuggerBreakpointsHandler debuggerBreakpointsHandler) {
+                                   DebuggerBreakpointsHandler debuggerBreakpointsHandler,
+                                   DebuggerInputHandler debuggerInputHandler) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
@@ -91,6 +94,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
         this.missingInputHandler = missingInputHandler;
         this.magicVariableHelper = magicVariableHelper;
         this.debuggerBreakpointsHandler = debuggerBreakpointsHandler;
+        this.debuggerInputHandler = debuggerInputHandler;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
@@ -133,6 +137,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
+            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_INPUTS)) {
+                callArguments.putAll(this.debuggerInputHandler.applyValues(systemContext, executableInputs));
+            }
             List<Input> newExecutableInputs =
                     addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
 
