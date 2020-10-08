@@ -21,6 +21,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
+import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
@@ -67,6 +68,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
     private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
     public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
+    private static final String PARENT_RUNNING_ID = "PARENT_RUNNING_ID";
+    private static final String RUNNING_PLANS_MAP = "RUNNING_PLANS_MAP";
 
     private final ResultsBinding resultsBinding;
     private final InputsBinding inputsBinding;
@@ -74,17 +77,20 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private final ExecutionPreconditionService executionPreconditionService;
     private final MissingInputHandler missingInputHandler;
     private final CsMagicVariableHelper magicVariableHelper;
+    private final DebuggerBreakpointsHandler debuggerBreakpointsHandler;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
                                    MissingInputHandler missingInputHandler,
-                                   CsMagicVariableHelper magicVariableHelper) {
+                                   CsMagicVariableHelper magicVariableHelper,
+                                   DebuggerBreakpointsHandler debuggerBreakpointsHandler) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
         this.executionPreconditionService = preconditionService;
         this.missingInputHandler = missingInputHandler;
         this.magicVariableHelper = magicVariableHelper;
+        this.debuggerBreakpointsHandler = debuggerBreakpointsHandler;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
@@ -172,6 +178,20 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     runEnv.keepPromptedValues(promptedValues);
                     return;
                 }
+            }
+
+            if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
+                Long parentRid = null;
+                if (systemContext.containsKey(PARENT_RUNNING_ID)) {
+                    parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
+                }
+                this.debuggerBreakpointsHandler.handleBreakpoints(
+                        systemContext,
+                        runEnv,
+                        executionRuntimeServices,
+                        stepType,
+                        nodeName,
+                        executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." + nodeName);
             }
 
             Map<String, Value> actionArguments = new HashMap<>(boundInputValues);
