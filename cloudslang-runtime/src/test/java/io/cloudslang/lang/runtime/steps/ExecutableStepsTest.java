@@ -29,8 +29,6 @@ import io.cloudslang.lang.runtime.bindings.ResultsBinding;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandlerStub;
-import io.cloudslang.lang.runtime.bindings.strategies.DebuggerInputHandler;
-import io.cloudslang.lang.runtime.bindings.strategies.DebuggerInputHandlerStub;
 import io.cloudslang.lang.runtime.bindings.strategies.EnforceValueMissingInputHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
@@ -418,8 +416,7 @@ public class ExecutableStepsTest {
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
                     executionPreconditionService(), missingInputHandler(), csMagicVariableHelper(),
-                    debuggerBreakpointHandler(),
-                    debuggerInputHandler());
+                    debuggerBreakpointHandler());
         }
 
         @Bean
@@ -430,11 +427,6 @@ public class ExecutableStepsTest {
         @Bean
         public DebuggerBreakpointsHandler debuggerBreakpointHandler() {
             return new DebuggerBreakpointsHandlerStub();
-        }
-
-        @Bean
-        public DebuggerInputHandler debuggerInputHandler() {
-            return new DebuggerInputHandlerStub();
         }
 
         @Bean
