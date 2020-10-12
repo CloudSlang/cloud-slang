@@ -134,7 +134,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
             if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_INPUTS)) {
-                callArguments.putAll(this.debuggerBreakpointsHandler.applyValues(systemContext, executableInputs));
+                callArguments.putAll(debuggerBreakpointsHandler.applyValues(systemContext, executableInputs));
             }
             List<Input> newExecutableInputs =
                     addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
