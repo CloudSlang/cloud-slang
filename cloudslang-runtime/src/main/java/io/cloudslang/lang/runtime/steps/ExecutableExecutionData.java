@@ -183,19 +183,22 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
+            boolean cont = true;
             if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
                 Long parentRid = null;
                 if (systemContext.containsKey(PARENT_RUNNING_ID)) {
                     parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
                 }
-                this.debuggerBreakpointsHandler.handleBreakpoints(
+                cont = !this.debuggerBreakpointsHandler.handleBreakpoints(
                         systemContext,
                         runEnv,
                         executionRuntimeServices,
                         stepType,
                         nodeName,
-                        executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." + nodeName);
+                        executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." +
+                                executionRuntimeServices.getNodeName());
             }
+
 
             Map<String, Value> actionArguments = new HashMap<>(boundInputValues);
 
@@ -221,15 +224,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     callArguments);
 
             executionRuntimeServices.setShouldCheckGroup();
-
-            // put the next step position for the navigation
-            runEnv.putNextStepPosition(nextStepId);
-            runEnv.getExecutionPath().down();
+            if (cont) {
+                // put the next step position for the navigation
+                runEnv.putNextStepPosition(nextStepId);
+                runEnv.getExecutionPath().down();
+            }
         } catch (RuntimeException e) {
             logger.error("There was an error running the start executable execution step of: \'" + nodeName +
                     "\'.\n\tError is: " + e.getMessage());
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
+
     }
 
     private List<Input> addUserDefinedStepInputs(List<Input> executableInputs,
