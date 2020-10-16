@@ -183,20 +183,22 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
 
-            boolean cont = true;
+            boolean continueToNext = true;
             if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
                 Long parentRid = null;
                 if (systemContext.containsKey(PARENT_RUNNING_ID)) {
                     parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
                 }
-                cont = !this.debuggerBreakpointsHandler.handleBreakpoints(
+                String newNodeName = executionRuntimeServices.getNodeName();
+                continueToNext = !debuggerBreakpointsHandler.handleBreakpoints(
                         systemContext,
                         runEnv,
                         executionRuntimeServices,
                         stepType,
                         nodeName,
                         executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." +
-                                executionRuntimeServices.getNodeName());
+                                //need new node name for debugger, node name is still set to the last value
+                                newNodeName);
             }
 
 
@@ -224,7 +226,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     callArguments);
 
             executionRuntimeServices.setShouldCheckGroup();
-            if (cont) {
+            if (continueToNext) {
                 // put the next step position for the navigation
                 runEnv.putNextStepPosition(nextStepId);
                 runEnv.getExecutionPath().down();
