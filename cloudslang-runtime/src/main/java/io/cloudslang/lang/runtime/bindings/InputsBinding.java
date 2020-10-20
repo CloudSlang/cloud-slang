@@ -102,7 +102,7 @@ public class InputsBinding extends AbstractBinding {
             }
 
             if (input.hasPrompt()) {
-                if (useEmptyValuesForPrompts) {
+                if (useEmptyValuesForPrompts && isNull(value)) {
                     value = createEmptyValue(input);
                 } else if (isNull(promptValue)) {
                     resolvePromptExpressions(input, context, targetContext, systemProperties);
