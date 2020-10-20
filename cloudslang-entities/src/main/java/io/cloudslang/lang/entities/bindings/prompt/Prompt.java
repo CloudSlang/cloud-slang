@@ -17,7 +17,7 @@ import java.util.Collection;
 
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class Prompt implements Serializable {
@@ -134,7 +134,7 @@ public class Prompt implements Serializable {
             switch (promptType) {
                 case SINGLE_CHOICE:
                 case MULTI_CHOICE:
-                    if (isBlank(promptDelimiter)) {
+                    if (isEmpty(promptDelimiter)) {
                         promptDelimiter = DEFAULT_DELIMITER;
                     }
                     break;
