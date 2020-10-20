@@ -7,7 +7,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>1.0.198-SNAPSHOT</version>
+        <version>1.0.198</version>
     </parent>
 
     <artifactId>cloudslang-cli</artifactId>
