@@ -34,6 +34,9 @@ import static io.cloudslang.lang.entities.utils.ExpressionUtils.extractExpressio
 
 public class AbstractBinding {
 
+    private static final String SENSITIVE_VALUE_IN_PROMPT_OPTION_ERROR =
+            "Sensitive values can't be used as an option for selection like fields.";
+
     @Autowired
     protected ScriptEvaluator scriptEvaluator;
 
@@ -116,8 +119,13 @@ public class AbstractBinding {
         if (prompt.getPromptType().isChoiceLike()) {
             //prompt options
             tryEvaluateExpression(prompt.getPromptOptions(), evaluationContextHolder)
-                    .map(Value::toStringSafeEmpty)
-                    .ifPresent(prompt::setPromptOptions);
+                    .ifPresent(value -> {
+                        if (value.isSensitive()) {
+                            throw new RuntimeException(SENSITIVE_VALUE_IN_PROMPT_OPTION_ERROR);
+                        }
+
+                        prompt.setPromptOptions(Value.toStringSafeEmpty(value));
+                    });
 
             //prompt delimiter
             tryEvaluateExpression(prompt.getPromptDelimiter(), evaluationContextHolder)
