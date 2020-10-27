@@ -463,7 +463,7 @@ public class ArgumentsBindingTest {
 
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
-            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100));
+            return new ExternalPythonRuntimeServiceImpl(new Semaphore(100), new Semaphore(50));
         }
 
         @Bean(name = "externalPythonExecutionEngine")
