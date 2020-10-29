@@ -25,4 +25,4 @@ deploy:
     jdk: openjdk8
 
 after_success:
-  -  mvn clean test jacoco:report coveralls:jacoco
+  - mvn clean test jacoco:report coveralls:jacoco
