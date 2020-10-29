@@ -179,6 +179,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 ValueFactory.create((Serializable) branchesContext)
             );
 
+            Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
             Map<String, Value> publishValues =
                 bindPublishValues(
                     runEnv,
@@ -186,7 +187,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     stepPublishValues,
                     stepNavigationValues,
                     nodeName,
-                    outputBindingContext
+                    outputBindingContext,
+                    globalContext
                 );
 
             flowContext.putVariables(publishValues);
@@ -267,7 +269,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         List<Output> stepPublishValues,
         Map<String, ResultNavigation> stepNavigationValues,
         String nodeName,
-        Map<String, Value> publishContext) {
+        Map<String, Value> publishContext,
+        Map<String, Value> globalContext) {
 
         fireEvent(
             executionRuntimeServices,
@@ -280,7 +283,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
             Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
-        ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(publishContext);
+        ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(publishContext, globalContext);
         return outputsBinding.bindOutputs(
             outputsBindingAccessor,
             runEnv.getSystemProperties(),
