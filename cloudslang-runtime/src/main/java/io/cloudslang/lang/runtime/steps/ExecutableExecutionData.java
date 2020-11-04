@@ -127,13 +127,14 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
             if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_FLOW_INPUTS)) {
-                List<Input> updatedInputList = debuggerBreakpointsHandler.resolveInputs(systemContext,
-                        mutableInputList);
-                executableInputs = Collections.unmodifiableList(updatedInputList);
-            } else {
-                executableInputs = Collections.unmodifiableList(mutableInputList);
 
+                Context flowContext = runEnv.getStack().popContext();
+                flowContext.putVariables(debuggerBreakpointsHandler.resolveInputs(systemContext));
+                runEnv.getStack().pushContext(flowContext);
             }
+
+            executableInputs = Collections.unmodifiableList(mutableInputList);
+
             //restore what was already prompted and add newly prompted values
             Map<String, Value> promptedValues = runEnv.removePromptedValues();
             promptedValues.putAll(missingInputHandler.applyPromptInputValues(systemContext, executableInputs));

@@ -32,7 +32,7 @@ public class DebuggerBreakpointsHandlerStub implements DebuggerBreakpointsHandle
     }
 
     @Override
-    public List<Input> resolveInputs(SystemContext systemContext, Collection<Input> inputs) {
+    public Map<String,Value> resolveInputs(SystemContext systemContext) {
         return null;
     }
 
