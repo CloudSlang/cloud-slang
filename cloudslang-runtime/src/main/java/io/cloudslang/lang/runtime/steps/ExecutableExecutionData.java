@@ -137,7 +137,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             executableInputs = Collections.unmodifiableList(mutableInputList);
 
-            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_STEP_INPUTS)) {
+            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_EXECUTABLE_INPUTS)) {
                 callArguments.putAll(debuggerBreakpointsHandler.applyValues(systemContext, executableInputs));
             }
             //restore what was already prompted and add newly prompted values
