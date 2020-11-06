@@ -135,15 +135,15 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             executableInputs = Collections.unmodifiableList(mutableInputList);
 
+            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_STEP_INPUTS)) {
+                callArguments.putAll(debuggerBreakpointsHandler.applyValues(systemContext, executableInputs));
+            }
             //restore what was already prompted and add newly prompted values
             Map<String, Value> promptedValues = runEnv.removePromptedValues();
             promptedValues.putAll(missingInputHandler.applyPromptInputValues(systemContext, executableInputs));
 
             Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
-            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_STEP_INPUTS)) {
-                callArguments.putAll(debuggerBreakpointsHandler.applyValues(systemContext, executableInputs));
-            }
             List<Input> newExecutableInputs =
                     addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
 
@@ -169,6 +169,24 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     isTrue(useEmptyValuesForPrompts),
                     promptArguments);
 
+            boolean continueToNext = true;
+            if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
+                Long parentRid = null;
+                if (systemContext.containsKey(PARENT_RUNNING_ID)) {
+                    parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
+                }
+                String newNodeName = executionRuntimeServices.getNodeName();
+                continueToNext = !debuggerBreakpointsHandler.handleBreakpoints(
+                        systemContext,
+                        runEnv,
+                        executionRuntimeServices,
+                        stepType,
+                        nodeName,
+                        executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." +
+                                //need new node name for debugger, node name is still set to the last value
+                                newNodeName);
+            }
+
             //if there are any missing required input after binding
             // try to resolve it using provided missing input handler
             if (CollectionUtils.isNotEmpty(missingInputs)) {
@@ -190,25 +208,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     return;
                 }
             }
-
-            boolean continueToNext = true;
-            if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
-                Long parentRid = null;
-                if (systemContext.containsKey(PARENT_RUNNING_ID)) {
-                    parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
-                }
-                String newNodeName = executionRuntimeServices.getNodeName();
-                continueToNext = !debuggerBreakpointsHandler.handleBreakpoints(
-                        systemContext,
-                        runEnv,
-                        executionRuntimeServices,
-                        stepType,
-                        nodeName,
-                        executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." +
-                                //need new node name for debugger, node name is still set to the last value
-                                newNodeName);
-            }
-
 
             Map<String, Value> actionArguments = new HashMap<>(boundInputValues);
 
