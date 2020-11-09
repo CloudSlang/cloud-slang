@@ -106,7 +106,7 @@ public class SlangBuildMain {
             " Each test suite must have only one execution mode (parallel or sequential).";
     private static final String MESSAGE_ERROR_LOADING_SMART_MODE_CONFIG_FILE = "Error loading smart " +
             "mode configuration file:";
-    private static final String LOG4J_CONFIGURATION_KEY = "log4j.configuration";
+    private static final String LOG4J_CONFIGURATION_KEY = "log4j.configurationFile";
     private static final String LOG4J_ERROR_PREFIX = "log4j: error loading log4j properties file.";
     private static final String LOG4J_ERROR_SUFFIX = "Using default configuration.";
     private static final String APP_HOME_KEY = "app.home";
