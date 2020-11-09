@@ -135,7 +135,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         flowContext.putVariables(variables);
                         runEnv.getStack().pushContext(flowContext);
                     } else {
-                        runEnv.getStack().pushContext(new Context(variables, magicVariableHelper.getGlobalContext(executionRuntimeServices)));
+                        runEnv.getStack().pushContext(new Context(variables,
+                                magicVariableHelper.getGlobalContext(executionRuntimeServices)));
                     }
                 }
             }
