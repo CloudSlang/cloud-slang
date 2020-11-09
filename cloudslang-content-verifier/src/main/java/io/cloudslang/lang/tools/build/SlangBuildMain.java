@@ -30,11 +30,11 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -313,16 +313,12 @@ public class SlangBuildMain {
                         errorMessage = "Normalized config file path[" + normalizedPath + "]" +
                                 " does not lead to a regular file.";
                     } else {
-                        Properties log4jProperties = new Properties();
-                        try (InputStream log4jInputStream = SlangBuildMain.class.getResourceAsStream(normalizedPath)) {
-                            log4jProperties.load(log4jInputStream);
-                            //TODO fix this
-                            //PropertyConfigurator.configure(log4jProperties);
-                        }
+                        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+                        context.setConfigLocation(new File(normalizedPath).toURI());
                     }
                 }
             }
-        } catch (IOException | RuntimeException ex) {
+        } catch (RuntimeException ex) {
             errorMessage = ex.getMessage();
         }
 
