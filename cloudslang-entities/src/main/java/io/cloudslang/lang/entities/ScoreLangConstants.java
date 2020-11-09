@@ -107,7 +107,8 @@ public interface ScoreLangConstants {
 
     //debug
     String USER_INTERRUPT = "USER_INTERRUPT";
-    String DEBUGGER_INPUTS = "debuggerInputs";
+    String DEBUGGER_STEP_INPUTS = "debuggerStepInputs";
+    String DEBUGGER_FLOW_INPUTS = "debuggerFlowInputs";
 
 
 }
