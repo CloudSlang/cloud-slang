@@ -28,9 +28,8 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
@@ -77,6 +76,8 @@ import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.logging.log4j.Level.ERROR;
+import static org.apache.logging.log4j.Level.INFO;
 
 
 public class SlangBuildMain {
@@ -86,7 +87,7 @@ public class SlangBuildMain {
     private static final String CONTENT_DIR = File.separator + "content";
     private static final String TEST_DIR = File.separator + "test";
 
-    private static final Logger log = Logger.getLogger(SlangBuildMain.class);
+    private static final Logger log = LogManager.getLogger(SlangBuildMain.class);
     private static final int MAX_THREADS_TEST_RUNNER = 32;
     private static final String MESSAGE_NOT_SCHEDULED_FOR_RUN_RULES = "Rules '%s' defined in '%s' key " +
             "are not scheduled for run.";
@@ -286,7 +287,7 @@ public class SlangBuildMain {
 
         } catch (Throwable e) {
             logErrorsPrefix(loggingService);
-            loggingService.logEvent(Level.ERROR, "Exception: " + e.getMessage());
+            loggingService.logEvent(ERROR, "Exception: " + e.getMessage());
             logErrorsSuffix(projectPath, loggingService);
             loggingService.waitForAllLogTasksToFinish();
             System.exit(1);
@@ -315,7 +316,8 @@ public class SlangBuildMain {
                         Properties log4jProperties = new Properties();
                         try (InputStream log4jInputStream = SlangBuildMain.class.getResourceAsStream(normalizedPath)) {
                             log4jProperties.load(log4jInputStream);
-                            PropertyConfigurator.configure(log4jProperties);
+                            //TODO fix this
+                            //PropertyConfigurator.configure(log4jProperties);
                         }
                     }
                 }
@@ -484,7 +486,7 @@ public class SlangBuildMain {
                                   final LoggingService loggingService) {
         logErrorsPrefix(loggingService);
         for (RuntimeException runtimeException : exceptions) {
-            loggingService.logEvent(Level.ERROR, "Exception: " + runtimeException.getMessage());
+            loggingService.logEvent(ERROR, "Exception: " + runtimeException.getMessage());
         }
         logErrorsSuffix(projectPath, loggingService);
         loggingService.waitForAllLogTasksToFinish();
@@ -492,15 +494,15 @@ public class SlangBuildMain {
     }
 
     private static void logErrorsSuffix(String projectPath, final LoggingService loggingService) {
-        loggingService.logEvent(Level.ERROR, "FAILURE: Validation of slang files for project: \"" +
+        loggingService.logEvent(ERROR, "FAILURE: Validation of slang files for project: \"" +
                 projectPath + "\" failed.");
-        loggingService.logEvent(Level.ERROR, "------------------------------------------------------------");
-        loggingService.logEvent(Level.ERROR, "");
+        loggingService.logEvent(ERROR, "------------------------------------------------------------");
+        loggingService.logEvent(ERROR, "");
     }
 
     private static void logErrorsPrefix(final LoggingService loggingService) {
-        loggingService.logEvent(Level.ERROR, "");
-        loggingService.logEvent(Level.ERROR, "------------------------------------------------------------");
+        loggingService.logEvent(ERROR, "");
+        loggingService.logEvent(ERROR, "------------------------------------------------------------");
     }
 
     private static void generateTestCaseReport(
@@ -579,33 +581,33 @@ public class SlangBuildMain {
     private static void printBuildSuccessSummary(String contentPath, SlangBuildResults buildResults,
                                                  IRunTestResults runTestsResults,
                                                  final LoggingService loggingService) {
-        loggingService.logEvent(Level.INFO, "");
-        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "BUILD SUCCESS");
-        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "Found " + buildResults.getNumberOfCompiledSources() +
+        loggingService.logEvent(INFO, "");
+        loggingService.logEvent(INFO, "------------------------------------------------------------");
+        loggingService.logEvent(INFO, "BUILD SUCCESS");
+        loggingService.logEvent(INFO, "------------------------------------------------------------");
+        loggingService.logEvent(INFO, "Found " + buildResults.getNumberOfCompiledSources() +
                 " slang files under directory: \"" + contentPath + "\" and all are valid.");
         printNumberOfPassedAndSkippedTests(runTestsResults, loggingService);
-        loggingService.logEvent(Level.INFO, "");
+        loggingService.logEvent(INFO, "");
     }
 
     private static void printNumberOfPassedAndSkippedTests(IRunTestResults runTestsResults,
                                                            final LoggingService loggingService) {
-        loggingService.logEvent(Level.INFO, runTestsResults.getPassedTests().size() + " test cases passed");
+        loggingService.logEvent(INFO, runTestsResults.getPassedTests().size() + " test cases passed");
         Map<String, TestRun> skippedTests = runTestsResults.getSkippedTests();
         if (skippedTests.size() > 0) {
-            loggingService.logEvent(Level.INFO, skippedTests.size() + " test cases skipped");
+            loggingService.logEvent(INFO, skippedTests.size() + " test cases skipped");
         }
     }
 
     private static void printPassedTests(IRunTestResults runTestsResults, final LoggingService loggingService) {
         if (runTestsResults.getPassedTests().size() > 0) {
-            loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-            loggingService.logEvent(Level.INFO, "Following " + runTestsResults.getPassedTests().size() +
+            loggingService.logEvent(INFO, "------------------------------------------------------------");
+            loggingService.logEvent(INFO, "Following " + runTestsResults.getPassedTests().size() +
                     " test cases passed:");
             for (Map.Entry<String, TestRun> passedTest : runTestsResults.getPassedTests().entrySet()) {
                 String testCaseReference = SlangTestCase.generateTestCaseReference(passedTest.getValue().getTestCase());
-                loggingService.logEvent(Level.INFO, "- " + testCaseReference.replaceAll("\n", "\n\t"));
+                loggingService.logEvent(INFO, "- " + testCaseReference.replaceAll("\n", "\n\t"));
             }
         }
     }
@@ -615,26 +617,26 @@ public class SlangBuildMain {
         printNumberOfPassedAndSkippedTests(runTestsResults, loggingService);
         final Map<String, TestRun> failedTests = runTestsResults.getFailedTests();
         logErrorsPrefix(loggingService);
-        loggingService.logEvent(Level.ERROR, "BUILD FAILURE");
-        loggingService.logEvent(Level.ERROR, "------------------------------------------------------------");
-        loggingService.logEvent(Level.ERROR, "CloudSlang build for repository: \"" + projectPath +
+        loggingService.logEvent(ERROR, "BUILD FAILURE");
+        loggingService.logEvent(ERROR, "------------------------------------------------------------");
+        loggingService.logEvent(ERROR, "CloudSlang build for repository: \"" + projectPath +
                 "\" failed due to failed tests.");
-        loggingService.logEvent(Level.ERROR, "Following " + failedTests.size() + " tests failed:");
+        loggingService.logEvent(ERROR, "Following " + failedTests.size() + " tests failed:");
         for (Map.Entry<String, TestRun> failedTest : failedTests.entrySet()) {
             String failureMessage = failedTest.getValue().getMessage();
-            loggingService.logEvent(Level.ERROR, "- " + failureMessage.replaceAll("\n", "\n\t"));
+            loggingService.logEvent(ERROR, "- " + failureMessage.replaceAll("\n", "\n\t"));
         }
-        loggingService.logEvent(Level.ERROR, "");
+        loggingService.logEvent(ERROR, "");
     }
 
     private static void printSkippedTestsSummary(Map<String, TestRun> skippedTests,
                                                  final LoggingService loggingService) {
-        loggingService.logEvent(Level.INFO, "");
-        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "Following " + skippedTests.size() + " tests were skipped:");
+        loggingService.logEvent(INFO, "");
+        loggingService.logEvent(INFO, "------------------------------------------------------------");
+        loggingService.logEvent(INFO, "Following " + skippedTests.size() + " tests were skipped:");
         for (Map.Entry<String, TestRun> skippedTest : skippedTests.entrySet()) {
             String message = skippedTest.getValue().getMessage();
-            loggingService.logEvent(Level.INFO, "- " + message.replaceAll("\n", "\n\t"));
+            loggingService.logEvent(INFO, "- " + message.replaceAll("\n", "\n\t"));
         }
     }
 
@@ -645,30 +647,30 @@ public class SlangBuildMain {
         int uncoveredExecutablesSize = runTestsResults.getUncoveredExecutables().size();
         int totalNumberOfExecutables = coveredExecutablesSize + uncoveredExecutablesSize;
         double coveragePercentage = (double) coveredExecutablesSize / (double) totalNumberOfExecutables * 100;
-        loggingService.logEvent(Level.INFO, "");
-        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, ((int) coveragePercentage) + "% of the content has tests");
-        loggingService.logEvent(Level.INFO, "Out of " + totalNumberOfExecutables + " executables, " +
+        loggingService.logEvent(INFO, "");
+        loggingService.logEvent(INFO, "------------------------------------------------------------");
+        loggingService.logEvent(INFO, ((int) coveragePercentage) + "% of the content has tests");
+        loggingService.logEvent(INFO, "Out of " + totalNumberOfExecutables + " executables, " +
                 coveredExecutablesSize + " executables have tests");
     }
 
     private static void printCoveredExecutables(Set<String> coveredExecutables, final LoggingService loggingService) {
-        loggingService.logEvent(Level.INFO, "");
-        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "Following " + coveredExecutables.size() + " executables have tests:");
+        loggingService.logEvent(INFO, "");
+        loggingService.logEvent(INFO, "------------------------------------------------------------");
+        loggingService.logEvent(INFO, "Following " + coveredExecutables.size() + " executables have tests:");
         for (String executable : coveredExecutables) {
-            loggingService.logEvent(Level.INFO, "- " + executable);
+            loggingService.logEvent(INFO, "- " + executable);
         }
     }
 
     private static void printUncoveredExecutables(Set<String> uncoveredExecutables,
                                                   final LoggingService loggingService) {
-        loggingService.logEvent(Level.INFO, "");
-        loggingService.logEvent(Level.INFO, "------------------------------------------------------------");
-        loggingService.logEvent(Level.INFO, "Following " + uncoveredExecutables.size() +
+        loggingService.logEvent(INFO, "");
+        loggingService.logEvent(INFO, "------------------------------------------------------------");
+        loggingService.logEvent(INFO, "Following " + uncoveredExecutables.size() +
                 " executables do not have tests:");
         for (String executable : uncoveredExecutables) {
-            loggingService.logEvent(Level.INFO, "- " + executable);
+            loggingService.logEvent(INFO, "- " + executable);
         }
     }
 

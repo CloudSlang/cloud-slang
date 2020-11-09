@@ -148,7 +148,7 @@
   	+ List - The new `list` command lists the system properties contained in a system properties file.
   	+ Default Folder - The location of the default folders for automatically importing system properties files and input files has moved to `cslang/configuration/inputs` and `cslang/configuration/properties`.
   	+ Verbosity Level - The amount of information printed to the screen by the CLI can be changed using the `--v` flag.
-  	+ Configuration - A new configuration file can be found at `cslang/configuration/cslang.properties`. The file currently includes configuration for character encoding and the location of the new logging configuration file, which is found at `cslang/configuration/logging/log4j.properties` by default.
+  	+ Configuration - A new configuration file can be found at `cslang/configuration/cslang.properties`. The file currently includes configuration for character encoding and the location of the new logging configuration file, which is found at `cslang/configuration/logging/log4j2.xml` by default.
 + Compiler Changes
     + Error Handling - Executable files that are valid YAML but not valid CloudSlang, which previously failed in the pre-compilation stage, now pass pre-compilation and all errors are collected.
 + Content

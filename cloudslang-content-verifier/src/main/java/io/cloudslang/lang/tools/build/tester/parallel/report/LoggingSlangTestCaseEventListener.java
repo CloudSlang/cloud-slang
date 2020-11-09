@@ -16,8 +16,10 @@ import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.BeginSlangT
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.apache.logging.log4j.Level.INFO;
 
 public class LoggingSlangTestCaseEventListener implements ISlangTestCaseEventListener {
 
@@ -28,10 +30,10 @@ public class LoggingSlangTestCaseEventListener implements ISlangTestCaseEventLis
     public synchronized void onEvent(SlangTestCaseEvent event) {
         SlangTestCase slangTestCase = event.getSlangTestCase();
         if (event instanceof BeginSlangTestCaseEvent) {
-            loggingService.logEvent(Level.INFO, "Running test: " +
+            loggingService.logEvent(INFO, "Running test: " +
                     SlangTestCase.generateTestCaseReference(slangTestCase) + " - " + slangTestCase.getDescription());
         } else if (event instanceof SkippedSlangTestCaseEvent) {
-            loggingService.logEvent(Level.INFO, "Skipping test: " +
+            loggingService.logEvent(INFO, "Skipping test: " +
                     SlangTestCase.generateTestCaseReference(slangTestCase) +
                     " because it is not in active test suites");
         }

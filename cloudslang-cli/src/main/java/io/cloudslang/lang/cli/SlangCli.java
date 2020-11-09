@@ -27,7 +27,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -53,7 +54,7 @@ import java.util.Set;
 @Component
 public class SlangCli implements CommandMarker {
 
-    private static final Logger logger = Logger.getLogger(SlangCli.class);
+    private static final Logger logger = LogManager.getLogger(SlangCli.class);
 
     private static final String TRIGGERED_FLOW_MSG = "Triggered flow : ";
     private static final String WITH_EXECUTION_ID_MSG = "Execution id: ";

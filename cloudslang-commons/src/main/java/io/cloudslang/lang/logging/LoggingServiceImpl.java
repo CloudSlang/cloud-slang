@@ -13,8 +13,9 @@ package io.cloudslang.lang.logging;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 
 import javax.annotation.PostConstruct;
@@ -24,18 +25,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.apache.log4j.Level.DEBUG;
-import static org.apache.log4j.Level.ERROR;
-import static org.apache.log4j.Level.FATAL;
-import static org.apache.log4j.Level.INFO;
-import static org.apache.log4j.Level.TRACE;
-import static org.apache.log4j.Level.WARN;
+import static org.apache.logging.log4j.Level.DEBUG;
+import static org.apache.logging.log4j.Level.ERROR;
+import static org.apache.logging.log4j.Level.FATAL;
+import static org.apache.logging.log4j.Level.INFO;
+import static org.apache.logging.log4j.Level.TRACE;
+import static org.apache.logging.log4j.Level.WARN;
 
 /**
  * Implements a logging service that is asynchronous with respect to the caller
  */
 public class LoggingServiceImpl implements LoggingService, DisposableBean {
-    private static final Logger logger = Logger.getLogger(LoggingServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(LoggingServiceImpl.class);
 
     private ThreadPoolExecutor singleThreadExecutor;
 
