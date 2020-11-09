@@ -127,8 +127,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
             if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_FLOW_INPUTS)) {
-                Map<String, Value> variables = debuggerBreakpointsHandler.resolveInputs(systemContext);
-                Context flowContext = new Context(variables, magicVariableHelper.getGlobalContext(executionRuntimeServices));
+
+                Context flowContext = runEnv.getStack().popContext();
+                flowContext.putVariables(debuggerBreakpointsHandler.resolveInputs(systemContext));
                 runEnv.getStack().pushContext(flowContext);
 
             }
