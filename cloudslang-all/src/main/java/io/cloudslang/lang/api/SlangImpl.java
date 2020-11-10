@@ -32,7 +32,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang.Validate;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,7 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SlangImpl implements Slang {
 
-    private static final Logger logger = Logger.getLogger(SlangImpl.class);
+    private static final Logger logger = LogManager.getLogger(SlangImpl.class);
 
     @Autowired
     private SlangCompiler compiler;
@@ -159,6 +160,7 @@ public class SlangImpl implements Slang {
 
         Map<String, Serializable> executionContext = new HashMap<>();
         RunEnvironment runEnv = new RunEnvironment(systemProperties);
+        runEnv.getStatefulSessionsStack().pushSessionsMap(new HashMap<>());
         executionContext.put(ScoreLangConstants.RUN_ENV, runEnv);
 
         executionContext.put(ScoreLangConstants.USER_INPUTS_KEY, (Serializable) runInputs);

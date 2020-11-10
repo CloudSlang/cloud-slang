@@ -12,7 +12,8 @@ package io.cloudslang.lang.runtime.services;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -27,7 +28,7 @@ import java.util.Map;
 @Service
 public class ScriptsService {
 
-    private static final Logger logger = Logger.getLogger(ScriptsService.class);
+    private static final Logger logger = LogManager.getLogger(ScriptsService.class);
 
     private Map<ScriptFunction, String> scriptsMap = new HashMap<>();
 

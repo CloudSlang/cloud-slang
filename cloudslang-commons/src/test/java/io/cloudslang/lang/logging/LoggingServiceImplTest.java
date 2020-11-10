@@ -12,7 +12,6 @@ package io.cloudslang.lang.logging;
 
 import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.log4j.Level;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,6 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static org.apache.logging.log4j.Level.DEBUG;
+import static org.apache.logging.log4j.Level.ERROR;
+import static org.apache.logging.log4j.Level.FATAL;
+import static org.apache.logging.log4j.Level.INFO;
+import static org.apache.logging.log4j.Level.TRACE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -103,16 +107,16 @@ public class LoggingServiceImplTest {
         }).when(singleThreadExecutor).submit(Mockito.any(Runnable.class));
 
         // Tested calls
-        loggingService.logEvent(Level.INFO, "aaa");
-        loggingService.logEvent(Level.ERROR, "bbb");
+        loggingService.logEvent(INFO, "aaa");
+        loggingService.logEvent(ERROR, "bbb");
 
         assertEquals(2, runnableList.size());
 
         assertTrue(runnableList.get(0) instanceof LoggingServiceImpl.LoggingDetailsRunnable);
         assertTrue(runnableList.get(1) instanceof LoggingServiceImpl.LoggingDetailsRunnable);
 
-        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(Level.INFO, "aaa"), runnableList.get(0));
-        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(Level.ERROR, "bbb"), runnableList.get(1));
+        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(INFO, "aaa"), runnableList.get(0));
+        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(ERROR, "bbb"), runnableList.get(1));
     }
 
     @Test
@@ -137,10 +141,10 @@ public class LoggingServiceImplTest {
         final String message4 = "message4";
 
         // Tested calls
-        loggingService.logEvent(Level.DEBUG, message1, ex1);
-        loggingService.logEvent(Level.TRACE, message2, ex2);
-        loggingService.logEvent(Level.ERROR, message3, ex3);
-        loggingService.logEvent(Level.FATAL, message4, ex4);
+        loggingService.logEvent(DEBUG, message1, ex1);
+        loggingService.logEvent(TRACE, message2, ex2);
+        loggingService.logEvent(ERROR, message3, ex3);
+        loggingService.logEvent(FATAL, message4, ex4);
 
         assertEquals(4, runnableList.size());
         assertTrue(runnableList.get(0) instanceof LoggingServiceImpl.LoggingDetailsRunnable);
@@ -148,10 +152,10 @@ public class LoggingServiceImplTest {
         assertTrue(runnableList.get(2) instanceof LoggingServiceImpl.LoggingDetailsRunnable);
         assertTrue(runnableList.get(3) instanceof LoggingServiceImpl.LoggingDetailsRunnable);
 
-        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(Level.DEBUG, message1, ex1), runnableList.get(0));
-        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(Level.TRACE, message2, ex2), runnableList.get(1));
-        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(Level.ERROR, message3, ex3), runnableList.get(2));
-        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(Level.FATAL, message4, ex4), runnableList.get(3));
+        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(DEBUG, message1, ex1), runnableList.get(0));
+        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(TRACE, message2, ex2), runnableList.get(1));
+        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(ERROR, message3, ex3), runnableList.get(2));
+        assertEquals(new LoggingServiceImpl.LoggingDetailsRunnable(FATAL, message4, ex4), runnableList.get(3));
     }
 
 }

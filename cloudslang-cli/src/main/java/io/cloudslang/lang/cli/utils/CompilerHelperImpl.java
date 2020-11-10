@@ -25,7 +25,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -51,7 +52,7 @@ import static ch.lambdaj.Lambda.convert;
 @Component
 public class CompilerHelperImpl implements CompilerHelper {
 
-    private static final Logger logger = Logger.getLogger(CompilerHelperImpl.class);
+    private static final Logger logger = LogManager.getLogger(CompilerHelperImpl.class);
     private static final String SP_DIR = "properties";
     private static final String INPUT_DIR = "inputs";
     private static final String CONFIG_DIR = "configuration";

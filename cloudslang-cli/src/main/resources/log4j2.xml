@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="LOG_FILE_PATH" value="${sys:app.home}/logs"/>
+        <Property name="LOG_LEVEL" value="INFO"/>
+        <Property name="MAX_FILE_SIZE" value="900KB"/>
+        <Property name="MAX_BACKUP_INDEX" value="10"/>
+        <Property name="LOG_PATTERN" value="[%-5p] %d{yyyy/MM/dd HH:mm:ss} %c{1} - %m %n"/>
+    </Properties>
+
+    <Appenders>
+        <RollingFile name="ExecutionAppender"
+                     fileName="${LOG_FILE_PATH}/execution.log"
+                     filePattern="${LOG_FILE_PATH}/execution.log.%i">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_BACKUP_INDEX}"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="${LOG_LEVEL}">
+            <AppenderRef ref="ExecutionAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>

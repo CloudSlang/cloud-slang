@@ -34,7 +34,8 @@ import io.cloudslang.score.lang.SystemContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -67,7 +68,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 @Component
 public class ExecutableExecutionData extends AbstractExecutionData {
 
-    private static final Logger logger = Logger.getLogger(ExecutableExecutionData.class);
+    private static final Logger logger = LogManager.getLogger(ExecutableExecutionData.class);
     public static final String ACTION_RETURN_VALUES_KEY = "actionReturnValues";
     private static final String PARENT_RUNNING_ID = "PARENT_RUNNING_ID";
     private static final String RUNNING_PLANS_MAP = "RUNNING_PLANS_MAP";

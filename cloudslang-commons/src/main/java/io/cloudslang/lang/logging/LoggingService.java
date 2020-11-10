@@ -10,7 +10,7 @@
 package io.cloudslang.lang.logging;
 
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 import java.util.concurrent.Future;
 

@@ -26,14 +26,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SlangCompilationServiceImpl implements SlangCompilationService {
 
-    private static final Logger logger = Logger.getLogger(SlangCompilationServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(SlangCompilationServiceImpl.class);
 
     @Autowired
     private Slang slang;

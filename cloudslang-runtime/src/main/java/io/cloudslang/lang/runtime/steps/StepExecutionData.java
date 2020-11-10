@@ -39,7 +39,8 @@ import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +71,7 @@ public class StepExecutionData extends AbstractExecutionData {
 
     private static final String DEFAULT_GROUP = "RAS_Operator_Path";
     private static final String DEFAULT_ROBOT_GROUP = "Default";
-    private static final Logger logger = Logger.getLogger(StepExecutionData.class);
+    private static final Logger logger = LogManager.getLogger(StepExecutionData.class);
     @Autowired
     private ArgumentsBinding argumentsBinding;
     @Autowired

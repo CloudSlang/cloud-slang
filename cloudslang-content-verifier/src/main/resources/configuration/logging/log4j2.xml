@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="LOG_FILE_PATH" value="${sys:app.home}/logs"/>
+        <Property name="LOG_PATTERN" value="[%-5p] %d{yyyy/MM/dd HH:mm:ss} %c{1} - %m %n"/>
+        <Property name="MAX_FILE_SIZE" value="900KB"/>
+        <Property name="MAX_BACKUP_INDEX" value="10"/>
+        <Property name="LOG_LEVEL" value="INFO"/>
+    </Properties>
+
+    <Appenders>
+        <RollingFile name="BuilderAppender"
+                     fileName="${LOG_FILE_PATH}/builder.log"
+                     filePattern="${LOG_FILE_PATH}/builder.log.%i">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_BACKUP_INDEX}"/>
+        </RollingFile>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="io.cloudslang.lang" level="DEBUG" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Root level="${LOG_LEVEL}">
+            <AppenderRef ref="BuilderAppender"/>
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</Configuration>

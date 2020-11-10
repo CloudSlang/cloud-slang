@@ -68,8 +68,13 @@
         </dependency>
 
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+           <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
         </dependency>
 
         <dependency>
@@ -283,6 +288,7 @@
                             <failOnWarning>true</failOnWarning>
                             <ignoredUnusedDeclaredDependencies>
                                 <ignoredUnusedDeclaredDependency>javax.xml.bind:jaxb-api:jar:2.3.0</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-core:jar:2.13.3</ignoredUnusedDeclaredDependency>
                             </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>

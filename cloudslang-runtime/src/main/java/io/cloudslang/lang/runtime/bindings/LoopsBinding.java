@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import static io.cloudslang.lang.runtime.env.LoopCondition.LOOP_CONDITION_KEY;
@@ -32,7 +33,7 @@ public class LoopsBinding extends AbstractBinding {
     public static final String FOR_LOOP_EXPRESSION_ERROR_MESSAGE = "Error evaluating for loop expression in step";
     public static final String INVALID_MAP_EXPRESSION_MESSAGE = "Invalid expression for iterating maps";
 
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LogManager.getLogger(getClass());
 
     public LoopCondition getOrCreateLoopCondition(
             LoopStatement forLoopStatement,
