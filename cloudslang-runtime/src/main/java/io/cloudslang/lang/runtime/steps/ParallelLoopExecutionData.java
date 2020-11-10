@@ -46,7 +46,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.DEFAULT_ROI_VALUE;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
+import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_TOTAL_ROI;
 import static org.apache.commons.lang3.Validate.notNull;
 
 /**
@@ -298,6 +300,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         List<Map<String, Serializable>> branchesContext) {
 
         List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
+        Double roiBeforeParallelLoop = executionRuntimeServices.getRoiValue();
         for (EndBranchDataContainer branch : branches) {
             checkExceptionInBranch(branch);
 
@@ -313,6 +316,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
             // up branch path
             branchRuntimeEnvironment.getExecutionPath().up();
+
+            // The ROI value for each branch does already contain any previous ROI value, so we need to subtract it
+            Double branchRoi = (Double) branch.getSystemContext()
+                    .getOrDefault(EXECUTION_TOTAL_ROI, DEFAULT_ROI_VALUE) - roiBeforeParallelLoop;
+            executionRuntimeServices.addRoiValue(branchRoi);
 
             fireEvent(
                 executionRuntimeServices,
