@@ -32,6 +32,7 @@ import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionServi
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -127,10 +128,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 }
             }
             if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_FLOW_INPUTS)) {
-
-                Context flowContext = runEnv.getStack().popContext();
-                flowContext.putVariables(debuggerBreakpointsHandler.resolveInputs(systemContext));
-                runEnv.getStack().pushContext(flowContext);
+                Map<String, Value> variables = debuggerBreakpointsHandler.resolveInputs(systemContext);
+                if (MapUtils.isNotEmpty(variables)) {
+                    Context flowContext = runEnv.getStack().popContext();
+                    if (flowContext != null) {
+                        flowContext.putVariables(variables);
+                        runEnv.getStack().pushContext(flowContext);
+                    } else {
+                        runEnv.getStack().pushContext(new Context(variables,
+                                magicVariableHelper.getGlobalContext(executionRuntimeServices)));
+                    }
+                }
             }
 
             executableInputs = Collections.unmodifiableList(mutableInputList);
