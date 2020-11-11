@@ -24,7 +24,9 @@ import io.cloudslang.lang.runtime.bindings.ResultsBinding;
 import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
 import io.cloudslang.lang.runtime.env.Context;
+import io.cloudslang.lang.runtime.env.ContextStack;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
+import io.cloudslang.lang.runtime.env.ParentFlowStack;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
@@ -133,8 +135,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 if (MapUtils.isNotEmpty(variables)) {
                     Context flowContext = runEnv.getStack().popContext();
                     if (flowContext != null) {
-                        flowContext.putVariables(variables);
-                        runEnv.getStack().pushContext(flowContext);
+                        updateStacks(runEnv, variables);
                     } else {
                         runEnv.getStack().pushContext(new Context(variables,
                                 magicVariableHelper.getGlobalContext(executionRuntimeServices)));
@@ -253,6 +254,28 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             throw new RuntimeException("Error running: \'" + nodeName + "\'.\n\t " + e.getMessage(), e);
         }
 
+    }
+
+    private void updateStacks(RunEnvironment runEnvironment, Map<String, Value> newValues) {
+        ContextStack tempStack = new ContextStack();
+        Context context = runEnvironment.getStack().popContext();
+        while (context != null) {
+            Map<String, Value> contextVariables = new HashMap<>(context.getImmutableViewOfVariables());
+            for (String input : newValues.keySet()) {
+                if (contextVariables.containsKey(input)) {
+                    contextVariables.put(input, newValues.get(input));
+                }
+            }
+            tempStack.pushContext(new Context(contextVariables,
+                    context.getImmutableViewOfMagicVariables()));
+            context = runEnvironment.getStack().popContext();
+        }
+        ParentFlowStack parentFlowStack = runEnvironment.getParentFlowStack();
+        runEnvironment.resetStacks();
+        runEnvironment.setParentFlowStack(parentFlowStack);
+        while (tempStack.peekContext() != null) {
+            runEnvironment.getStack().pushContext(tempStack.popContext());
+        }
     }
 
     private List<Input> addUserDefinedStepInputs(List<Input> executableInputs,

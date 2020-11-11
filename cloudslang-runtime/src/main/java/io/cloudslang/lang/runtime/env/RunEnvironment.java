@@ -18,6 +18,8 @@ import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.api.StatefulSessionStack;
+import org.apache.commons.lang3.Validate;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.Validate;
 
 /**
  * User: stoneo
@@ -93,6 +94,10 @@ public class RunEnvironment implements Serializable {
 
     public ParentFlowStack getParentFlowStack() {
         return parentFlowStack;
+    }
+
+    public void setParentFlowStack(ParentFlowStack parentFlowStack) {
+        this.parentFlowStack = parentFlowStack;
     }
 
     public Map<String, Value> removeCallArguments() {
