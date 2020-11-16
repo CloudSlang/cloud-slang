@@ -435,7 +435,7 @@ public abstract class AbstractExecutionData {
 
     private List<String> mapContextToSensitiveKeys(Map<String, Value> context) {
         return context.entrySet().stream()
-                .filter(entry -> entry.getValue().isSensitive())
+                .filter(entry -> entry != null && entry.getValue() != null && entry.getValue().isSensitive())
                 .map(Entry::getKey).collect(Collectors.toList());
     }
 
