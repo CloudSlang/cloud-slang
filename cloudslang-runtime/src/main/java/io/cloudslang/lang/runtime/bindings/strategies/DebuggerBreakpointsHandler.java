@@ -9,13 +9,10 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings.strategies;
 
-import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
-
-import java.util.Map;
 
 
 public interface DebuggerBreakpointsHandler extends InputHandler {
@@ -28,5 +25,4 @@ public interface DebuggerBreakpointsHandler extends InputHandler {
             String stepName,
             String stepId);
 
-    Map<String, Value> resolveInputs(SystemContext systemContext);
 }

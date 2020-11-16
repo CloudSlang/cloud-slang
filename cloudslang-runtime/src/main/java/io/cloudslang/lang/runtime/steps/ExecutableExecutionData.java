@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.DEBUGGER_EXECUTABLE_INPUTS;
 import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
 import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
@@ -130,24 +131,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     }
                 }
             }
-            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_FLOW_INPUTS)) {
-                Map<String, Value> variables = debuggerBreakpointsHandler.resolveInputs(systemContext);
-                if (MapUtils.isNotEmpty(variables)) {
-                    Context flowContext = runEnv.getStack().popContext();
-                    if (flowContext != null) {
-                        updateStacks(runEnv, variables);
-                    } else {
-                        runEnv.getStack().pushContext(new Context(variables,
-                                magicVariableHelper.getGlobalContext(executionRuntimeServices)));
-                    }
-                }
-            }
 
             executableInputs = Collections.unmodifiableList(mutableInputList);
 
-            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_EXECUTABLE_INPUTS)) {
-                callArguments.putAll(debuggerBreakpointsHandler.applyValues(systemContext, executableInputs));
-            }
             //restore what was already prompted and add newly prompted values
             Map<String, Value> promptedValues = runEnv.removePromptedValues();
             promptedValues.putAll(missingInputHandler.applyPromptInputValues(systemContext, executableInputs));
