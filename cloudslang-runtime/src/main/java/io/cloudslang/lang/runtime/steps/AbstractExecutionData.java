@@ -35,6 +35,7 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 
 import static io.cloudslang.lang.entities.properties.EventVerbosityLevel.ALL;
 import static io.cloudslang.lang.entities.properties.EventVerbosityLevel.DEFAULT;
@@ -86,13 +88,13 @@ public abstract class AbstractExecutionData {
 
     @SafeVarargs
     public static void fireEvent(ExecutionRuntimeServices runtimeServices,
-            RunEnvironment runEnvironment,
-            String type,
-            String description,
-            LanguageEventData.StepType stepType,
-            String stepName,
-            ReadOnlyContextAccessor contextAccessor,
-            Map.Entry<String, ? extends Serializable>... fields) {
+                                 RunEnvironment runEnvironment,
+                                 String type,
+                                 String description,
+                                 LanguageEventData.StepType stepType,
+                                 String stepName,
+                                 ReadOnlyContextAccessor contextAccessor,
+                                 Map.Entry<String, ? extends Serializable>... fields) {
 
         LanguageEventData eventData = getLanguageEventData(runtimeServices, type, description,
                 runEnvironment.getExecutionPath().getCurrentPath(), stepType, stepName);
@@ -132,9 +134,9 @@ public abstract class AbstractExecutionData {
     }
 
     private static void addEventToRuntime(ExecutionRuntimeServices runtimeServices,
-            String type,
-            LanguageEventData eventData,
-            Entry<String, ? extends Serializable>[] fields) {
+                                          String type,
+                                          LanguageEventData eventData,
+                                          Entry<String, ? extends Serializable>[] fields) {
         for (Entry<String, ? extends Serializable> field : fields) {
             eventData.put(field.getKey(), LanguageEventData.maskSensitiveValues(field.getValue()));
         }
@@ -151,7 +153,7 @@ public abstract class AbstractExecutionData {
     }
 
     protected static void prepareNodeName(ExecutionRuntimeServices executionRuntimeServices, String nodeName,
-            int flowDepth) {
+                                          int flowDepth) {
 
         executionRuntimeServices.setNodeName(nodeName);
         executionRuntimeServices.setNodeNameWithDepth(nodeName + "_" + flowDepth);
@@ -330,10 +332,14 @@ public abstract class AbstractExecutionData {
                                           String stepName,
                                           Map<String, Value> context) {
         Map<String, Value> inputsForEvent = new LinkedHashMap<>();
+        List<String> sensitiveKeys = new ArrayList<>();
         for (Input input : inputs) {
             String inputName = input.getName();
             Value inputValue = boundInputValues.get(inputName);
             inputsForEvent.put(inputName, inputValue);
+            if (inputValue.isSensitive()) {
+                sensitiveKeys.add(inputName);
+            }
         }
         fireEvent(
                 executionRuntimeServices,
@@ -343,7 +349,9 @@ public abstract class AbstractExecutionData {
                 stepType,
                 stepName,
                 context,
-                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent)
+                Pair.of(LanguageEventData.BOUND_INPUTS, (Serializable) inputsForEvent),
+                Pair.of(LanguageEventData.SENSITIVE_KEYS, (Serializable) sensitiveKeys),
+                Pair.of(LanguageEventData.CONTEXT_SENSITIVE_KEYS, (Serializable) mapContextToSensitiveKeys(context))
         );
     }
 
@@ -379,10 +387,14 @@ public abstract class AbstractExecutionData {
             String stepName,
             Map<String, Value> context) {
         Map<String, Value> argumentsForEvent = new LinkedHashMap<>();
+        List<String> sensitiveKeys = new ArrayList<>();
         for (Argument argument : arguments) {
             String argumentName = argument.getName();
             Value argumentValue = boundInputs.get(argumentName);
             argumentsForEvent.put(argumentName, argumentValue);
+            if (argumentValue.isSensitive()) {
+                sensitiveKeys.add(argumentName);
+            }
         }
         fireEvent(
                 executionRuntimeServices,
@@ -391,7 +403,9 @@ public abstract class AbstractExecutionData {
                 LanguageEventData.StepType.STEP,
                 stepName,
                 context,
-                Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent)
+                Pair.of(LanguageEventData.BOUND_ARGUMENTS, (Serializable) argumentsForEvent),
+                Pair.of(LanguageEventData.SENSITIVE_KEYS, (Serializable) sensitiveKeys),
+                Pair.of(LanguageEventData.CONTEXT_SENSITIVE_KEYS, (Serializable) mapContextToSensitiveKeys(context))
         );
     }
 
@@ -417,6 +431,12 @@ public abstract class AbstractExecutionData {
                     executableReturnValues.getResult());
         }
         return navigation;
+    }
+
+    private List<String> mapContextToSensitiveKeys(Map<String, Value> context) {
+        return context.entrySet().stream()
+                .filter(entry -> entry != null && entry.getValue() != null && entry.getValue().isSensitive())
+                .map(Entry::getKey).collect(Collectors.toList());
     }
 
 

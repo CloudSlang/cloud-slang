@@ -41,6 +41,8 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String INPUTS = "INPUTS";
     public static final String ARGUMENTS = "ARGUMENTS";
     public static final String BOUND_INPUTS = "BOUND_INPUTS";
+    public static final String SENSITIVE_KEYS = "SENSITIVE_KEYS";
+    public static final String CONTEXT_SENSITIVE_KEYS = "CONTEXT_SENSITIVE_KEYS";
     public static final String BOUND_ARGUMENTS = "BOUND_ARGUMENTS";
     public static final String BOUND_PARALLEL_LOOP_EXPRESSION = "BOUND_PARALLEL_LOOP_EXPRESSION";
     public static final String NEXT_STEP_POSITION = "nextPosition";
