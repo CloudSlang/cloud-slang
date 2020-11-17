@@ -32,7 +32,6 @@ import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionServi
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -128,25 +127,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     }
                 }
             }
-            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_FLOW_INPUTS)) {
-                Map<String, Value> variables = debuggerBreakpointsHandler.resolveInputs(systemContext);
-                if (MapUtils.isNotEmpty(variables)) {
-                    Context flowContext = runEnv.getStack().popContext();
-                    if (flowContext != null) {
-                        flowContext.putVariables(variables);
-                        runEnv.getStack().pushContext(flowContext);
-                    } else {
-                        runEnv.getStack().pushContext(new Context(variables,
-                                magicVariableHelper.getGlobalContext(executionRuntimeServices)));
-                    }
-                }
-            }
 
             executableInputs = Collections.unmodifiableList(mutableInputList);
 
-            if (systemContext.containsKey(ScoreLangConstants.DEBUGGER_EXECUTABLE_INPUTS)) {
-                callArguments.putAll(debuggerBreakpointsHandler.applyValues(systemContext, executableInputs));
-            }
             //restore what was already prompted and add newly prompted values
             Map<String, Value> promptedValues = runEnv.removePromptedValues();
             promptedValues.putAll(missingInputHandler.applyPromptInputValues(systemContext, executableInputs));
