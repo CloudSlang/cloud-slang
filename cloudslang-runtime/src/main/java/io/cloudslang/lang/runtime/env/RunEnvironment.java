@@ -96,10 +96,6 @@ public class RunEnvironment implements Serializable {
         return parentFlowStack;
     }
 
-    public void setParentFlowStack(ParentFlowStack parentFlowStack) {
-        this.parentFlowStack = parentFlowStack;
-    }
-
     public Map<String, Value> removeCallArguments() {
         Map<String, Value> callArgumentsValues = callArguments;
         callArguments = new HashMap<>();
