@@ -14,7 +14,6 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Iterator;
 
 /**
  * User: stoneo
@@ -46,13 +45,12 @@ public class ContextStack implements Serializable {
     }
 
     public void updateVariable(String name, Value value) {
-        Iterator<Context> contextIterator = this.stack.iterator();
-        while (contextIterator.hasNext()) {
-            Context context = contextIterator.next();
-            if (context.getImmutableViewOfVariables().containsKey(name)) {
-                context.putVariable(name, value);
-            }
+        if (this.stack.size() > 1) {
+            this.stack.removeFirst();
         }
-
+        Context flowContext = this.stack.getLast();
+        if (flowContext.getImmutableViewOfVariables().containsKey(name)) {
+            flowContext.putVariable(name, value);
+        }
     }
 }
