@@ -9,10 +9,12 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.env;
 
+import io.cloudslang.lang.entities.bindings.values.Value;
+
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Stack;
+import java.util.Iterator;
 
 /**
  * User: stoneo
@@ -41,5 +43,16 @@ public class ContextStack implements Serializable {
 
     public Context peekContext() {
         return stack.peek();
+    }
+
+    public void updateVariable(String name, Value value) {
+        Iterator<Context> contextIterator = this.stack.iterator();
+        while (contextIterator.hasNext()) {
+            Context context = contextIterator.next();
+            if (context.getImmutableViewOfVariables().containsKey(name)) {
+                context.putVariable(name, value);
+            }
+        }
+
     }
 }
