@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Map;
 
 /**
  * User: stoneo
@@ -44,13 +45,17 @@ public class ContextStack implements Serializable {
         return stack.peek();
     }
 
-    public void updateVariable(String name, Value value) {
+    public void updateVariables(Map<String, Value> newVariables) {
         if (this.stack.size() > 1) {
             this.stack.removeFirst();
         }
         Context flowContext = this.stack.getLast();
-        if (flowContext.getImmutableViewOfVariables().containsKey(name)) {
-            flowContext.putVariable(name, value);
-        }
+        newVariables.keySet().forEach(variable -> {
+            if (flowContext.getImmutableViewOfVariables().containsKey(variable)) {
+                flowContext.putVariable(variable, newVariables.get(variable));
+
+            }
+        });
+
     }
 }
