@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.DEBUGGER_EXECUTABLE_INPUTS;
 import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
 import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
@@ -136,10 +137,18 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
-            List<Input> partialExecutableInputs =
-                    addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
             List<Input> newExecutableInputs =
-                    addUserDefinedDebuggerStepInputs(partialExecutableInputs, callArguments);
+                    addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
+            if (systemContext.containsKey(DEBUGGER_EXECUTABLE_INPUTS)) {
+                Map<String, Value> debuggerInputs =
+                        (Map<String, Value>) systemContext.remove(DEBUGGER_EXECUTABLE_INPUTS);
+                List<Input> newInputs = debuggerInputs.keySet().stream().map(key ->
+                        new Input.InputBuilder(key, debuggerInputs.get(key)).build()).collect(toList());
+                List<Input> updatedExecutableInputs = new ArrayList<>(newExecutableInputs.size() + newInputs.size());
+                updatedExecutableInputs.addAll(executableInputs);
+                updatedExecutableInputs.addAll(newInputs);
+                newExecutableInputs = updatedExecutableInputs;
+            }
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
                     newExecutableInputs,
@@ -428,33 +437,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 )
                 .collect(toList());
 
-    }
-
-    private List<Input> addUserDefinedDebuggerStepInputs(List<Input> executableInputs,
-                                                         Map<String, Value> callArguments) {
-        Set<String> inputNames = executableInputs.stream().map(Input::getName)
-                .collect(toCollection(LinkedHashSet::new));
-        Set<String> debuggerInputNames = callArguments.keySet();
-        List<Input> newExecInputs = Sets
-                .difference(debuggerInputNames, inputNames)
-                .stream()
-                .map(additionalInputName ->
-                        new Input
-                                .InputBuilder(additionalInputName, callArguments.get(additionalInputName))
-                                .build()
-                )
-                .collect(toList());
-
-
-        if (newExecInputs.size() == 0) {
-            return executableInputs;
-        }
-
-        List<Input> newExecutableInputs = new ArrayList<>(executableInputs.size() + newExecInputs.size());
-        newExecutableInputs.addAll(executableInputs);
-        newExecutableInputs.addAll(newExecInputs);
-
-        return newExecutableInputs;
     }
 
     public void saveStepInputsResultContext(RunEnvironment runEnv,
