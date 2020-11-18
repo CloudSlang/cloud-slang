@@ -136,9 +136,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             Map<String, Prompt> promptArguments = runEnv.removePromptArguments();
 
-            List<Input> newExecutableInputs =
+            List<Input> partialExecutableInputs =
                     addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
-
+            List<Input> newExecutableInputs =
+                    addUserDefinedDebuggerStepInputs(partialExecutableInputs, callArguments);
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
                     newExecutableInputs,
@@ -427,6 +428,33 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 )
                 .collect(toList());
 
+    }
+
+    private List<Input> addUserDefinedDebuggerStepInputs(List<Input> executableInputs,
+                                                         Map<String, Value> callArguments) {
+        Set<String> inputNames = executableInputs.stream().map(Input::getName)
+                .collect(toCollection(LinkedHashSet::new));
+        Set<String> debuggerInputNames = callArguments.keySet();
+        List<Input> newExecInputs = Sets
+                .difference(debuggerInputNames, inputNames)
+                .stream()
+                .map(additionalInputName ->
+                        new Input
+                                .InputBuilder(additionalInputName, callArguments.get(additionalInputName))
+                                .build()
+                )
+                .collect(toList());
+
+
+        if (newExecInputs.size() == 0) {
+            return executableInputs;
+        }
+
+        List<Input> newExecutableInputs = new ArrayList<>(executableInputs.size() + newExecInputs.size());
+        newExecutableInputs.addAll(executableInputs);
+        newExecutableInputs.addAll(newExecInputs);
+
+        return newExecutableInputs;
     }
 
     public void saveStepInputsResultContext(RunEnvironment runEnv,
