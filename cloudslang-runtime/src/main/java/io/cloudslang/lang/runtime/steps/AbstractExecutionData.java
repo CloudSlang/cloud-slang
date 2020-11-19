@@ -426,7 +426,8 @@ public abstract class AbstractExecutionData {
                                                             Context currentContext,
                                                             Map<String, Value> callArguments,
                                                             Map<String, Prompt> prompts) {
-        updateCallArgumentsAndPushContextToStack(runEnvironment,currentContext,callArguments,prompts,true);
+        updateCallArgumentsAndPushContextToStack(runEnvironment, currentContext, callArguments, prompts,
+                true);
 
     }
 
