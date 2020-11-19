@@ -142,9 +142,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             if (systemContext.containsKey(DEBUGGER_EXECUTABLE_INPUTS)) {
                 Map<String, Value> debuggerInputs =
                         (Map<String, Value>) systemContext.remove(DEBUGGER_EXECUTABLE_INPUTS);
-                List<Input> newInputs = debuggerInputs.keySet().stream().map(key ->
-                        new Input.InputBuilder(key, debuggerInputs.get(key)).build()).collect(toList());
-                List<Input> updatedExecutableInputs = new ArrayList<>(newExecutableInputs.size() + newInputs.size());
+                List<Input> newInputs = debuggerInputs.entrySet().stream().map(entry ->
+                        new Input.InputBuilder(entry.getKey(), entry.getValue()).build()).collect(toList());
+                List<Input> updatedExecutableInputs = new ArrayList<>(newExecutableInputs.size() +
+                        newInputs.size());
                 updatedExecutableInputs.addAll(executableInputs);
                 updatedExecutableInputs.addAll(newInputs);
                 newExecutableInputs = updatedExecutableInputs;
