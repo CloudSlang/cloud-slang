@@ -47,12 +47,9 @@ public class ContextStack implements Serializable {
 
     public void updateVariables(Map<String, Value> newVariables) {
         Context flowContext = this.stack.getLast();
-        newVariables.keySet().forEach(variable -> {
-            if (flowContext.getImmutableViewOfVariables().containsKey(variable)) {
-                flowContext.putVariable(variable, newVariables.get(variable));
-
-            }
-        });
+        newVariables.keySet().stream()
+                .filter(variable -> flowContext.getVariable(variable) != null)
+                .forEach(variable -> flowContext.putVariable(variable, newVariables.get(variable)));
 
     }
 }
