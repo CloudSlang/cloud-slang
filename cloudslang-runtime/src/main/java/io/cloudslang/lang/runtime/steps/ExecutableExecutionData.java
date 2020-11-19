@@ -222,7 +222,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
 
             updateCallArgumentsAndPushContextToStack(runEnv,
-                    new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>());
+                    new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>(), continueToNext);
 
             sendEndBindingInputsEvent(
                     newExecutableInputs,

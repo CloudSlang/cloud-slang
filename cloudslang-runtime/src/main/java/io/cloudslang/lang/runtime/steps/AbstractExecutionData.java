@@ -35,7 +35,6 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
@@ -48,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 
 import static io.cloudslang.lang.entities.properties.EventVerbosityLevel.ALL;
 import static io.cloudslang.lang.entities.properties.EventVerbosityLevel.DEFAULT;
@@ -412,11 +411,15 @@ public abstract class AbstractExecutionData {
     protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment,
                                                             Context currentContext,
                                                             Map<String, Value> callArguments,
-                                                            Map<String, Prompt> prompts) {
-        ContextStack contextStack = runEnvironment.getStack();
-        contextStack.pushContext(currentContext);
+                                                            Map<String, Prompt> prompts,
+                                                            boolean pushContext) {
+        if (pushContext) {
+            ContextStack contextStack = runEnvironment.getStack();
+            contextStack.pushContext(currentContext);
+        }
         runEnvironment.putCallArguments(callArguments);
         runEnvironment.putPromptArguments(prompts);
+
     }
 
     protected ResultNavigation getResultNavigation(Map<String, ResultNavigation> stepNavigationValues,
