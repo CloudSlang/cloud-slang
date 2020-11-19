@@ -150,8 +150,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     runEnv,
                     flowContext,
                     boundInputs,
-                    createPrompts(stepInputs),
-                    true);
+                    createPrompts(stepInputs));
 
             Value workerGroupValue = flowContext.removeLanguageVariable(WORKER_GROUP_VALUE);
             Value workerGroupOverride = flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE);

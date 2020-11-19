@@ -422,6 +422,14 @@ public abstract class AbstractExecutionData {
 
     }
 
+    protected void updateCallArgumentsAndPushContextToStack(RunEnvironment runEnvironment,
+                                                            Context currentContext,
+                                                            Map<String, Value> callArguments,
+                                                            Map<String, Prompt> prompts) {
+        updateCallArgumentsAndPushContextToStack(runEnvironment,currentContext,callArguments,prompts,true);
+
+    }
+
     protected ResultNavigation getResultNavigation(Map<String, ResultNavigation> stepNavigationValues,
                                                    String nodeName, ReturnValues executableReturnValues,
                                                    String executableResult) {
