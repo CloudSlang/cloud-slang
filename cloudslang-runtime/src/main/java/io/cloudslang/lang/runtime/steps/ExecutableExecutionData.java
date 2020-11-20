@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.DEBUGGER_EXECUTABLE_INPUTS;
 import static io.cloudslang.lang.entities.ScoreLangConstants.USE_EMPTY_VALUES_FOR_PROMPTS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
 import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
@@ -138,7 +139,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             List<Input> newExecutableInputs =
                     addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
-
+            if (systemContext.containsKey(DEBUGGER_EXECUTABLE_INPUTS)) {
+                Map<String, Value> debuggerInputs =
+                        (Map<String, Value>) systemContext.remove(DEBUGGER_EXECUTABLE_INPUTS);
+                List<Input> newInputs = debuggerInputs.entrySet().stream().map(entry ->
+                        new Input.InputBuilder(entry.getKey(), entry.getValue()).build()).collect(toList());
+                List<Input> updatedExecutableInputs = new ArrayList<>(newExecutableInputs.size() +
+                        newInputs.size());
+                updatedExecutableInputs.addAll(executableInputs);
+                updatedExecutableInputs.addAll(newInputs);
+                newExecutableInputs = updatedExecutableInputs;
+            }
             LanguageEventData.StepType stepType = LanguageEventData.convertExecutableType(executableType);
             sendStartBindingInputsEvent(
                     newExecutableInputs,
@@ -212,7 +223,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             }
 
             updateCallArgumentsAndPushContextToStack(runEnv,
-                    new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>());
+                    new Context(boundInputValues, magicVariables), actionArguments, new HashMap<>(), continueToNext);
 
             sendEndBindingInputsEvent(
                     newExecutableInputs,
