@@ -69,4 +69,9 @@ public class ForLoopCondition implements LoopCondition {
                 .append(index)
                 .toHashCode();
     }
+
+
+    public int getIndex() {
+        return index;
+    }
 }
