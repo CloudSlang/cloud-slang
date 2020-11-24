@@ -32,9 +32,11 @@ import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionServi
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -178,16 +180,13 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 if (systemContext.containsKey(PARENT_RUNNING_ID)) {
                     parentRid = (Long) systemContext.get(PARENT_RUNNING_ID);
                 }
-                String newNodeName = executionRuntimeServices.getNodeName();
                 continueToNext = !debuggerBreakpointsHandler.handleBreakpoints(
                         systemContext,
                         runEnv,
                         executionRuntimeServices,
                         stepType,
                         nodeName,
-                        executionRuntimeServices.extractParentNameFromRunId(parentRid) + "." +
-                                //need new node name for debugger, node name is still set to the last value
-                                newNodeName);
+                        extractUuid(executionRuntimeServices, parentRid));
             }
 
             //if there are any missing required input after binding
@@ -449,5 +448,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             finalActionArguments.putAll(promptedValues);
             saveStepInputsResultContext(flowContext, finalActionArguments);
         }
+    }
+
+    private String extractUuid(ExecutionRuntimeServices executionRuntimeServices, Long parentRid) {
+        String parentName;
+        String newNodeName;
+        if (StringUtils.isEmpty(parentName = executionRuntimeServices.extractParentNameFromRunId(parentRid)) ||
+                StringUtils.isEmpty(newNodeName = executionRuntimeServices.getNodeName())) {
+            return Strings.EMPTY;
+        } else {
+            return parentName + "." + newNodeName;
+        }
+
     }
 }
