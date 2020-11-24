@@ -10,7 +10,7 @@
     -->
     <groupId>io.cloudslang.lang</groupId>
     <artifactId>cloudslang</artifactId>
-    <version>1.0.222-SNAPSHOT</version>
+    <version>1.0.222</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -28,7 +28,7 @@
         <connection>scm:git:https://github.com/CloudSlang/cloud-slang.git</connection>
         <developerConnection>scm:git:git@github.com:CloudSlang/cloud-slang.git</developerConnection>
         <url>https://github.com/CloudSlang/cloud-slang.git</url>
-        <tag>master</tag>
+        <tag>cloudslang-1.0.222</tag>
     </scm>
 
     <properties>
