@@ -101,22 +101,22 @@ public class ScriptEvaluatorTest {
     private PythonInterpreter pythonInterpreter;
 
     @Resource(name = "jythonRuntimeService")
-    private PythonRuntimeService pythonRuntimeService;
+    private PythonRuntimeService jythonRuntimeService;
 
     @Test
     public void testEvalExpr() throws Exception {
-        reset(pythonRuntimeService);
-        when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
+        reset(jythonRuntimeService);
+        when(jythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
                 .thenReturn(new PythonEvaluationResult("result", new HashMap<String, Serializable>()));
         scriptEvaluator.evalExpr("", new HashMap<String, Value>(),
                 new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
-        verify(pythonRuntimeService).eval(eq(""), anyString(), anyMap());
+        verify(jythonRuntimeService).eval(eq(""), anyString(), anyMap());
     }
 
     @Test
     public void testEvalExprError() throws Exception {
-        reset(pythonRuntimeService);
-        when(pythonRuntimeService.eval(anyString(), anyString(), anyMap()))
+        reset(jythonRuntimeService);
+        when(jythonRuntimeService.eval(anyString(), anyString(), anyMap()))
                 .thenThrow(new RuntimeException("error from interpreter"));
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
@@ -126,8 +126,8 @@ public class ScriptEvaluatorTest {
     }
 
     @Test
-    public void testEvalFunctions() throws Exception {
-        reset(pythonRuntimeService);
+    public void testEvalFunctions() {
+        reset(jythonRuntimeService);
         Set<SystemProperty> props = new HashSet<>();
         SystemProperty systemProperty = new SystemProperty("a.b", "c.key", "value", "");
         props.add(systemProperty);
@@ -138,17 +138,18 @@ public class ScriptEvaluatorTest {
         Map<String, Serializable> scriptReturnContext = new HashMap<>();
         scriptReturnContext.put(SYSTEM_PROPERTIES_MAP, new PyDictionary());
 
-        when(pythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
+        when(jythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
                 .thenReturn(new PythonEvaluationResult("result", scriptReturnContext));
 
         String expr = "";
-        scriptEvaluator.evalExpr(expr, new HashMap<String, Value>(), props, functionDependencies);
+        scriptEvaluator.evalExpr(expr, new HashMap<>(), props, functionDependencies);
 
-        Map<String, Serializable> expectedContext = new HashMap<>();
-        Map<String, Value> properties = new HashMap<>();
+        HashMap<String, Value> properties = new HashMap<>();
         properties.put("a.b.c.key", ValueFactory.createPyObjectValue("value", false, false));
+        Map<String, Serializable> expectedContext = new HashMap<>();
+        expectedContext.put("sys_prop", properties);
 
-        verify(pythonRuntimeService).eval(scriptCaptor.capture(), eq(expr), eq(expectedContext));
+        verify(jythonRuntimeService).eval(scriptCaptor.capture(), eq(expr), eq(expectedContext));
 
         final String actualScript = scriptCaptor.getValue();
         String[] actualFunctionsArray = actualScript.split(LINE_SEPARATOR + LINE_SEPARATOR);
