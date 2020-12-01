@@ -9,21 +9,13 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings.scripts;
 
-import io.cloudslang.lang.entities.bindings.values.PlainPyObjectValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 
 import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-/**
- * Script processor
- * <p>
- * Created by Ifat Gavish on 25/05/2016
- */
 public abstract class ScriptProcessor {
 
     protected Map<String, Serializable> createPythonContext(Map<String, Value> context, boolean externalPython) {

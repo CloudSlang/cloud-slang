@@ -25,12 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -40,7 +40,8 @@ import java.util.stream.Stream;
  */
 @Component
 public class ScriptEvaluator extends ScriptProcessor {
-    private static String LINE_SEPARATOR = "\n";
+
+    private static final String LINE_SEPARATOR = "\n";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
     private static final String ACCESS_MONITORING_METHOD_NAME = "accessed";
@@ -49,41 +50,39 @@ public class ScriptEvaluator extends ScriptProcessor {
             LINE_SEPARATOR + "  pass";
     private static final boolean EXTERNAL_PYTHON = !Boolean.valueOf(
             System.getProperty("use.jython.expressions", "true"));
-
-
     public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
+
+    @Resource(name = "jythonRuntimeService")
+    private PythonRuntimeService jythonRuntimeService;
 
     @Resource(name = "externalPythonRuntimeService")
     private PythonRuntimeService pythonRuntimeService;
 
-    @Resource(name = "jythonRuntimeService")
-    private PythonRuntimeService legacyJythonRuntimeService;
-
     @Autowired
     private ScriptsService scriptsService;
 
-    public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
-                          Set<ScriptFunction> functionDependencies) {
-        try {
+    public Value evalExpr(String expr,
+            Map<String, Value> context,
+            Set<SystemProperty> systemProperties,
+            Set<ScriptFunction> functionDependencies) {
 
+        try {
             Map<String, Serializable> pythonContext = createPythonContext(context, EXTERNAL_PYTHON);
             boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
             if (systemPropertiesDefined) {
-                pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties,
-                        EXTERNAL_PYTHON));
+                pythonContext.put(SYSTEM_PROPERTIES_MAP, prepareSystemProperties(systemProperties, EXTERNAL_PYTHON));
             }
 
             if (EXTERNAL_PYTHON) {
                 PythonEvaluationResult result = pythonRuntimeService.eval(
-                        buildAddFunctionsScript(functionDependencies), expr, pythonContext);
+                        buildFunctionsScriptExternalPython(functionDependencies), expr, pythonContext);
 
                 //noinspection unchecked
                 Set<String> accessedResources = (Set<String>) result.getResultContext().get(ACCESSED_RESOURCES_SET);
                 return ValueFactory.create(result.getEvalResult(),
-                        getSensitive(pythonContext, accessedResources));
+                        isAnyAccessedVariableSensitive(pythonContext, accessedResources));
             } else {
-                return processLegacyPythonEvaluation(expr, pythonContext, systemPropertiesDefined,
-                        functionDependencies);
+                return processJythonEvaluation(expr, pythonContext, systemPropertiesDefined, functionDependencies);
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error in evaluating expression: '" +
@@ -99,21 +98,20 @@ public class ScriptEvaluator extends ScriptProcessor {
             Map<String, Serializable> pythonContext = createPythonContext(context, EXTERNAL_PYTHON);
             boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
             if (systemPropertiesDefined) {
-                pythonContext.put(SYSTEM_PROPERTIES_MAP, (Serializable) prepareSystemProperties(systemProperties,
+                pythonContext.put(SYSTEM_PROPERTIES_MAP, prepareSystemProperties(systemProperties,
                         EXTERNAL_PYTHON));
             }
 
             if (EXTERNAL_PYTHON) {
                 PythonEvaluationResult result = pythonRuntimeService.test(
-                        buildAddFunctionsScript(functionDependencies), expr, pythonContext,
-                        timeoutPeriod);
+                        buildFunctionsScriptExternalPython(functionDependencies), expr, pythonContext, timeoutPeriod);
 
                 //noinspection unchecked
                 Set<String> accessedResources = (Set<String>) result.getResultContext().get(ACCESSED_RESOURCES_SET);
                 return ValueFactory.create(result.getEvalResult(),
-                        getSensitive(pythonContext, accessedResources));
+                        isAnyAccessedVariableSensitive(pythonContext, accessedResources));
             } else {
-                return processLegacyPythonExpressionTesting(expr, pythonContext, systemPropertiesDefined,
+                return processJythonExpressionTesting(expr, pythonContext, systemPropertiesDefined,
                         functionDependencies, timeoutPeriod);
             }
         } catch (Exception exception) {
@@ -127,26 +125,33 @@ public class ScriptEvaluator extends ScriptProcessor {
         return expr.length() > MAX_LENGTH ? expr.substring(0, MAX_LENGTH) + "..." : expr;
     }
 
-    private String buildAddFunctionsScript(Set<ScriptFunction> functionDependencies) {
-        String functions = "";
+    private String buildFunctionsScriptExternalPython(Set<ScriptFunction> functionDependencies) {
+        StringBuilder functionsBuilder = new StringBuilder();
+        doBuildFunctionsScript(functionDependencies, LINE_SEPARATOR, functionsBuilder);
+        return functionsBuilder.toString();
+    }
+
+    private String buildFunctionsScriptJython(Set<ScriptFunction> functionDependencies) {
+        StringBuilder functionsBuilder = new StringBuilder();
+        doBuildFunctionsScript(functionDependencies, LINE_SEPARATOR, functionsBuilder);
+        functionsBuilder.append(BACKWARD_COMPATIBLE_ACCESS_METHOD)
+                .append(LINE_SEPARATOR)
+                .append(LINE_SEPARATOR);
+        return functionsBuilder.toString();
+    }
+
+    private void doBuildFunctionsScript(final Set<ScriptFunction> functionDependencies,
+            final String newLine,
+            final StringBuilder functionsBuilder) {
         for (ScriptFunction function : functionDependencies) {
-            functions += scriptsService.getScript(function);
-            functions = appendDelimiterBetweenFunctions(functions);
-
-            if (!EXTERNAL_PYTHON) {
-                functions += BACKWARD_COMPATIBLE_ACCESS_METHOD;
-                functions = appendDelimiterBetweenFunctions(functions);
-            }
+            functionsBuilder.append(scriptsService.getScript(function))
+                    .append(newLine)
+                    .append(newLine);
         }
-        return functions;
     }
 
-    private String appendDelimiterBetweenFunctions(String text) {
-        return text + LINE_SEPARATOR + LINE_SEPARATOR;
-    }
-
-    private Map<String, Value> prepareSystemProperties(Set<SystemProperty> properties, boolean externalPython) {
-        Map<String, Value> processedSystemProperties = new HashMap<>();
+    private HashMap<String, Value> prepareSystemProperties(Set<SystemProperty> properties, boolean externalPython) {
+        HashMap<String, Value> processedSystemProperties = new HashMap<>();
         for (SystemProperty property : properties) {
             processedSystemProperties.put(property.getFullyQualifiedName(),
                     ValueFactory.createPyObjectValue(property.getValue(), externalPython));
@@ -163,24 +168,16 @@ public class ScriptEvaluator extends ScriptProcessor {
         return processedMessage;
     }
 
-    private boolean getSensitive(Map<String, Serializable> fullContext, Set<String> accessedVariables) {
-        if (CollectionUtils.isEmpty(accessedVariables)) {
-            return false;
-        }
-        Collection<Serializable> accessedValues = fullContext.entrySet().stream()
-                .flatMap(entry -> {
-                    if (entry.getValue() instanceof Map) {
-                        //noinspection unchecked
-                        Map<String, Serializable> nestedContext = (Map<String, Serializable>) entry.getValue();
-                        return nestedContext.entrySet().stream();
-                    } else {
-                        return Stream.of(entry);
-                    }
-                })
-                .filter(entry -> accessedVariables.contains(entry.getKey()))
+    private boolean isAnyAccessedVariableSensitive(Map<String, Serializable> fullContext, Set<String> accessedVars) {
+        //noinspection unchecked
+        return !CollectionUtils.isEmpty(accessedVars) && fullContext.entrySet().stream()
+                .flatMap(entry ->
+                    entry.getValue() instanceof Map ?
+                            ((Map<String, Serializable>) entry.getValue()).entrySet().stream()
+                            : Stream.of(entry))
+                .filter(entry -> accessedVars.contains(entry.getKey()))
                 .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
-        return checkSensitivity(accessedValues);
+                .anyMatch(this::checkSensitivityForValue);
     }
 
     @Deprecated
@@ -210,32 +207,30 @@ public class ScriptEvaluator extends ScriptProcessor {
         return false;
     }
 
-    //region Legacy Content
+    private boolean checkSensitivityForValue(Serializable value) {
+        return (value instanceof PyObjectValue)
+                && ((PyObjectValue) value).isSensitive()
+                && ((PyObjectValue) value).isAccessed();
+    }
 
-    private Value processLegacyPythonEvaluation(String expr, Map<String, Serializable> pythonContext,
+    //region Legacy Content
+    private Value processJythonEvaluation(String expr, Map<String, Serializable> pythonContext,
                                                 boolean systemPropertiesDefined,
                                                 Set<ScriptFunction> functionDependencies) {
-        PythonEvaluationResult result = legacyJythonRuntimeService.eval(
-                buildAddFunctionsScript(functionDependencies), expr, pythonContext);
-        if (systemPropertiesDefined) {
-            pythonContext.remove(SYSTEM_PROPERTIES_MAP);
-        }
+        PythonEvaluationResult result = jythonRuntimeService.eval(
+                buildFunctionsScriptJython(functionDependencies), expr, pythonContext);
         return ValueFactory.create(result.getEvalResult(), getSensitive(result.getResultContext(),
                 systemPropertiesDefined));
     }
 
-    private Value processLegacyPythonExpressionTesting(String expr, Map<String, Serializable> pythonContext,
+    private Value processJythonExpressionTesting(String expr, Map<String, Serializable> pythonContext,
                                                        boolean systemPropertiesDefined,
                                                        Set<ScriptFunction> functionDependencies, long timeoutPeriod) {
-        PythonEvaluationResult result = legacyJythonRuntimeService.test(
-                buildAddFunctionsScript(functionDependencies), expr, pythonContext,
+        PythonEvaluationResult result = jythonRuntimeService.test(
+                buildFunctionsScriptJython(functionDependencies), expr, pythonContext,
                 timeoutPeriod);
-        if (systemPropertiesDefined) {
-            pythonContext.remove(SYSTEM_PROPERTIES_MAP);
-        }
         return ValueFactory.create(result.getEvalResult(), getSensitive(result.getResultContext(),
                 systemPropertiesDefined));
     }
-
     //endregion
 }

@@ -18,51 +18,51 @@ import org.python.core.PyObject;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-/**
- * @author Bonczidai Levente
- * @since 1/19/2016
- */
+import static java.util.Collections.emptySet;
+
 @Component
 public class ScriptExecutor extends ScriptProcessor {
+
     @Resource(name = "jythonRuntimeService")
-    private PythonRuntimeService pythonRuntimeService;
+    private PythonRuntimeService jythonRuntimeService;
 
     @Resource(name = "externalPythonRuntimeService")
-    private PythonRuntimeService externalPytonRuntimeService;
+    private PythonRuntimeService pythonRuntimeService;
 
     public Map<String, Value> executeScript(String script, Map<String, Value> callArguments, boolean useJython) {
-        return executeScript(Collections.emptySet(), script, callArguments, useJython);
+        return executeScript(emptySet(), script, callArguments, useJython);
     }
 
     public Map<String, Value> executeScript(Set<String> dependencies, String script, Map<String, Value> callArguments,
                                             boolean useJython) {
         if (useJython) {
             return runJythonAction(dependencies, script, callArguments);
+        } else {
+            return runExternalPythonAction(dependencies, script, callArguments);
         }
-        return runExternalPythonAction(dependencies, script, callArguments);
     }
 
     private Map<String, Value> runExternalPythonAction(Set<String> dependencies, String script,
                                                        Map<String, Value> callArguments) {
 
-        String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(script);
-        Map<String, Value> neededArguments = callArguments.entrySet().stream()
-                .filter(entry -> Arrays.asList(scriptParams).contains(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(script);
+        final Map<String, Value> neededArguments = new HashMap<>();
+        for (String scriptParam : scriptParams) {
+            if (callArguments.containsKey(scriptParam)) {
+                neededArguments.put(scriptParam, callArguments.get(scriptParam));
+            }
+        }
 
-        Map<String, Serializable> executionResult = externalPytonRuntimeService.exec(dependencies, script,
+        Map<String, Serializable> executionResult = pythonRuntimeService.exec(dependencies, script,
                 createPythonContext(neededArguments, true)).getExecutionResult();
         Map<String, Value> result = new HashMap<>();
-
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value inputValue = callArguments.get(entry.getKey());
             boolean isSensitive = (inputValue != null) && inputValue.isSensitive();
@@ -75,7 +75,7 @@ public class ScriptExecutor extends ScriptProcessor {
                                                Map<String, Value> callArguments) {
 
         Map<String, Value> result = new HashMap<>();
-        Map<String, Serializable> executionResult = pythonRuntimeService
+        Map<String, Serializable> executionResult = jythonRuntimeService
                 .exec(dependencies, script, createPythonContext(callArguments, false)).getExecutionResult();
 
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
