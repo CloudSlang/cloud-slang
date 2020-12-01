@@ -97,24 +97,21 @@ public class ScriptEvaluatorTest {
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
-    @Autowired
-    private PythonInterpreter pythonInterpreter;
-
     @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService jythonRuntimeService;
 
     @Test
-    public void testEvalExpr() throws Exception {
+    public void testEvalExpr() {
         reset(jythonRuntimeService);
         when(jythonRuntimeService.eval(anyString(), anyString(), isA(Map.class)))
                 .thenReturn(new PythonEvaluationResult("result", new HashMap<String, Serializable>()));
-        scriptEvaluator.evalExpr("", new HashMap<String, Value>(),
-                new HashSet<SystemProperty>(), new HashSet<ScriptFunction>());
+        scriptEvaluator.evalExpr("", new HashMap<>(),
+                new HashSet<SystemProperty>(), new HashSet<>());
         verify(jythonRuntimeService).eval(eq(""), anyString(), anyMap());
     }
 
     @Test
-    public void testEvalExprError() throws Exception {
+    public void testEvalExprError() {
         reset(jythonRuntimeService);
         when(jythonRuntimeService.eval(anyString(), anyString(), anyMap()))
                 .thenThrow(new RuntimeException("error from interpreter"));
@@ -122,7 +119,7 @@ public class ScriptEvaluatorTest {
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
         scriptEvaluator.evalExpr("input_expression", new HashMap<>(), new HashSet<>(),
-                new HashSet<ScriptFunction>());
+                new HashSet<>());
     }
 
     @Test

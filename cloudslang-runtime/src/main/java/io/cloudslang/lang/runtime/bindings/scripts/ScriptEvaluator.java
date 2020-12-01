@@ -134,9 +134,11 @@ public class ScriptEvaluator extends ScriptProcessor {
     private String buildFunctionsScriptJython(Set<ScriptFunction> functionDependencies) {
         StringBuilder functionsBuilder = new StringBuilder();
         doBuildFunctionsScript(functionDependencies, LINE_SEPARATOR, functionsBuilder);
-        functionsBuilder.append(BACKWARD_COMPATIBLE_ACCESS_METHOD)
-                .append(LINE_SEPARATOR)
-                .append(LINE_SEPARATOR);
+        if (!functionDependencies.isEmpty()) {
+            functionsBuilder.append(BACKWARD_COMPATIBLE_ACCESS_METHOD)
+                    .append(LINE_SEPARATOR)
+                    .append(LINE_SEPARATOR);
+        }
         return functionsBuilder.toString();
     }
 
