@@ -121,7 +121,7 @@ public class ScriptEvaluatorTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("input_expression");
         exception.expectMessage("error from interpreter");
-        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>(),
+        scriptEvaluator.evalExpr("input_expression", new HashMap<>(), new HashSet<>(),
                 new HashSet<ScriptFunction>());
     }
 
