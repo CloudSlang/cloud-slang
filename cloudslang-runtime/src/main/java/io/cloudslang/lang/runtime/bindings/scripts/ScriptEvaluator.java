@@ -207,10 +207,8 @@ public class ScriptEvaluator extends ScriptProcessor {
         return false;
     }
 
-    private boolean checkSensitivityForValue(Serializable value) {
-        return (value instanceof PyObjectValue)
-                && ((PyObjectValue) value).isSensitive()
-                && ((PyObjectValue) value).isAccessed();
+    private boolean checkSensitivityForValue(Serializable v) {
+        return (v instanceof PyObjectValue) && ((PyObjectValue) v).isSensitive() && ((PyObjectValue) v).isAccessed();
     }
 
     //region Legacy Content
