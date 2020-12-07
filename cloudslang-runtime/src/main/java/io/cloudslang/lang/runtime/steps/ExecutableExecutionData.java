@@ -111,7 +111,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             List<Input> mutableInputList = new ArrayList<>(executableInputs);
 
             if (userInputs != null) {
-
                 callArguments.putAll(userInputs);
                 // merge is done only for flows that have extra inputs besides those defined as "flow inputs"
                 if (executionRuntimeServices.getMergeUserInputs()) {
