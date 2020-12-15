@@ -22,6 +22,7 @@ public class Argument extends InOutParam {
 
     private boolean privateArgument;
     private Prompt prompt;
+    private boolean isExpression;
 
     public Argument(String name, Value value) {
         super(name, value);
@@ -80,5 +81,13 @@ public class Argument extends InOutParam {
 
     public Prompt getPrompt() {
         return prompt;
+    }
+
+    public boolean isExpression() {
+        return isExpression;
+    }
+
+    public void setIsExpression(boolean expression) {
+        this.isExpression = expression;
     }
 }

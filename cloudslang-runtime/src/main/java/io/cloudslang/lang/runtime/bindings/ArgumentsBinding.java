@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -86,7 +87,14 @@ public class ArgumentsBinding extends AbstractBinding {
 
                 Serializable expression = rawValue == null ? null : rawValue.get();
 
-                inputValue = tryEvaluateExpression(expression, evaluationContextHolder).orElse(rawValue);
+                Optional<Value> value = tryEvaluateExpression(expression, evaluationContextHolder);
+                if (value.equals(Optional.empty())) {
+                    inputValue = rawValue;
+                } else {
+                    inputValue = value.get();
+                    argument.setIsExpression(true);
+
+                }
             }
 
             if (argument.hasPrompt()) {

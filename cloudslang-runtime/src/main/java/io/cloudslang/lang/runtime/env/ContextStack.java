@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * User: stoneo
@@ -45,11 +46,17 @@ public class ContextStack implements Serializable {
         return stack.peek();
     }
 
-    public void updateVariables(Map<String, Value> newVariables) {
-        Context flowContext = this.stack.getLast();
-        newVariables.keySet().stream()
-                .filter(variable -> flowContext.getVariable(variable) != null)
-                .forEach(variable -> flowContext.putVariable(variable, newVariables.get(variable)));
-
+    public Boolean updateVariables(Map<String, Value> newVariables) {
+        Context flowContext = peekContext();
+        AtomicReference<Boolean> changedContext = new AtomicReference<>(false);
+        newVariables.keySet()
+                .forEach(variable -> {
+                    if (flowContext.getVariable(variable) != null &&
+                            !flowContext.getVariable(variable).equals(newVariables.get(variable))) {
+                        flowContext.putVariable(variable, newVariables.get(variable));
+                        changedContext.set(true);
+                    }
+                });
+        return changedContext.get();
     }
 }
