@@ -88,12 +88,11 @@ public class ArgumentsBinding extends AbstractBinding {
                 Serializable expression = rawValue == null ? null : rawValue.get();
 
                 Optional<Value> value = tryEvaluateExpression(expression, evaluationContextHolder);
-                if (value.equals(Optional.empty())) {
-                    inputValue = rawValue;
-                } else {
+                if (!value.equals(Optional.empty())) {
                     inputValue = value.get();
                     argument.setIsExpression(true);
-
+                } else {
+                    inputValue = rawValue;
                 }
             }
 

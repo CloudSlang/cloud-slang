@@ -46,16 +46,15 @@ public class ContextStack implements Serializable {
         return stack.peek();
     }
 
-    public Boolean updateVariables(Map<String, Value> newVariables) {
+    public boolean updateVariables(Map<String, Value> newVariables) {
         Context flowContext = peekContext();
         AtomicReference<Boolean> changedContext = new AtomicReference<>(false);
-        newVariables.keySet()
+        newVariables.keySet().stream()
+                .filter(variable -> flowContext.getVariable(variable) != null &&
+                        !flowContext.getVariable(variable).equals(newVariables.get(variable)))
                 .forEach(variable -> {
-                    if (flowContext.getVariable(variable) != null &&
-                            !flowContext.getVariable(variable).equals(newVariables.get(variable))) {
-                        flowContext.putVariable(variable, newVariables.get(variable));
-                        changedContext.set(true);
-                    }
+                    flowContext.putVariable(variable, newVariables.get(variable));
+                    changedContext.set(true);
                 });
         return changedContext.get();
     }

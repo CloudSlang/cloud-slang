@@ -15,7 +15,6 @@ import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
-import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -74,10 +73,10 @@ public class RunEnvironment implements Serializable {
     private Map<String, Value> promptedValues;
 
     //flag for keeping track of the changed context
-    private Boolean contextModified;
+    private boolean contextModified;
 
     //list of the arguments that need to be rebound if context is modified
-    private List<Argument> stepInputs;
+    private List<Argument> modifiedArguments;
 
     public RunEnvironment(Set<SystemProperty> systemProperties) {
         Validate.notNull(systemProperties, "system properties cannot be null");
@@ -301,19 +300,19 @@ public class RunEnvironment implements Serializable {
         this.statefulSessionStack = statefulSessionsStack;
     }
 
-    public Boolean isContextModified() {
+    public boolean isContextModified() {
         return contextModified;
     }
 
-    public void setContextModified(Boolean contextModified) {
+    public void setContextModified(boolean contextModified) {
         this.contextModified = contextModified;
     }
 
-    public List<Argument> getStepInputs() {
-        return stepInputs;
+    public List<Argument> getModifiedArguments() {
+        return modifiedArguments;
     }
 
-    public void setStepInputs(List<Argument> stepInputs) {
-        this.stepInputs = stepInputs;
+    public void setModifiedArguments(List<Argument> modifiedArguments) {
+        this.modifiedArguments = modifiedArguments;
     }
 }

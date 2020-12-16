@@ -12,6 +12,7 @@ package io.cloudslang.lang.entities.bindings;
 import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+
 import java.util.Set;
 
 /**
@@ -83,11 +84,11 @@ public class Argument extends InOutParam {
         return prompt;
     }
 
-    public boolean isExpression() {
+    public boolean getIsExpression() {
         return isExpression;
     }
 
-    public void setIsExpression(boolean expression) {
-        this.isExpression = expression;
+    public void setIsExpression(boolean isExpression) {
+        this.isExpression = isExpression;
     }
 }

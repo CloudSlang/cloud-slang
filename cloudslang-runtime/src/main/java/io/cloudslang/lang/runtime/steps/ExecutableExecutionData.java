@@ -112,29 +112,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(USE_EMPTY_VALUES_FOR_PROMPTS_KEY) Boolean useEmptyValuesForPrompts) {
         try {
             if (runEnv.isContextModified()) {
-                Context flowContext = runEnv.getStack().peekContext();
-                Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
-
-                ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
-                        flowVariables,
-                        flowContext.getImmutableViewOfMagicVariables());
-
-                Map<String, Value> boundInputs = argumentsBinding
-                        .bindArguments(runEnv.getStepInputs(), contextAccessor,
-                                runEnv.getSystemProperties());
-
-                runEnv.putCallArguments(boundInputs);
-
-                sendEndBindingArgumentsEvent(
-                        runEnv.getStepInputs(),
-                        boundInputs,
-                        runEnv,
-                        executionRuntimeServices,
-                        "Step inputs resolved",
-                        nodeName,
-                        flowVariables
-                );
-                runEnv.setContextModified(false);
+                rebindArguments(runEnv, executionRuntimeServices, nodeName);
             }
 
             Map<String, Value> callArguments = runEnv.removeCallArguments();
@@ -491,5 +469,33 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             return parentName + "." + newNodeName;
         }
 
+    }
+
+    private void rebindArguments(RunEnvironment runEnvironment,
+                                 ExecutionRuntimeServices executionRuntimeServices,
+                                 String nodeName) {
+        Context flowContext = runEnvironment.getStack().peekContext();
+        Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
+
+        ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
+                flowVariables,
+                flowContext.getImmutableViewOfMagicVariables());
+
+        Map<String, Value> boundInputs = argumentsBinding
+                .bindArguments(runEnvironment.getModifiedArguments(), contextAccessor,
+                        runEnvironment.getSystemProperties());
+
+        runEnvironment.putCallArguments(boundInputs);
+
+        sendEndBindingArgumentsEvent(
+                runEnvironment.getModifiedArguments(),
+                boundInputs,
+                runEnvironment,
+                executionRuntimeServices,
+                "Step inputs resolved",
+                nodeName,
+                flowVariables
+        );
+        runEnvironment.setContextModified(false);
     }
 }
