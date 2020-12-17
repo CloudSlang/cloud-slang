@@ -90,7 +90,7 @@ public class ArgumentsBinding extends AbstractBinding {
                 Optional<Value> value = tryEvaluateExpression(expression, evaluationContextHolder);
                 if (!value.equals(Optional.empty())) {
                     inputValue = value.get();
-                    argument.setIsExpression(true);
+                    argument.setExpression(true);
                 } else {
                     inputValue = rawValue;
                 }

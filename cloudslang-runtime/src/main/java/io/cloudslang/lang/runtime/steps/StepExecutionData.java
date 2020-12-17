@@ -146,7 +146,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     nodeName,
                     flowVariables
             );
-            runEnv.setModifiedArguments(stepInputs.stream().filter(Argument::getIsExpression)
+            runEnv.setModifiedArguments(stepInputs.stream().filter(Argument::getExpression)
                     .collect(Collectors.toList()));
             updateCallArgumentsAndPushContextToStack(
                     runEnv,
