@@ -84,11 +84,11 @@ public class Argument extends InOutParam {
         return prompt;
     }
 
-    public boolean getExpression() {
+    public boolean isExpression() {
         return expression;
     }
 
-    public void setExpression(boolean isExpression) {
-        this.expression = isExpression;
+    public void setExpression(boolean expression) {
+        this.expression = expression;
     }
 }
