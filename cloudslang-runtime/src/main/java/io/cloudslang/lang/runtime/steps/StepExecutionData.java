@@ -50,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.cloudslang.lang.entities.ScoreLangConstants.STEP_NAVIGATION_OPTIONS_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WORKER_GROUP;
@@ -145,7 +146,8 @@ public class StepExecutionData extends AbstractExecutionData {
                     nodeName,
                     flowVariables
             );
-
+            runEnv.setModifiedArguments(stepInputs.stream().filter(Argument::isExpression)
+                    .collect(Collectors.toList()));
             updateCallArgumentsAndPushContextToStack(
                     runEnv,
                     flowContext,

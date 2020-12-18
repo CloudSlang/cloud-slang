@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.steps;
 
+import com.google.common.collect.Lists;
 import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
@@ -16,6 +17,7 @@ import io.cloudslang.dependency.impl.services.MavenConfigImpl;
 import io.cloudslang.lang.entities.ExecutableType;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.WorkerGroupMetadata;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -23,6 +25,7 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
@@ -31,6 +34,7 @@ import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandler
 import io.cloudslang.lang.runtime.bindings.strategies.DebuggerBreakpointsHandlerStub;
 import io.cloudslang.lang.runtime.bindings.strategies.EnforceValueMissingInputHandler;
 import io.cloudslang.lang.runtime.bindings.strategies.MissingInputHandler;
+import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ParentFlowData;
 import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
@@ -60,6 +64,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -98,6 +103,9 @@ public class ExecutableStepsTest {
 
     @Autowired
     private OutputsBinding outputsBinding;
+
+    @Autowired
+    private ArgumentsBinding argumentsBinding;
 
     @Autowired
     private ExecutionPreconditionService executionPreconditionService;
@@ -197,6 +205,95 @@ public class ExecutableStepsTest {
                 new SystemContext(), false);
 
         assertEquals(nextStepPosition, runEnv.removeNextStepPosition());
+    }
+
+    @Test
+    public void testStartExecutableRebindArguments() {
+        Map<String, Value> flowVariables = new HashMap<>();
+        flowVariables.put("fl1", ValueFactory.create("1"));
+        Context flowContext = new Context(flowVariables, new HashMap<>());
+        List<Argument> modifiedArguments = Lists.newArrayList(
+                new Argument(
+                        "step_input_1",
+                        ValueFactory.create("${ fl1 }", false),
+                        true,
+                        Collections.emptySet(),
+                        Collections.emptySet()
+                ),
+                new Argument(
+                        "step_input_2",
+                        ValueFactory.create("${ str(int(step_input_1)+3*4) }", false),
+                        true,
+                        Collections.emptySet(),
+                        Collections.emptySet()
+                ));
+        final RunEnvironment runEnv = new RunEnvironment();
+        runEnv.getStack().pushContext(flowContext);
+        runEnv.setContextModified(true);
+        runEnv.setModifiedArguments(modifiedArguments);
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        executableSteps.startExecutable(new ArrayList<>(), runEnv, new HashMap<>(),
+                runtimeServices, "test", 2L, ExecutableType.OPERATION, new SystemContext(),
+                false);
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        //check that the event was sent
+        assertFalse(events.isEmpty());
+        ScoreEvent boundArgumentEvent = null;
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ARGUMENT_END)) {
+                boundArgumentEvent = event;
+            }
+        }
+        assertNotNull(boundArgumentEvent);
+        assertFalse(runEnv.isContextModified());
+
+        //check if the arguments are as expected
+        Map<String, Serializable> result = new HashMap<>();
+        result.put("step_input_1", "1");
+        result.put("step_input_2", "13");
+        LanguageEventData eventData = (LanguageEventData) boundArgumentEvent.getData();
+        assertTrue(eventData.containsKey(LanguageEventData.BOUND_ARGUMENTS));
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> stepInputsBounded =
+                (Map<String, Serializable>) eventData.get(LanguageEventData.BOUND_ARGUMENTS);
+        assertEquals(stepInputsBounded, result);
+
+    }
+
+    @Test
+    public void testStartExecutableRebindWithNoArguments() {
+        List<Argument> modifiedArguments = new ArrayList<>();
+        final RunEnvironment runEnv = new RunEnvironment();
+        runEnv.getStack().pushContext(new Context(new HashMap<>(),new HashMap<>()));
+        runEnv.setContextModified(true);
+        runEnv.setModifiedArguments(modifiedArguments);
+        ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
+        executableSteps.startExecutable(new ArrayList<>(), runEnv, new HashMap<>(),
+                runtimeServices, "test", 2L, ExecutableType.OPERATION, new SystemContext(),
+                false);
+        Collection<ScoreEvent> events = runtimeServices.getEvents();
+
+        //check that the event was sent
+        assertFalse(events.isEmpty());
+        ScoreEvent boundArgumentEvent = null;
+        for (ScoreEvent event : events) {
+            if (event.getEventType().equals(ScoreLangConstants.EVENT_ARGUMENT_END)) {
+                boundArgumentEvent = event;
+            }
+        }
+        assertNotNull(boundArgumentEvent);
+        assertFalse(runEnv.isContextModified());
+
+        //check if the arguments are as expected
+        Map<String, Serializable> result = new HashMap<>();
+        LanguageEventData eventData = (LanguageEventData) boundArgumentEvent.getData();
+        assertTrue(eventData.containsKey(LanguageEventData.BOUND_ARGUMENTS));
+        @SuppressWarnings("unchecked")
+        Map<String, Serializable> stepInputsBounded =
+                (Map<String, Serializable>) eventData.get(LanguageEventData.BOUND_ARGUMENTS);
+        assertEquals(stepInputsBounded, result);
+
     }
 
     @Test
@@ -368,13 +465,18 @@ public class ExecutableStepsTest {
         }
 
         @Bean
+        public ArgumentsBinding argumentsBinding() {
+            return new ArgumentsBinding();
+        }
+
+        @Bean
         public ExecutionPreconditionService executionPreconditionService() {
             return mock(ExecutionPreconditionService.class);
         }
 
         @Bean
         public ScriptEvaluator scriptEvaluator() {
-            return mock(ScriptEvaluator.class);
+            return new ScriptEvaluator();
         }
 
         @Bean
@@ -416,7 +518,7 @@ public class ExecutableStepsTest {
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
                     executionPreconditionService(), missingInputHandler(), csMagicVariableHelper(),
-                    debuggerBreakpointHandler());
+                    debuggerBreakpointHandler(), argumentsBinding());
         }
 
         @Bean

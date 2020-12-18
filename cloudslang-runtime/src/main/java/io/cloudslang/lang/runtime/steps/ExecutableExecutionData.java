@@ -18,6 +18,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
 import io.cloudslang.lang.runtime.bindings.OutputsBinding;
 import io.cloudslang.lang.runtime.bindings.ResultsBinding;
@@ -82,12 +83,14 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private final MissingInputHandler missingInputHandler;
     private final CsMagicVariableHelper magicVariableHelper;
     private final DebuggerBreakpointsHandler debuggerBreakpointsHandler;
+    private final ArgumentsBinding argumentsBinding;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
                                    MissingInputHandler missingInputHandler,
                                    CsMagicVariableHelper magicVariableHelper,
-                                   DebuggerBreakpointsHandler debuggerBreakpointsHandler) {
+                                   DebuggerBreakpointsHandler debuggerBreakpointsHandler,
+                                   ArgumentsBinding argumentsBinding) {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
@@ -95,6 +98,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
         this.missingInputHandler = missingInputHandler;
         this.magicVariableHelper = magicVariableHelper;
         this.debuggerBreakpointsHandler = debuggerBreakpointsHandler;
+        this.argumentsBinding = argumentsBinding;
     }
 
     public void startExecutable(@Param(ScoreLangConstants.EXECUTABLE_INPUTS_KEY) List<Input> executableInputs,
@@ -107,6 +111,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                                 @Param(SYSTEM_CONTEXT) SystemContext systemContext,
                                 @Param(USE_EMPTY_VALUES_FOR_PROMPTS_KEY) Boolean useEmptyValuesForPrompts) {
         try {
+            if (runEnv.isContextModified()) {
+                rebindArguments(runEnv, executionRuntimeServices, nodeName);
+            }
+
             Map<String, Value> callArguments = runEnv.removeCallArguments();
             List<Input> mutableInputList = new ArrayList<>(executableInputs);
 
@@ -145,7 +153,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 Map<String, Value> debuggerInputs =
                         (Map<String, Value>) systemContext.remove(DEBUGGER_EXECUTABLE_INPUTS);
                 List<Input> newInputs = debuggerInputs.entrySet().stream().map(entry ->
-                        new Input.InputBuilder(entry.getKey(), entry.getValue()).build()).collect(toList());
+                        new Input.InputBuilder(entry.getKey(), entry.getValue()).withRequired(false).build())
+                        .collect(toList());
                 List<Input> updatedExecutableInputs = new ArrayList<>(newExecutableInputs.size() +
                         newInputs.size());
                 updatedExecutableInputs.addAll(executableInputs);
@@ -460,5 +469,33 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             return parentName + "." + newNodeName;
         }
 
+    }
+
+    private void rebindArguments(RunEnvironment runEnvironment,
+                                 ExecutionRuntimeServices executionRuntimeServices,
+                                 String nodeName) {
+        Context flowContext = runEnvironment.getStack().peekContext();
+        Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
+
+        ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
+                flowVariables,
+                flowContext.getImmutableViewOfMagicVariables());
+
+        Map<String, Value> boundInputs = argumentsBinding
+                .bindArguments(runEnvironment.getModifiedArguments(), contextAccessor,
+                        runEnvironment.getSystemProperties());
+
+        runEnvironment.putCallArguments(boundInputs);
+
+        sendEndBindingArgumentsEvent(
+                runEnvironment.getModifiedArguments(),
+                boundInputs,
+                runEnvironment,
+                executionRuntimeServices,
+                "Step inputs resolved",
+                nodeName,
+                flowVariables
+        );
+        runEnvironment.setContextModified(false);
     }
 }
