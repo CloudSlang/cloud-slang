@@ -74,8 +74,19 @@ public class AbstractBinding {
                     (Iterable<? extends Serializable>) loopCollectionContent;
             return convert(loopCollectionContentSerializable, loopCollection.isSensitive());
         } else if (loopCollectionContent instanceof String) {
-            String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
-            return convert(Arrays.asList(strings), loopCollection.isSensitive());
+            String expression = (String) loopCollectionContent;
+            if (expression.charAt(0) == '{' && expression.charAt(expression.length() - 1) == '}') {
+                expression = expression.substring(1,expression.length() - 1);
+                expression = expression.replace("\"","");
+                ArrayList<String> keys = new ArrayList<>();
+                for (String value : expression.split(",")) {
+                    keys.add(value.split(":")[0]);
+                }
+                return convert(keys,loopCollection.isSensitive());
+            } else {
+                String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
+                return convert(Arrays.asList(strings), loopCollection.isSensitive());
+            }
         } else if (loopCollectionContent instanceof PyObject) {
             PyObject pyObject = (PyObject) loopCollectionContent;
             return convert(pyObject.asIterable(), loopCollection.isSensitive());
