@@ -149,7 +149,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
             List<Input> newExecutableInputs =
                     addUserDefinedStepInputs(executableInputs, callArguments, promptArguments);
-            if (systemContext.containsKey(DEBUGGER_EXECUTABLE_INPUTS)) {
+            if (systemContext.get(DEBUGGER_EXECUTABLE_INPUTS) != null) {
                 Map<String, Value> debuggerInputs =
                         (Map<String, Value>) systemContext.remove(DEBUGGER_EXECUTABLE_INPUTS);
                 List<Input> newInputs = debuggerInputs.entrySet().stream().map(entry ->
