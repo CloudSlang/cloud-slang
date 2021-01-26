@@ -38,6 +38,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -79,14 +81,17 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private final ResultsBinding resultsBinding;
     private final InputsBinding inputsBinding;
     private final OutputsBinding outputsBinding;
-    private final ExecutionPreconditionService executionPreconditionService;
     private final MissingInputHandler missingInputHandler;
     private final CsMagicVariableHelper magicVariableHelper;
     private final DebuggerBreakpointsHandler debuggerBreakpointsHandler;
     private final ArgumentsBinding argumentsBinding;
 
+    @Autowired
+    @Qualifier("executionPreconditionServiceImpl")
+    private ExecutionPreconditionService executionPreconditionService;
+
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
-                                   OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
+                                   OutputsBinding outputsBinding,
                                    MissingInputHandler missingInputHandler,
                                    CsMagicVariableHelper magicVariableHelper,
                                    DebuggerBreakpointsHandler debuggerBreakpointsHandler,
@@ -94,7 +99,6 @@ public class ExecutableExecutionData extends AbstractExecutionData {
         this.resultsBinding = resultsBinding;
         this.inputsBinding = inputsBinding;
         this.outputsBinding = outputsBinding;
-        this.executionPreconditionService = preconditionService;
         this.missingInputHandler = missingInputHandler;
         this.magicVariableHelper = magicVariableHelper;
         this.debuggerBreakpointsHandler = debuggerBreakpointsHandler;

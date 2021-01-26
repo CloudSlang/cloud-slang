@@ -470,7 +470,7 @@ public class ExecutableStepsTest {
         }
 
         @Bean
-        public ExecutionPreconditionService executionPreconditionService() {
+        public ExecutionPreconditionService executionPreconditionServiceImpl() {
             return mock(ExecutionPreconditionService.class);
         }
 
@@ -517,7 +517,7 @@ public class ExecutableStepsTest {
         @Bean
         public ExecutableExecutionData operationSteps() {
             return new ExecutableExecutionData(resultsBinding(), inputsBinding(), outputsBinding(),
-                    executionPreconditionService(), missingInputHandler(), csMagicVariableHelper(),
+                    missingInputHandler(), csMagicVariableHelper(),
                     debuggerBreakpointHandler(), argumentsBinding());
         }
 
