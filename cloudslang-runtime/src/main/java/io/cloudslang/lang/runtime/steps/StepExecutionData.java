@@ -246,13 +246,13 @@ public class StepExecutionData extends AbstractExecutionData {
             Map<String, Value> flowVariables = flowContext.getImmutableViewOfVariables();
             HashMap<String, Value> outputs = new HashMap<>(flowVariables);
 
-            final ReturnValues returnValues = getReturnValues(executableResult, presetResult, outputs);
+            final ReturnValues returnValues = new ReturnValues(outputs, executableResult);
 
             List<NavigationOptions> stepNavigationOptions = runEnv
                     .removeStepNavigationOptions(nodeName + previousStepId);
             final Double roiValue = getRoiValue(executableResult, stepNavigationOptions, flowVariables);
 
-            runEnv.putReturnValues(returnValues);
+            runEnv.putReturnValues(getReturnValues(executableResult, presetResult, outputs));
             throwEventOutputEnd(
                     runEnv,
                     executionRuntimeServices,

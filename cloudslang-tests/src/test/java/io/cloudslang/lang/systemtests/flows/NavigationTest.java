@@ -97,9 +97,9 @@ public class NavigationTest extends SystemsTestsParent {
         assertEquals("print_message1", steps.get(FIRST_STEP_PATH).getName());
         assertEquals(ScoreLangConstants.SUCCESS_RESULT, steps.get(FIRST_STEP_PATH).getResult());
         assertEquals("print_on_failure_1", steps.get(SECOND_STEP_KEY).getName());
-        assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(SECOND_STEP_KEY).getResult());
+        assertEquals("CUSTOM_SUCCESS", steps.get(SECOND_STEP_KEY).getResult());
         assertEquals("print_message1_flow_with_custom_result", steps.get("0.1.0").getName());
-        assertEquals("CUSTOM_SUCCESS", steps.get("0.1.0").getResult());
+        assertEquals("SUCCESS", steps.get("0.1.0").getResult());
     }
 
     @Test
@@ -129,11 +129,11 @@ public class NavigationTest extends SystemsTestsParent {
         assertEquals("print_message1_first_level", steps.get(FIRST_STEP_PATH).getName());
         assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(FIRST_STEP_PATH).getResult());
         assertEquals("print_message1_flow_with_custom_result", steps.get("0.0.1.0").getName());
-        assertEquals("CUSTOM_SUCCESS", steps.get("0.0.1.0").getResult());
+        assertEquals("SUCCESS", steps.get("0.0.1.0").getResult());
         assertEquals("print_on_failure_first_level", steps.get(SECOND_STEP_KEY).getName());
-        assertEquals(ScoreLangConstants.FAILURE_RESULT, steps.get(SECOND_STEP_KEY).getResult());
+        assertEquals("CUSTOM_SUCCESS", steps.get(SECOND_STEP_KEY).getResult());
         assertEquals("print_message1_flow_with_custom_result", steps.get("0.1.0").getName());
-        assertEquals("CUSTOM_SUCCESS", steps.get("0.1.0").getResult());
+        assertEquals("SUCCESS", steps.get("0.1.0").getResult());
     }
 
     @Test

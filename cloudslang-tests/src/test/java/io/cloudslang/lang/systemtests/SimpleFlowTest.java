@@ -225,6 +225,6 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Assert.assertEquals("get_value", firstStep.getName());
         Assert.assertEquals("SUCCESS", firstStep.getResult());
         Assert.assertEquals("test_equality", secondStep.getName());
-        Assert.assertEquals("SUCCESS", secondStep.getResult());
+        Assert.assertEquals("EQUALS", secondStep.getResult());
     }
 }
