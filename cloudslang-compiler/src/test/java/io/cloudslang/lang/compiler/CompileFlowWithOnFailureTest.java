@@ -10,7 +10,6 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.compiler.modeller.ExecutableBuilder;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.NavigationOptions;
@@ -18,6 +17,13 @@ import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -26,19 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /*
@@ -51,9 +48,6 @@ public class CompileFlowWithOnFailureTest {
 
     @Autowired
     private SlangCompiler compiler;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testCompileOnFailureBasic() throws Exception {
@@ -90,11 +84,12 @@ public class CompileFlowWithOnFailureTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expectMessage("Multiple 'on_failure' steps found");
-        expectedException.expect(RuntimeException.class);
-
         URI flow = getClass().getResource("/corrupted/multiple_on_failure.sl").toURI();
-        compiler.compile(SlangSource.fromFile(flow), path);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Flow: 'multiple_on_failure' syntax is illegal.\n" +
+                "Multiple 'on_failure' steps found", exception.getMessage());
     }
 
     @Test
@@ -104,12 +99,12 @@ public class CompileFlowWithOnFailureTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expectMessage(ExecutableBuilder.UNIQUE_STEP_NAME_MESSAGE_SUFFIX);
-        expectedException.expectMessage("step_same_name");
-        expectedException.expect(RuntimeException.class);
-
         URI flow = getClass().getResource("/corrupted/same_step_name_in_flow_and_on_failure.sl").toURI();
-        compiler.compile(SlangSource.fromFile(flow), path);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Step name: 'step_same_name' appears more than once in the workflow. " +
+                "Each step name in the workflow must be unique", exception.getMessage());
     }
 
     @Test
@@ -119,11 +114,12 @@ public class CompileFlowWithOnFailureTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("'on_failure' should be last step in the workflow");
-
         URI flow = getClass().getResource("/corrupted/flow_with_on_failure_second_step.sl").toURI();
-        compiler.compile(SlangSource.fromFile(flow), path);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Flow: 'flow_with_on_failure_second_step' syntax is illegal.\n" +
+                "'on_failure' should be last step in the workflow", exception.getMessage());
     }
 
     @Test
@@ -175,14 +171,14 @@ public class CompileFlowWithOnFailureTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(
-                "Failed to compile step: jedi_training_3." +
-                        " The step/result name: FAILURE of navigation: SUCCESS -> FAILURE is missing"
-        );
-
         URI flow = getClass().getResource("/corrupted/default_navigation_missing_result_on_failure.sl").toURI();
-        compiler.compile(SlangSource.fromFile(flow), path);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Flow default_navigation_missing_result_on_failure has errors:\n" +
+                "Failed to compile step: jedi_training_3. The step/result name: FAILURE of navigation: SUCCESS -> FAILURE is missing\n" +
+                "Failed to compile step: jedi_training_3. The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing",
+                exception.getMessage());
     }
 
     @Test

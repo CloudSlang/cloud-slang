@@ -76,6 +76,7 @@ import java.util.concurrent.Semaphore;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -100,9 +101,6 @@ public class StepExecutionDataTest {
 
     @Autowired
     private LoopsBinding loopsBinding;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private RunEnvironment createRunEnvironment() {
         RunEnvironment runEnvironment = new RunEnvironment();
@@ -324,12 +322,12 @@ public class StepExecutionDataTest {
         stepNavigationValues.put(ScoreLangConstants.SUCCESS_RESULT, successNavigation);
         ResultNavigation failureNavigation = new ResultNavigation(1, null);
         stepNavigationValues.put(ScoreLangConstants.FAILURE_RESULT, failureNavigation);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("CUSTOM");
-        exception.expectMessage("navigation");
-        stepExecutionData.endStep(runEnv, new ArrayList<Output>(), stepNavigationValues,
-            createRuntimeServices(), 1L, new ArrayList<String>(), "Step1", false);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                stepExecutionData.endStep(runEnv, new ArrayList<Output>(), stepNavigationValues,
+                        createRuntimeServices(), 1L, new ArrayList<String>(), "Step1", false));
+        Assert.assertEquals("Error running: 'Step1': Step: Step1 has no matching navigation " +
+                "for the executable result: CUSTOM", exception.getMessage());
     }
 
     @Test

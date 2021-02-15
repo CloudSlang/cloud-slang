@@ -45,7 +45,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -72,6 +71,7 @@ import static io.cloudslang.lang.entities.ActionType.SEQUENTIAL;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -96,8 +96,6 @@ public class ActionStepsTest {
     private static final String GLOBAL_SESSION_OBJECT = "globalSessionObject";
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     ExecutionRuntimeServices executionRuntimeServicesMock = mock(ExecutionRuntimeServices.class);
     private Map<String, Map<String, Object>> nonSerializableExecutionData;
     private List<SeqStep> seqSteps;
@@ -1060,24 +1058,22 @@ public class ActionStepsTest {
                 "from datetime import datetime\n" +
                         NON_SERIALIZABLE_VARIABLE_NAME + " = datetime.utcnow()";
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(NON_SERIALIZABLE_VARIABLE_NAME);
-        exception.expectMessage("serializable");
-
-        actionSteps.doAction(
-                executionRuntimeServicesMock,
-                runEnv,
-                nonSerializableExecutionData,
-                2L,
-                PYTHON,
-                "",
-                "",
-                GAV_DEFAULT,
-                userPythonScript,
-                true,
-                DEPENDENCIES_DEFAULT, seqSteps, null,
-                null
-        );
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                actionSteps.doAction(
+                        executionRuntimeServicesMock,
+                        runEnv,
+                        nonSerializableExecutionData,
+                        2L,
+                        PYTHON,
+                        "",
+                        "",
+                        GAV_DEFAULT,
+                        userPythonScript,
+                        true,
+                        DEPENDENCIES_DEFAULT, seqSteps, null,
+                        null
+                ));
+        Assert.assertTrue(exception.getMessage().contains(NON_SERIALIZABLE_VARIABLE_NAME));
     }
 
     @Test

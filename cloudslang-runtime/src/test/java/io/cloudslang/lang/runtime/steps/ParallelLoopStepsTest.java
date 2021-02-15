@@ -60,6 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.any;
@@ -93,9 +94,6 @@ public class ParallelLoopStepsTest {
 
     @Autowired
     private LoopsBinding loopsBinding;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Before
     public void resetMocks() {
@@ -459,16 +457,18 @@ public class ParallelLoopStepsTest {
 
         ExecutionRuntimeServices executionRuntimeServices = createExecutionRuntimeServicesMockWithBranchException();
 
-        exception.expectMessage(BRANCH_EXCEPTION_MESSAGE);
-        exception.expect(RuntimeException.class);
-
-        parallelLoopSteps.joinBranches(
-            runEnvironment,
-            executionRuntimeServices,
-            new ArrayList<Output>(0),
-            new HashMap<String, ResultNavigation>(),
-            "nodeName"
-        );
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parallelLoopSteps.joinBranches(
+                        runEnvironment,
+                        executionRuntimeServices,
+                        new ArrayList<Output>(0),
+                        new HashMap<String, ResultNavigation>(),
+                        "nodeName"
+                ));
+        Assert.assertEquals("Error running: 'nodeName': \n" +
+                "Error running branch: \n" +
+                "Exception details placeholder",
+                exception.getMessage());
     }
 
     private ExecutionRuntimeServices createAndConfigureExecutionRuntimeServicesMock(
