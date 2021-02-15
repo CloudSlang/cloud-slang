@@ -14,9 +14,7 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,13 +28,12 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig.class})
 public class ExternalSlangCompilerIntegrationTest {
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
     @Autowired
     private SlangCompiler slangCompiler;
 
@@ -78,10 +75,11 @@ public class ExternalSlangCompilerIntegrationTest {
         final URL resource = getClass().getResource("/external/flow_with_external_step_by_uuid.sl");
         final SlangSource slangSource = SlangSource.fromFile(new File(resource.toURI()));
 
-        expectedException.expect(UnsupportedOperationException.class);
-        expectedException.expectMessage("CloudSlang does not support compiling external " +
-                "steps. To provide this functionality, you must extend all necessary classes.");
-        slangCompiler.compile(slangSource, new HashSet<>());
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                slangCompiler.compile(slangSource, new HashSet<>()));
+        assertEquals(exception.getMessage(),
+                "CloudSlang does not support compiling external " +
+                        "steps. To provide this functionality, you must extend all necessary classes.");
     }
 
     @Test
@@ -89,9 +87,10 @@ public class ExternalSlangCompilerIntegrationTest {
         final URL resource = getClass().getResource("/external/flow_with_external_step_by_path.sl");
         final SlangSource slangSource = SlangSource.fromFile(new File(resource.toURI()));
 
-        expectedException.expect(UnsupportedOperationException.class);
-        expectedException.expectMessage("CloudSlang does not support compiling external " +
-                "steps. To provide this functionality, you must extend all necessary classes.");
-        slangCompiler.compile(slangSource, new HashSet<>());
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () ->
+                slangCompiler.compile(slangSource, new HashSet<>()));
+        assertEquals(exception.getMessage(),
+                "CloudSlang does not support compiling external " +
+                        "steps. To provide this functionality, you must extend all necessary classes.");
     }
 }
