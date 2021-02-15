@@ -23,18 +23,8 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Argument;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import junit.framework.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +34,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /*******************************************************************************
  * (c) Copyright 2014 Hewlett-Packard Development Company, L.P.
@@ -65,9 +65,6 @@ public class DoTransformerTest extends TransformersTestParent {
 
     @Autowired
     private YamlParser yamlParser;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testTransformExpression() throws Exception {
@@ -125,25 +122,21 @@ public class DoTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformInvalidArgument() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("argument");
-        exception.expectMessage("22");
-
         @SuppressWarnings("unchecked")
         Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/corrupted/flow_with_invalid_argument.yaml");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(doTransformer, doArgumentsMap));
+        assertEquals("Could not transform step argument: 22", exception.getMessage());
 
-        transformAndThrowFirstException(doTransformer, doArgumentsMap);
     }
 
     @Test
     public void testOneLinerTransformIsInvalid() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Step arguments should be defined using a standard YAML list.");
-
         @SuppressWarnings("unchecked")
         Map<String, Object> doArgumentsMap = loadFirstStepFromFile("/step-args-in-list/flow_arguments_one_liner.yaml");
-
-        transformAndThrowFirstException(doTransformer, doArgumentsMap);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(doTransformer, doArgumentsMap));
+        assertEquals("Step arguments should be defined using a standard YAML list.", exception.getMessage());
     }
 
     @Test

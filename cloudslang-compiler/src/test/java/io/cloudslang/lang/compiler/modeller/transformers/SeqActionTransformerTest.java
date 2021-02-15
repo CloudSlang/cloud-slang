@@ -72,8 +72,6 @@ public class SeqActionTransformerTest extends TransformersTestParent {
     @Autowired
     private SeqStepsTransformer seqStepsTransformer;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     private Map<String, Serializable> initialSeqActionSimple;
 
     @Before

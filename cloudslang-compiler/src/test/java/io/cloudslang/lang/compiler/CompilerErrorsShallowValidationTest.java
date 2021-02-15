@@ -11,21 +11,18 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.model.Executable;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Bonczidai Levente
@@ -37,8 +34,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class CompilerErrorsShallowValidationTest {
     @Autowired
     private SlangCompiler compiler;
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testValidateSlangModelWithDependenciesBasic() throws Exception {
@@ -72,7 +67,7 @@ public class CompilerErrorsShallowValidationTest {
         Assert.assertEquals(0, errors.size());
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testValidationOfFlowWithMissingNavigationFromOperationResult() throws Exception {
         URI flowUri = getClass()
                 .getResource("/corrupted/step_with_missing_navigation_from_operation_result_flow.sl").toURI();
@@ -83,16 +78,15 @@ public class CompilerErrorsShallowValidationTest {
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operationModel);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot compile flow 'step_with_missing_navigation_from_operation_result_flow' " +
-                "since for step 'step1' the results [FAILURE] of its dependency 'user.ops.java_op' " +
-                "have no matching navigation.");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
+        Assert.assertEquals("Cannot compile flow 'step_with_missing_navigation_from_operation_result_flow' " +
+                "since for step 'step1' the results [FAILURE] of its dependency 'user.ops.java_op' " +
+                "have no matching navigation.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInputsNoDefaultNotInStep() throws Exception {
         final URI flowUri = getClass()
                 .getResource("/shallow_validation/test_inputs_no_default_not_in_step.sl").toURI();
@@ -103,17 +97,16 @@ public class CompilerErrorsShallowValidationTest {
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
 
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot compile flow 'io.cloudslang.test_inputs_no_default_not_in_step'. " +
-                "Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
-                "The following inputs of 'user.ops.test_op' are not private, " +
-                "required and with no default value: alla.");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
+        Assert.assertEquals("Cannot compile flow 'io.cloudslang.test_inputs_no_default_not_in_step'. " +
+                "Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
+                "The following inputs of 'user.ops.test_op' are not private, " +
+                "required and with no default value: alla.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInputsEmptyStringDefaultNotInStep() throws Exception {
         final URI flowUri = getClass()
                 .getResource("/shallow_validation/test_inputs_empty_string_default_not_in_step.sl").toURI();
@@ -124,18 +117,16 @@ public class CompilerErrorsShallowValidationTest {
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
 
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot compile flow 'io.cloudslang.test_inputs_empty_string_default_not_in_step'." +
-                " Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
-                "The following inputs of 'io.cloudslang.check_op' are not private, " +
-                "required and with no default value: alla."
-        );
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
+        Assert.assertEquals("Cannot compile flow 'io.cloudslang.test_inputs_empty_string_default_not_in_step'." +
+                " Step 'explicit_alias' does not declare all the mandatory inputs of its reference. " +
+                "The following inputs of 'io.cloudslang.check_op' are not private, " +
+                "required and with no default value: alla.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInputsNoDefaultInStep() throws Exception {
         final URI flowUri = getClass()
                 .getResource("/shallow_validation/test_inputs_no_default_in_step.sl").toURI();
@@ -146,18 +137,16 @@ public class CompilerErrorsShallowValidationTest {
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
 
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot compile flow 'io.cloudslang.test_inputs_no_default_in_step'. " +
-                "Step 'explicit_alias' does not declare all the mandatory inputs of its reference." +
-                " The following inputs of 'user.ops.test_op' are not private, " +
-                "required and with no default value: alla."
-        );
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
+        Assert.assertEquals("Cannot compile flow 'io.cloudslang.test_inputs_no_default_in_step'. " +
+                "Step 'explicit_alias' does not declare all the mandatory inputs of its reference." +
+                " The following inputs of 'user.ops.test_op' are not private, " +
+                "required and with no default value: alla.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInputsEmptyStringDefaultInStep() throws Exception {
         final URI flowUri = getClass()
                 .getResource("/shallow_validation/test_inputs_empty_string_default_in_step.sl").toURI();
@@ -168,18 +157,16 @@ public class CompilerErrorsShallowValidationTest {
         Set<Executable> dependencies = new HashSet<>();
         dependencies.add(operation1Model);
 
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot compile flow 'io.cloudslang.test_inputs_empty_string_default_in_step'." +
-                " Step 'explicit_alias' does not declare all the mandatory inputs of its reference." +
-                " The following inputs of 'io.cloudslang.check_op' are not private, " +
-                "required and with no default value: alla."
-        );
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
+        Assert.assertEquals("Cannot compile flow 'io.cloudslang.test_inputs_empty_string_default_in_step'." +
+                " Step 'explicit_alias' does not declare all the mandatory inputs of its reference." +
+                " The following inputs of 'io.cloudslang.check_op' are not private, " +
+                "required and with no default value: alla.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testValidationOfFlowInputInStepWithSameNameAsDependencyOutput() throws Exception {
         final URI flowUri = getClass()
                 .getResource("/corrupted/flow_input_in_step_same_name_as_dependency_output.sl").toURI();
@@ -193,13 +180,11 @@ public class CompilerErrorsShallowValidationTest {
         dependencies.add(operation1Model);
         dependencies.add(operation2Model);
 
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage(
-                "Cannot compile flow 'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
-                "Step 'explicit_alias' has input 'balla' with the same name as the " +
-                "one of the outputs of 'user.ops.test_op'.");
         List<RuntimeException> errors = compiler.validateSlangModelWithDirectDependencies(flowModel, dependencies);
         Assert.assertEquals(1, errors.size());
+        Assert.assertEquals("Cannot compile flow 'io.cloudslang.flow_input_in_step_same_name_as_dependency_output'. " +
+                "Step 'explicit_alias' has input 'balla' with the same name as the " +
+                "one of the outputs of 'user.ops.test_op'.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 }

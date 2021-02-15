@@ -16,17 +16,6 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
 import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.ExternalPythonScriptValidator;
@@ -39,9 +28,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +37,21 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static io.cloudslang.lang.compiler.modeller.transformers.AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX;
+import static io.cloudslang.lang.compiler.modeller.transformers.DependencyFormatValidator.INVALID_DEPENDENCY;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Date: 11/11/2014
@@ -64,8 +66,6 @@ public class PythonActionTransformerTest extends TransformersTestParent {
     private PythonActionTransformer pythonActionTransformer;
     @Autowired
     private YamlParser yamlParser;
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     private Map<String, Serializable> initialPythonActionSimple;
     private Map<String, Serializable> initialPythonActionWithDependencies;
     private Map<String, Serializable> initialPythonActionInvalidKey;
@@ -106,64 +106,65 @@ public class PythonActionTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformWithDependencies() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Following tags are invalid: [dependencies]. " +
-                "Please take a look at the supported features per versions link");
-        transformAndThrowErrorIfExists(pythonActionTransformer, initialPythonActionWithDependencies);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowErrorIfExists(pythonActionTransformer, initialPythonActionWithDependencies));
+        assertEquals("Following tags are invalid: [dependencies]. " +
+                "Please take a look at the supported features per versions link", exception.getMessage());
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer,
-                loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(pythonActionTransformer,
+                        loadPythonActionData("/python_action_with_dependencies_1_empty_part.sl")));
+        assertTrue(exception.getMessage().contains(INVALID_DEPENDENCY));
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithEmptyDependencies() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer,
-                loadPythonActionData("/python_action_with_dependencies_1_part.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(pythonActionTransformer,
+                        loadPythonActionData("/python_action_with_dependencies_1_part.sl")));
+        assertTrue(exception.getMessage().contains(INVALID_DEPENDENCY));
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithAllEmptyParts() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer,
-                loadPythonActionData("/python_action_with_dependencies_2_parts.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(pythonActionTransformer,
+                        loadPythonActionData("/python_action_with_dependencies_2_parts.sl")));
+        assertTrue(exception.getMessage().contains(INVALID_DEPENDENCY));
+
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithOnePart() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer,
-                loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(pythonActionTransformer,
+                        loadPythonActionData("/python_action_with_dependencies_all_empty_parts.sl")));
+        assertTrue(exception.getMessage().contains(INVALID_DEPENDENCY));
     }
 
     @Ignore("Enable when `dependencies` tag will be added")
     @Test
     public void testTransformWithTwoEmptyParts() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(pythonActionTransformer,
-                loadPythonActionData("/python_action_with_dependencies_empty.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(pythonActionTransformer,
+                        loadPythonActionData("/python_action_with_dependencies_empty.sl")));
+        assertTrue(exception.getMessage().contains(INVALID_DEPENDENCY));
     }
 
     @Test
     public void testTransformInvalidKey() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX);
-        exception.expectMessage("invalid_key");
         //noinspection unchecked
-        transformAndThrowFirstException(pythonActionTransformer, initialPythonActionInvalidKey);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(pythonActionTransformer, initialPythonActionInvalidKey));
+        assertTrue(exception.getMessage().contains(INVALID_KEYS_ERROR_MESSAGE_PREFIX));
+
     }
 
     @Test
@@ -178,18 +179,17 @@ public class PythonActionTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformWithExternalInvalidPythonValid() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Method {execute} is missing or is invalid");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction));
+        assertEquals("Method {execute} is missing or is invalid.", exception.getMessage());
 
-        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction);
     }
 
     @Test
     public void testTransformWithExternalInvalidPythonValid2() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Overload of the execution method is not allowed");
-
-        transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction2);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                transformAndThrowErrorIfExists(pythonActionTransformer, initialExternalPythonInvalidAction2));
+        assertEquals("Overload of the execution method is not allowed.", exception.getMessage());
     }
 
     @Test
