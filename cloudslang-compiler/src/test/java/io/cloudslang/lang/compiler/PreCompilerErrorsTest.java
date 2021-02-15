@@ -13,14 +13,15 @@ import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
-import java.net.URI;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -430,8 +431,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         assertEquals(result.getErrors().get(0).getMessage(),
-                "Action syntax is illegal.\n" +
-                        "Under property: 'python_action' there should be a map of values, but instead there is a list.\n" +
+                "Action syntax is illegal.\nUnder property: 'python_action' " +
+                        "there should be a map of values, but instead there is a list.\n" +
                         "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)");
         throw result.getErrors().get(0);
     }
@@ -555,8 +556,8 @@ public class PreCompilerErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         assertEquals(result.getErrors().get(0).getMessage(),
-                "Error compiling source 'flow_on_failure_skipped.sl'.\n" +
-                        "Flow: 'flow_on_failure_skipped' has steps with keyword on the same indentation as the step name or " +
+                "Error compiling source 'flow_on_failure_skipped.sl'.\nFlow: 'flow_on_failure_skipped' has " +
+                        "steps with keyword on the same indentation as the step name or " +
                         "there is no space between step name and hyphen.");
         throw result.getErrors().get(0);
     }

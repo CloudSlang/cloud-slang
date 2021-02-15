@@ -176,8 +176,10 @@ public class CompileFlowWithOnFailureTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 compiler.compile(SlangSource.fromFile(flow), path));
         Assert.assertEquals("Flow default_navigation_missing_result_on_failure has errors:\n" +
-                "Failed to compile step: jedi_training_3. The step/result name: FAILURE of navigation: SUCCESS -> FAILURE is missing\n" +
-                "Failed to compile step: jedi_training_3. The step/result name: FAILURE of navigation: FAILURE -> FAILURE is missing",
+                "Failed to compile step: jedi_training_3. The step/result name: " +
+                        "FAILURE of navigation: SUCCESS -> FAILURE is missing\n" +
+                "Failed to compile step: jedi_training_3. The step/result name: " +
+                        "FAILURE of navigation: FAILURE -> FAILURE is missing",
                 exception.getMessage());
     }
 

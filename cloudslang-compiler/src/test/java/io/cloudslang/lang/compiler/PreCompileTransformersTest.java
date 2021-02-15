@@ -134,8 +134,8 @@ public class PreCompileTransformersTest {
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
         assertEquals("For operation 'check_weather_optional_input_default_integer' syntax is illegal.\n" +
-                        "Input: 'input_with_default_value' should have a String value, but got value '2' of type Integer.",
-                errors.get(0).getMessage());
+                        "Input: 'input_with_default_value' should have a String value, but got " +
+                        "value '2' of type Integer.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 

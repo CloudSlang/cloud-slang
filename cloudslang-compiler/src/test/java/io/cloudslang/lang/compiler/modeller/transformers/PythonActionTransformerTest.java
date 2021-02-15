@@ -50,8 +50,9 @@ import java.util.Map;
 
 import static io.cloudslang.lang.compiler.modeller.transformers.AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX;
 import static io.cloudslang.lang.compiler.modeller.transformers.DependencyFormatValidator.INVALID_DEPENDENCY;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Date: 11/11/2014

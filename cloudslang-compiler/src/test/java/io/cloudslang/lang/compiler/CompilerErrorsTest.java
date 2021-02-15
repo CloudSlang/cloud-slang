@@ -114,7 +114,8 @@ public class CompilerErrorsTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 compiler.compile(SlangSource.fromFile(systemProperties), path));
-        Assert.assertTrue(exception.getMessage().contains("There was a problem parsing the YAML source: system_properties.yaml.\n" +
+        Assert.assertTrue(exception.getMessage().contains("There was a problem parsing the" +
+                " YAML source: system_properties.yaml.\n" +
                 "Cannot create property=user.sys.props.host for JavaBean" +
                 "=io.cloudslang.lang.compiler.parser.model.ParsedSlang"));
 
@@ -509,7 +510,8 @@ public class CompilerErrorsTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 compiler.compile(SlangSource.fromFile(resource), path));
-        Assert.assertTrue(exception.getMessage().contains("There was a problem parsing the YAML source: operation_with_list_of_actions.sl.\n" +
+        Assert.assertTrue(exception.getMessage()
+                .contains("There was a problem parsing the YAML source: operation_with_list_of_actions.sl.\n" +
                 "while parsing a block mapping"));
     }
 
@@ -520,8 +522,8 @@ public class CompilerErrorsTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 compiler.compile(SlangSource.fromFile(resource), path));
-        Assert.assertEquals("Action syntax is illegal.\n" +
-                        "Under property: 'python_action' there should be a map of values, but instead there is a list.\n" +
+        Assert.assertEquals("Action syntax is illegal.\nUnder property: 'python_action' " +
+                        "there should be a map of values, but instead there is a list.\n" +
                         "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)",
                 exception.getMessage());
     }
