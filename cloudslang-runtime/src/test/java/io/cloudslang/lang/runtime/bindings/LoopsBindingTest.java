@@ -19,6 +19,14 @@ import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
 import io.cloudslang.lang.runtime.env.ForLoopCondition;
 import io.cloudslang.lang.runtime.env.LoopCondition;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.python.google.common.collect.Lists;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,17 +36,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.python.google.common.collect.Lists;
-
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.anySetOf;
@@ -57,9 +55,6 @@ public class LoopsBindingTest {
     private static final Set<SystemProperty> EMPTY_SET = Collections.EMPTY_SET;
     @SuppressWarnings("unchecked")
     private static final Set<ScriptFunction> EMPTY_FUNCTION_SET = Collections.EMPTY_SET;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
     private LoopsBinding loopsBinding = new LoopsBinding();
@@ -98,10 +93,10 @@ public class LoopsBindingTest {
         Map<String, Value> langVars = Collections.emptyMap();
         when(context.getImmutableViewOfLanguageVariables()).thenReturn(langVars);
 
-        exception.expectMessage("expression is empty");
-        exception.expect(RuntimeException.class);
-
-        loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node"));
+        Assert.assertEquals("Error evaluating for loop expression in step 'node',\n" +
+                "\tError is: expression is empty", exception.getMessage());
     }
 
     @Test(expected = RuntimeException.class)

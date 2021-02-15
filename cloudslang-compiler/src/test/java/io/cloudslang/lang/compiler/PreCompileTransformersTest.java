@@ -16,21 +16,18 @@ import io.cloudslang.lang.entities.PromptType;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-
 import io.cloudslang.lang.entities.bindings.prompt.Prompt;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -46,13 +43,10 @@ import static junit.framework.TestCase.assertTrue;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class PreCompileTransformersTest {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Autowired
     private SlangCompiler compiler;
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testOpInvalidInput() throws Exception {
         URI resource = getClass().getResource("/corrupted/transformers/operation_input_private_no_default.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -67,10 +61,9 @@ public class PreCompileTransformersTest {
         List<RuntimeException> errors = result.getErrors();
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For operation 'operation_input_private_no_default' syntax is illegal.");
-        exception.expectMessage("Input: 'input_private_no_default' is private " +
-                "and required but no default value was specified");
+        assertEquals("For operation 'operation_input_private_no_default' syntax is illegal.\n" +
+                "Validation failed. Input: 'input_private_no_default' is private and required but no " +
+                "default value was specified", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
@@ -116,7 +109,7 @@ public class PreCompileTransformersTest {
         assertEquals(0, errors.size());
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInputBoolean() throws Exception {
         URL resource = getClass().getResource("/corrupted/transformers/check_weather_optional_input_boolean.sl");
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource.toURI()));
@@ -125,13 +118,13 @@ public class PreCompileTransformersTest {
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For operation 'check_weather_optional_input_boolean' syntax is illegal.");
-        exception.expectMessage("Input: 'city' should have a String value, but got value 'true' of type Boolean.");
+        assertEquals("For operation 'check_weather_optional_input_boolean' syntax is illegal.\n" +
+                        "Input: 'city' should have a String value, but got value 'true' of type Boolean.",
+                errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInputDefaultInteger() throws Exception {
         URL resource = getClass()
                 .getResource("/corrupted/transformers/check_weather_optional_input_default_integer.sl");
@@ -140,14 +133,13 @@ public class PreCompileTransformersTest {
         List<RuntimeException> errors = result.getErrors();
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For operation 'check_weather_optional_input_default_integer' syntax is illegal.");
-        exception.expectMessage("Input: 'input_with_default_value' should have a String value, but got value '2' " +
-                "of type Integer.");
+        assertEquals("For operation 'check_weather_optional_input_default_integer' syntax is illegal.\n" +
+                        "Input: 'input_with_default_value' should have a String value, but got value '2' of type Integer.",
+                errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testStepInputDefaultDouble() throws Exception {
         URL resource = getClass().getResource("/corrupted/transformers/check_weather_flow_step_input_double.sl");
 
@@ -156,14 +148,13 @@ public class PreCompileTransformersTest {
         List<RuntimeException> errors = result.getErrors();
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For step 'bootstrap_node' syntax is illegal.");
-        exception.expectMessage("Step input: 'input_with_sensitive_no_default' should have a String value, " +
-                "but got value '2.5' of type Double.");
+        assertEquals("For step 'bootstrap_node' syntax is illegal.\n" +
+                "Step input: 'input_with_sensitive_no_default' should have a String" +
+                " value, but got value '2.5' of type Double.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testOutputDefaultDouble() throws Exception {
         URL resource = getClass().getResource("/corrupted/transformers/check_weather_flow_output_default_double.sl");
 
@@ -172,14 +163,13 @@ public class PreCompileTransformersTest {
         List<RuntimeException> errors = result.getErrors();
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For flow 'check_weather_flow_output_default_double' syntax is illegal.");
-        exception.expectMessage("Output / publish value: 'flow_output_0' should have a String value, " +
-                "but got value '3.5' of type Double.");
+        assertEquals("For flow 'check_weather_flow_output_default_double' syntax is illegal.\n" +
+                "Output / publish value: 'flow_output_0' should have a String value, but got value '3.5' " +
+                "of type Double.", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testOpWrongOutput() throws Exception {
         URI resource = getClass().getResource("/corrupted/transformers/operation_output_wrong_property.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -194,13 +184,12 @@ public class PreCompileTransformersTest {
         List<RuntimeException> errors = result.getErrors();
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For operation 'operation_output_wrong_property' syntax is illegal.");
-        exception.expectMessage("Key: wrong_key in output: output_wrong_key is not a known property");
+        assertEquals("For operation 'operation_output_wrong_property' syntax is illegal.\n" +
+                "Key: wrong_key in output: output_wrong_key is not a known property", errors.get(0).getMessage());
         throw errors.get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testOpWrongResult() throws Exception {
         URI resource = getClass().getResource("/corrupted/transformers/operation_duplicate_result.sl").toURI();
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
@@ -215,9 +204,8 @@ public class PreCompileTransformersTest {
         List<RuntimeException> errors = result.getErrors();
         assertNotNull(errors);
         assertTrue(errors.size() > 0);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For operation 'operation_duplicate_result' syntax is illegal.");
-        exception.expectMessage("Duplicate result found: SUCCESS");
+        assertEquals("For operation 'operation_duplicate_result' syntax is illegal.\n" +
+                "Validation failed. Duplicate result found: SUCCESS", errors.get(0).getMessage());
         throw errors.get(0);
     }
 

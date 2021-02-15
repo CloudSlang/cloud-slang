@@ -9,6 +9,23 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import com.google.common.collect.Sets;
+import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
+import io.cloudslang.lang.compiler.modeller.model.SeqStep;
+import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ACTION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEP_ARGS_KEY;
@@ -25,24 +42,6 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.Sets;
-import io.cloudslang.lang.compiler.modeller.DependenciesHelper;
-import io.cloudslang.lang.compiler.modeller.model.SeqStep;
-import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SeqStepsTransformerTest.Config.class})
 public class SeqStepsTransformerTest extends TransformersTestParent {
@@ -52,9 +51,6 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
 
     @Autowired
     private DependenciesHelper dependenciesHelper;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testTransformSimple() {
@@ -245,12 +241,12 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     }
 
     private Map<String, Map<String, String>> newStep(String id,
-            String objPath,
-            String action,
-            String args,
-            String defaultArgs,
-            String snapshot,
-            String highlightId) {
+                                                     String objPath,
+                                                     String action,
+                                                     String args,
+                                                     String defaultArgs,
+                                                     String snapshot,
+                                                     String highlightId) {
         Map<String, String> stepDetails = new HashMap<>();
 
         putIfValueNotNull(stepDetails, SEQ_STEP_ID_KEY, id);
@@ -268,12 +264,12 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
     }
 
     private SeqStep newSeqStep(String id,
-            String objPath,
-            String action,
-            String args,
-            String defaultArgs,
-            String snapshot,
-            String highlightId) {
+                               String objPath,
+                               String action,
+                               String args,
+                               String defaultArgs,
+                               String snapshot,
+                               String highlightId) {
         SeqStep seqStep = new SeqStep();
 
         seqStep.setId(id);

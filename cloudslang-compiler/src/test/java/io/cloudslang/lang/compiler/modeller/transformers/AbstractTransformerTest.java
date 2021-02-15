@@ -10,13 +10,15 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import com.google.common.collect.Sets;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static io.cloudslang.lang.compiler.modeller.transformers.AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX;
+import static io.cloudslang.lang.compiler.modeller.transformers.AbstractTransformer.MISSING_KEYS_ERROR_MESSAGE_PREFIX;
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author Bonczidai Levente
@@ -24,8 +26,6 @@ import org.junit.rules.ExpectedException;
  */
 public class AbstractTransformerTest extends TransformersTestParent {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     private AbstractTransformer abstractTransformer;
     private Set<String> mandatoryKeys;
     private Set<String> optionalKeys;
@@ -48,8 +48,9 @@ public class AbstractTransformerTest extends TransformersTestParent {
 
     @Test
     public void testNulls() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        abstractTransformer.validateKeySet(null, null, null);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                abstractTransformer.validateKeySet(null, null, null));
+        Assert.assertEquals("The validated object is null", exception.getMessage());
     }
 
     @Test
@@ -72,26 +73,27 @@ public class AbstractTransformerTest extends TransformersTestParent {
 
     @Test
     public void testInvalidKeys() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX);
-        exception.expectMessage(invalidKey1);
-        abstractTransformer.validateKeySet(
-                Sets.newHashSet(mandatoryKey1, mandatoryKey2, invalidKey1),
-                mandatoryKeys,
-                optionalKeys
-        );
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                abstractTransformer.validateKeySet(
+                        Sets.newHashSet(mandatoryKey1, mandatoryKey2, invalidKey1),
+                        mandatoryKeys,
+                        optionalKeys
+                ));
+        Assert.assertTrue(exception.getMessage().contains(INVALID_KEYS_ERROR_MESSAGE_PREFIX));
+        Assert.assertTrue(exception.getMessage().contains(invalidKey1));
+
     }
 
     @Test
     public void testMissingKeys() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(AbstractTransformer.MISSING_KEYS_ERROR_MESSAGE_PREFIX);
-        exception.expectMessage(mandatoryKey2);
-        abstractTransformer.validateKeySet(
-                Sets.newHashSet(mandatoryKey1, optionalKey1),
-                mandatoryKeys,
-                optionalKeys
-        );
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                abstractTransformer.validateKeySet(
+                        Sets.newHashSet(mandatoryKey1, optionalKey1),
+                        mandatoryKeys,
+                        optionalKeys
+                ));
+        Assert.assertTrue(exception.getMessage().contains(MISSING_KEYS_ERROR_MESSAGE_PREFIX));
+        Assert.assertTrue(exception.getMessage().contains(mandatoryKey2));
     }
 
 }

@@ -12,13 +12,8 @@ package io.cloudslang.lang.compiler.parser;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,14 +21,15 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 
 @RunWith(MockitoJUnitRunner.class)
 public class YamlParserTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
     private YamlParser yamlParser = new YamlParser() {
@@ -52,15 +48,16 @@ public class YamlParserTest {
     @Test
     public void throwExceptionWhenFileIsNotValid() throws Exception {
         Mockito.when(yaml.loadAs(any(InputStream.class), eq(ParsedSlang.class))).thenThrow(IOException.class);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("parsing");
-        yamlParser.parse(new SlangSource("a", "b"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                yamlParser.parse(new SlangSource("a", "b")));
+        Assert.assertEquals("There was a problem parsing the YAML source: b.\n" +
+                "null", exception.getMessage());
     }
 
     @Test
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("empty");
-        yamlParser.parse(new SlangSource("", null));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                yamlParser.parse(new SlangSource("", null)));
+        Assert.assertEquals("Source null cannot be empty", exception.getMessage());
     }
 }

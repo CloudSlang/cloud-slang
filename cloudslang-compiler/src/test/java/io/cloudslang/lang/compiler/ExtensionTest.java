@@ -10,20 +10,18 @@
 package io.cloudslang.lang.compiler;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertThrows;
 
 public class ExtensionTest {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Test
     public void testValidateSlangFileExtensionInvalidExtension() {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("File: slang.sls must have one of the following extensions: sl, sl.yaml, sl.yml.");
-        Extension.validateSlangFileExtension("slang.sls");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                Extension.validateSlangFileExtension("slang.sls"));
+        Assert.assertEquals("File: slang.sls must have one of the following extensions: sl, sl.yaml, sl.yml.",
+                exception.getMessage());
     }
 
     @Test
@@ -43,9 +41,10 @@ public class ExtensionTest {
 
     @Test
     public void testValidatePropertiesFileExtensionInvalidExtension() {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("File: slang.sls must have one of the following extensions: prop.sl.");
-        Extension.validatePropertiesFileExtension("slang.sls");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                Extension.validatePropertiesFileExtension("slang.sls"));
+        Assert.assertEquals("File: slang.sls must have one of the following extensions: prop.sl.",
+                exception.getMessage());
     }
 
     @Test
