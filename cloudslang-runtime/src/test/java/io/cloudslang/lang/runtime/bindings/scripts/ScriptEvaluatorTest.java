@@ -27,9 +27,8 @@ import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.python.core.PyDictionary;
@@ -41,7 +40,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +51,7 @@ import java.util.concurrent.Semaphore;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.anyString;
@@ -91,9 +90,6 @@ public class ScriptEvaluatorTest {
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def " + ACCESS_MONITORING_METHOD_NAME + "(key):" +
             LINE_SEPARATOR + "  pass";
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Autowired
     private ScriptEvaluator scriptEvaluator;
 
@@ -118,11 +114,11 @@ public class ScriptEvaluatorTest {
         reset(pythonRuntimeService);
         when(pythonRuntimeService.eval(anyString(), anyString(), anyMap()))
                 .thenThrow(new RuntimeException("error from interpreter"));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("input_expression");
-        exception.expectMessage("error from interpreter");
-        scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>(),
-                new HashSet<ScriptFunction>());
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>(),
+                new HashSet<ScriptFunction>()));
+        Assert.assertEquals("Error in evaluating expression: 'input_expression',\n" +
+                "\terror from interpreter", exception.getMessage());
     }
 
     @Test
