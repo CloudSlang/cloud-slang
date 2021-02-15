@@ -58,6 +58,23 @@ import io.cloudslang.lang.tools.build.validation.StaticValidator;
 import io.cloudslang.lang.tools.build.validation.StaticValidatorImpl;
 import io.cloudslang.lang.tools.build.verifier.SlangContentVerifier;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
@@ -72,23 +89,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.yaml.snakeyaml.Yaml;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.cloudslang.lang.tools.build.SlangBuildMain.BulkRunMode.ALL_PARALLEL;
@@ -98,6 +98,7 @@ import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
@@ -172,9 +173,6 @@ public class SlangBuilderTest {
     @Autowired
     private LoggingSlangTestCaseEventListener loggingSlangTestCaseEventListener;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     private SlangBuildMain.BuildMode buildMode = SlangBuildMain.BuildMode.BASIC;
     private Set<String> changedFiles = new HashSet<>();
     private BuildModeConfig buildModeConfig = BuildModeConfig.createBasicBuildModeConfig();
@@ -188,17 +186,19 @@ public class SlangBuilderTest {
 
     @Test
     public void testNullDirPath() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("path");
-        slangBuilder.buildSlangContent(null, null, null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                slangBuilder.buildSlangContent(null, null, null, null,
+                        false, false, ALL_SEQUENTIAL, buildMode, changedFiles));
+        Assert.assertEquals("You must specify a path", exception.getMessage());
     }
 
     @Test
     public void testEmptyDirPath() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("path");
-        slangBuilder.buildSlangContent("", "content", null,
-                null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                slangBuilder.buildSlangContent("", "content", null,
+                        null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles));
+        Assert.assertEquals("Directory path argument 'content' does not lead to a directory",
+                exception.getMessage());
     }
 
     @Test
@@ -230,18 +230,18 @@ public class SlangBuilderTest {
 
     @Test
     public void testIllegalDirPath() throws Exception {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("c/h/j");
-        exception.expectMessage("directory");
-        slangBuilder.buildSlangContent("c/h/j", "c/h/j/content", null,
-                null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                slangBuilder.buildSlangContent("c/h/j", "c/h/j/content", null,
+                        null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles));
+        Assert.assertEquals("Directory path argument 'c/h/j/content' does not lead to a directory",
+                exception.getMessage());
+
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testPreCompileIllegalSlangFile() throws Exception {
         URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompile(any(SlangSource.class))).thenThrow(new RuntimeException());
-        exception.expect(RuntimeException.class);
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
@@ -249,21 +249,23 @@ public class SlangBuilderTest {
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testNotAllSlangFilesWerePreCompiled() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(null, new ArrayList<RuntimeException>()));
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("1");
-        exception.expectMessage("0");
-        exception.expectMessage("compiled");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertTrue(slangBuildResults.getCompilationExceptions().get(0).getMessage()
+                .contains("Some Slang files were not pre-compiled."));
+        assertTrue(slangBuildResults.getCompilationExceptions().get(0).getMessage()
+                .contains("Found: 1 executable files in path:"));
+        assertTrue(slangBuildResults.getCompilationExceptions().get(0).getMessage()
+                .contains("But managed to create slang models for only: 0"));
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
@@ -284,7 +286,7 @@ public class SlangBuilderTest {
                 numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testCompileInvalidSlangFile() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
@@ -292,7 +294,6 @@ public class SlangBuilderTest {
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(null, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenThrow(new RuntimeException());
-        exception.expect(RuntimeException.class);
         SlangBuildResults results = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, false,
                 ALL_SEQUENTIAL, buildMode, changedFiles);
@@ -300,7 +301,7 @@ public class SlangBuilderTest {
         throw results.getCompilationExceptions().get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testNotAllSlangFilesWereCompiled() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
@@ -308,19 +309,16 @@ public class SlangBuilderTest {
         when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
                 .thenReturn(new MetadataModellingResult(null, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(EMPTY_EXECUTABLE, new HashSet<Executable>())).thenReturn(null);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("1");
-        exception.expectMessage("0");
-        exception.expectMessage("compile");
-        exception.expectMessage("models");
         SlangBuildResults results = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, false,
                 ALL_SEQUENTIAL, buildMode, changedFiles);
-
+        assertEquals("Some Slang files were not compiled.\n" +
+                        "Found: 1 slang models, but managed to compile only: 0",
+                results.getCompilationExceptions().get(0).getMessage());
         throw results.getCompilationExceptions().get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testCompileValidSlangFileWithMissingDependencies() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         Set<String> flowDependencies = new HashSet<>();
@@ -336,13 +334,12 @@ public class SlangBuilderTest {
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA),
                         eq(false), any(Queue.class));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("dependency");
-        exception.expectMessage("dep1");
         SlangBuildResults results = slangBuilder.buildSlangContent(resource.getPath(),
                 resource.getPath(), null, null, false, false,
                 ALL_SEQUENTIAL, buildMode, changedFiles);
-
+        assertEquals("Failed compiling Slang source: 'no_dependencies.empty_flow'.\n" +
+                        "Failed compiling slang source: no_dependencies.empty_flow. Missing dependency: dep1",
+                results.getCompilationExceptions().get(0).getMessage());
         throw results.getCompilationExceptions().get(0);
     }
 
@@ -380,7 +377,7 @@ public class SlangBuilderTest {
                 numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 2);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInvalidNamespaceFlow() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         final Flow newExecutable = new Flow(null, null, null, "wrong.namespace", "empty_flow", null,
@@ -392,17 +389,16 @@ public class SlangBuilderTest {
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA),
                         eq(false), any(Queue.class));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Namespace");
-        exception.expectMessage("wrong.namespace");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
                 null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertTrue(slangBuildResults.getCompilationExceptions().get(0).getMessage()
+                .contains("Namespace of slang source: empty_flow is wrong."));
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInvalidFlowName() throws Exception {
         final URI resource = getClass().getResource("/no_dependencies").toURI();
         final Flow newExecutable = new Flow(null, null, null, "no_dependencies", "wrong_name", null,
@@ -415,14 +411,13 @@ public class SlangBuilderTest {
                 .validateSlangFile(any(File.class), eq(newExecutable),
                         eq(EMPTY_METADATA), eq(false), any(Queue.class));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Name");
-        exception.expectMessage("wrong_name");
-
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(),
                 resource.getPath(), null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertTrue(slangBuildResults.getCompilationExceptions().get(0).getMessage()
+                .contains("Name of flow or operation: 'wrong_name' is not valid.\n" +
+                        "It should be identical to the file name: 'empty_flow'"));
 
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
@@ -461,7 +456,7 @@ public class SlangBuilderTest {
                 numberOfCompiledSlangFiles, 1, numberOfCompiledSlangFiles);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testNamespaceWithInvalidCharsFlow() throws Exception {
         final URI resource = getClass().getResource("/invalid-chars$").toURI();
         final Flow newExecutable = new Flow(null, null, null, "invalid-chars$", "empty_flow", null,
@@ -473,13 +468,12 @@ public class SlangBuilderTest {
         doCallRealMethod().when(staticValidator)
                 .validateSlangFile(any(File.class), eq(newExecutable), eq(EMPTY_METADATA),
                         eq(false), any(Queue.class));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("invalid-chars$");
-        exception.expectMessage("alphanumeric");
         SlangBuildResults slangBuildResults = slangBuilder.buildSlangContent(resource.getPath(),
                 resource.getPath(), null, null, false, false, ALL_SEQUENTIAL, buildMode, changedFiles);
         assertNotNull(slangBuildResults.getCompilationExceptions());
         assertTrue(slangBuildResults.getCompilationExceptions().size() > 0);
+        assertEquals("Namespace: invalid-chars$ is invalid. It can contain only alphanumeric characters, " +
+                "underscore or hyphen", slangBuildResults.getCompilationExceptions().get(0).getMessage());
         throw slangBuildResults.getCompilationExceptions().get(0);
     }
 
