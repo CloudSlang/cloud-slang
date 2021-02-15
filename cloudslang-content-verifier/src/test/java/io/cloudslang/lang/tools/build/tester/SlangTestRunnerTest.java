@@ -55,7 +55,6 @@ import io.cloudslang.score.events.ScoreEventListener;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,9 +70,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -93,6 +90,7 @@ import static io.cloudslang.lang.tools.build.tester.SlangTestRunner.MAX_TIME_PER
 import static io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeConfig.createChangedBuildModeConfig;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMapOf;
@@ -141,9 +139,6 @@ public class SlangTestRunnerTest {
     @Autowired
     private DependenciesHelper dependenciesHelper;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     private List<String> specialTestSuite = Collections.singletonList("special");
     private List<String> specialRuntimeTestSuite = asList("special", "default");
     private Set<String> allAvailableExecutables = SetUtils.emptySet();
@@ -156,23 +151,25 @@ public class SlangTestRunnerTest {
 
     @Test
     public void createTestCaseWithNullTestPath() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("path");
-        slangTestRunner.createTestCases(null, allAvailableExecutables);
+        NullPointerException exception = assertThrows(NullPointerException.class, () ->
+                slangTestRunner.createTestCases(null, allAvailableExecutables));
+        assertEquals("You must specify a path for tests", exception.getMessage());
     }
 
     @Test
     public void createTestCaseWithEmptyTestPath() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("path");
-        slangTestRunner.createTestCases("", allAvailableExecutables);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                slangTestRunner.createTestCases("", allAvailableExecutables));
+        assertEquals(exception.getMessage(),
+                "You must specify a path for tests");
     }
 
     @Test
     public void createTestCaseWithInvalidTestPath() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("directory");
-        slangTestRunner.createTestCases("aaa", allAvailableExecutables);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                slangTestRunner.createTestCases("aaa", allAvailableExecutables));
+        assertEquals(exception.getMessage(),
+                "Directory path argument 'aaa' does not lead to a directory");
     }
 
     @Test
@@ -212,11 +209,11 @@ public class SlangTestRunnerTest {
         testCases.put("Test1", new SlangTestCase("Test1", "path", "desc", null, null, null, null, null, null));
         testCases.put("Test2", new SlangTestCase("Test1", "path2", "desc2", null, null, null, null, null, null));
         when(parser.parseTestCases(Mockito.any(SlangSource.class))).thenReturn(testCases);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("name");
-        exception.expectMessage("Test1");
-        exception.expectMessage("exists");
-        slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                slangTestRunner.createTestCases(resource.getPath(), allAvailableExecutables));
+        assertEquals(exception.getMessage(),
+                "Test case with the name: Test1 already exists. " +
+                        "Test case name should be unique across the project");
     }
 
     @Test

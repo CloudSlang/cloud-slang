@@ -28,9 +28,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class StaticValidatorTest {
 
@@ -38,15 +39,12 @@ public class StaticValidatorTest {
 
     private StaticValidator staticValidator;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Before
     public void setup() {
         staticValidator = new StaticValidatorImpl();
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void missingDescriptionForInput() throws URISyntaxException {
         List<Input> inputList = Lists.newArrayList(new Input.InputBuilder("input1", "value1").build(),
                 new Input.InputBuilder("input2", "value2").build(),
@@ -64,9 +62,9 @@ public class StaticValidatorTest {
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true, exceptions);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
-                "Input 'input3' is missing description.");
+        assertNotNull(exceptions.peek());
+        assertEquals(exceptions.peek().getMessage(),
+                "Error for executable no_dependencies.empty_flow: Input 'input3' is missing description.");
 
         throw exceptions.peek();
     }
@@ -91,7 +89,7 @@ public class StaticValidatorTest {
                 newExecutable, metadata, true, exceptions);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void missingDescriptionForOutput() throws URISyntaxException {
         List<Output> outputList = Lists.newArrayList(new Output("output1", ValueFactory.create("value1"),
                         Collections.<ScriptFunction>emptySet(), Collections.<String>emptySet()),
@@ -112,13 +110,13 @@ public class StaticValidatorTest {
 
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true, exceptions);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
-                "Output 'output3' is missing description.");
+        assertNotNull(exceptions.peek());
+        assertEquals(exceptions.peek().getMessage(),
+                "Error for executable no_dependencies.empty_flow: Output 'output3' is missing description.");
         throw exceptions.peek();
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void missingDescriptionForResult() throws URISyntaxException {
         List<Result> resultList = Lists.newArrayList(new Result("result1", ValueFactory.create("value1")),
                 new Result("result2", ValueFactory.create("value2")),
@@ -136,13 +134,13 @@ public class StaticValidatorTest {
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true, exceptions);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
-                "Result 'result3' is missing description.");
+        assertNotNull(exceptions.peek());
+        assertEquals(exceptions.peek().getMessage(),
+                "Error for executable no_dependencies.empty_flow: Result 'result3' is missing description.");
         throw exceptions.peek();
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void missingDescriptionEntirelyForResult() throws URISyntaxException {
         List<Result> resultList = Lists.newArrayList(new Result("result1", ValueFactory.create("value1")),
                 new Result("result2", ValueFactory.create("value2")),
@@ -155,9 +153,9 @@ public class StaticValidatorTest {
         staticValidator.validateSlangFile(new File(getClass().getResource("/no_dependencies/empty_flow.sl").toURI()),
                 newExecutable, metadata, true, exceptions);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error for executable no_dependencies.empty_flow: " +
-                "Results are missing description entirely.");
+        assertNotNull(exceptions.peek());
+        assertEquals(exceptions.peek().getMessage(),
+                "Error for executable no_dependencies.empty_flow: Results are missing description entirely.");
         throw exceptions.peek();
     }
 
