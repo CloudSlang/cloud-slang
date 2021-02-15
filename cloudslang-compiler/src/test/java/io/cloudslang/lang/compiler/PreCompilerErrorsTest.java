@@ -308,7 +308,6 @@ public class PreCompilerErrorsTest {
         assertEquals(result.getErrors().get(0).getMessage(),
                 "For operation 'op_1' syntax is illegal.\n" +
                         "Result cannot be called 'on_failure'.");
-        //exception.expectMessage("Result cannot be called 'on_failure'.");
         throw result.getErrors().get(0);
     }
 
@@ -321,7 +320,6 @@ public class PreCompilerErrorsTest {
         assertEquals(result.getErrors().get(0).getMessage(),
                 "For flow 'flow_1' syntax is illegal.\n" +
                         "Result cannot be called 'on_failure'.");
-        //exception.expectMessage("Result cannot be called 'on_failure'.");
         throw result.getErrors().get(0);
     }
 
@@ -334,7 +332,6 @@ public class PreCompilerErrorsTest {
         assertEquals(result.getErrors().get(0).getMessage(),
                 "For decision 'decision_1' syntax is illegal.\n" +
                         "Result cannot be called 'on_failure'.");
-        //exception.expectMessage("Result cannot be called 'on_failure'.");
         throw result.getErrors().get(0);
     }
 

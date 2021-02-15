@@ -20,14 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author Bonczidai Levente
@@ -50,9 +51,6 @@ public class CompileResultsTest {
         expectedFlowResults.add(failure);
     }
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Autowired
     private SlangCompiler compiler;
 
@@ -68,40 +66,50 @@ public class CompileResultsTest {
 
     @Test
     public void testOpDefaultResultNotLastPosition() throws Exception {
-        expectMessage(PreCompileValidator.VALIDATION_ERROR +
-                "Flow: 'op_2' syntax is illegal. Error compiling result: 'CUSTOM_2'." +
-                " Default result should be on last position.");
-        preCompileExecutable("/results/op_2.sl");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                preCompileExecutable("/results/op_2.sl"));
+        assertEquals(exception.getMessage(),
+                PreCompileValidator.VALIDATION_ERROR +
+                        "Flow: 'op_2' syntax is illegal. Error compiling result: 'CUSTOM_2'." +
+                        " Default result should be on last position.");
     }
 
     @Test
     public void testOpMissingDefaultResult() throws Exception {
-        expectMessage("Flow: 'op_3' syntax is illegal. Error compiling result: 'CUSTOM_3'." +
-                " Last result should be default result.");
-        preCompileExecutable("/results/op_3.sl");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                preCompileExecutable("/results/op_3.sl"));
+        assertEquals(exception.getMessage(),
+                "Validation failed. Flow: 'op_3' syntax is illegal. Error compiling result: 'CUSTOM_3'. " +
+                        "Last result should be default result.");
     }
 
     @Test
     public void testOpWrongResultValueBooleanFalse() throws Exception {
-        expectMessage("Flow: 'op_4' syntax is illegal. Error compiling result: 'CUSTOM_2'." +
-                " Value supports only expression or boolean true values.");
-        preCompileExecutable("/results/op_4.sl");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                preCompileExecutable("/results/op_4.sl"));
+        assertEquals(exception.getMessage(),
+                "Flow: 'op_4' syntax is illegal. Error compiling result: 'CUSTOM_2'." +
+                        " Value supports only expression or boolean true values.");
     }
 
     @Test
     public void testDecisionWrongResultValueInteger() throws Exception {
-        expectMessage("Flow: 'decision_1' syntax is illegal. Error compiling result: 'LESS_THAN'." +
-                " Value supports only expression or boolean true values.");
-        preCompileExecutable("/results/decision_1.sl");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                preCompileExecutable("/results/decision_1.sl"));
+        assertEquals(exception.getMessage(),
+                "Flow: 'decision_1' syntax is illegal. Error compiling result: 'LESS_THAN'." +
+                        " Value supports only expression or boolean true values.");
     }
 
 
     @Test
     public void testDecisionMultipleDefaultResults() throws Exception {
-        expectMessage(PreCompileValidator.VALIDATION_ERROR +
-                "Flow: 'decision_1' syntax is illegal. Error compiling result: 'LESS_THAN'." +
-                " Default result should be on last position.");
-        preCompileExecutable("/results/decision_2.sl");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                preCompileExecutable("/results/decision_2.sl"));
+        assertEquals(exception.getMessage(),
+                PreCompileValidator.VALIDATION_ERROR +
+                        "Flow: 'decision_1' syntax is illegal. Error compiling result: 'LESS_THAN'." +
+                        " Default result should be on last position.");
     }
 
     private void testResults(String source, List<Result> expectedResults) throws Exception {
@@ -114,11 +122,6 @@ public class CompileResultsTest {
     private Executable preCompileExecutable(String source) throws Exception {
         URL sourceUri = getClass().getResource(source);
         return compiler.preCompile(SlangSource.fromFile(sourceUri.toURI()));
-    }
-
-    private void expectMessage(String message) {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(message);
     }
 
 }
