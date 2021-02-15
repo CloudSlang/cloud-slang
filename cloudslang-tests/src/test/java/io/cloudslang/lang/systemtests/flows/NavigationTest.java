@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.systemtests.flows;
 
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ResultNavigation;
@@ -19,6 +18,8 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.SystemsTestsParent;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -27,14 +28,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 
 /**
@@ -45,8 +42,6 @@ import static org.junit.Assert.assertEquals;
 public class NavigationTest extends SystemsTestsParent {
 
     public static final long FLOW_END_STEP_ID = 0L;
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void testComplexNavigationEvenNumber() throws Exception {
@@ -148,10 +143,10 @@ public class NavigationTest extends SystemsTestsParent {
         Map<String, Value> userInputs = new HashMap<>();
         userInputs.put("input1", ValueFactory.create("value1", false));
 
-        expectedEx.expect(RuntimeException.class);
-        expectedEx.expectMessage("Error running: 'operation_results_empty_list'.\n" +
-                "\tNo results were found");
-        triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>());
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                triggerWithData(compilationArtifact, userInputs, new HashSet<SystemProperty>()));
+        Assert.assertEquals("Error running: 'operation_results_empty_list'.\n" +
+                "\tNo results were found", exception.getMessage());
     }
 
     @Test
@@ -160,10 +155,14 @@ public class NavigationTest extends SystemsTestsParent {
 
         Set<SlangSource> path = newHashSet();
 
-        expectedEx.expect(RuntimeException.class);
-        expectedEx.expectMessage("Failed to compile step: print1. The step/result name: " +
-                "SUCCESS of navigation: SUCCESS -> SUCCESS is missing");
-        slang.compile(fromFile(resource), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                slang.compile(fromFile(resource), path));
+        Assert.assertEquals("java.lang.RuntimeException: Flow flow_results_empty_list has errors:\n" +
+                        "Failed to compile step: print1. The step/result name: " +
+                        "SUCCESS of navigation: SUCCESS -> SUCCESS is missing\n" +
+                        "Failed to compile step: print1. The step/result name: " +
+                        "FAILURE of navigation: FAILURE -> FAILURE is missing",
+                exception.getMessage());
     }
 
     @Test
@@ -278,9 +277,6 @@ public class NavigationTest extends SystemsTestsParent {
 
     @Test
     public void testOnFailureNavigationMoreSteps() throws Exception {
-        expectedEx.expect(RuntimeException.class);
-        expectedEx.expectMessage("Below 'on_failure' property there should be only one step");
-
         URI resource = getClass().getResource("/yaml/on_failure_more_steps.sl").toURI();
         URI operationPython = getClass().getResource("/yaml/produce_default_navigation.sl").toURI();
         URI operation2Python = getClass().getResource("/yaml/send_email_mock.sl").toURI();
@@ -288,7 +284,10 @@ public class NavigationTest extends SystemsTestsParent {
 
         Set<SlangSource> path =
                 newHashSet(fromFile(operationPython), fromFile(operation2Python), fromFile(operation3Python));
-        slang.compile(fromFile(resource), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                slang.compile(fromFile(resource), path));
+        Assert.assertEquals("java.lang.RuntimeException: Flow: 'on_failure_more_steps' syntax is illegal.\n" +
+                        "Below 'on_failure' property there should be only one step", exception.getMessage());
     }
 
     @Test

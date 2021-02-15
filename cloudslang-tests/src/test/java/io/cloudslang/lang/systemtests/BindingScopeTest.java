@@ -21,8 +21,6 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author Bonczidai Levente
@@ -75,21 +74,13 @@ public class BindingScopeTest extends SystemsTestsParent {
         Map<String, Value> userInputs = Collections.emptyMap();
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
-        exception.expect(RuntimeException.class);
-
-        exception.expectMessage(new BaseMatcher<String>() {
-            public void describeTo(Description description) {
-            }
-
-            public boolean matches(Object o) {
-                String message = o.toString();
-                return message.contains("Error running: 'check_weather_missing_input'") &&
-                        message.contains("Error binding input: 'input_get_missing_input'") &&
-                        message.contains("Error in evaluating expression: 'missing_input'") &&
-                        message.contains("name 'missing_input' is not defined");
-            }
-        });
-        triggerWithData(compilationArtifact, userInputs, systemProperties);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                triggerWithData(compilationArtifact, userInputs, systemProperties));
+        Assert.assertEquals("Error running: 'check_weather_missing_input'.\n" +
+                "\t Error binding input: 'input_get_missing_input', \n" +
+                "\tError in evaluating expression: 'missing_input',\n" +
+                "\tError in running script expression: 'missing_input',\n" +
+                "\tException is: name 'missing_input' is not defined", exception.getMessage());
     }
 
     @Test
@@ -136,19 +127,10 @@ public class BindingScopeTest extends SystemsTestsParent {
         userInputs.put("city", ValueFactory.create(""));
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
-        exception.expect(RuntimeException.class);
-
-        exception.expectMessage(new BaseMatcher<String>() {
-            public void describeTo(Description description) {
-            }
-
-            public boolean matches(Object o) {
-                String message = o.toString();
-                return message.contains("Error running: 'check_weather_input_required'.") &&
-                        message.contains("Input with name: 'city' is Required, but value is empty");
-            }
-        });
-        triggerWithData(compilationArtifact, userInputs, systemProperties);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                triggerWithData(compilationArtifact, userInputs, systemProperties));
+        Assert.assertEquals("Error running: 'check_weather_input_required'.\n" +
+                "\t Input with name: 'city' is Required, but value is empty", exception.getMessage());
     }
 
     @Test
@@ -161,19 +143,10 @@ public class BindingScopeTest extends SystemsTestsParent {
         userInputs.put("city", ValueFactory.create(null));
         Set<SystemProperty> systemProperties = Collections.emptySet();
 
-        exception.expect(RuntimeException.class);
-
-        exception.expectMessage(new BaseMatcher<String>() {
-            public void describeTo(Description description) {
-            }
-
-            public boolean matches(Object o) {
-                String message = o.toString();
-                return message.contains("Error running: 'check_weather_input_required'.") &&
-                        message.contains("Input with name: 'city' is Required, but value is empty");
-            }
-        });
-        triggerWithData(compilationArtifact, userInputs, systemProperties);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                triggerWithData(compilationArtifact, userInputs, systemProperties));
+        Assert.assertEquals("Error running: 'check_weather_input_required'.\n" +
+                "\t Input with name: 'city' is Required, but value is empty", exception.getMessage());
     }
 
     @Test
@@ -336,12 +309,13 @@ public class BindingScopeTest extends SystemsTestsParent {
         final Map<String, Value> userInputs = Collections.emptyMap();
         final Set<SystemProperty> systemProperties = Collections.emptySet();
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("flow_var");
-        exception.expectMessage("not defined");
-
         // trigger ExecutionPlan
-        triggerWithData(compilationArtifact, userInputs, systemProperties);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                triggerWithData(compilationArtifact, userInputs, systemProperties));
+        Assert.assertEquals("Error running: 'step1': Binding output: 'step1_publish_1 failed',\n" +
+                "\tError in evaluating expression: 'flow_var',\n" +
+                "\tError in running script expression: 'flow_var',\n" +
+                "\tException is: name 'flow_var' is not defined", exception.getMessage());
     }
 
 }

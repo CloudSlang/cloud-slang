@@ -19,6 +19,9 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.systemtests.RuntimeInformation;
 import io.cloudslang.lang.systemtests.StepData;
 import io.cloudslang.lang.systemtests.ValueSyntaxParent;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,9 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Bonczidai Levente
@@ -87,23 +89,21 @@ public class SensitiveSystemPropertiesTest extends ValueSyntaxParent {
     public void testInvalidKey() throws Exception {
         URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive_invalid_key.prop.sl").toURI();
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(
-                "Artifact {flow.var3_sensitive} has unrecognized tag {invalid_key}." +
-                        " Please take a look at the supported features per versions link"
-        );
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri)));
+        Assert.assertEquals("Artifact {flow.var3_sensitive} has unrecognized tag {invalid_key}." +
+                " Please take a look at the supported features per versions link", exception.getMessage());
 
-        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri));
     }
 
     @Test
     public void testKeyNotString() throws Exception {
         URI propertiesFileUri = getClass().getResource("/yaml/properties/a/b/sensitive_key_not_string.prop.sl").toURI();
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Artifact {flow.var3_sensitive} has invalid tag {123}: Value cannot be cast to String");
-
-        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri)));
+        Assert.assertEquals("Artifact {flow.var3_sensitive} has invalid tag {123}: " +
+                "Value cannot be cast to String", exception.getMessage());
     }
 
     @Test
@@ -111,11 +111,10 @@ public class SensitiveSystemPropertiesTest extends ValueSyntaxParent {
         final URI propertiesFileUri = getClass()
                 .getResource("/yaml/properties/a/b/sensitive_value_not_serializable.prop.sl").toURI();
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Artifact {flow.var3_sensitive} has invalid value {java.lang.Object");
-        exception.expectMessage("}: Value cannot be cast to Serializable");
-
-        slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri)));
+        assertTrue(exception.getMessage().contains("Artifact {flow.var3_sensitive} has invalid value"));
+        assertTrue(exception.getMessage().contains("Value cannot be cast to Serializable"));
     }
 
     private void testExecutable(

@@ -10,11 +10,12 @@
 package io.cloudslang.lang.systemtests;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -25,11 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangSource.fromFile;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Date: 3/25/2015
@@ -206,11 +205,13 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
                 .getResource("/yaml/loops/parallel_loop/print_branch.sl").toURI();
         final Set<SlangSource> path = newHashSet(fromFile(operation1));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("flow_var");
-        exception.expectMessage("not defined");
-
-        triggerWithData(fromFile(resource), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                triggerWithData(fromFile(resource), path));
+        Assert.assertEquals("Error running: 'print_values': \n" +
+                "Binding output: 'output_from_flow_context failed',\n" +
+                "\tError in evaluating expression: 'flow_var',\n" +
+                "\tError in running script expression: 'flow_var',\n" +
+                "\tException is: name 'flow_var' is not defined", exception.getMessage());
     }
 
     @Test

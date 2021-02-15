@@ -23,16 +23,6 @@ import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.fusesource.jansi.Ansi;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -40,9 +30,7 @@ import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -54,7 +42,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static com.google.common.collect.Sets.newHashSet;
+import static io.cloudslang.lang.commons.services.api.SlangCompilationService.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -81,8 +81,6 @@ public class CompilerHelperTest {
     @Autowired
     private ConsolePrinter consolePrinter;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test(expected = NullPointerException.class)
     public void testFilePathWrong() throws Exception {
@@ -102,9 +100,10 @@ public class CompilerHelperTest {
     @Test
     public void testUnsupportedExtension() throws Exception {
         final URI flowFilePath = getClass().getResource("/flow.yaml").toURI();
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("must have one of the following extensions");
-        compilerHelper.compile(flowFilePath.getPath(), null);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                compilerHelper.compile(flowFilePath.getPath(), null));
+        Assert.assertEquals("File: flow.yaml must have one of the following extensions: sl, sl.yaml, sl.yml.",
+                exception.getMessage());
 
     }
 
@@ -214,30 +213,28 @@ public class CompilerHelperTest {
         String currentDirPath = getClass().getResource("").getPath();
         final String invalidDirPath = currentDirPath.concat("xxx");
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("xxx");
-        expectedException.expectMessage(SlangCompilationService.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
-
-        compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compilerHelper.compile(flowFilePath, Lists.newArrayList(invalidDirPath)));
+        Assert.assertTrue(exception.getMessage().contains("Failed compilation for file : flow.sl "));
+        Assert.assertTrue(exception.getMessage().contains(INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX));
     }
 
     @Test
     public void testInvalidDirPathForDependencies2() throws Exception {
         final String flowFilePath = getClass().getResource("/flow.sl").getPath();
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("flow.sl");
-        expectedException.expectMessage(SlangCompilationService.INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX);
-
-        compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compilerHelper.compile(flowFilePath, Lists.newArrayList(flowFilePath)));
+        Assert.assertTrue(exception.getMessage().contains("Failed compilation for file : flow.sl "));
+        Assert.assertTrue(exception.getMessage().contains(INVALID_DIRECTORY_ERROR_MESSAGE_SUFFIX));
     }
 
     @Test
     public void testLoadSystemProperties() throws Exception {
         final Set<SystemProperty> systemProperties =
                 newHashSet(new SystemProperty("user.sys", "props.host", "localhost", ""),
-                new SystemProperty("user.sys", "props.port", "22", ""),
-                new SystemProperty("user.sys", "props.alla", "balla", ""));
+                        new SystemProperty("user.sys", "props.port", "22", ""),
+                        new SystemProperty("user.sys", "props.alla", "balla", ""));
         final URI systemPropertyUri = getClass().getResource("/properties/system_properties.prop.sl").toURI();
         final SlangSource source = SlangSource.fromFile(systemPropertyUri);
         when(slang.loadSystemProperties(eq(source))).thenReturn(systemProperties);
@@ -258,14 +255,10 @@ public class CompilerHelperTest {
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props1)))).thenReturn(systemProperties1);
         when(slang.loadSystemProperties(eq(SlangSource.fromFile(props2)))).thenReturn(systemProperties2);
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(containsIgnoreCase("user.SYS.props.host"));
-        expectedException
-                .expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
-        expectedException
-                .expectMessage("properties" + File.separator + "duplicate" + File.separator + "props1.prop.sl");
-
-        compilerHelper.loadSystemProperties(Lists.newArrayList(props1.getPath(), props2.getPath()));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compilerHelper.loadSystemProperties(Lists.newArrayList(props1.getPath(), props2.getPath())));
+        Assert.assertTrue(exception.getMessage().contains("props2.prop.sl nested exception is Duplicate" +
+                " system property: 'user.SYS.props.host' in the following files:"));
     }
 
     @Test
@@ -307,31 +300,30 @@ public class CompilerHelperTest {
 
     @Test
     public void testLoadInputsFromFileBadValueKey() throws Exception {
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("inputs_value_missing.yaml} " +
-                "has unrecognized tag {bad_value_key}. Please take a look at the supported features per versions link");
-
         final URI inputsFromFile = getClass().getResource("/inputs/inputs_value_missing.yaml").toURI();
-        compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath())));
+        Assert.assertEquals("java.lang.RuntimeException: Artifact {inputs_value_missing.yaml} has " +
+                "unrecognized tag {bad_value_key}. Please take a look at the " +
+                "supported features per versions link", exception.getMessage());
     }
 
     @Test
     public void testLoadInputsFromCommentedFile() throws Exception {
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Inputs file");
-
         final URI inputsFromFile = getClass().getResource("/inputs/commented_inputs.yaml").toURI();
-        compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath())));
+        Assert.assertTrue(exception.getMessage()
+                .contains("commented_inputs.yaml is empty or does not contain valid YAML content."));
     }
 
     @Test
     public void testLoadInputsFromEmptyFile() throws Exception {
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Inputs file");
-
         URI inputsFromFile = getClass().getResource("/inputs/empty_inputs.yaml").toURI();
-        compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath()));
-
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compilerHelper.loadInputsFromFile(Collections.singletonList(inputsFromFile.getPath())));
+        Assert.assertTrue(exception.getMessage()
+                .contains("empty_inputs.yaml is empty or does not contain valid YAML content."));
     }
 
     @Ignore("Awaiting CloudSlang/cloud-slang#302 decision")

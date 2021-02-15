@@ -18,6 +18,8 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.ScoreEvent;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.Serializable;
@@ -30,12 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
-
 import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Date: 11/14/2014
@@ -81,10 +80,11 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testSimpleFlowBasicMissingFlowInput() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("input1");
-        exception.expectMessage("Required");
-        compileAndRunSimpleFlow(new HashMap<String, Value>(), EMPTY_SET);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compileAndRunSimpleFlow(new HashMap<String, Value>(), EMPTY_SET));
+        Assert.assertEquals("Error running: 'simple_flow'.\n" +
+                "\t Input with name: 'input1' is Required, but value is empty\n" +
+                "Input with name: 'host' is Required, but value is empty", exception.getMessage());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -92,10 +92,11 @@ public class SimpleFlowTest extends SystemsTestsParent {
         Map<String, Value> inputs = new HashMap<>();
         inputs.put("input1", ValueFactory.create("-2"));
         inputs.put("time_zone_as_string", ValueFactory.create("+2"));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("host");
-        exception.expectMessage("Required");
-        compileAndRunSimpleFlow(inputs, EMPTY_SET);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compileAndRunSimpleFlow(inputs, EMPTY_SET));
+        Assert.assertEquals("Error running: 'simple_flow'.\n" +
+                "\t Input with name: 'host' is Required, but value is empty", exception.getMessage());
     }
 
     @Test
@@ -132,10 +133,12 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(fromFile(operations1), fromFile(operations2));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Step arguments");
         CompilationArtifact compilationArtifact = slang.compile(fromFile(flow), path);
-        trigger(compilationArtifact, inputs, systemProperties);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                trigger(compilationArtifact, inputs, systemProperties));
+        Assert.assertEquals("Error running: 'operation_results_empty_list'.\n" +
+                "\tNo results were found", exception.getMessage());
     }
 
     @Test
@@ -145,12 +148,12 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         SlangSource operationsSource = fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Step1");
-        exception.expectMessage("CUSTOM");
-        exception.expectMessage("navigation");
         CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
-        trigger(compilationArtifact, new HashMap<String, Value>(), null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                trigger(compilationArtifact, new HashMap<String, Value>(), null));
+        Assert.assertEquals("Error running: 'operation_results_empty_list'.\n" +
+                "\tNo results were found", exception.getMessage());
     }
 
     @Test
