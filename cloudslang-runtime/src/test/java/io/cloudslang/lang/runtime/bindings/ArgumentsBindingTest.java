@@ -33,9 +33,7 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -98,9 +96,6 @@ public class ArgumentsBindingTest {
 
     @Autowired
     private ArgumentsBinding argumentsBinding;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testEmptyBindArguments() throws Exception {

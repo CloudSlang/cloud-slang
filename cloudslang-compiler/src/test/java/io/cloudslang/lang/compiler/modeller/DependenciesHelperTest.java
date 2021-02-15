@@ -16,6 +16,9 @@ import io.cloudslang.lang.compiler.modeller.model.Flow;
 import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -24,12 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,9 +37,6 @@ import static org.mockito.Mockito.when;
  * @since 10/12/2016
  */
 public class DependenciesHelperTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private DependenciesHelper dependenciesHelper;
 
@@ -51,16 +47,16 @@ public class DependenciesHelperTest {
 
     @Test
     public void testFetchDependenciesNullExecutable() throws Exception {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("The validated object is null");
-        dependenciesHelper.fetchDependencies(null, Collections.<String, Executable>emptyMap());
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                dependenciesHelper.fetchDependencies(null, Collections.<String, Executable>emptyMap()));
+        Assert.assertEquals("The validated object is null", exception.getMessage());
     }
 
     @Test
     public void testFetchDependenciesNullDependencies() throws Exception {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("The validated object is null");
-        dependenciesHelper.fetchDependencies(null, Collections.<String, Executable>emptyMap());
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                dependenciesHelper.fetchDependencies(null, Collections.<String, Executable>emptyMap()));
+        Assert.assertEquals("The validated object is null", exception.getMessage());
     }
 
     @Test

@@ -30,9 +30,7 @@ import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Result;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +47,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
@@ -59,9 +58,6 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ExecutableBuilderTest.Config.class})
 public class ExecutableBuilderTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private ExecutableBuilder executableBuilder;
@@ -116,10 +112,10 @@ public class ExecutableBuilderTest {
         String flowName = "flow2";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(flowName);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Error compiling filename. Flow: flow2 has no workflow property",
+                exception.getMessage());
     }
 
     @Test
@@ -130,10 +126,10 @@ public class ExecutableBuilderTest {
         String flowName = "flow2";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, flowName);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(flowName);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Flow: 'flow2' syntax is illegal.\n" +
+                "Below 'workflow' property there should be a list of steps and not a map", exception.getMessage());
     }
 
     @Test
@@ -148,10 +144,9 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, "flow1");
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(stepName);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Step: step1 has no data", exception.getMessage());
     }
 
     @Test
@@ -167,10 +162,10 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, "flow1");
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(keyword);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Flow: 'flow1' syntax is illegal.\n" +
+                "Below 'workflow' property there should be a list of steps and not a map", exception.getMessage());
     }
 
     @Test
@@ -188,10 +183,10 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, "flow1");
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(keyword);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Flow: 'flow1' syntax is illegal.\n" +
+                "Below 'workflow' property there should be a list of steps and not a map", exception.getMessage());
     }
 
     @Test
@@ -211,10 +206,10 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, "flow1");
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(keyword);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Flow: 'flow1' syntax is illegal.\n" +
+                "Below 'workflow' property there should be a list of steps and not a map", exception.getMessage());
     }
 
     @Test
@@ -234,10 +229,10 @@ public class ExecutableBuilderTest {
         executableRawData.put(SlangTextualKeys.WORKFLOW_KEY, workFlowData);
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, "flow1");
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(stepName);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Artifact {step1} has unrecognized tag {a}. " +
+                "Please take a look at the supported features per versions link", exception.getMessage());
     }
 
     @Test
@@ -311,12 +306,10 @@ public class ExecutableBuilderTest {
         String operationName = "op1";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, operationName);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(operationName);
-        exception.expectMessage(key);
-
-        Operation op = (Operation) transformToExecutable(mockParsedSlang, executableRawData);
-        Assert.assertNotNull(op);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Artifact {op1} has unrecognized tag {a}. " +
+                "Please take a look at the supported features per versions link", exception.getMessage());
     }
 
     @Test
@@ -332,10 +325,10 @@ public class ExecutableBuilderTest {
         String operationName = "op1";
         executableRawData.put(SlangTextualKeys.EXECUTABLE_NAME_KEY, operationName);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(operationName);
-
-        transformToExecutable(mockParsedSlang, executableRawData);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformToExecutable(mockParsedSlang, executableRawData));
+        Assert.assertEquals("Artifact {op1} has unrecognized tag {a}. " +
+                "Please take a look at the supported features per versions link", exception.getMessage());
     }
 
     private Executable transformToExecutable(ParsedSlang mockParsedSlang, Map<String, Object> executableRawData) {
