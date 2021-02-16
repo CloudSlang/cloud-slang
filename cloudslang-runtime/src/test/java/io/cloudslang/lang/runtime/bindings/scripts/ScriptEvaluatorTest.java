@@ -115,8 +115,8 @@ public class ScriptEvaluatorTest {
         when(pythonRuntimeService.eval(anyString(), anyString(), anyMap()))
                 .thenThrow(new RuntimeException("error from interpreter"));
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(), new HashSet<SystemProperty>(),
-                new HashSet<ScriptFunction>()));
+                scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(),
+                        new HashSet<SystemProperty>(), new HashSet<ScriptFunction>()));
         Assert.assertEquals("Error in evaluating expression: 'input_expression',\n" +
                 "\terror from interpreter", exception.getMessage());
     }
