@@ -82,9 +82,9 @@ public class SimpleFlowTest extends SystemsTestsParent {
     public void testSimpleFlowBasicMissingFlowInput() throws Exception {
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 compileAndRunSimpleFlow(new HashMap<String, Value>(), EMPTY_SET));
-        Assert.assertEquals("Error running: 'simple_flow'.\n" +
-                "\t Input with name: 'input1' is Required, but value is empty\n" +
-                "Input with name: 'host' is Required, but value is empty", exception.getMessage());
+        Assert.assertTrue(exception.getMessage().contains("Error running: 'simple_flow'."));
+        Assert.assertTrue(exception.getMessage().contains("Input with name: 'input1' is Required, but value is empty"));
+        Assert.assertTrue(exception.getMessage().contains("Input with name: 'host' is Required, but value is empty"));
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -133,12 +133,11 @@ public class SimpleFlowTest extends SystemsTestsParent {
         URI operations1 = getClass().getResource("/yaml/get_time_zone.sl").toURI();
         URI operations2 = getClass().getResource("/yaml/compute_daylight_time_zone.sl").toURI();
         Set<SlangSource> path = Sets.newHashSet(fromFile(operations1), fromFile(operations2));
-        CompilationArtifact compilationArtifact = slang.compile(fromFile(flow), path);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                trigger(compilationArtifact, inputs, systemProperties));
-        Assert.assertEquals("Error running: 'operation_results_empty_list'.\n" +
-                "\tNo results were found", exception.getMessage());
+                slang.compile(fromFile(flow), path));
+        Assert.assertEquals("java.lang.RuntimeException: For step 'Step1' syntax is illegal.\n" +
+                "Step arguments should be defined using a standard YAML list.", exception.getMessage());
     }
 
     @Test
@@ -148,12 +147,14 @@ public class SimpleFlowTest extends SystemsTestsParent {
 
         SlangSource operationsSource = fromFile(operations);
         Set<SlangSource> path = Sets.newHashSet(operationsSource);
-        CompilationArtifact compilationArtifact = slang.compile(fromFile(resource), path);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                trigger(compilationArtifact, new HashMap<String, Value>(), null));
-        Assert.assertEquals("Error running: 'operation_results_empty_list'.\n" +
-                "\tNo results were found", exception.getMessage());
+                slang.compile(fromFile(resource), path));
+        Assert.assertEquals("java.lang.IllegalArgumentException: " +
+                "Cannot compile flow 'flow_with_missing_navigation_from_op_result' " +
+                        "since for step 'Step1' the results " +
+                "[CUSTOM] of its dependency 'user.ops.print_custom_result_op' have no matching navigation.",
+                exception.getMessage());
     }
 
     @Test
