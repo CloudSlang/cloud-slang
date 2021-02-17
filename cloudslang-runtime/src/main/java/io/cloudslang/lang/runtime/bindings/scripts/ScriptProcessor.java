@@ -9,29 +9,28 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings.scripts;
 
-import io.cloudslang.lang.entities.bindings.values.PlainPyObjectValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 
 import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-/**
- * Script processor
- * <p>
- * Created by Ifat Gavish on 25/05/2016
- */
 public abstract class ScriptProcessor {
 
-    protected Map<String, Serializable> createPythonContext(Map<String, Value> context, boolean externalPython) {
+    public Map<String, Serializable> createJythonContext(Map<String, Value> context) {
+        Map<String, Serializable> jythonContext = new HashMap<>();
+        for (Map.Entry<String, ? extends Value> entry : context.entrySet()) {
+            jythonContext.put(entry.getKey(), ValueFactory.createPyObjectValueForJython(entry.getValue()));
+        }
+        return jythonContext;
+    }
+
+    public Map<String, Serializable> createExternalPythonContext(Map<String, Value> context) {
         Map<String, Serializable> pythonContext = new HashMap<>();
         for (Map.Entry<String, ? extends Value> entry : context.entrySet()) {
-            pythonContext.put(entry.getKey(), ValueFactory.createPyObjectValue(entry.getValue(), externalPython));
+            pythonContext.put(entry.getKey(), ValueFactory.createPyObjectValueForExternalPython(entry.getValue()));
         }
-
         return pythonContext;
     }
 }

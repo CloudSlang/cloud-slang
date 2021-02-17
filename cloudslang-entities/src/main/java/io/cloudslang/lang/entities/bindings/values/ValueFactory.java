@@ -59,6 +59,16 @@ public abstract class ValueFactory implements Serializable {
                 externalPython);
     }
 
+    public static PyObjectValue createPyObjectValueForJython(Value value) {
+        return PyObjectValueProxyFactory.create(value == null ? null : value.get(),
+                value != null && value.isSensitive());
+    }
+
+    public static PyObjectValue createPyObjectValueForExternalPython(Value value) {
+        return new PlainPyObjectValue(value == null ? null : value.get(),
+                value != null && value.isSensitive());
+    }
+
     private static Value createValue(Serializable content, boolean sensitive) {
         return sensitive ? new SensitiveValue(content) : new SimpleValue(content);
     }

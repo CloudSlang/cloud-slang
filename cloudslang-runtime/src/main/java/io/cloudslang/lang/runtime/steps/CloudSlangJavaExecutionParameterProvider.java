@@ -60,16 +60,16 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
 
     @Override
     public Object[] getExecutionParameters(Method executionMethod) {
-        List<Object> args = new ArrayList<>();
-
-        int index = 0;
-        Class[] parameterTypes = executionMethod.getParameterTypes();
-        for (Annotation[] annotations : executionMethod.getParameterAnnotations()) {
+        Class<?>[] parameterTypes = executionMethod.getParameterTypes();
+        List<Object> args = new ArrayList<>(parameterTypes.length);
+        int index = -1;
+        Annotation[][] parameterAnnotations = executionMethod.getParameterAnnotations();
+        for (Annotation[] annotations : parameterAnnotations) {
             index++;
             for (Annotation annotation : annotations) {
                 String parameterName = getValueIfParamAnnotation(annotation);
                 if (parameterName != null) {
-                    String paramClassName = parameterTypes[index - 1].getCanonicalName();
+                    String paramClassName = parameterTypes[index].getCanonicalName();
                     if (paramClassName.equals(GLOBAL_SESSION_OBJECT_CLASS_NAME)) {
                         handleSessionContextArgument(globalSessionObjectData, GLOBAL_SESSION_OBJECT_CLASS_NAME,
                                 args, parameterName,
@@ -87,8 +87,8 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                                 annotation.getClass().getClassLoader());
                     } else {
                         Serializable value = currentContext.get(parameterName);
-                        Class parameterClass = parameterTypes[index - 1];
-                        if (parameterClass.isInstance(value) || value == null) {
+                        Class<?> parameterClass = parameterTypes[index];
+                        if ((value == null) || parameterClass.isInstance(value)) {
                             args.add(value);
                         } else {
                             throw new RuntimeException(new StringBuilder("Parameter type mismatch for action ")
@@ -106,9 +106,9 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                     }
                 }
             }
-            if (args.size() != index) {
-                throw new RuntimeException("All action arguments should be annotated with @Param");
-            }
+        }
+        if (args.size() != parameterAnnotations.length) {
+            throw new RuntimeException("All action arguments should be annotated with @Param");
         }
         return args.toArray(new Object[args.size()]);
     }
@@ -133,8 +133,8 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
         if (sessionContextObject == null) {
             try {
                 sessionContextObject = Class.forName(STEP_SERIALIZABLE_SESSION_OBJECT, true, classLoader)
-                                            .getConstructor(String.class)
-                                            .newInstance(stepSessionKey);
+                        .getConstructor(String.class)
+                        .newInstance(stepSessionKey);
             } catch (Exception e) {
                 throw new RuntimeException(
                         "Failed to create instance of [" + STEP_SERIALIZABLE_SESSION_OBJECT + "] class", e);
@@ -149,7 +149,7 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                                               String parameterName, ClassLoader classLoader) {
         // cloudslang list iterator fix
         final String parameter = StringUtils.startsWith(this.nodeNameWithDepth, "list_iterator") ?
-                                                   this.nodeNameWithDepth : parameterName;
+                this.nodeNameWithDepth : parameterName;
 
         Object sessionContextObject = sessionData.get(parameter);
         if (sessionContextObject == null) {

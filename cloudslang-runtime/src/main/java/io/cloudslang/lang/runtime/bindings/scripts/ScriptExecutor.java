@@ -25,7 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Bonczidai Levente
@@ -47,8 +48,9 @@ public class ScriptExecutor extends ScriptProcessor {
                                             boolean useJython) {
         if (useJython) {
             return runJythonAction(dependencies, script, callArguments);
+        } else {
+            return runExternalPythonAction(dependencies, script, callArguments);
         }
-        return runExternalPythonAction(dependencies, script, callArguments);
     }
 
     private Map<String, Value> runExternalPythonAction(Set<String> dependencies, String script,
@@ -57,12 +59,12 @@ public class ScriptExecutor extends ScriptProcessor {
         String[] scriptParams = ExternalPythonScriptUtils.getScriptParams(script);
         Map<String, Value> neededArguments = callArguments.entrySet().stream()
                 .filter(entry -> Arrays.asList(scriptParams).contains(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         Map<String, Serializable> executionResult = externalPytonRuntimeService.exec(dependencies, script,
-                createPythonContext(neededArguments, true)).getExecutionResult();
-        Map<String, Value> result = new HashMap<>();
+                createExternalPythonContext(neededArguments)).getExecutionResult();
 
+        Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
             Value inputValue = callArguments.get(entry.getKey());
             boolean isSensitive = (inputValue != null) && inputValue.isSensitive();
@@ -74,12 +76,12 @@ public class ScriptExecutor extends ScriptProcessor {
     private Map<String, Value> runJythonAction(Set<String> dependencies, String script,
                                                Map<String, Value> callArguments) {
 
-        Map<String, Value> result = new HashMap<>();
         Map<String, Serializable> executionResult = pythonRuntimeService
-                .exec(dependencies, script, createPythonContext(callArguments, false)).getExecutionResult();
+                .exec(dependencies, script, createJythonContext(callArguments)).getExecutionResult();
 
+        Map<String, Value> result = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : executionResult.entrySet()) {
-            Value callArgumenet = callArguments.get(entry.getKey());
+            Value callArgument = callArguments.get(entry.getKey());
             Serializable theValue;
             if (entry.getValue() instanceof PyList) {
                 ArrayList<String> localList = new ArrayList<>();
@@ -93,7 +95,7 @@ public class ScriptExecutor extends ScriptProcessor {
             } else {
                 theValue = entry.getValue();
             }
-            Value value = ValueFactory.create(theValue, callArgumenet != null && callArgumenet.isSensitive());
+            Value value = ValueFactory.create(theValue, callArgument != null && callArgument.isSensitive());
             result.put(entry.getKey(), value);
         }
         return result;
