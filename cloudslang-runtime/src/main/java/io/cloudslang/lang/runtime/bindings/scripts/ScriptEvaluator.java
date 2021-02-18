@@ -178,10 +178,8 @@ public class ScriptEvaluator extends ScriptProcessor {
             functions += scriptsService.getScript(function);
             functions = appendDelimiterBetweenFunctions(functions);
         }
-        if (functionDependencies.size() > 0) {
-            functions += BACKWARD_COMPATIBLE_ACCESS_METHOD;
-            functions = appendDelimiterBetweenFunctions(functions);
-        }
+        functions += BACKWARD_COMPATIBLE_ACCESS_METHOD;
+        functions = appendDelimiterBetweenFunctions(functions);
         return functions;
     }
 
