@@ -146,10 +146,6 @@ public class InputsBinding extends AbstractBinding {
     private Value resolveValue(Input input, Map<String, ? extends Value> context,
                                Map<String, ? extends Value> targetContext, Set<SystemProperty> systemProperties) {
         Value value = null;
-
-        //we do not want to change original context map
-        Map<String, Value> scriptContext = new HashMap<>(context);
-
         String inputName = input.getName();
         Value valueFromContext = context.get(inputName);
         boolean sensitive = input.getValue() != null && input.getValue().isSensitive() ||
@@ -162,6 +158,8 @@ public class InputsBinding extends AbstractBinding {
             Value rawValue = input.getValue();
             String expressionToEvaluate = ExpressionUtils.extractExpression(rawValue == null ? null : rawValue.get());
             if (expressionToEvaluate != null) {
+                // we do not want to change original context map
+                Map<String, Value> scriptContext = new HashMap<>(context);
                 if (context.containsKey(inputName)) {
                     scriptContext.put(inputName, valueFromContext);
                 }
