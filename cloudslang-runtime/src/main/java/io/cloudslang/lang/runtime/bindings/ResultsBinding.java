@@ -10,7 +10,6 @@
 package io.cloudslang.lang.runtime.bindings;
 
 
-
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -19,13 +18,14 @@ import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import io.cloudslang.lang.entities.utils.MapUtils;
 import io.cloudslang.lang.entities.utils.ResultUtils;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * User: stoneo
@@ -119,9 +119,9 @@ public class ResultsBinding {
                 } catch (ClassCastException ex) {
                     throw new RuntimeException("Error resolving the result. The expression " + expression +
                             " does not return boolean value", ex);
-                } catch (Throwable t) {
+                } catch (Exception exception) {
                     throw new RuntimeException("Error evaluating result: '" + resultName + "',\n\tError is: " +
-                            t.getMessage(), t);
+                            exception.getMessage(), exception);
                 }
             } else {
                 throw new RuntimeException("Error resolving the result. Value: '" + rawValue + "' is not valid.");
