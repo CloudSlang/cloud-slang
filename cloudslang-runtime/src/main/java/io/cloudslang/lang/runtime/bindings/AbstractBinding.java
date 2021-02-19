@@ -76,13 +76,13 @@ public class AbstractBinding {
         } else if (loopCollectionContent instanceof String) {
             String expression = (String) loopCollectionContent;
             if (expression.charAt(0) == '{' && expression.charAt(expression.length() - 1) == '}') {
-                expression = expression.substring(1,expression.length() - 1);
-                expression = expression.replace("\"","");
+                expression = expression.substring(1, expression.length() - 1);
+                expression = expression.replace("\"", "");
                 ArrayList<String> keys = new ArrayList<>();
                 for (String value : expression.split(",")) {
                     keys.add(value.split(":")[0]);
                 }
-                return convert(keys,loopCollection.isSensitive());
+                return convert(keys, loopCollection.isSensitive());
             } else {
                 String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
                 return convert(Arrays.asList(strings), loopCollection.isSensitive());
