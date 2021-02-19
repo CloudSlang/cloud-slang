@@ -116,9 +116,9 @@ public class AbstractBinding {
                     evaluationContext,
                     evaluationContextHolder.getSystemProperties(),
                     evaluationContextHolder.getFunctionDependencies()));
+        } else {
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
 
     protected void resolvePromptExpressions(Prompt prompt, EvaluationContextHolder evaluationContextHolder) {
