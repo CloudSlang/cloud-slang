@@ -121,11 +121,7 @@ public class LoopsBinding extends AbstractBinding {
 
     private ForLoopCondition createForLoopCondition(Value evalResult) {
         Iterable<Value> iterable = getIterableFromEvalResult(evalResult);
-        if (iterable != null) {
-            return new ForLoopCondition(iterable);
-        } else {
-            return null;
-        }
+        return iterable != null ? new ForLoopCondition(iterable) : null;
     }
 
 }
