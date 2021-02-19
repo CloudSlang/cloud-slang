@@ -58,8 +58,8 @@ public class ParallelLoopBinding extends AbstractBinding {
             evalResult = getEvalResultForMap(evalResult, parallelLoopStatement, parallelLoopStatement.getExpression());
 
             result = (List<Value>) getIterableFromEvalResult(evalResult);
-        } catch (Throwable t) {
-            throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, t.getMessage()), t);
+        } catch (Exception exc) {
+            throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, exc.getMessage()), exc);
         }
         if (CollectionUtils.isEmpty(result)) {
             throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, "expression is empty"));
