@@ -118,8 +118,8 @@ public class InputsBinding extends AbstractBinding {
                 return;
             }
 
-        } catch (Throwable t) {
-            throw new RuntimeException(errorMessagePrefix + "', \n\t" + t.getMessage(), t);
+        } catch (Exception exc) {
+            throw new RuntimeException(errorMessagePrefix + "', \n\t" + exc.getMessage(), exc);
         }
 
         validateStringValue(errorMessagePrefix, value);
