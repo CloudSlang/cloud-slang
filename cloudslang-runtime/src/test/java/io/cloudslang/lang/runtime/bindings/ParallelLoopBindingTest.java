@@ -16,6 +16,12 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.bindings.scripts.ScriptEvaluator;
 import io.cloudslang.lang.runtime.env.Context;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -24,16 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.python.google.common.collect.Lists;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,9 +50,6 @@ public class ParallelLoopBindingTest {
     @SuppressWarnings("unchecked")
     private static final Set<String> EMPTY_PROPERTY_SET = Collections.EMPTY_SET;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @InjectMocks
     private ParallelLoopBinding parallelLoopBinding = new ParallelLoopBinding();
 
@@ -63,26 +58,31 @@ public class ParallelLoopBindingTest {
 
     @Test
     public void passingNullParallelLoopStatementThrowsException() throws Exception {
-        exception.expect(RuntimeException.class);
-        parallelLoopBinding
-                .bindParallelLoopList(null, new Context(
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parallelLoopBinding
+                        .bindParallelLoopList(null, new Context(
                         new HashMap<String, Value>(),
-                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName");
+                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName"));
+        Assert.assertEquals("parallel loop statement cannot be null", exception.getMessage());
+
     }
 
     @Test
     public void passingNullContextThrowsException() throws Exception {
-        exception.expect(RuntimeException.class);
-        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), null, EMPTY_SET, "nodeName");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(),
+                        null, EMPTY_SET, "nodeName"));
+        Assert.assertEquals("flow context cannot be null", exception.getMessage());
     }
 
     @Test
     public void passingNullNodeNameThrowsException() throws Exception {
-        exception.expect(RuntimeException.class);
-        parallelLoopBinding.bindParallelLoopList(
-                createBasicSyncLoopStatement(), new Context(
-                        new HashMap<String, Value>(),
-                        Collections.<String, Value>emptyMap()), EMPTY_SET, null);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parallelLoopBinding.bindParallelLoopList(
+                    createBasicSyncLoopStatement(), new Context(
+                            new HashMap<String, Value>(),
+                            Collections.<String, Value>emptyMap()), EMPTY_SET, null));
+        Assert.assertEquals("node name cannot be null", exception.getMessage());
     }
 
     @Test
@@ -113,10 +113,11 @@ public class ParallelLoopBindingTest {
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
                 .thenReturn(ValueFactory.create(newArrayList()));
 
-        exception.expectMessage("expression is empty");
-        exception.expect(RuntimeException.class);
-
-        parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(), context, EMPTY_SET, "nodeName");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parallelLoopBinding.bindParallelLoopList(createBasicSyncLoopStatement(),
+                        context, EMPTY_SET, "nodeName"));
+        Assert.assertEquals("Error evaluating parallel loop expression in step 'nodeName', error is: \n" +
+                "expression is empty", exception.getMessage());
     }
 
     @Test
@@ -125,14 +126,14 @@ public class ParallelLoopBindingTest {
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
                 .thenThrow(new RuntimeException("evaluation exception"));
-        exception.expectMessage("evaluation exception");
-        exception.expectMessage("nodeName");
-        exception.expect(RuntimeException.class);
 
-        parallelLoopBinding
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parallelLoopBinding
                 .bindParallelLoopList(createBasicSyncLoopStatement(), new Context(
                         variables,
-                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName");
+                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName"));
+        Assert.assertEquals("Error evaluating parallel loop expression in step 'nodeName', error is: \n" +
+                "evaluation exception", exception.getMessage());
     }
 
     private ListLoopStatement createBasicSyncLoopStatement() {

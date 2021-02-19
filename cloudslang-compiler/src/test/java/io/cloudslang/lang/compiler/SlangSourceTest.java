@@ -10,6 +10,13 @@
 package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,15 +24,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
-
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,9 +32,6 @@ public class SlangSourceTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private static final String content = "file_content";
     private static final Extension extension = Extension.SL;
@@ -145,10 +141,9 @@ public class SlangSourceTest {
     public void testWhenPassingDirectoryShouldThrowException() throws Exception {
         File tempFolder = folder.newFolder();
 
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("directories");
-        exception.expectMessage(tempFolder.getName());
-        SlangSource.fromFile(tempFolder);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                SlangSource.fromFile(tempFolder));
+        Assert.assertTrue( exception.getMessage().contains("doesn't lead to a file, directories are not supported"));
     }
 
     @Test
@@ -159,20 +154,16 @@ public class SlangSourceTest {
 
         when(file.getPath()).thenThrow((Class) IOException.class);
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("reading");
-        exception.expectMessage(file.getName());
-
-        SlangSource.fromFile(file);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                SlangSource.fromFile(file));
+        Assert.assertEquals("There was a problem reading the file: file_name.sl", exception.getMessage());
     }
 
     @Test
     public void testWhenPassingNullFileThrowException() throws Exception {
-
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("null");
-
-        SlangSource.fromFile((File) null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () ->
+                SlangSource.fromFile((File) null));
+        Assert.assertEquals("File cannot be null", exception.getMessage());
     }
 
     @Test

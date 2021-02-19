@@ -25,20 +25,9 @@ import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +37,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {InputsTransformerTest.Config.class, SlangCompilerSpringConfig.class})
@@ -62,9 +62,6 @@ public class InputsTransformerTest extends TransformersTestParent {
     private List<Object> inputsMap;
 
     private List<Object> inputsMapWithFunctions;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Before
     public void init() throws URISyntaxException {
@@ -89,7 +86,7 @@ public class InputsTransformerTest extends TransformersTestParent {
     public void testSimpleRefInput() throws Exception {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(0);
-        Assert.assertEquals("input1", input.getName());
+        assertEquals("input1", input.getName());
         Assert.assertNull(null, input.getValue().get());
     }
 
@@ -97,8 +94,8 @@ public class InputsTransformerTest extends TransformersTestParent {
     public void testExplicitRefInput() throws Exception {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(1);
-        Assert.assertEquals("input2", input.getName());
-        Assert.assertEquals("${ input2 }", input.getValue().get());
+        assertEquals("input2", input.getName());
+        assertEquals("${ input2 }", input.getValue().get());
     }
 
     @Test
@@ -106,8 +103,8 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(2);
-        Assert.assertEquals("input3", input.getName());
-        Assert.assertEquals("value3", input.getValue().get());
+        assertEquals("input3", input.getName());
+        assertEquals("value3", input.getValue().get());
     }
 
     @Test
@@ -115,8 +112,8 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(3);
-        Assert.assertEquals("input4", input.getName());
-        Assert.assertEquals("${ 'value4' if input3 == value3 else None }", input.getValue().get());
+        assertEquals("input4", input.getName());
+        assertEquals("${ 'value4' if input3 == value3 else None }", input.getValue().get());
     }
 
     @Test
@@ -124,10 +121,10 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(4);
-        Assert.assertEquals("input5", input.getName());
-        Assert.assertEquals(null, input.getValue().get());
-        Assert.assertEquals(true, input.isSensitive());
-        Assert.assertEquals(true, input.isRequired());
+        assertEquals("input5", input.getName());
+        assertEquals(null, input.getValue().get());
+        assertEquals(true, input.isSensitive());
+        assertEquals(true, input.isRequired());
     }
 
     @Test
@@ -135,10 +132,10 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(5);
-        Assert.assertEquals("input6", input.getName());
-        Assert.assertEquals("${ 1 + 5 }", input.getValue().get());
-        Assert.assertEquals(false, input.isSensitive());
-        Assert.assertEquals(false, input.isRequired());
+        assertEquals("input6", input.getName());
+        assertEquals("${ 1 + 5 }", input.getValue().get());
+        assertEquals(false, input.isSensitive());
+        assertEquals(false, input.isRequired());
     }
 
     @Test
@@ -146,10 +143,10 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(6);
-        Assert.assertEquals("input7", input.getName());
+        assertEquals("input7", input.getName());
         Assert.assertTrue("77".equals(input.getValue().get()));
-        Assert.assertEquals(false, input.isSensitive());
-        Assert.assertEquals(true, input.isRequired());
+        assertEquals(false, input.isSensitive());
+        assertEquals(true, input.isRequired());
     }
 
     @Test
@@ -157,10 +154,10 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(7);
-        Assert.assertEquals("input8", input.getName());
-        Assert.assertEquals("${ input6 }", input.getValue().get());
-        Assert.assertEquals(false, input.isSensitive());
-        Assert.assertEquals(true, input.isRequired());
+        assertEquals("input8", input.getName());
+        assertEquals("${ input6 }", input.getValue().get());
+        assertEquals(false, input.isSensitive());
+        assertEquals(true, input.isRequired());
     }
 
     @Test
@@ -168,8 +165,8 @@ public class InputsTransformerTest extends TransformersTestParent {
         @SuppressWarnings("unchecked")
         List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(8);
-        Assert.assertEquals("input9", input.getName());
-        Assert.assertEquals("${ input6 }", input.getValue().get());
+        assertEquals("input9", input.getName());
+        assertEquals("${ input6 }", input.getValue().get());
         Assert.assertFalse(!input.isPrivateInput());
         Assert.assertFalse(input.isSensitive());
         Assert.assertTrue(input.isRequired());
@@ -177,18 +174,20 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testPrivateRequiredInputWithEmptyStringDefault() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Input: 'input1' is private and required but no default value was specified");
         List inputs = getInputsFormSl("/corrupted/operation_with_data_invalid_input.sl");
-        transformAndThrowFirstException(inputTransformer, inputs);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(inputTransformer, inputs));
+        assertEquals("Validation failed. Input: 'input1' is private and required but no default value " +
+                "was specified", exception.getMessage());
     }
 
     @Test
     public void testPrivateRequiredInputWithNoneDefault() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Input: 'input1' is private and required but no default value was specified");
         List inputs = getInputsFormSl("/corrupted/operation_with_data_invalid_input.sl");
-        transformAndThrowFirstException(inputTransformer, inputs);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(inputTransformer, inputs));
+        assertEquals("Validation failed. Input: 'input1' is private and required but no default " +
+                        "value was specified", exception.getMessage());
     }
 
     @Test
@@ -211,46 +210,44 @@ public class InputsTransformerTest extends TransformersTestParent {
 
     @Test
     public void testPrivateInputWithoutDefault() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("private");
-        exception.expectMessage("default");
-        exception.expectMessage("input_without_default");
         List inputs = getInputsFormSl("/private_input_without_default.sl");
-        transformAndThrowFirstException(inputTransformer, inputs);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(inputTransformer, inputs));
+        assertEquals("Validation failed. Input: 'input_without_default' is private and required but no " +
+                        "default value was specified", exception.getMessage());
     }
 
     @Test
     public void testIllegalKeyInInput() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("known property");
-        exception.expectMessage("input_with_illegal_key");
-        exception.expectMessage("karambula");
         List inputs = getInputsFormSl("/illegal_key_in_input.sl");
-        transformAndThrowFirstException(inputTransformer, inputs);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(inputTransformer, inputs));
+        assertEquals("key: karambula in input: input_with_illegal_key is not a known property",
+                exception.getMessage());
     }
 
     @Test
     public void testLeadingSpaces() throws Exception {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(9);
-        Assert.assertEquals("input10", input.getName());
-        Assert.assertEquals("${ input5 }", input.getValue().get());
+        assertEquals("input10", input.getName());
+        assertEquals("${ input5 }", input.getValue().get());
     }
 
     @Test
     public void testLeadingAndTrailingSpaces() throws Exception {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(10);
-        Assert.assertEquals("input11", input.getName());
-        Assert.assertEquals("${ 5 + 6 }", input.getValue().get());
+        assertEquals("input11", input.getName());
+        assertEquals("${ 5 + 6 }", input.getValue().get());
     }
 
     @Test
     public void testLeadingAndTrailingSpacesComplex() throws Exception {
         @SuppressWarnings("unchecked") List<Input> inputs = inputTransformer.transform(inputsMap).getTransformedData();
         Input input = inputs.get(11);
-        Assert.assertEquals("input12", input.getName());
-        Assert.assertEquals("${ \"mighty\" + \" max\"   + varX }", input.getValue().get());
+        assertEquals("input12", input.getName());
+        assertEquals("${ \"mighty\" + \" max\"   + varX }", input.getValue().get());
     }
 
     @Test
@@ -270,7 +267,7 @@ public class InputsTransformerTest extends TransformersTestParent {
         Set<ScriptFunction> setGetAndCheckEmpty = new HashSet<>(setGet);
         setGetAndCheckEmpty.add(ScriptFunction.CHECK_EMPTY);
 
-        Assert.assertEquals("inputs size not as expected", 14, inputs.size());
+        assertEquals("inputs size not as expected", 14, inputs.size());
 
         verifyFunctionsAndSpDependencies(inputs, 0, emptySetScriptFunction, emptySetString);
         verifyFunctionsAndSpDependencies(inputs, 1, emptySetScriptFunction, emptySetString);
@@ -294,8 +291,8 @@ public class InputsTransformerTest extends TransformersTestParent {
             Set<ScriptFunction> expectedFunctions,
             Set<String> expectedSystemProperties) {
         Input input = inputs.get(inputIndex);
-        Assert.assertEquals(expectedFunctions, input.getFunctionDependencies());
-        Assert.assertEquals(expectedSystemProperties, input.getSystemPropertyDependencies());
+        assertEquals(expectedFunctions, input.getFunctionDependencies());
+        assertEquals(expectedSystemProperties, input.getSystemPropertyDependencies());
     }
 
     @Configuration

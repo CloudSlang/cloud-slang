@@ -24,6 +24,15 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.score.api.ExecutionPlan;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,19 +40,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -54,8 +54,6 @@ public class CompileForLoopsFlowTest {
     @Autowired
     private SlangCompiler compiler;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     public static ListLoopStatement validateListForLoopStatement(LoopStatement statement) {
         Assert.assertEquals(true, statement instanceof ListLoopStatement);
@@ -212,10 +210,10 @@ public class CompileForLoopsFlowTest {
         final URI operation = getClass().getResource("/loops/print.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For step 'print_values' syntax is illegal.\n" +
-                "For statement is empty.");
-        compiler.compile(SlangSource.fromFile(flow), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("For step 'print_values' syntax is illegal.\n" +
+                "For statement is empty.", exception.getMessage());
     }
 
     @Test
@@ -224,10 +222,10 @@ public class CompileForLoopsFlowTest {
         final URI operation = getClass().getResource("/loops/print.sl").toURI();
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For step 'print_values' syntax is illegal.\n" +
-                "For statement is empty.");
-        compiler.compile(SlangSource.fromFile(flow), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("For step 'print_values' syntax is illegal.\n" +
+                "For statement is empty.", exception.getMessage());
     }
 
     @Test
@@ -361,13 +359,11 @@ public class CompileForLoopsFlowTest {
         final URI operation = getClass().getResource("/loops/print.sl").toURI();
         final Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage(
-                "Cannot compile flow 'loops.loop_with_break_on_non_existing_result' since in step" +
-                        " 'print_values' the results [CUSTOM_1, CUSTOM_2] declared in 'break' section " +
-                        "are not declared in the dependency 'loops.print' result section."
-        );
-        compiler.compile(SlangSource.fromFile(flow), path);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Cannot compile flow 'loops.loop_with_break_on_non_existing_result' since in step" +
+                " 'print_values' the results [CUSTOM_1, CUSTOM_2] declared in 'break' section " +
+                "are not declared in the dependency 'loops.print' result section.", exception.getMessage());
     }
 
 }

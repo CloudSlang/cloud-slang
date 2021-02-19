@@ -14,20 +14,19 @@ import io.cloudslang.lang.entities.CompilationArtifact;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author Bonczidai Levente
@@ -40,9 +39,6 @@ public class CompileFlowReferenceIdTest {
 
     @Autowired
     private SlangCompiler compiler;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testBasicAlias() throws Exception {
@@ -157,10 +153,10 @@ public class CompileFlowReferenceIdTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        exception.expectMessage("sample_typo.simple_op");
-        exception.expect(RuntimeException.class);
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Reference: 'sample_typo.simple_op' in executable: " +
+                "'reference_not_found_flow', wasn't found in path", exception.getMessage());
     }
 
 }

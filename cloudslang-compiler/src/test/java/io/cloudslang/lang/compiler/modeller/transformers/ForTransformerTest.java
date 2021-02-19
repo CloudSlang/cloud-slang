@@ -18,9 +18,7 @@ import io.cloudslang.lang.entities.ListLoopStatement;
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
 import junit.framework.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,12 +26,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ForTransformerTest.Config.class, SlangCompilerSpringConfig.class})
 public class ForTransformerTest extends TransformersTestParent {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private ForTransformer transformer;
@@ -74,23 +72,23 @@ public class ForTransformerTest extends TransformersTestParent {
 
     @Test
     public void testNoVarName() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Argument[] violates character rules");
-        transformAndThrowFirstException(transformer, "  in  collection");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(transformer, "  in  collection"));
+        assertEquals("Argument[] violates character rules.", exception.getMessage());
     }
 
     @Test
     public void testVarNameContainInvalidChars() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Argument[x a] violates character rules.");
-        transformAndThrowFirstException(transformer, "x a  in  collection");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(transformer, "x a  in  collection"));
+        assertEquals("Argument[x a] violates character rules.", exception.getMessage());
     }
 
     @Test
     public void testNoCollectionExpression() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("expression");
-        transformAndThrowFirstException(transformer, "x in  ");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(transformer, "x in  "));
+        assertEquals("loop expression cannot be empty", exception.getMessage());
     }
 
     @Test
@@ -153,16 +151,16 @@ public class ForTransformerTest extends TransformersTestParent {
 
     @Test
     public void testMapVarNameContainInvalidChars() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Argument[(k v m)] violates character rules.");
-        transformAndThrowFirstException(transformer, "(k v m)  in  collection");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(transformer, "(k v m)  in  collection"));
+        assertEquals("Argument[(k v m)] violates character rules.", exception.getMessage());
     }
 
     @Test
     public void testMapNoCollectionExpression() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("expression");
-        transformAndThrowFirstException(transformer, "k, v in  ");
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(transformer, "k, v in  "));
+        assertEquals("loop expression cannot be empty", exception.getMessage());
     }
 
     @Configuration

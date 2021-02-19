@@ -10,13 +10,13 @@
 package io.cloudslang.lang.cli;
 
 import io.cloudslang.lang.cli.converters.MapConverter;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Date: 2/16/2015
@@ -33,8 +33,6 @@ public class MapConverterTest {
     public static final String INVALID_INPUTS_UNESCAPED_COMMA = "input1=value1,value2,input2=value3,value4";
     public static final String INPUT_1 = "input1";
     public static final String INPUT_2 = "input2";
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private MapConverter mapConverter;
 
@@ -51,20 +49,18 @@ public class MapConverterTest {
 
     @Test
     public void testConvertFailureWrongDelimiter() {
-        expectException();
-
-        Map<String, String> inputs = mapConverter.convertFromText(INVALID_INPUTS_WRONG_DELIMITER, null, null);
-        Assert.assertEquals(null, inputs);
-
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                mapConverter.convertFromText(INVALID_INPUTS_WRONG_DELIMITER, null, null));
+        assertEquals("Input should be in a key=value comma separated format, e.g. key1=val1,key2=val2 etc.",
+                exception.getMessage());
     }
 
     @Test
     public void testConvertFailureConcatenated() {
-        expectException();
-
-        Map<String, String> inputs = mapConverter.convertFromText(INVALID_INPUTS_CONCATENATED_VALUES, null, null);
-        Assert.assertEquals(null, inputs);
-
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                mapConverter.convertFromText(INVALID_INPUTS_CONCATENATED_VALUES, null, null));
+        assertEquals("Input should be in a key=value comma separated format, e.g. key1=val1,key2=val2 etc.",
+                exception.getMessage());
     }
 
     @Test
@@ -76,18 +72,10 @@ public class MapConverterTest {
 
     @Test
     public void testConvertFailureComma() {
-        expectException();
-
-        Map<String, String> inputs = mapConverter.convertFromText(INVALID_INPUTS_UNESCAPED_COMMA, null, null);
-        Assert.assertEquals(null, inputs);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                mapConverter.convertFromText(INVALID_INPUTS_UNESCAPED_COMMA, null, null));
+        assertEquals("Input should be in a key=value comma separated format, e.g. key1=val1,key2=val2 etc.",
+                exception.getMessage());
     }
-
-    private void expectException() {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Input");
-        exception.expectMessage("key=value");
-        exception.expectMessage("format");
-    }
-
 
 }

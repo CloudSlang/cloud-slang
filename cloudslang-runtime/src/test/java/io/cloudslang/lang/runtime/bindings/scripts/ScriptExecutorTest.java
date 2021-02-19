@@ -28,9 +28,7 @@ import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.utils.PythonScriptGeneratorUtils;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.python.core.PyObject;
@@ -50,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -62,9 +61,6 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = ScriptExecutorTest.Config.class)
 public class ScriptExecutorTest {
     private static PythonInterpreter execInterpreter = mock(PythonInterpreter.class);
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -107,11 +103,10 @@ public class ScriptExecutorTest {
         String script = "pass";
         doThrow(new RuntimeException("error from interpreter")).when(execInterpreter).exec(eq(script));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("error from interpreter");
-        exception.expectMessage("Error executing python script");
-
-        scriptExecutor.executeScript(script, new HashMap<String, Value>(), true);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                scriptExecutor.executeScript(script, new HashMap<String, Value>(), true));
+        Assert.assertEquals("Error executing python script: java.lang.RuntimeException: " +
+                "error from interpreter", exception.getMessage());
     }
 
     @Test

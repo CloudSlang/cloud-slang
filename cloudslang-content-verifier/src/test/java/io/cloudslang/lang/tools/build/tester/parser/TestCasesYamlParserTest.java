@@ -27,6 +27,16 @@ import io.cloudslang.lang.logging.LoggingService;
 import io.cloudslang.lang.logging.LoggingServiceImpl;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
 import io.cloudslang.lang.tools.build.tester.parse.TestCasesYamlParser;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -38,19 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.introspector.BeanAccess;
-
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -71,9 +69,6 @@ public class TestCasesYamlParserTest {
 
     @Autowired
     private LoggingService loggingService;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void emptyTestCaseFileParsing() throws Exception {
@@ -105,32 +100,35 @@ public class TestCasesYamlParserTest {
     public void testSimpleTestCasesParsingInvalidKey() throws URISyntaxException {
         String filePath = "/test/base/test_print_text-unrecognized_tag.inputs.yaml";
         URI fileUri = getClass().getResource(filePath).toURI();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Artifact {testPrintFinishesWithSuccess} has unrecognized tag {invalid_key}. " +
-                "Please take a look at the supported features per versions link");
-        parser.parseTestCases(SlangSource.fromFile(fileUri));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parser.parseTestCases(SlangSource.fromFile(fileUri)));
+        Assert.assertEquals("There was a problem parsing the YAML source: " +
+                "test_print_text-unrecognized_tag.inputs.yaml.\n" +
+                "Artifact {testPrintFinishesWithSuccess} has unrecognized tag {invalid_key}. " +
+                "Please take a look at the supported features per versions link", exception.getMessage());
     }
 
     @Test
     public void testCaseFileParsingForNonTestCasesFile() throws Exception {
         String filePath = "/content/base/properties.prop.sl";
         final URI fileUri = getClass().getResource(filePath).toURI();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("problem");
-        exception.expectMessage("parsing");
-        exception.expectMessage("properties");
-        parser.parseTestCases(SlangSource.fromFile(fileUri));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parser.parseTestCases(SlangSource.fromFile(fileUri)));
+        Assert.assertEquals("There was a problem parsing the YAML source: properties.prop.sl.\n" +
+                "java.lang.String cannot be cast to java.util.Map", exception.getMessage());
     }
 
     @Test
     public void illegalTestCaseFileParsing() throws Exception {
         String filePath = "/test/invalid/invalid_test_case.yaml";
         final URI fileUri = getClass().getResource(filePath).toURI();
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("slang");
-        exception.expectMessage("parsing");
-        exception.expectMessage("invalid_test_case");
-        parser.parseTestCases(SlangSource.fromFile(fileUri));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parser.parseTestCases(SlangSource.fromFile(fileUri)));
+        Assert.assertTrue(exception.getMessage()
+                .contains("There was a problem parsing the YAML source: invalid_test_case.yaml."));
     }
 
     @Test
@@ -148,38 +146,21 @@ public class TestCasesYamlParserTest {
     public void parseSystemPropertiesFileInvalidExtension() throws Exception {
         final URI filePath = getClass().getResource("/content/base/print_text.sl").toURI();
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("print_text.sl");
-        exception.expectMessage("extension");
-        exception.expectMessage("prop.sl");
-
-        parser.parseProperties(filePath.getPath());
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parser.parseProperties(filePath.getPath()));
+        Assert.assertEquals("File: print_text.sl must have one of the following extensions: prop.sl.",
+                exception.getMessage());
     }
 
     @Test
     public void testExceptionContainsDetailsWhenInvalidSource() throws Exception {
         final URI fileUri = getClass().getResource("/test/invalid/invalid_field.inputs.yaml").toURI();
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(
-                "There was a problem parsing the YAML source: invalid_field.inputs.yaml."
-        );
-        exception.expectMessage(
-                "Error parsing slang test case: Unrecognized field \"invalid_field\"" +
-                        " (class io.cloudslang.lang.tools.build.tester.parse.SlangTestCase)," +
-                        " not marked as ignorable (8 known properties: \"outputs\", \"testFlowPath\"," +
-                        " \"name\", \"description\", \"testSuites\", \"systemPropertiesFile\", \"throwsException\"," +
-                        " \"result\"])"
-        );
-        exception.expectMessage(
-                " at [Source: (String)\"{\"inputs\":[{\"text\":\"text to print\"}],\"description\":" +
-                        "\"Tests that print_text operation finishes with SUCCESS\",\"testFlowPath\":" +
-                        "\"base.print_property\",\"result\":\"SUCCESS\",\"invalid_field\":\"value\"}\";" +
-                        " line: 1, column: 181] (through reference chain:" +
-                        " io.cloudslang.lang.tools.build.tester.parse.SlangTestCase[\"invalid_field\"])"
-        );
-
-        parser.parseTestCases(SlangSource.fromFile(fileUri));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                parser.parseTestCases(SlangSource.fromFile(fileUri)));
+        Assert.assertTrue(exception.getMessage().contains("There was a problem parsing the YAML source:" +
+                " invalid_field.inputs.yaml.\n" +
+                "Error parsing slang test case: Unrecognized field \"invalid_field\""));
     }
 
     @Configuration
