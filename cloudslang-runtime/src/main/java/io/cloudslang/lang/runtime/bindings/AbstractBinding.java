@@ -75,7 +75,8 @@ public class AbstractBinding {
             return convert(loopCollectionContentSerializable, loopCollection.isSensitive());
         } else if (loopCollectionContent instanceof String) {
             String expression = (String) loopCollectionContent;
-            if (expression.charAt(0) == '{' && expression.charAt(expression.length() - 1) == '}') {
+            if ((expression.length() >= 2) &&
+                    (expression.charAt(0) == '{') && (expression.charAt(expression.length() - 1) == '}')) {
                 expression = expression.substring(1, expression.length() - 1);
                 expression = expression.replace("\"", "");
                 ArrayList<String> keys = new ArrayList<>();
