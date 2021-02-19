@@ -60,15 +60,16 @@ public class InputsBinding extends AbstractBinding {
                                          Map<String, Prompt> prompts) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
 
-        //we do not want to change original context map
+        // we do not want to change original context map
         Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
+        Map<String, ? extends Value> actualPromptContext = defaultIfNull(promptContext, emptyMap());
         for (Input input : inputs) {
-            //prompts might be passed from arguments
-            //this is the case for step inputs
+            // prompts might be passed from arguments
+            // this is the case for step inputs
             input = overridePromptSettingIfExists(prompts, input);
 
-            bindInput(input, srcContext, defaultIfNull(promptContext, emptyMap()), resultContext,
+            bindInput(input, srcContext, actualPromptContext, resultContext,
                     systemProperties, missingInputs, useEmptyValuesForPrompts);
         }
 
@@ -204,8 +205,9 @@ public class InputsBinding extends AbstractBinding {
                     .InputBuilder(input, input.getValue())
                     .withPrompt(prompts.get(input.getName()))
                     .build();
+        } else {
+            return input;
         }
-        return input;
     }
 
 }
