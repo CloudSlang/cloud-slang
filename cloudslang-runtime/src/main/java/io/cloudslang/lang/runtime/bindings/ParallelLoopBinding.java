@@ -61,9 +61,10 @@ public class ParallelLoopBinding extends AbstractBinding {
         } catch (Exception exc) {
             throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, exc.getMessage()), exc);
         }
-        if (CollectionUtils.isEmpty(result)) {
+        if (!CollectionUtils.isEmpty(result)) {
+            return result;
+        } else {
             throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, "expression is empty"));
         }
-        return result;
     }
 }
