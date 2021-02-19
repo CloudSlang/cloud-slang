@@ -54,8 +54,8 @@ public class OutputsBinding extends AbstractBinding {
                         Value value = scriptEvaluator.evalExpr(expressionToEvaluate, context,
                                 systemProperties, output.getFunctionDependencies());
                         valueToAssign = ValueFactory.create(value, rawValue != null && rawValue.isSensitive());
-                    } catch (Throwable t) {
-                        throw new RuntimeException(errorMessagePrefix + "',\n\t" + t.getMessage(), t);
+                    } catch (Exception exc) {
+                        throw new RuntimeException(errorMessagePrefix + "',\n\t" + exc.getMessage(), exc);
                     }
                 }
                 validateStringValue(errorMessagePrefix, valueToAssign);
