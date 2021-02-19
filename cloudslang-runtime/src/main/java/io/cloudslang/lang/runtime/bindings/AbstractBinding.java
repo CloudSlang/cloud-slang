@@ -122,25 +122,23 @@ public class AbstractBinding {
     }
 
     protected void resolvePromptExpressions(Prompt prompt, EvaluationContextHolder evaluationContextHolder) {
-
-        //prompt message
+        // prompt message
         tryEvaluateExpression(prompt.getPromptMessage(), evaluationContextHolder)
                 .map(Value::toStringSafeEmpty)
                 .ifPresent(prompt::setPromptMessage);
 
-        //in case of single/multi-choice
+        // in case of single/multi-choice
         if (prompt.getPromptType().isChoiceLike()) {
-            //prompt options
+            // prompt options
             tryEvaluateExpression(prompt.getPromptOptions(), evaluationContextHolder)
                     .ifPresent(value -> {
                         if (value.isSensitive()) {
                             throw new RuntimeException(SENSITIVE_VALUE_IN_PROMPT_OPTION_ERROR);
                         }
-
                         prompt.setPromptOptions(Value.toStringSafeEmpty(value));
                     });
 
-            //prompt delimiter
+            // prompt delimiter
             tryEvaluateExpression(prompt.getPromptDelimiter(), evaluationContextHolder)
                     .map(Value::toStringSafeEmpty)
                     .ifPresent(prompt::setPromptDelimiter);
