@@ -49,10 +49,11 @@ public class AbstractBinding {
     protected Value getEvalResultForMap(Value evalResult, LoopStatement loopStatement, String collectionExpression) {
         if (loopStatement instanceof MapLoopStatement) {
             if (evalResult != null && evalResult.get() instanceof Map) {
-                List<Value> entriesAsValues = new ArrayList<>();
-                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet =
+                //noinspection unchecked
+                Set<Map.Entry<Serializable, Serializable>> entrySet =
                         ((Map) evalResult.get()).entrySet();
 
+                List<Value> entriesAsValues = new ArrayList<>();
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
                     entriesAsValues.add(ValueFactory.create(Pair.of(
                             ValueFactory.create(entry.getKey(), evalResult.isSensitive()),

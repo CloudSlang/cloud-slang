@@ -130,10 +130,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 if (parallelLoopStatement instanceof ListLoopStatement) {
                     branchContext.putVariable(((ListLoopStatement) parallelLoopStatement).getVarName(), splitItem);
                 } else if (parallelLoopStatement instanceof MapLoopStatement) {
-                    branchContext.putVariable(((MapLoopStatement) parallelLoopStatement).getKeyName(),
-                        (Value) ((ImmutablePair) splitItem.get()).getLeft());
-                    branchContext.putVariable(((MapLoopStatement) parallelLoopStatement).getValueName(),
-                        (Value) ((ImmutablePair) splitItem.get()).getRight());
+                    MapLoopStatement mapLoopStatement = (MapLoopStatement) parallelLoopStatement;
+                    //noinspection unchecked
+                    ImmutablePair<Value, Value> pair = (ImmutablePair<Value, Value>) splitItem.get();
+                    branchContext.putVariable(mapLoopStatement.getKeyName(), pair.getLeft());
+                    branchContext.putVariable(mapLoopStatement.getValueName(), pair.getRight());
                 }
                 updateCallArgumentsAndPushContextToStack(branchRuntimeEnvironment,
                         branchContext, new HashMap<>(), new HashMap<>());
