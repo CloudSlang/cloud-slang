@@ -70,7 +70,7 @@ public class AbstractBinding {
     protected Iterable<Value> getIterableFromEvalResult(Value loopCollection) {
         Serializable loopCollectionContent = loopCollection.get();
         if (loopCollectionContent instanceof Iterable) {
-            @SuppressWarnings("unchecked")
+            //noinspection unchecked
             Iterable<? extends Serializable> loopCollectionContentSerializable =
                     (Iterable<? extends Serializable>) loopCollectionContent;
             return convert(loopCollectionContentSerializable, loopCollection.isSensitive());
