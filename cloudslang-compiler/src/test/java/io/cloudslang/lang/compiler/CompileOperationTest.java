@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -41,9 +42,6 @@ import static org.junit.Assert.assertNotNull;
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CompileOperationTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private SlangCompiler compiler;
@@ -104,63 +102,75 @@ public class CompileOperationTest {
     @Test
     public void testCompileOperationMissingClassName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_class_name.sl");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Action syntax is illegal.\n" +
-                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY);
-        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(resource.toURI()), null));
+        Assert.assertEquals("Action syntax is illegal.\n" +
+                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_CLASS_NAME_KEY + "]",
+                exception.getMessage());
+
     }
 
     @Test
     public void testCompileOperationMissingMethodName() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_method_name.sl");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Action syntax is illegal.\n" +
-                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY);
-        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(resource.toURI()), null));
+        Assert.assertEquals("Action syntax is illegal.\n" +
+                "Following tags are missing: [" + SlangTextualKeys.JAVA_ACTION_METHOD_NAME_KEY + "]",
+                exception.getMessage());
     }
 
     @Test
     public void testCompileOperationInvalidActionProperty() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_invalid_action_property.sl");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Action syntax is illegal.\n" +
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(resource.toURI()), null));
+        Assert.assertEquals("Action syntax is illegal.\n" +
                 "Following tags are invalid: [IDontBelongHere]. " +
-                "Please take a look at the supported features per versions link");
-        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+                "Please take a look at the supported features per versions link", exception.getMessage());
     }
 
     @Test
     public void testCompileOperationMultipleActionTypes() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_action_multiple_types.sl");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Conflicting keys[java_action, python_action] at: operation_action_multiple_types");
-        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(resource.toURI()), null));
+        Assert.assertEquals("Conflicting keys[java_action, python_action] at: operation_action_multiple_types",
+                exception.getMessage());
     }
 
     @Test
     public void testCompileOperationMissingActionProperties() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_action_properties.sl");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling operation_missing_action_properties.sl. " +
-                "Operation: operation_missing_action_properties has no action data");
-        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(resource.toURI()), null));
+        Assert.assertEquals("Error compiling operation_missing_action_properties.sl. " +
+                        "Operation: operation_missing_action_properties has no action data", exception.getMessage());
     }
 
     @Test
     public void testCompileOperationMissingPythonScript() throws Exception {
         URL resource = getClass().getResource("/corrupted/operation_missing_python_script.sl");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error compiling operation_missing_python_script.sl. " +
-                "Operation: operation_missing_python_script has no action data");
-        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(resource.toURI()), null));
+        Assert.assertEquals("Error compiling operation_missing_python_script.sl. " +
+                "Operation: operation_missing_python_script has no action data", exception.getMessage());
     }
 
     @Test
     public void testCompileOperationWithMissingNamespace() throws Exception {
         URL resource = getClass().getResource("/corrupted/op_without_namespace.sl");
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("For source[op_without_namespace.sl] namespace cannot be empty.");
-        compiler.compile(SlangSource.fromFile(resource.toURI()), null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(resource.toURI()), null));
+        Assert.assertEquals("For source[op_without_namespace.sl] namespace cannot be empty.",
+                exception.getMessage());
     }
 
     @Test

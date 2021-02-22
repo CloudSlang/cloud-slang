@@ -16,9 +16,7 @@ import io.cloudslang.score.api.ExecutionPlan;
 import io.cloudslang.score.api.ExecutionStep;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -29,10 +27,10 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 /*
  * Created by orius123 on 05/11/14.
@@ -41,9 +39,6 @@ import static org.junit.Assert.assertThat;
 @ContextConfiguration(classes = SlangCompilerSpringConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CompileDependenciesTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private SlangCompiler compiler;
@@ -62,10 +57,10 @@ public class CompileDependenciesTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(containsString("ops.test_op"));
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Reference: 'user.ops.test_op' in executable: 'basic_flow', wasn't found in path",
+                exception.getMessage());
     }
 
     @Test
@@ -75,10 +70,10 @@ public class CompileDependenciesTest {
         Set<SlangSource> path = new HashSet<>();
         path.add(SlangSource.fromFile(operation));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(containsString("ops"));
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        Assert.assertEquals("Reference: 'user.ops.test_op' in executable: 'basic_flow', wasn't found in path",
+                exception.getMessage());
     }
 
     @Test
@@ -102,10 +97,10 @@ public class CompileDependenciesTest {
     public void sourceFileIsADirectory() throws Exception {
         final URI dir = getClass().getResource("/").toURI();
 
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage(containsString("directories"));
-
-        compiler.compile(SlangSource.fromFile(dir), null);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(dir), null));
+        Assert.assertEquals("File content: test-classes doesn't lead to a file, directories are not supported",
+                exception.getMessage());
     }
 
     @Test

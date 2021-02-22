@@ -11,14 +11,13 @@ package io.cloudslang.lang.compiler;
 
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
-import java.net.URI;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.net.URI;
 
 import static org.junit.Assert.assertTrue;
 
@@ -32,40 +31,37 @@ public class CharValidationsPreCompileErrorsTest {
     @Autowired
     private SlangCompiler compiler;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testNamespace() throws Exception {
         runAndValidateError("/corrupted/chars/op_1.sl", "Argument[bo$$.ops] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testImportValue() throws Exception {
         runAndValidateError("/corrupted/chars/flow_1.sl", "Argument[bo$$.ops] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testReferenceId() throws Exception {
         runAndValidateError("/corrupted/chars/flow_2.sl", "Argument[bo$$.ops.check_Weather] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testAlias() throws Exception {
         runAndValidateError("/corrupted/chars/flow_3.sl", "Argument[op$] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testExecutableName() throws Exception {
         runAndValidateError("/corrupted/chars/flow-4.sl", "Argument[flow-4] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testStepName() throws Exception {
         runAndValidateError("/corrupted/chars/flow_5.sl", "Argument[*CheckWeather*] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testResultName() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/op_2.sl",
@@ -74,12 +70,12 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testNavigationKey() throws Exception {
         runAndValidateError("/corrupted/chars/flow_6.sl", "Argument[SUCCE$$] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testBreakKeys() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/flow_7.sl",
@@ -88,12 +84,12 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testNavigationValue() throws Exception {
         runAndValidateError("/corrupted/chars/flow_8.sl", "Argument[%SUCCESS%] violates character rules.");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testInputKey() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/op_3.sl",
@@ -102,7 +98,7 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testOutputKey() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/op_4.sl",
@@ -111,7 +107,7 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testPublishKey() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/flow_9.sl",
@@ -119,7 +115,7 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testLoopStatementVariable() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/flow_10.sl",
@@ -128,7 +124,7 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testStepInputName() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/flow_11.sl",
@@ -137,7 +133,7 @@ public class CharValidationsPreCompileErrorsTest {
         );
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testStepInputNameMissingColon() throws Exception {
         runAndValidateError(
                 "/corrupted/chars/flow_12.sl",
@@ -151,9 +147,8 @@ public class CharValidationsPreCompileErrorsTest {
         ExecutableModellingResult result = compiler.preCompileSource(SlangSource.fromFile(resource));
         assertTrue(result.getErrors().size() > 0);
         if (messages.length > 0) {
-            exception.expect(RuntimeException.class);
             for (String element : messages) {
-                exception.expectMessage(element);
+                assertTrue(result.getErrors().get(0).getMessage().contains(element));
             }
         }
         throw result.getErrors().get(0);

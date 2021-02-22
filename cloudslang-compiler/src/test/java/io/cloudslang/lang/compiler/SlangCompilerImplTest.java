@@ -31,9 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import junit.framework.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +39,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -67,9 +66,6 @@ public class SlangCompilerImplTest {
     @Autowired
     private MetadataExtractor metadataExtractor;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     @Before
     public void setUp() {
         slangSource = new SlangSource("source_content", "source_name");
@@ -84,11 +80,11 @@ public class SlangCompilerImplTest {
         when(parsedSlangInvalidTypeMock.getType()).thenReturn(ParsedSlang.Type.FLOW);
         when(parsedSlangInvalidTypeMock.getName()).thenReturn("flow_name");
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("flow_name");
-        exception.expectMessage(SlangCompilerImpl.NOT_A_VALID_SYSTEM_PROPERTY_FILE_ERROR_MESSAGE_SUFFIX);
-
-        slangCompiler.loadSystemProperties(slangSource);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                slangCompiler.loadSystemProperties(slangSource));
+        assertEquals(exception.getMessage(),
+                "Error loading properties source: 'source_name'. Nested exception is: " +
+                        "Source: flow_name is not a valid system property file.");
     }
 
     @Test

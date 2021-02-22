@@ -9,18 +9,16 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.validator;
 
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author Bonczidai Levente
  * @since 8/11/2016
  */
 public class SystemPropertyValidatorImplTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     private SystemPropertyValidator systemPropertyValidator;
 
     public SystemPropertyValidatorImplTest() {
@@ -66,48 +64,54 @@ public class SystemPropertyValidatorImplTest {
     @Test
     public void testNamespaceNoMatch1() throws Exception {
         String input = ".c";
-        expectException("Error validating system property namespace. Nested exception is:" +
-                " Argument[.c] cannot start with delimiter[.].");
-        systemPropertyValidator.validateNamespace(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateNamespace(input));
+        Assert.assertEquals("Error validating system property namespace. Nested exception is:" +
+                " Argument[.c] cannot start with delimiter[.].", exception.getMessage());
     }
 
     @Test
     public void testNamespaceNoMatch2() throws Exception {
         String input = "a..c";
-        expectException("Error validating system property namespace. Nested exception is:" +
-                " Argument[a..c] cannot contain multiple delimiters[.] without content.");
-        systemPropertyValidator.validateNamespace(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateNamespace(input));
+        Assert.assertEquals("Error validating system property namespace. Nested exception is:" +
+                " Argument[a..c] cannot contain multiple delimiters[.] without content.", exception.getMessage());
     }
 
     @Test
     public void testNamespaceNoMatch3() throws Exception {
         String input = "a.c.";
-        expectException("Error validating system property namespace. Nested exception is:" +
-                " Argument[a.c.] cannot end with delimiter[.].");
-        systemPropertyValidator.validateNamespace(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateNamespace(input));
+        Assert.assertEquals("Error validating system property namespace. Nested exception is:" +
+                " Argument[a.c.] cannot end with delimiter[.].", exception.getMessage());
     }
 
     @Test
     public void testNamespaceNoMatch4() throws Exception {
         String input = ".";
-        expectException("Error validating system property namespace." +
-                " Nested exception is: Argument[.] cannot start with delimiter[.].");
-        systemPropertyValidator.validateNamespace(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateNamespace(input));
+        Assert.assertEquals("Error validating system property namespace." +
+                " Nested exception is: Argument[.] cannot start with delimiter[.].", exception.getMessage());
     }
 
     @Test
     public void testNamespaceNoMatch5() throws Exception {
         String input = "a.b.?";
-        expectException("Error validating system property namespace." +
-                " Nested exception is: Argument[a.b.?] violates character rules.");
-        systemPropertyValidator.validateNamespace(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateNamespace(input));
+        Assert.assertEquals("Error validating system property namespace." +
+                " Nested exception is: Argument[a.b.?] violates character rules.", exception.getMessage());
     }
 
     @Test
     public void testKeyEmpty() throws Exception {
         String input = "";
-        expectException("Key cannot be empty.");
-        systemPropertyValidator.validateKey(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateKey(input));
+        Assert.assertEquals("Key cannot be empty.", exception.getMessage());
     }
 
     @Test
@@ -143,45 +147,45 @@ public class SystemPropertyValidatorImplTest {
     @Test
     public void testKeyNoMatch1() throws Exception {
         String input = ".c";
-        expectException("Error validating system property key. Nested exception is:" +
-                " Argument[.c] cannot start with delimiter[.].");
-        systemPropertyValidator.validateKey(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateKey(input));
+        Assert.assertEquals("Error validating system property key. Nested exception is:" +
+                " Argument[.c] cannot start with delimiter[.].", exception.getMessage());
     }
 
     @Test
     public void testKeyNoMatch2() throws Exception {
         String input = "a..c";
-        expectException("Error validating system property key. Nested exception is: " +
-                "Argument[a..c] cannot contain multiple delimiters[.] without content.");
-        systemPropertyValidator.validateKey(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateKey(input));
+        Assert.assertEquals("Error validating system property key. Nested exception is: " +
+                "Argument[a..c] cannot contain multiple delimiters[.] without content.", exception.getMessage());
     }
 
     @Test
     public void testKeyNoMatch3() throws Exception {
         String input = "a.c.";
-        expectException("Error validating system property key. Nested exception is:" +
-                " Argument[a.c.] cannot end with delimiter[.].");
-        systemPropertyValidator.validateKey(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateKey(input));
+        Assert.assertEquals("Error validating system property key. Nested exception is:" +
+                " Argument[a.c.] cannot end with delimiter[.].", exception.getMessage());
     }
 
     @Test
     public void testKeyNoMatch4() throws Exception {
         String input = ".";
-        expectException("Error validating system property key. Nested exception is:" +
-                " Argument[.] cannot start with delimiter[.].");
-        systemPropertyValidator.validateKey(input);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateKey(input));
+        Assert.assertEquals("Error validating system property key. Nested exception is:" +
+                " Argument[.] cannot start with delimiter[.].", exception.getMessage());
     }
 
     @Test
     public void testKeyNoMatch5() throws Exception {
         String input = "a.b.?";
-        expectException("Error validating system property key. Nested exception is:" +
-                " Argument[a.b.?] violates character rules.");
-        systemPropertyValidator.validateKey(input);
-    }
-
-    private void expectException(String message) {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(message);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                systemPropertyValidator.validateKey(input));
+        Assert.assertEquals("Error validating system property key. Nested exception is:" +
+                " Argument[a.b.?] violates character rules.", exception.getMessage());
     }
 }

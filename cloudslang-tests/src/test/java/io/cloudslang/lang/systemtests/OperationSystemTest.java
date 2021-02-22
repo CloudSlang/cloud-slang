@@ -16,8 +16,6 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-import io.cloudslang.runtime.api.sequential.SequentialExecutionParametersProvider;
-import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.score.events.ScoreEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,6 +26,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import static org.junit.Assert.assertThrows;
 
 /**
  * User: stoneo
@@ -71,14 +71,13 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input4", ValueFactory.create("value4"));
         userInputs.put("input5", ValueFactory.create("value5"));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Error binding input: 'input1' should have a String value, but got value '11' " +
-                "of type Integer.");
-
         URL resource = getClass().getResource("/yaml/test_op_2.sl");
         CompilationArtifact compilationArtifact = slang.compile(SlangSource.fromFile(resource.toURI()), null);
-        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
-        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>()));
+        Assert.assertEquals("Error running: 'test_op_2'.\n" +
+                "\t Error binding input: 'input1' should have a String value, " +
+                "but got value '11' of type Integer.", exception.getMessage());
     }
 
     @Test
@@ -90,11 +89,11 @@ public class OperationSystemTest extends SystemsTestsParent {
         userInputs.put("input2", ValueFactory.create("value2"));
         userInputs.put("input4", ValueFactory.create("value4"));
         userInputs.put("input5", ValueFactory.create("value5"));
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("input1");
-        exception.expectMessage("Required");
-        ScoreEvent event = trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>());
-        Assert.assertEquals(ScoreLangConstants.EVENT_EXECUTION_FINISHED, event.getEventType());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                trigger(compilationArtifact, userInputs, new HashSet<SystemProperty>()));
+        Assert.assertEquals("Error running: 'test_op_2'.\n" +
+                "\t Input with name: 'input1' is Required, but value is empty", exception.getMessage());
         System.out.println("testCompileAndRunOperationWithDataMissingInput finished successfully");
     }
 

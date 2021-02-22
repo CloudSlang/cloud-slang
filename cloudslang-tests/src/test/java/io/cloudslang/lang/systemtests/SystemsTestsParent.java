@@ -114,9 +114,6 @@ public abstract class SystemsTestsParent {
     @Autowired
     protected TriggerFlows triggerFlows;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     public List<ScoreEvent>  runAndCollectAllEvents(
         CompilationArtifact compilationArtifact,
         Map<String, Value> userInputs,

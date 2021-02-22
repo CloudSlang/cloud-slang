@@ -29,13 +29,9 @@ import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +50,7 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
@@ -64,9 +61,6 @@ public class InputsBindingTest {
 
     @Autowired
     private InputsBinding inputsBinding;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testEmptyBindInputs() throws Exception {
@@ -148,19 +142,11 @@ public class InputsBindingTest {
                 .withPrivateInput(true)
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(new BaseMatcher<String>() {
-            public void describeTo(Description description) {
-            }
-
-            public boolean matches(Object o) {
-                String message = o.toString();
-                return message.contains("Error binding input: 'input1'") &&
-                        message.contains("Error in evaluating expression: 'input1'") &&
-                        message.contains("name 'input1' is not defined");
-            }
-        });
-        bindInputs(inputs);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                bindInputs(inputs));
+        Assert.assertTrue(exception.getMessage().contains("Error binding input: 'input1'"));
+        Assert.assertTrue(exception.getMessage().contains("Error in evaluating expression: 'input1'"));
+        Assert.assertTrue(exception.getMessage().contains("name 'input1' is not defined"));
     }
 
     @Test
@@ -170,19 +156,11 @@ public class InputsBindingTest {
                 .withPrivateInput(false)
                 .build();
         List<Input> inputs = Collections.singletonList(input1);
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(new BaseMatcher<String>() {
-            public void describeTo(Description description) {
-            }
-
-            public boolean matches(Object o) {
-                String message = o.toString();
-                return message.contains("Error binding input: 'input1'") &&
-                        message.contains("Error in evaluating expression: 'input1'") &&
-                        message.contains("name 'input1' is not defined");
-            }
-        });
-        bindInputs(inputs);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                bindInputs(inputs));
+        Assert.assertTrue(exception.getMessage().contains("Error binding input: 'input1'"));
+        Assert.assertTrue(exception.getMessage().contains("Error in evaluating expression: 'input1'"));
+        Assert.assertTrue(exception.getMessage().contains("name 'input1' is not defined"));
     }
 
     @Test

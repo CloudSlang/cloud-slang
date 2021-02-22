@@ -34,9 +34,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 import org.apache.commons.collections4.MapUtils;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -45,6 +43,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static io.cloudslang.lang.compiler.SlangSource.fromFile;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author Bonczidai Levente
@@ -56,8 +56,6 @@ import static io.cloudslang.lang.compiler.SlangSource.fromFile;
 public class CompileDecisionTest {
     private static final HashSet<ScriptFunction> SP_SCRIPT_FUNCTIONS_SET =
             newHashSet(ScriptFunction.GET_SYSTEM_PROPERTY);
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private SlangCompiler compiler;
@@ -171,37 +169,31 @@ public class CompileDecisionTest {
     @Test
     public void testDecisionWrongKey() throws Exception {
         URL decision = getClass().getResource("/decision/decision_4_unrecognized_key.sl");
-
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(
-                "Artifact {decision_4_py_action_key} has unrecognized tag {wrong_key}." +
-                        " Please take a look at the supported features per versions link"
-        );
-        compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(fromFile(decision.toURI()), emptySetSlangSource));
+        assertEquals(exception.getMessage(),
+                "Artifact {decision_4_py_action_key} has unrecognized tag {wrong_key}. " +
+                        "Please take a look at the supported features per versions link");
     }
 
     @Test
     public void testDecisionPyActionKey() throws Exception {
         URL decision = getClass().getResource("/decision/decision_4_py_action_key.sl");
-
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(
-                "Artifact {decision_4_py_action_key} has unrecognized tag {python_action}." +
-                        " Please take a look at the supported features per versions link"
-        );
-        compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(fromFile(decision.toURI()), emptySetSlangSource));
+        assertEquals(exception.getMessage(),
+                "Artifact {decision_4_py_action_key} has unrecognized tag {python_action}. " +
+                        "Please take a look at the supported features per versions link");
     }
 
     @Test
     public void testDecisionMissingResults() throws Exception {
         URL decision = getClass().getResource("/decision/decision_wo_results.sl");
-
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(
-                "Artifact {decision_wo_results} syntax is invalid:" +
-                        " 'results' section cannot be empty for executable type 'decision'"
-        );
-        compiler.compile(fromFile(decision.toURI()), emptySetSlangSource);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(fromFile(decision.toURI()), emptySetSlangSource));
+        assertEquals(exception.getMessage(),
+                "Artifact {decision_wo_results} syntax is invalid: " +
+                        "'results' section cannot be empty for executable type 'decision'");
     }
 
     private void validateCompilationArtifact(

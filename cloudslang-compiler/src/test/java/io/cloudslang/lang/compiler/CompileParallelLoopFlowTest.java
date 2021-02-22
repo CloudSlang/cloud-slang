@@ -34,9 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -45,6 +43,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -59,9 +58,6 @@ public class CompileParallelLoopFlowTest {
 
     @Autowired
     private SlangCompiler compiler;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testPreCompileParallelLoopFlow() throws Exception {
@@ -275,14 +271,12 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        assertEquals(exception.getMessage(),
                 "Cannot compile flow 'parallel_loop_navigate_default_custom' since for step 'print_values' " +
                         "the navigation keys [FAILURE] have no matching results. The parallel loop depending on " +
-                        "'loops.parallel_loop.print_branch_custom_only' can have the following results: [SUCCESS]."
-        );
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+                        "'loops.parallel_loop.print_branch_custom_only' can have the following results: [SUCCESS].");
     }
 
     @Test
@@ -324,14 +318,12 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        assertEquals(exception.getMessage(),
                 "Cannot compile flow 'parallel_loop_navigate_default_success_only' since for step 'print_values' " +
                         "the navigation keys [FAILURE] have no matching results. The parallel loop depending on " +
-                        "'loops.parallel_loop.print_branch_success_only' can have the following results: [SUCCESS]."
-        );
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+                        "'loops.parallel_loop.print_branch_success_only' can have the following results: [SUCCESS].");
     }
 
     @Test
@@ -372,13 +364,11 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        assertEquals(exception.getMessage(),
                 "Cannot compile flow 'parallel_loop_navigate_not_wired' since for step " +
-                        "'print_values' the parallel loop results [FAILURE] have no matching navigation."
-        );
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+                        "'print_values' the parallel loop results [FAILURE] have no matching navigation.");
     }
 
     @Test
@@ -425,12 +415,11 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
 
-        expectedException.expect(RuntimeException.class);
-        expectedException
-                .expectMessage("Artifact {print_values} has unrecognized tag {publish} under 'parallel_loop'. " +
-                "Please take a look at the supported features per versions link");
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        assertEquals(exception.getMessage(),
+                "Artifact {print_values} has unrecognized tag {publish} under 'parallel_loop'. " +
+                        "Please take a look at the supported features per versions link");
     }
 
     @Test
@@ -443,11 +432,11 @@ public class CompileParallelLoopFlowTest {
         path.add(SlangSource.fromFile(operation1));
         path.add(SlangSource.fromFile(operation2));
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("Artifact {print_values} has unrecognized tag {aggregate}. " +
-                "Please take a look at the supported features per versions link");
-
-        compiler.compile(SlangSource.fromFile(flow), path);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                compiler.compile(SlangSource.fromFile(flow), path));
+        assertEquals(exception.getMessage(),
+                "Artifact {print_values} has unrecognized tag {aggregate}. " +
+                        "Please take a look at the supported features per versions link");
     }
 
     private void verifyPublishValues(Map<String, ?> joinBranchesActionData) {

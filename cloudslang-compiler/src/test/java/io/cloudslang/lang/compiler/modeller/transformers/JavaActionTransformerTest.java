@@ -20,18 +20,9 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +31,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.BeanAccess;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.cloudslang.lang.compiler.modeller.transformers.DependencyFormatValidator.INVALID_DEPENDENCY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Date: 11/11/2014
@@ -56,8 +57,6 @@ public class JavaActionTransformerTest extends TransformersTestParent {
     @Autowired
     private YamlParser yamlParser;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     private Map<String, String> initialJavaActionSimple;
     private Map<String, String> initialJavaActionWithDependencies;
     private Map<String, String> initialJavaActionInvalidKey;
@@ -96,58 +95,61 @@ public class JavaActionTransformerTest extends TransformersTestParent {
 
     @Test
     public void testTransformInvalidKey() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(AbstractTransformer.INVALID_KEYS_ERROR_MESSAGE_PREFIX);
-        exception.expectMessage("invalid_key");
         //noinspection unchecked
-        transformAndThrowFirstException(javaActionTransformer, initialJavaActionInvalidKey);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(javaActionTransformer, initialJavaActionInvalidKey));
+        assertEquals("Following tags are invalid: [invalid_key]. " +
+                "Please take a look at the supported features per versions link", exception.getMessage());
     }
 
     @Test
     public void testTransformWithoutGav() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("Following tags are missing: [gav]");
-        transformAndThrowFirstException(javaActionTransformer, loadJavaActionData("/java_action_wo_dependencies.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(javaActionTransformer,
+                        loadJavaActionData("/java_action_wo_dependencies.sl")));
+        assertEquals("Following tags are missing: [gav]", exception.getMessage());
     }
 
     @Test
     public void testTransformWithEmptyOneEmptyPart() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(javaActionTransformer,
-                loadJavaActionData("/java_action_with_dependencies_1_empty_part.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(javaActionTransformer,
+                        loadJavaActionData("/java_action_with_dependencies_1_empty_part.sl")));
+        assertEquals(INVALID_DEPENDENCY, exception.getMessage());
+
     }
 
     @Test
     public void testTransformWithEmptyDependencies() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(javaActionTransformer,
-                loadJavaActionData("/java_action_with_dependencies_empty.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(javaActionTransformer,
+                        loadJavaActionData("/java_action_with_dependencies_empty.sl")));
+        assertEquals(INVALID_DEPENDENCY, exception.getMessage());
+
     }
 
     @Test
     public void testTransformWithAllEmptyParts() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(javaActionTransformer,
-                loadJavaActionData("/java_action_with_dependencies_all_empty_parts.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(javaActionTransformer,
+                        loadJavaActionData("/java_action_with_dependencies_all_empty_parts.sl")));
+        assertEquals(INVALID_DEPENDENCY, exception.getMessage());
     }
 
     @Test
     public void testTransformWithOnePart() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(javaActionTransformer,
-                loadJavaActionData("/java_action_with_dependencies_1_part.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(javaActionTransformer,
+                        loadJavaActionData("/java_action_with_dependencies_1_part.sl")));
+        assertEquals(INVALID_DEPENDENCY, exception.getMessage());
     }
 
     @Test
     public void testTransformWithTwoEmptyParts() throws Exception {
-        exception.expect(RuntimeException.class);
-        exception.expectMessage(DependencyFormatValidator.INVALID_DEPENDENCY);
-        transformAndThrowFirstException(javaActionTransformer,
-                loadJavaActionData("/java_action_with_dependencies_2_parts.sl"));
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                transformAndThrowFirstException(javaActionTransformer,
+                        loadJavaActionData("/java_action_with_dependencies_2_parts.sl")));
+        assertEquals(INVALID_DEPENDENCY, exception.getMessage());
     }
 
     @SuppressWarnings("unchecked")

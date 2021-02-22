@@ -19,10 +19,9 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.events.EventConstants;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
@@ -40,6 +39,7 @@ import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyMapOf;
@@ -61,9 +61,6 @@ public class ScoreServicesImplTest {
     private static final long DEFAULT_THREAD_SLEEP_TIME = 100;
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final long DEFAULT_EXECUTION_ID = 1;
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Autowired
     private ScoreServicesImpl scoreServicesImpl;
@@ -193,11 +190,9 @@ public class ScoreServicesImplTest {
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("exception message");
-
-        // invoke method
-        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false));
+        Assert.assertEquals("Slang Error: exception message", exception.getMessage());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -237,13 +232,10 @@ public class ScoreServicesImplTest {
             }
         }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
 
-        exception.expect(RuntimeException.class);
-        exception.expectMessage("This value can also be supplied using a system property");
-        exception.expectMessage("A system property file can be included using --spf <path_to_file>");
-
-
-        // invoke method
-        scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false);
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false));
+        Assert.assertEquals("Slang Error: This value can also be supplied using a system property\n" +
+                        "\nA system property file can be included using --spf <path_to_file>", exception.getMessage());
     }
 
     @Configuration
