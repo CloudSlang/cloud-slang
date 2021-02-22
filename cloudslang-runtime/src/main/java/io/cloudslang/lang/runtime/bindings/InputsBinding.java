@@ -25,20 +25,20 @@ import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
+import org.apache.commons.lang.Validate;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.LinkedHashMap;
-import org.apache.commons.lang.Validate;
-import org.springframework.stereotype.Component;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 @Component
 public class InputsBinding extends AbstractBinding {
@@ -60,15 +60,16 @@ public class InputsBinding extends AbstractBinding {
                                          Map<String, Prompt> prompts) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
 
-        //we do not want to change original context map
+        // we do not want to change original context map
         Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
+        Map<String, ? extends Value> actualPromptContext = defaultIfNull(promptContext, emptyMap());
         for (Input input : inputs) {
-            //prompts might be passed from arguments
-            //this is the case for step inputs
+            // prompts might be passed from arguments
+            // this is the case for step inputs
             input = overridePromptSettingIfExists(prompts, input);
 
-            bindInput(input, srcContext, defaultIfNull(promptContext, emptyMap()), resultContext,
+            bindInput(input, srcContext, actualPromptContext, resultContext,
                     systemProperties, missingInputs, useEmptyValuesForPrompts);
         }
 
@@ -117,8 +118,8 @@ public class InputsBinding extends AbstractBinding {
                 return;
             }
 
-        } catch (Throwable t) {
-            throw new RuntimeException(errorMessagePrefix + "', \n\t" + t.getMessage(), t);
+        } catch (Exception exc) {
+            throw new RuntimeException(errorMessagePrefix + "', \n\t" + exc.getMessage(), exc);
         }
 
         validateStringValue(errorMessagePrefix, value);
@@ -163,7 +164,7 @@ public class InputsBinding extends AbstractBinding {
                 if (context.containsKey(inputName)) {
                     scriptContext.put(inputName, valueFromContext);
                 }
-                //so you can resolve previous inputs already bound
+                // so you can resolve previous inputs already bound
                 scriptContext.putAll(targetContext);
                 value = scriptEvaluator.evalExpr(expressionToEvaluate, scriptContext, systemProperties,
                         input.getFunctionDependencies());
@@ -204,8 +205,9 @@ public class InputsBinding extends AbstractBinding {
                     .InputBuilder(input, input.getValue())
                     .withPrompt(prompts.get(input.getName()))
                     .build();
+        } else {
+            return input;
         }
-        return input;
     }
 
 }

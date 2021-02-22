@@ -11,28 +11,43 @@ package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
-
-import java.io.Serializable;
-import java.util.Iterator;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.ListIterator;
+
 public class ForLoopCondition implements LoopCondition {
 
-    private final Iterable<? extends Serializable> iterable;
-    private int index = 0;
+    private final ArrayList<? extends Serializable> iterable;
+    private int index;
 
-    public ForLoopCondition(Iterable<? extends Serializable> iterable) {
-        this.iterable = iterable;
+    public ForLoopCondition(Iterable<? extends Serializable> param) {
+        if (param instanceof ArrayList) {
+            ArrayList<? extends Serializable> localList;
+            try {
+                localList = (ArrayList<? extends Serializable>) param;
+            } catch (Exception exc) {
+                localList = copyIterable(param);
+            }
+            this.iterable = localList;
+        } else {
+            this.iterable = copyIterable(param);
+        }
+        this.index = 0;
     }
 
-    private Iterator<? extends Serializable> loopToCurrentObject() {
-        Iterator<? extends Serializable> iterator = iterable.iterator();
-        for (int i = 0; i < index; i++) {
-            iterator.next();
+    private ArrayList<Serializable> copyIterable(Iterable<? extends Serializable> param) {
+        ArrayList<Serializable> list = new ArrayList<>();
+        for (Serializable next : param) {
+            list.add(next);
         }
-        return iterator;
+        return list;
+    }
+
+    private ListIterator<? extends Serializable> loopToCurrentObject() {
+        return iterable.listIterator(index);
     }
 
     public Value next() {

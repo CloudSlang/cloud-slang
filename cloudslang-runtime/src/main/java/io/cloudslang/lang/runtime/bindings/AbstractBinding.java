@@ -49,10 +49,11 @@ public class AbstractBinding {
     protected Value getEvalResultForMap(Value evalResult, LoopStatement loopStatement, String collectionExpression) {
         if (loopStatement instanceof MapLoopStatement) {
             if (evalResult != null && evalResult.get() instanceof Map) {
-                List<Value> entriesAsValues = new ArrayList<>();
-                @SuppressWarnings("unchecked") Set<Map.Entry<Serializable, Serializable>> entrySet =
+                //noinspection unchecked
+                Set<Map.Entry<Serializable, Serializable>> entrySet =
                         ((Map) evalResult.get()).entrySet();
 
+                List<Value> entriesAsValues = new ArrayList<>();
                 for (Map.Entry<Serializable, Serializable> entry : entrySet) {
                     entriesAsValues.add(ValueFactory.create(Pair.of(
                             ValueFactory.create(entry.getKey(), evalResult.isSensitive()),
@@ -69,20 +70,21 @@ public class AbstractBinding {
     protected Iterable<Value> getIterableFromEvalResult(Value loopCollection) {
         Serializable loopCollectionContent = loopCollection.get();
         if (loopCollectionContent instanceof Iterable) {
-            @SuppressWarnings("unchecked")
+            //noinspection unchecked
             Iterable<? extends Serializable> loopCollectionContentSerializable =
                     (Iterable<? extends Serializable>) loopCollectionContent;
             return convert(loopCollectionContentSerializable, loopCollection.isSensitive());
         } else if (loopCollectionContent instanceof String) {
             String expression = (String) loopCollectionContent;
-            if (expression.charAt(0) == '{' && expression.charAt(expression.length() - 1) == '}') {
-                expression = expression.substring(1,expression.length() - 1);
-                expression = expression.replace("\"","");
+            if ((expression.length() >= 2) &&
+                    (expression.charAt(0) == '{') && (expression.charAt(expression.length() - 1) == '}')) {
+                expression = expression.substring(1, expression.length() - 1);
+                expression = expression.replace("\"", "");
                 ArrayList<String> keys = new ArrayList<>();
                 for (String value : expression.split(",")) {
                     keys.add(value.split(":")[0]);
                 }
-                return convert(keys,loopCollection.isSensitive());
+                return convert(keys, loopCollection.isSensitive());
             } else {
                 String[] strings = ((String) loopCollectionContent).split(Pattern.quote(","));
                 return convert(Arrays.asList(strings), loopCollection.isSensitive());
@@ -114,31 +116,29 @@ public class AbstractBinding {
                     evaluationContext,
                     evaluationContextHolder.getSystemProperties(),
                     evaluationContextHolder.getFunctionDependencies()));
+        } else {
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
 
     protected void resolvePromptExpressions(Prompt prompt, EvaluationContextHolder evaluationContextHolder) {
-
-        //prompt message
+        // prompt message
         tryEvaluateExpression(prompt.getPromptMessage(), evaluationContextHolder)
                 .map(Value::toStringSafeEmpty)
                 .ifPresent(prompt::setPromptMessage);
 
-        //in case of single/multi-choice
+        // in case of single/multi-choice
         if (prompt.getPromptType().isChoiceLike()) {
-            //prompt options
+            // prompt options
             tryEvaluateExpression(prompt.getPromptOptions(), evaluationContextHolder)
                     .ifPresent(value -> {
                         if (value.isSensitive()) {
                             throw new RuntimeException(SENSITIVE_VALUE_IN_PROMPT_OPTION_ERROR);
                         }
-
                         prompt.setPromptOptions(Value.toStringSafeEmpty(value));
                     });
 
-            //prompt delimiter
+            // prompt delimiter
             tryEvaluateExpression(prompt.getPromptDelimiter(), evaluationContextHolder)
                     .map(Value::toStringSafeEmpty)
                     .ifPresent(prompt::setPromptDelimiter);

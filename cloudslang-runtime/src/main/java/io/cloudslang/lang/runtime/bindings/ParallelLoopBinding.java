@@ -13,12 +13,13 @@ import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.runtime.env.Context;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.stereotype.Component;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Date: 3/25/2015
@@ -40,10 +41,13 @@ public class ParallelLoopBinding extends AbstractBinding {
             Context flowContext,
             Set<SystemProperty> systemProperties,
             String nodeName) {
-        Validate.notNull(parallelLoopStatement, "parallel loop statement cannot be null");
-        Validate.notNull(flowContext, "flow context cannot be null");
-        Validate.notNull(systemProperties, "system properties cannot be null");
-        Validate.notNull(nodeName, "node name cannot be null");
+        if ((parallelLoopStatement == null) || (flowContext == null) ||
+                (systemProperties == null) || (nodeName == null)) {
+            requireNonNull(parallelLoopStatement, "parallel loop statement cannot be null");
+            requireNonNull(flowContext, "flow context cannot be null");
+            requireNonNull(systemProperties, "system properties cannot be null");
+            throw new NullPointerException("node name cannot be null");
+        }
 
         List<Value> result;
         try {
@@ -54,12 +58,13 @@ public class ParallelLoopBinding extends AbstractBinding {
             evalResult = getEvalResultForMap(evalResult, parallelLoopStatement, parallelLoopStatement.getExpression());
 
             result = (List<Value>) getIterableFromEvalResult(evalResult);
-        } catch (Throwable t) {
-            throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, t.getMessage()), t);
+        } catch (Exception exc) {
+            throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, exc.getMessage()), exc);
         }
-        if (CollectionUtils.isEmpty(result)) {
+        if (!CollectionUtils.isEmpty(result)) {
+            return result;
+        } else {
             throw new RuntimeException(generateParallelLoopExpressionMessage(nodeName, "expression is empty"));
         }
-        return result;
     }
 }
