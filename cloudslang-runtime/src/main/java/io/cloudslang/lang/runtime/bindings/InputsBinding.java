@@ -53,7 +53,7 @@ public class InputsBinding extends AbstractBinding {
      */
     public Map<String, Value> bindInputs(List<Input> inputs,
                                          Map<String, ? extends Value> context,
-                                         Map<String, ? extends Value> promptContext,
+                                         Map<String, Value> promptContext,
                                          Set<SystemProperty> systemProperties,
                                          List<Input> missingInputs,
                                          boolean useEmptyValuesForPrompts,
@@ -63,7 +63,7 @@ public class InputsBinding extends AbstractBinding {
         // we do not want to change original context map
         Map<String, Value> srcContext = new LinkedHashMap<>(context);
 
-        Map<String, ? extends Value> actualPromptContext = defaultIfNull(promptContext, emptyMap());
+        Map<String, Value> actualPromptContext = defaultIfNull(promptContext, emptyMap());
         for (Input input : inputs) {
             // prompts might be passed from arguments
             // this is the case for step inputs
@@ -77,7 +77,7 @@ public class InputsBinding extends AbstractBinding {
     }
 
     private void bindInput(Input input, Map<String, ? extends Value> context,
-                           Map<String, ? extends Value> promptContext, Map<String, Value> targetContext,
+                           Map<String, Value> promptContext, Map<String, Value> targetContext,
                            Set<SystemProperty> systemProperties, List<Input> missingInputs,
                            boolean useEmptyValuesForPrompts) {
         Value value;
@@ -95,6 +95,7 @@ public class InputsBinding extends AbstractBinding {
                         valueFromContext != null && valueFromContext.isSensitive();
                 if (!input.isPrivateInput() && sensitive) {
                     value = ValueFactory.create(promptValue, true);
+                    promptContext.put(inputName, value);
                 } else {
                     value = promptValue;
                 }
