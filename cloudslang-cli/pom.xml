@@ -7,7 +7,7 @@
     <parent>
         <artifactId>cloudslang</artifactId>
         <groupId>io.cloudslang.lang</groupId>
-        <version>1.0.260-SNAPSHOT</version>
+        <version>1.0.261-SNAPSHOT</version>
     </parent>
 
     <artifactId>cloudslang-cli</artifactId>
@@ -153,6 +153,12 @@
         <dependency>
             <groupId>com.mattbertolini</groupId>
             <artifactId>liquibase-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- runtime -->
