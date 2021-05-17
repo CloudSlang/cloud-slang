@@ -104,6 +104,7 @@ public class ExecutionPlanBuilderTest {
                 refId,
                 null,
                 null,
+                null,
                 isParallelLoop,
                 false);
     }
@@ -176,10 +177,11 @@ public class ExecutionPlanBuilderTest {
         String name = step.getName();
         String group = step.getWorkerGroup();
         String robotGroup = step.getRobotGroup();
+        String robotSessionAlias = step.getRobotSessionAlias();
         when(stepFactory
                 .createWorkerGroupStep(eq(stepId),
                         eq(preStepActionData), eq(name), eq(group),
-                        eq(robotGroup))).thenReturn(new ExecutionStep(stepId));
+                        eq(robotGroup), eq(robotSessionAlias))).thenReturn(new ExecutionStep(stepId));
     }
 
     private void mockAddBranchesStep(Long stepId, Long nextStepId, Long branchBeginStepId, Step step, Flow flow) {

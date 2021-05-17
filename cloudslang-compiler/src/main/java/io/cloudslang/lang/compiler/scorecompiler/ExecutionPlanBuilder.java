@@ -255,7 +255,7 @@ public class ExecutionPlanBuilder {
                     step.getName(), workerGroup);
         }
         return stepFactory.createWorkerGroupStep(id, step.getPreStepActionData(), step.getName(), workerGroup,
-                robotGroup);
+                robotGroup, step.getRobotSessionAlias());
     }
 
     public void setStepFactory(ExecutionStepFactory stepFactory) {

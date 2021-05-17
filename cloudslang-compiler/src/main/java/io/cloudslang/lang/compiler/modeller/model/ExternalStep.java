@@ -37,6 +37,7 @@ public class ExternalStep extends Step {
                 refId,
                 workerGroup,
                 null,
+                null,
                 parallelLoop,
                 onFailureStep
         );

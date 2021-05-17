@@ -15,6 +15,7 @@ import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.NavigationOptions;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.RobotGroupStatement;
+import io.cloudslang.lang.entities.RobotSessionAliasStatement;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.WorkerGroupMetadata;
 import io.cloudslang.lang.entities.WorkerGroupStatement;
@@ -283,13 +284,17 @@ public class StepExecutionData extends AbstractExecutionData {
             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
             @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
-            @Param(ScoreLangConstants.ROBOT_GROUP) RobotGroupStatement robotGroup) {
+            @Param(ScoreLangConstants.ROBOT_GROUP) RobotGroupStatement robotGroup,
+            @Param(ScoreLangConstants.ROBOT_SESSION_ALIAS) RobotSessionAliasStatement robotSessionAlias) {
         try {
             Context flowContext = runEnv.getStack().peekContext();
 
             handleWorkerGroup(workerGroup, flowContext, runEnv, executionRuntimeServices);
 
             handleRobotGroup(robotGroup, flowContext, runEnv, executionRuntimeServices);
+
+            handleRobotSessionAlias(robotSessionAlias, flowContext, runEnv, executionRuntimeServices);
+
             runEnv.putNextStepPosition(nextStepId);
         } catch (RuntimeException e) {
             logger.error("There was an error running the setWorkerGroupStep execution step of: \'" + nodeName +
@@ -364,6 +369,22 @@ public class StepExecutionData extends AbstractExecutionData {
             robotGroupValue = execRuntimeServices.getRobotGroupName();
         }
         execRuntimeServices.setRobotGroupName(robotGroupValue);
+    }
+
+    private void handleRobotSessionAlias(RobotSessionAliasStatement robotSessionAlias,
+            Context flowContext,
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices execRuntimeServices) {
+
+        String robotSessionAliasValue = null;
+        if (robotSessionAlias != null) {
+            robotSessionAliasValue = computeWorkerValue(robotSessionAlias.getFunctionDependencies(),
+                    robotSessionAlias.getSystemPropertyDependencies(),
+                    flowContext, runEnv, robotSessionAlias.getExpression());
+        } else if (isNotEmpty(execRuntimeServices.getRobotGroupName())) {
+            robotSessionAliasValue = execRuntimeServices.getRobotGroupName();
+        }
+        execRuntimeServices.setRobotSessionAlias(robotSessionAliasValue);
     }
 
     private String computeWorkerValue(Set<ScriptFunction> scriptFunctionSet,

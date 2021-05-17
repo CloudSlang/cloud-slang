@@ -59,7 +59,7 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createWorkerGroupStep(Long index, Map<String, Serializable> preStepData, String stepName,
-                                                  String workerGroup, String robotGroup) {
+                                                  String workerGroup, String robotGroup, String robotSessionAlias) {
         Validate.notNull(preStepData, "preStepData is null");
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.HOOKS, "TBD");
@@ -71,6 +71,10 @@ public class ExecutionStepFactory {
         }
         if (robotGroup != null) {
             actionData.put(ScoreLangConstants.ROBOT_GROUP, preStepData.get(SlangTextualKeys.ROBOT_GROUP));
+        }
+        if (robotSessionAlias != null) {
+            actionData.put(ScoreLangConstants.ROBOT_SESSION_ALIAS,
+                    preStepData.get(SlangTextualKeys.ROBOT_SESSION_ALIAS));
         }
         return createGeneralStep(index, STEP_EXECUTION_DATA_CLASS, "setWorkerGroupStep", actionData);
     }

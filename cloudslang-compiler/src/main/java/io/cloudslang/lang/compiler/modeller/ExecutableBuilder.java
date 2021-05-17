@@ -648,6 +648,7 @@ public class ExecutableBuilder {
 
         String workerGroup = computeWorkerGroupString(stepRawData);
         String robotGroup = (String) stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
+        String robortSessionAlias = (String) stepRawData.get(SlangTextualKeys.ROBOT_SESSION_ALIAS);
 
         String refId = "";
         final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
@@ -666,7 +667,7 @@ public class ExecutableBuilder {
                 getNavigationStrings(postStepData, defaultSuccess, defaultFailure, errors);
 
         Step step = createStep(stepName, onFailureSection, preStepData, postStepData,
-                arguments, workerGroup, robotGroup, refId, navigationStrings);
+                arguments, workerGroup, robotGroup, robortSessionAlias, refId, navigationStrings);
         return new StepModellingResult(step, errors);
     }
 
@@ -683,7 +684,7 @@ public class ExecutableBuilder {
 
     private Step createStep(String stepName, boolean onFailureSection, Map<String, Serializable> preStepData,
                             Map<String, Serializable> postStepData, List<Argument> arguments,
-                            String workerGroup, String robotGroup, String refId,
+                            String workerGroup, String robotGroup, String robotSessionAlias, String refId,
                             List<Map<String, Serializable>> navigationStrings) {
         if (preStepData.containsKey(DO_EXTERNAL_KEY)) {
             return new ExternalStep(stepName,
@@ -705,6 +706,7 @@ public class ExecutableBuilder {
                     refId,
                     workerGroup,
                     robotGroup,
+                    robotSessionAlias,
                     preStepData.containsKey(SlangTextualKeys.PARALLEL_LOOP_KEY),
                     onFailureSection);
         }

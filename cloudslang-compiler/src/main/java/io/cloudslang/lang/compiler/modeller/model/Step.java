@@ -27,6 +27,7 @@ public class Step {
     private final String refId;
     private final String workerGroup;
     private final String robotGroup;
+    private final String robotSessionAlias;
     private final boolean parallelLoop;
     private final boolean onFailureStep;
 
@@ -39,6 +40,7 @@ public class Step {
             String refId,
             String workerGroup,
             String robotGroup,
+            String robotSessionAlias,
             boolean parallelLoop,
             boolean onFailureStep) {
         this.name = name;
@@ -49,6 +51,7 @@ public class Step {
         this.refId = refId;
         this.workerGroup = workerGroup;
         this.robotGroup = robotGroup;
+        this.robotSessionAlias = robotSessionAlias;
         this.parallelLoop = parallelLoop;
         this.onFailureStep = onFailureStep;
     }
@@ -95,5 +98,9 @@ public class Step {
 
     public String getRobotGroup() {
         return robotGroup;
+    }
+
+    public String getRobotSessionAlias() {
+        return robotSessionAlias;
     }
 }
