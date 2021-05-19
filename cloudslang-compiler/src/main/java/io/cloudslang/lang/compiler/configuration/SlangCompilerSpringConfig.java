@@ -45,6 +45,7 @@ import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PythonActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ResultsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.RobotGroupTransformer;
+import io.cloudslang.lang.compiler.modeller.transformers.RobotSessionAliasTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.SeqActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.SeqStepsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
@@ -410,6 +411,11 @@ public class SlangCompilerSpringConfig {
     }
 
     @Bean
+    public RobotSessionAliasTransformer robotSessionAliasTransformer() {
+        return new RobotSessionAliasTransformer();
+    }
+
+    @Bean
     public ExecutableBuilder executableBuilder() {
         ExecutableBuilder executableBuilder = new ExecutableBuilder();
         executableBuilder.setTransformers(transformers());
@@ -454,7 +460,8 @@ public class SlangCompilerSpringConfig {
                 breakTransformer(),
                 seqActionTransformer(),
                 workerGroupTransformer(),
-                robotGroupTransformer());
+                robotGroupTransformer(),
+                robotSessionAliasTransformer());
     }
 
     private Constructor getConstructor() {
