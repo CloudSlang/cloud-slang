@@ -199,7 +199,6 @@
                             <id>cslang-builder</id>
                         </program>
                     </programs>
-                    <extraJvmArguments>-Dpython.path=@BASEDIR@/python-lib</extraJvmArguments>
                 </configuration>
             </plugin>
             <plugin>
