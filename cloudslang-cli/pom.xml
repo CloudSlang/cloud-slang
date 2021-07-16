@@ -395,7 +395,7 @@
             </build>
         </profile>
         <profile>
-            <id>content</id>
+            <id>assembly-content</id>
             <build>
                 <plugins>
                     <plugin>
