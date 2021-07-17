@@ -386,6 +386,7 @@
                                             src${file.separator}main${file.separator}resources${file.separator}cslang-cli.xml
                                         </descriptor>
                                     </descriptors>
+                                    <attach>false</attach>
                                 </configuration>
                             </execution>
                         </executions>
@@ -464,6 +465,7 @@
                                             src${file.separator}main${file.separator}resources${file.separator}cslang-cli-with-content.xml
                                         </descriptor>
                                     </descriptors>
+                                    <attach>false</attach>
                                 </configuration>
                             </execution>
                         </executions>

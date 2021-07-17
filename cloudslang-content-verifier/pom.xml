@@ -320,6 +320,7 @@
                                     <descriptors>
                                         <descriptor>src/main/resources/cslang-builder.xml</descriptor>
                                     </descriptors>
+                                    <attach>false</attach>
                                 </configuration>
                             </execution>
                         </executions>
