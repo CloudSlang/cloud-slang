@@ -46,7 +46,7 @@ public class EncryptionProvider {
             throw new RuntimeException("No encryptors found");
         } else if (encryptors.length == 1) {
             return encryptors[0];
-        } else if (encryptors.length == 2) {
+        } else if (encryptors.length == 2 || encryptors.length == 3) {
             return encryptors[0] instanceof DummyEncryptor ? encryptors[1] : encryptors[0];
         } else {
             throw new RuntimeException("Too many (" + encryptors.length + ") encryptors found");
