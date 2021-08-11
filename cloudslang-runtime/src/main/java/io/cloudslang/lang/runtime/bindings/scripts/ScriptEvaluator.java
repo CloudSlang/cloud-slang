@@ -94,6 +94,10 @@ public class ScriptEvaluator extends ScriptProcessor {
                                                      Set<ScriptFunction> functionDependencies) {
         Map<String, Serializable> pythonContext = createExternalPythonContext(context);
         boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
+        if (expr.indexOf('$') != -1) {
+            systemPropertiesDefined = true;
+            functionDependencies.add(ScriptFunction.GET_SYSTEM_PROPERTY);
+        }
         if (systemPropertiesDefined) {
             pythonContext.put(SYSTEM_PROPERTIES_MAP,
                     (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
