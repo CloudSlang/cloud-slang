@@ -37,6 +37,11 @@ public class AbstractInOutForTransformer {
                     functionDependencies.add(ScriptFunction.GET);
                 }
 
+                boolean getSpVarFunctionFound = ExpressionUtils.matchGetSystemPropertyVariableFunction(expression);
+                if (getSpVarFunctionFound) {
+                    functionDependencies.add(ScriptFunction.GET_SP_VAR);
+                }
+
                 for (ScriptFunction function : ScriptFunction.values()) {
                     if (ExpressionUtils.matchesFunction(function, expression)) {
                         functionDependencies.add(function);
