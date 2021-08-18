@@ -41,7 +41,9 @@ public enum ScriptFunction {
 
     CS_XPATH_QUERY("cs_xpath_query"),
 
-    CS_JSON_QUERY("cs_json_query");
+    CS_JSON_QUERY("cs_json_query"),
+
+    GET_SP_VAR("get_sp_var");
 
     private final String value;
 

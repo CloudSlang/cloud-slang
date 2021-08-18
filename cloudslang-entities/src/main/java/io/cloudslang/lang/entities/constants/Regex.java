@@ -98,5 +98,8 @@ public class Regex {
     public static final String DESCRIPTION_TOKEN = "#!";
 
     public static final String DESCRIPTION_EMPTY_LINE = "(\\s*)(#!)(\\s*)";
+
+    // get_sp_var(flow_input)
+    public static final String GET_SP_VAR_REGEX = "get_sp_var\\(\\s*(.+)\\s*\\)";
     //////////////// description end
 }

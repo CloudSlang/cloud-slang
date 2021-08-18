@@ -36,6 +36,7 @@ import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE;
 import static java.util.regex.Pattern.compile;
+import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX;
 
 /**
  * @author Bonczidai Levente
@@ -64,6 +65,8 @@ public final class ExpressionUtils {
     private static final Pattern CHECK_EMPTY_PATTERN = compile(CHECK_EMPTY_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
 
     private static final Map<ScriptFunction, Pattern> patternsMap = new HashMap<>();
+
+    private static final Pattern GET_SP_VAR_PATTERN = compile(GET_SP_VAR_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
 
     static {
         addPattern(ScriptFunction.CHECK_EMPTY, CHECK_EMPTY_REGEX);
@@ -130,5 +133,9 @@ public final class ExpressionUtils {
         }
 
         return false;
+    }
+
+    public static boolean matchGetSystemPropertyVariableFunction(String text) {
+        return matchPattern(GET_SP_VAR_PATTERN, text);
     }
 }

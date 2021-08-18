@@ -45,7 +45,8 @@ public class ScriptsService {
                 ScriptFunction.CS_ROUND,
                 ScriptFunction.CS_SUBSTRING,
                 ScriptFunction.CS_TO_UPPER,
-                ScriptFunction.CS_TO_LOWER
+                ScriptFunction.CS_TO_LOWER,
+                ScriptFunction.GET_SP_VAR
         );
 
         for (ScriptFunction function: list) {

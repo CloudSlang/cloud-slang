@@ -80,7 +80,13 @@ public class ScriptEvaluator extends ScriptProcessor {
                                              Set<SystemProperty> systemProperties,
                                              Set<ScriptFunction> functionDependencies) {
         Map<String, Serializable> jythonContext = createJythonContext(context);
-        boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
+
+        boolean systemPropertiesDefined = false;
+        if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY)
+                || functionDependencies.contains(ScriptFunction.GET_SP_VAR)) {
+            systemPropertiesDefined = true;
+        }
+
         if (systemPropertiesDefined) {
             jythonContext.put(SYSTEM_PROPERTIES_MAP,
                     (Serializable) prepareSystemPropertiesForJython(systemProperties));
@@ -93,7 +99,11 @@ public class ScriptEvaluator extends ScriptProcessor {
                                                      Set<SystemProperty> systemProperties,
                                                      Set<ScriptFunction> functionDependencies) {
         Map<String, Serializable> pythonContext = createExternalPythonContext(context);
-        boolean systemPropertiesDefined = functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY);
+        boolean systemPropertiesDefined = false;
+        if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY)
+                || functionDependencies.contains(ScriptFunction.GET_SP_VAR)) {
+            systemPropertiesDefined = true;
+        }
         if (systemPropertiesDefined) {
             pythonContext.put(SYSTEM_PROPERTIES_MAP,
                     (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
