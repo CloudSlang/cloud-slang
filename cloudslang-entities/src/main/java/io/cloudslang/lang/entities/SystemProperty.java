@@ -25,6 +25,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class SystemProperty implements Serializable {
 
+    private static final long serialVersionUID = 109869983897626061L;
     private final String namespace;
     private final String fullyQualifiedName;
     private final Value value;

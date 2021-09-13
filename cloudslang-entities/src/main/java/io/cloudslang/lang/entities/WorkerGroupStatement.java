@@ -20,6 +20,7 @@ import java.util.Set;
 
 public class WorkerGroupStatement implements Serializable {
 
+    private static final long serialVersionUID = -4811273001193667018L;
     private final String expression;
     private final boolean override;
     private final Set<ScriptFunction> functionDependencies;

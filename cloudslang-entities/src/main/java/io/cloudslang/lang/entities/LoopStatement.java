@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @author Bonczidai Levente
  */
 public abstract class LoopStatement implements Serializable {
+    private static final long serialVersionUID = 3563394747445675409L;
     private final String expression;
     private Set<ScriptFunction> functionDependencies;
     private Set<String> systemPropertyDependencies;
