@@ -31,6 +31,8 @@ import org.apache.commons.io.IOUtils;
  */
 public class SensitiveValue implements Value {
 
+    private static final long serialVersionUID = -1494652686913646816L;
+
     public static final String SENSITIVE_VALUE_MASK = "********";
 
     private String content = null;
@@ -114,6 +116,14 @@ public class SensitiveValue implements Value {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Serializable getOriginalContent() {
+        return originalContent;
+    }
+
+    public SensitivityLevel getSensitivityLevel() {
+        return sensitivityLevel;
     }
 
     @Override

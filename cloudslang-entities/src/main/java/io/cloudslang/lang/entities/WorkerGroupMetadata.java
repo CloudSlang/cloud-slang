@@ -14,6 +14,7 @@ import java.util.Objects;
 
 public class WorkerGroupMetadata implements Serializable {
 
+    private static final long serialVersionUID = 100682360450405572L;
     private String value;
     private boolean override;
 

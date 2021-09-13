@@ -19,6 +19,8 @@ import java.io.Serializable;
  */
 public class SimpleValue implements Value {
 
+    private static final long serialVersionUID = 5050440514342724992L;
+
     private Serializable content;
 
     @SuppressWarnings("unused")

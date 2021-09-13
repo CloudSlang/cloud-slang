@@ -18,6 +18,8 @@ import java.io.Serializable;
  */
 public class SensitiveStringValue extends SensitiveValue {
 
+    private static final long serialVersionUID = 1016328268790281844L;
+
     @SuppressWarnings("unused")
     public SensitiveStringValue() {
     }
