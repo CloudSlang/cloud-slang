@@ -21,6 +21,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class ResultNavigation implements Serializable {
 
+    private static final long serialVersionUID = 2041860995739656789L;
     private long nextStepId;
     private String presetResult;
 

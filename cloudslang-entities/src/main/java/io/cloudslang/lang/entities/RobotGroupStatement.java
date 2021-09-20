@@ -19,6 +19,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class RobotGroupStatement implements Serializable {
 
+    private static final long serialVersionUID = -6373545121361214121L;
     private final String expression;
     private final Set<ScriptFunction> functionDependencies;
     private final Set<String> systemPropertyDependencies;

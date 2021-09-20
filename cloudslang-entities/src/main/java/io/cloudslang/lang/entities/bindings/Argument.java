@@ -21,6 +21,7 @@ import java.util.Set;
  */
 public class Argument extends InOutParam {
 
+    private static final long serialVersionUID = 5295602668405254562L;
     private boolean privateArgument;
     private Prompt prompt;
     private boolean expression;

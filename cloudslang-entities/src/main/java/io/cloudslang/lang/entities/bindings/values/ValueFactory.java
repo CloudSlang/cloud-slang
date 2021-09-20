@@ -20,6 +20,8 @@ import java.io.Serializable;
  */
 public abstract class ValueFactory implements Serializable {
 
+    private static final long serialVersionUID = 2022710429263189391L;
+
     public static Value create(Serializable content) {
         return create(content, false);
     }

@@ -19,6 +19,7 @@ import java.util.Map;
  */
 public class NavigationOptions implements Serializable {
 
+    private static final long serialVersionUID = 1415809157458595126L;
     private String name;
     private long currStepId;
     private Map<String, Serializable> options;
