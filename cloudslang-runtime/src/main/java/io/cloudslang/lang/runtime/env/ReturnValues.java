@@ -11,7 +11,7 @@ package io.cloudslang.lang.runtime.env;
 
 import io.cloudslang.lang.entities.bindings.values.Value;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ReturnValues implements Serializable {
@@ -21,7 +21,7 @@ public class ReturnValues implements Serializable {
     private final String result;
 
     public ReturnValues(Map<String, Value> outputs, String result) {
-        this.outputs = new HashMap<>(outputs);
+        this.outputs = new LinkedHashMap<>(outputs);
         this.result = result;
     }
 
