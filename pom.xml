@@ -188,7 +188,7 @@
             <dependency>
                 <groupId>com.hp.score.sdk</groupId>
                 <artifactId>score-content-sdk</artifactId>
-                <version>1.10.7</version>
+                <version>1.10.10 </version>
             </dependency>
             <!--end of score dependencies-->
 
