@@ -6,6 +6,7 @@ def cs_extract_number(string, count = 1):
   result = None
   numbers = re.findall("[0-9]*\.?[0-9]+", string)
 
+  count = int(count)
   if len(numbers) >= count & count >= 1:
     result = numbers[count - 1]
 

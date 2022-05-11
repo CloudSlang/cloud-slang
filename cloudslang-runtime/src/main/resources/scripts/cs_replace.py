@@ -9,4 +9,4 @@ def cs_replace(string, old_val, new_val, count = -1):
   if type(new_val).__name__ != 'str' and type(new_val).__name__ != 'unicode':
     raise Exception("Expected a string for parameter 'new_val', got " + str(new_val))
 
-  return string.replace(old_val, new_val) if count < 0 else string.replace(old_val, new_val, count)
+  return string.replace(old_val, new_val) if int(count) < 0 else string.replace(old_val, new_val, int(count))
