@@ -62,7 +62,7 @@ public class ScriptEvaluator extends ScriptProcessor {
 
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
-        try {
+        /*try {
             if (EXTERNAL_PYTHON) {
                 return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
             } else {
@@ -72,6 +72,18 @@ public class ScriptEvaluator extends ScriptProcessor {
             throw new RuntimeException("Error in evaluating expression: '" +
                     getTruncatedExpression(expr) + "',\n\t" +
                     handleExceptionSpecialCases(exception.getMessage()), exception);
+        }*/
+
+        try {
+            return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
+        } catch (Exception ignore) {
+            try {
+                return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
+            } catch (Exception exception) {
+                throw new RuntimeException("Error in evaluating expression: '" +
+                        getTruncatedExpression(expr) + "',\n\t" +
+                        handleExceptionSpecialCases(exception.getMessage()), exception);
+            }
         }
     }
 
