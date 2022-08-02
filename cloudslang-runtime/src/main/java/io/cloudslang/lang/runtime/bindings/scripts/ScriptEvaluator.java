@@ -76,13 +76,14 @@ public class ScriptEvaluator extends ScriptProcessor {
 
         try {
             return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
-        } catch (Exception ignore) {
+        } catch (Exception jythonException) {
             try {
                 return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
-            } catch (Exception exception) {
+            } catch (Exception pythonException) {
                 throw new RuntimeException("Error in evaluating expression: '" +
                         getTruncatedExpression(expr) + "',\n\t" +
-                        handleExceptionSpecialCases(exception.getMessage()), exception);
+                        jythonException.getMessage() + "\n" +
+                        handleExceptionSpecialCases(pythonException.getMessage()), pythonException);
             }
         }
     }
