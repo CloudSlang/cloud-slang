@@ -71,7 +71,7 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             for (Annotation annotation : annotations) {
                 String parameterName = getValueIfParamAnnotation(annotation);
                 if (parameterName != null) {
-                    final String methodName =  executionMethod.getDeclaringClass().getName();
+                    final String methodName = executionMethod.getDeclaringClass().getName();
                     String paramClassName = parameterTypes[index].getCanonicalName();
                     if (paramClassName.equals(GLOBAL_SESSION_OBJECT_CLASS_NAME)) {
                         handleSessionContextArgument(globalSessionObjectData, GLOBAL_SESSION_OBJECT_CLASS_NAME,
