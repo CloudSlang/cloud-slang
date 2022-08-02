@@ -207,11 +207,11 @@ public class ParallelLoopFlowsTest extends SystemsTestsParent {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 triggerWithData(fromFile(resource), path));
-        Assert.assertEquals("Error running: 'print_values': \n" +
+        Assert.assertTrue(exception.getMessage().contains("Error running: 'print_values': \n" +
                 "Binding output: 'output_from_flow_context failed',\n" +
                 "\tError in evaluating expression: 'flow_var',\n" +
                 "\tError in running script expression: 'flow_var',\n" +
-                "\tException is: name 'flow_var' is not defined", exception.getMessage());
+                "\tException is: name 'flow_var' is not defined"));
     }
 
     @Test

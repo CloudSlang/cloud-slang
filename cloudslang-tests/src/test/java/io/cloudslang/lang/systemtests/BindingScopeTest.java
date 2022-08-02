@@ -76,11 +76,11 @@ public class BindingScopeTest extends SystemsTestsParent {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 triggerWithData(compilationArtifact, userInputs, systemProperties));
-        Assert.assertEquals("Error running: 'check_weather_missing_input'.\n" +
+        Assert.assertTrue(exception.getMessage().contains("Error running: 'check_weather_missing_input'.\n" +
                 "\t Error binding input: 'input_get_missing_input', \n" +
                 "\tError in evaluating expression: 'missing_input',\n" +
                 "\tError in running script expression: 'missing_input',\n" +
-                "\tException is: name 'missing_input' is not defined", exception.getMessage());
+                "\tException is: name 'missing_input' is not defined"));
     }
 
     @Test
@@ -315,7 +315,8 @@ public class BindingScopeTest extends SystemsTestsParent {
         Assert.assertEquals("Error running: 'step1': Binding output: 'step1_publish_1 failed',\n" +
                 "\tError in evaluating expression: 'flow_var',\n" +
                 "\tError in running script expression: 'flow_var',\n" +
-                "\tException is: name 'flow_var' is not defined", exception.getMessage());
+                "\tException is: name 'flow_var' is not defined\n" +
+                "Missing or invalid python path", exception.getMessage());
     }
 
 }

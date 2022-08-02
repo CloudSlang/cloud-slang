@@ -117,8 +117,8 @@ public class ScriptEvaluatorTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 scriptEvaluator.evalExpr("input_expression", new HashMap<String, Value>(),
                         new HashSet<SystemProperty>(), new HashSet<ScriptFunction>()));
-        Assert.assertEquals("Error in evaluating expression: 'input_expression',\n" +
-                "\terror from interpreter", exception.getMessage());
+        Assert.assertTrue(exception.getMessage().contains("Error in evaluating expression: 'input_expression',\n" +
+                "\terror from interpreter"));
     }
 
     @Test
