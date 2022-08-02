@@ -38,6 +38,8 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
     private static final String SERIALIZABLE_SESSION_OBJECT = SerializableSessionObject.class.getCanonicalName();
     private static final String STEP_SERIALIZABLE_SESSION_OBJECT =
             StepSerializableSessionObject.class.getCanonicalName();
+    private static final String LIST_ITERATOR_ACTION = "io.cloudslang.content.actions.ListIteratorAction";
+
     private final Map<String, SerializableSessionObject> serializableSessionData;
     private final Map<String, Serializable> currentContext;
     private final Map<String, Object> globalSessionObjectData;
@@ -69,18 +71,19 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             for (Annotation annotation : annotations) {
                 String parameterName = getValueIfParamAnnotation(annotation);
                 if (parameterName != null) {
+                    final String methodName =  executionMethod.getDeclaringClass().getName();
                     String paramClassName = parameterTypes[index].getCanonicalName();
                     if (paramClassName.equals(GLOBAL_SESSION_OBJECT_CLASS_NAME)) {
                         handleSessionContextArgument(globalSessionObjectData, GLOBAL_SESSION_OBJECT_CLASS_NAME,
-                                args, parameterName,
+                                args, parameterName, methodName,
                                 annotation.getClass().getClassLoader());
                     } else if (paramClassName.equals(SESSION_OBJECT_CLASS_NAME)) {
                         handleSessionContextArgument(sessionObjectData, SESSION_OBJECT_CLASS_NAME,
-                                args, parameterName + "_" + (depth - 1),
+                                args, parameterName + "_" + (depth - 1), methodName,
                                 annotation.getClass().getClassLoader());
                     } else if (paramClassName.equals(SERIALIZABLE_SESSION_OBJECT)) {
                         handleSessionContextArgument(serializableSessionData, SERIALIZABLE_SESSION_OBJECT,
-                                args, parameterName,
+                                args, parameterName, methodName,
                                 annotation.getClass().getClassLoader());
                     } else if (paramClassName.equals(STEP_SERIALIZABLE_SESSION_OBJECT)) {
                         handleStepSessionContextArgument(serializableSessionData, args, parameterName,
@@ -146,9 +149,9 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
     }
 
     private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args,
-                                              String parameterName, ClassLoader classLoader) {
-        // cloudslang list iterator fix
-        final String parameter = StringUtils.startsWith(this.nodeNameWithDepth, "list_iterator") ?
+                                              String parameterName, String methodName, ClassLoader classLoader) {
+        // cloudSlang list iterator fix
+        final String parameter = StringUtils.equals(methodName, LIST_ITERATOR_ACTION) ?
                 this.nodeNameWithDepth : parameterName;
 
         Object sessionContextObject = sessionData.get(parameter);
