@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,11 +101,6 @@ public class StepExecutionData extends AbstractExecutionData {
         try {
             runEnv.removeCallArguments();
             runEnv.removeReturnValues();
-
-            Set<String> unauthorizedFlows = executionRuntimeServices.getUnauthorizedFlows();
-            if (unauthorizedFlows.contains(refId)) {
-                throw new RuntimeException("Current user is not allowed to execute this step.");
-            }
 
             final int flowDepth = runEnv.getParentFlowStack().size();
             prepareNodeName(executionRuntimeServices, nodeName, flowDepth);
@@ -172,6 +168,11 @@ public class StepExecutionData extends AbstractExecutionData {
             // set the start step of the given ref as the next step to execute
             // (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
+
+            Set<String> unauthorizedFlows = executionRuntimeServices.getUnauthorizedFlows();
+            if (!unauthorizedFlows.isEmpty() && unauthorizedFlows.contains(refId)) {
+                throw new RuntimeException("Current user is not allowed to execute this step.");
+            }
 
             putStepNavigationOptions(runEnv, stepNavigationOptions, nodeName);
         } catch (RuntimeException e) {
