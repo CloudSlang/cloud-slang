@@ -170,7 +170,7 @@ public class StepExecutionData extends AbstractExecutionData {
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
 
             Set<String> unauthorizedFlows = executionRuntimeServices.getUnauthorizedFlows();
-            if (!unauthorizedFlows.isEmpty() && unauthorizedFlows.contains(refId)) {
+            if (unauthorizedFlows != null && !unauthorizedFlows.isEmpty() && unauthorizedFlows.contains(refId)) {
                 throw new RuntimeException("Current user is not allowed to execute this step.");
             }
 
@@ -307,19 +307,19 @@ public class StepExecutionData extends AbstractExecutionData {
     private void removeStepSerializableSessionObjects(final RunEnvironment runEnv) {
         final int flowDepth = runEnv.getParentFlowStack().size();
         runEnv.getSerializableDataMap().entrySet().removeIf(
-            (Map.Entry<String, ?> entry) -> {
-                try {
-                    final String key = entry.getKey();
-                    final String valueClassName = entry.getValue()
-                                                       .getClass()
-                                                       .getName();
-                    final int entryDepth = Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
-                    return (entryDepth > flowDepth) &&
-                            valueClassName.equals(StepSerializableSessionObject.class.getName());
-                } catch (Exception ignore) {
-                    return false;
+                (Map.Entry<String, ?> entry) -> {
+                    try {
+                        final String key = entry.getKey();
+                        final String valueClassName = entry.getValue()
+                                .getClass()
+                                .getName();
+                        final int entryDepth = Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
+                        return (entryDepth > flowDepth) &&
+                                valueClassName.equals(StepSerializableSessionObject.class.getName());
+                    } catch (Exception ignore) {
+                        return false;
+                    }
                 }
-            }
         );
     }
 
@@ -358,9 +358,9 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     private void handleRobotGroup(RobotGroupStatement robotGroup,
-            Context flowContext,
-            RunEnvironment runEnv,
-            ExecutionRuntimeServices execRuntimeServices) {
+                                  Context flowContext,
+                                  RunEnvironment runEnv,
+                                  ExecutionRuntimeServices execRuntimeServices) {
         String robotGroupValue = DEFAULT_ROBOT_GROUP;
         if (robotGroup != null) {
             robotGroupValue = computeWorkerValue(robotGroup.getFunctionDependencies(),
@@ -397,8 +397,8 @@ public class StepExecutionData extends AbstractExecutionData {
 
     private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions,
                                Map<String, Value> flowVariables) {
-        if (isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
-            for (NavigationOptions navigationOptions: stepNavigationOptions) {
+        if (isNotEmpty(stepExecutableResult) && stepNavigationOptions != null) {
+            for (NavigationOptions navigationOptions : stepNavigationOptions) {
                 if (navigationOptions.getName().equals(stepExecutableResult)) {
                     Serializable roi = navigationOptions.getOptions().get(LanguageEventData.ROI);
                     if (roi instanceof String) {
