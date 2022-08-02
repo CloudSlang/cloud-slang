@@ -170,7 +170,7 @@ public class StepExecutionData extends AbstractExecutionData {
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
 
             Set<String> unauthorizedFlows = executionRuntimeServices.getUnauthorizedFlows();
-            if (unauthorizedFlows != null && !unauthorizedFlows.isEmpty() && unauthorizedFlows.contains(refId)) {
+            if (unauthorizedFlows != null && unauthorizedFlows.contains(refId)) {
                 throw new RuntimeException("Current user is not allowed to execute this step.");
             }
 
