@@ -203,14 +203,15 @@ public abstract class AbstractExecutionData {
         if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
             LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY).get();
             if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
-                runEnv.putNextStepPosition(previousStepId);
+                // setWorkerGroupStep will always precede beginStep in execution plan
+                runEnv.putNextStepPosition(previousStepId - 1);
                 runEnv.getStack().pushContext(flowContext);
                 throwEventOutputEnd(
                         runEnv,
                         executionRuntimeServices,
                         nodeName,
                         publishValues,
-                        previousStepId,
+                        previousStepId - 1,
                         new ReturnValues(publishValues, executableReturnValues.getResult()),
                         ExecutionParametersConsts.DEFAULT_ROI_VALUE,
                         contextAccessor,

@@ -49,9 +49,7 @@ import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.python.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -518,7 +516,7 @@ public class StepExecutionDataTest {
     }
 
     @Test
-    public void whenLoopConditionHasMoreEndStepSetNextPositionIdToBeginStep() throws Exception {
+    public void whenLoopConditionHasMoreEndStepSetNextPositionIdToSetWorkerStep() throws Exception {
         RunEnvironment runEnv = new RunEnvironment();
         runEnv.putReturnValues(new ReturnValues(new HashMap<String, Value>(), "SUCCESS"));
         HashMap<String, ResultNavigation> stepNavigationValues = new HashMap<>();
@@ -529,11 +527,11 @@ public class StepExecutionDataTest {
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(mockLoopCondition));
         when(mockLoopCondition.hasMore()).thenReturn(true);
 
-        Long previousStepId = 1L;
+        Long previousStepId = 2L;
         stepExecutionData.endStep(runEnv, new ArrayList<Output>(), stepNavigationValues,
             createRuntimeServices(), previousStepId, new ArrayList<String>(), "stepName", false);
 
-        assertEquals(previousStepId, runEnv.removeNextStepPosition());
+        assertEquals(Long.valueOf(previousStepId - 1), runEnv.removeNextStepPosition());
         assertEquals(context, runEnv.getStack().popContext());
     }
 
