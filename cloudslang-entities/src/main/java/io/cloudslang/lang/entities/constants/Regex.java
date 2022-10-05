@@ -34,6 +34,7 @@ public class Regex {
     // match get_sp(key) function
     public static final String SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE = "get_sp\\(\\s*'" + NAMESPACE_CHARS + "'\\s*\\)";
     public static final String SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + NAMESPACE_CHARS + "\"\\s*\\)";
+    public static final String SYSTEM_PROPERTY_REGEX_WITHOUT_QUOTES = "get_sp\\(\\s*(.+?)\\s*\\)";
     // match get_sp(key, default) function
     public static final String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE = "get_sp\\(\\s*'" + NAMESPACE_CHARS +
             "'\\s*,\\s*(.+?)\\)";

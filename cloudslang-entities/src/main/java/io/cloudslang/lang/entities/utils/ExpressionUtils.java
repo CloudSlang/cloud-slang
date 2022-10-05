@@ -33,8 +33,10 @@ import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX_WITH_DEFAULT;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE;
+import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITHOUT_QUOTES;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE;
+import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_WITHOUT_QUOTES;
 import static java.util.regex.Pattern.compile;
 import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX;
 
@@ -53,11 +55,15 @@ public final class ExpressionUtils {
             Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE =
             compile(SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_WITHOUT_QUOTES =
+            compile(SYSTEM_PROPERTY_REGEX_WITHOUT_QUOTES, Pattern.UNICODE_CHARACTER_CLASS);
 
     private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE =
             compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE =
             compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_WITHOUT_QUOTES =
+            compile(SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_WITHOUT_QUOTES, Pattern.UNICODE_CHARACTER_CLASS);
 
     private static final Pattern GET_PATTERN = compile(GET_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
     private static final Pattern GET_PATTERN_WITH_DEFAULT = compile(GET_REGEX_WITH_DEFAULT,
