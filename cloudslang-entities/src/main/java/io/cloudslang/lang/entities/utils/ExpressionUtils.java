@@ -105,10 +105,12 @@ public final class ExpressionUtils {
     public static Set<String> extractSystemProperties(String expression) {
         Set<String> properties = matchFunction(SYSTEM_PROPERTY_PATTERN_SINGLE_QUOTE, expression, 1);
         properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_DOUBLE_QUOTE, expression, 1));
-        properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITHOUT_QUOTES, expression, 1));
         properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_SINGLE_QUOTE, expression, 1));
         properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_DOUBLE_QUOTE, expression, 1));
-        properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_WITHOUT_QUOTES, expression, 1));
+        if (properties.isEmpty()) {
+            properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITHOUT_QUOTES, expression, 1));
+            properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_WITHOUT_QUOTES, expression, 1));
+        }
         return properties;
     }
 

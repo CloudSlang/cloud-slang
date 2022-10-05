@@ -40,7 +40,8 @@ public class Regex {
             "'\\s*,\\s*(.+?)\\)";
     public static final String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_DOUBLE_QUOTE = "get_sp\\(\\s*\"" + NAMESPACE_CHARS +
             "\"\\s*,\\s*(.+?)\\)";
-    public static final String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_WITHOUT_QUOTES = "get_sp\\(\\s*(.+?)\\s*,\\s*(.+?)\\)";
+    public static final String SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_WITHOUT_QUOTES = "get_sp\\(\\s*" +
+            "(.+?)\\s*,\\s*(.+?)\\)";
     // match get() function
     public static final String GET_REGEX = "get\\((.+)\\)";
     public static final String GET_REGEX_WITH_DEFAULT = "get\\((.+?),(.+?)\\)";
