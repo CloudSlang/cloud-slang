@@ -87,7 +87,7 @@ public class ExpressionUtilsTest {
     }
 
     @Test
-    public void testExtractSystemPropertiesNoMatchConcat() throws Exception {
+    public void testExtractSystemPropertiesWhenConcatSingleQuote() throws Exception {
         Assert.assertEquals(props4, extractSystemProperties("get_sp('a.b.c.key' + 'd.e.f.key')"));
     }
 
@@ -123,7 +123,7 @@ public class ExpressionUtilsTest {
     }
 
     @Test
-    public void testExtractSystemPropertiesNoMatchConcatDoubleQuote() throws Exception {
+    public void testExtractSystemPropertiesWhenConcatDoubleQuote() throws Exception {
         Assert.assertEquals(props3, extractSystemProperties("get_sp(\"a.b.c.key\" + \"d.e.f.key\")"));
     }
 
