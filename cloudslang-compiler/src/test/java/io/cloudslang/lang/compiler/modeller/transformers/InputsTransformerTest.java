@@ -262,6 +262,7 @@ public class InputsTransformerTest extends TransformersTestParent {
         setGetAndSp.addAll(setSp);
         final Set<String> props1 = Sets.newHashSet("a.b.c.key");
         final Set<String> props2 = Sets.newHashSet("a.b.c.key", "d.e.f.key");
+        final Set<String> expression = Sets.newHashSet("expression");
         Set<ScriptFunction> emptySetScriptFunction = new HashSet<>();
         Set<String> emptySetString = new HashSet<>();
         Set<ScriptFunction> setGetAndCheckEmpty = new HashSet<>(setGet);
@@ -278,7 +279,7 @@ public class InputsTransformerTest extends TransformersTestParent {
         verifyFunctionsAndSpDependencies(inputs, 6, setGetAndSp, props1);
         verifyFunctionsAndSpDependencies(inputs, 7, setGetAndSp, props2);
         verifyFunctionsAndSpDependencies(inputs, 8, setGetAndSp, props1);
-        verifyFunctionsAndSpDependencies(inputs, 9, emptySetScriptFunction, emptySetString);
+        verifyFunctionsAndSpDependencies(inputs, 9, setSp, expression);
         verifyFunctionsAndSpDependencies(inputs, 10, setSp, props1);
         verifyFunctionsAndSpDependencies(inputs, 11, setGet, emptySetString);
         verifyFunctionsAndSpDependencies(inputs, 12, setSp, props2);
