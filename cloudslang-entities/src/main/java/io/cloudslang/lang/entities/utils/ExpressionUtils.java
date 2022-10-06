@@ -22,12 +22,15 @@ import java.util.regex.Pattern;
 import static io.cloudslang.lang.entities.constants.Regex.CHECK_EMPTY_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_APPEND_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_EXTRACT_NUMBER_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_JSON_QUERY_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_PREPEND_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_REGEX_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_REPLACE_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_ROUND_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_SUBSTRING_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_TO_LOWER_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.CS_TO_UPPER_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.CS_XPATH_QUERY_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.EXPRESSION_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX_WITH_DEFAULT;
@@ -74,6 +77,10 @@ public final class ExpressionUtils {
 
     private static final Pattern GET_SP_VAR_PATTERN = compile(GET_SP_VAR_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
 
+    private static final Pattern CS_REGEX_PATTERN = compile(CS_REGEX_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern CS_XPATH_PATTERN = compile(CS_XPATH_QUERY_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern CS_JSON_PATTERN = compile(CS_JSON_QUERY_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
+
     static {
         addPattern(ScriptFunction.CHECK_EMPTY, CHECK_EMPTY_REGEX);
         addPattern(ScriptFunction.CS_APPEND, CS_APPEND_REGEX);
@@ -116,6 +123,18 @@ public final class ExpressionUtils {
 
     public static boolean matchGetFunction(String text) {
         return matchPattern(GET_PATTERN_WITH_DEFAULT, text) || matchPattern(GET_PATTERN, text);
+    }
+
+    public static boolean matchCsRegexFunction(String text) {
+        return matchPattern(CS_REGEX_PATTERN, text);
+    }
+
+    public static boolean matchCsXpathQueryFunction(String text) {
+        return matchPattern(CS_XPATH_PATTERN, text);
+    }
+
+    public static boolean matchCsJsonQueryFunction(String text) {
+        return matchPattern(CS_JSON_PATTERN, text);
     }
 
     public static boolean matchCheckEmptyFunction(String text) {

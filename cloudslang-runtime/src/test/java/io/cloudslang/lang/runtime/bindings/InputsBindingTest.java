@@ -146,7 +146,6 @@ public class InputsBindingTest {
                 bindInputs(inputs));
         Assert.assertTrue(exception.getMessage().contains("Error binding input: 'input1'"));
         Assert.assertTrue(exception.getMessage().contains("Error in evaluating expression: 'input1'"));
-        Assert.assertTrue(exception.getMessage().contains("name 'input1' is not defined"));
     }
 
     @Test
@@ -160,7 +159,6 @@ public class InputsBindingTest {
                 bindInputs(inputs));
         Assert.assertTrue(exception.getMessage().contains("Error binding input: 'input1'"));
         Assert.assertTrue(exception.getMessage().contains("Error in evaluating expression: 'input1'"));
-        Assert.assertTrue(exception.getMessage().contains("name 'input1' is not defined"));
     }
 
     @Test
