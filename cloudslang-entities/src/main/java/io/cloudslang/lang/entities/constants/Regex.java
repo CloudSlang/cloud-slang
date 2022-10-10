@@ -55,8 +55,8 @@ public class Regex {
     public static final String CS_TO_UPPER_REGEX = "cs_to_upper\\((.+?)\\)";
     public static final String CS_TO_LOWER_REGEX = "cs_to_lower\\((.+?)\\)";
     public static final String CS_REGEX_REGEX = "cs_regex\\((.+)\\)";
-    public static final String CS_XPATH_QUERY_REGEX = "cs_regex\\((.+)\\)";
-    public static final String CS_JSON_QUERY_REGEX = "cs_regex\\((.+)\\)";
+    public static final String CS_XPATH_QUERY_REGEX = "cs_xpath_query\\((.+)\\)";
+    public static final String CS_JSON_QUERY_REGEX = "cs_json_query\\((.+)\\)";
 
     //////////////// description
     public static final String DESCRIPTION_START_LINE = "(\\s*)(#!!)(([^#])(.*))*";
