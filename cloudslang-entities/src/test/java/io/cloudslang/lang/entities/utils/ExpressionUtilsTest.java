@@ -31,6 +31,8 @@ public class ExpressionUtilsTest {
     private static final Set<String> EMPTY_SET = (Set<String>) Collections.EMPTY_SET;
     private Set<String> props1 = Sets.newHashSet("a.b.c.key");
     private Set<String> props2 = Sets.newHashSet("a.b.c.key", "d.e.f.key");
+    private Set<String> props3 = Sets.newHashSet("\"a.b.c.key\" + \"d.e.f.key\"");
+    private Set<String> props4 = Sets.newHashSet("\'a.b.c.key\' + \'d.e.f.key\'");
 
     @Test
     public void testExtractExpressionNonString() throws Exception {
@@ -85,18 +87,8 @@ public class ExpressionUtilsTest {
     }
 
     @Test
-    public void testExtractSystemPropertiesNoMatchExpression() throws Exception {
-        Assert.assertEquals(EMPTY_SET, extractSystemProperties("get_sp('a.b.c.key' + var)"));
-    }
-
-    @Test
-    public void testExtractSystemPropertiesNoMatchConcat() throws Exception {
-        Assert.assertEquals(EMPTY_SET, extractSystemProperties("get_sp('a.b.c.key' + 'hello')"));
-    }
-
-    @Test
-    public void testExtractSystemPropertiesNoMatchGet() throws Exception {
-        Assert.assertEquals(EMPTY_SET, extractSystemProperties("get_sp(get('key'))"));
+    public void testExtractSystemPropertiesWhenConcatSingleQuote() throws Exception {
+        Assert.assertEquals(props4, extractSystemProperties("get_sp('a.b.c.key' + 'd.e.f.key')"));
     }
 
     @Test
@@ -131,13 +123,8 @@ public class ExpressionUtilsTest {
     }
 
     @Test
-    public void testExtractSystemPropertiesNoMatchExpressionDoubleQuote() throws Exception {
-        Assert.assertEquals(EMPTY_SET, extractSystemProperties("get_sp(\"a.b.c.key\" + var)"));
-    }
-
-    @Test
-    public void testExtractSystemPropertiesNoMatchConcatDoubleQuote() throws Exception {
-        Assert.assertEquals(EMPTY_SET, extractSystemProperties("get_sp(\"a.b.c.key\" + \"hello\")"));
+    public void testExtractSystemPropertiesWhenConcatDoubleQuote() throws Exception {
+        Assert.assertEquals(props3, extractSystemProperties("get_sp(\"a.b.c.key\" + \"d.e.f.key\")"));
     }
 
     @Test
@@ -154,11 +141,6 @@ public class ExpressionUtilsTest {
     public void testExtractSystemPropertiesMixedDoubleQuote() throws Exception {
         Assert.assertEquals(props2,
                 extractSystemProperties("get(get_sp(\"a.b.c.key\"), get_sp(\"d.e.f.key\", default_expression))"));
-    }
-
-    @Test
-    public void testExtractSystemPropertiesNoMatchMixedQuotes() throws Exception {
-        Assert.assertEquals(EMPTY_SET, extractSystemProperties("get_sp(\"a.b.c.key')"));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +168,11 @@ public class StepExecutionData extends AbstractExecutionData {
             // set the start step of the given ref as the next step to execute
             // (in the new running execution plan that will be set)
             runEnv.putNextStepPosition(executionRuntimeServices.getSubFlowBeginStep(refId));
+
+            Set<String> unauthorizedFlows = executionRuntimeServices.getUnauthorizedFlows();
+            if (unauthorizedFlows != null && unauthorizedFlows.contains(refId)) {
+                throw new RuntimeException("Current user is not allowed to execute this step.");
+            }
 
             putStepNavigationOptions(runEnv, stepNavigationOptions, nodeName);
         } catch (RuntimeException e) {
@@ -352,9 +358,9 @@ public class StepExecutionData extends AbstractExecutionData {
     }
 
     private void handleRobotGroup(RobotGroupStatement robotGroup,
-            Context flowContext,
-            RunEnvironment runEnv,
-            ExecutionRuntimeServices execRuntimeServices) {
+                                  Context flowContext,
+                                  RunEnvironment runEnv,
+                                  ExecutionRuntimeServices execRuntimeServices) {
         String robotGroupValue = DEFAULT_ROBOT_GROUP;
         if (robotGroup != null) {
             robotGroupValue = computeWorkerValue(robotGroup.getFunctionDependencies(),
@@ -391,8 +397,8 @@ public class StepExecutionData extends AbstractExecutionData {
 
     private Double getRoiValue(String stepExecutableResult, List<NavigationOptions> stepNavigationOptions,
                                Map<String, Value> flowVariables) {
-        if (isNotEmpty(stepExecutableResult) &&  stepNavigationOptions != null) {
-            for (NavigationOptions navigationOptions: stepNavigationOptions) {
+        if (isNotEmpty(stepExecutableResult) && stepNavigationOptions != null) {
+            for (NavigationOptions navigationOptions : stepNavigationOptions) {
                 if (navigationOptions.getName().equals(stepExecutableResult)) {
                     Serializable roi = navigationOptions.getOptions().get(LanguageEventData.ROI);
                     if (roi instanceof String) {
