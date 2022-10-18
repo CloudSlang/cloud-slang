@@ -748,6 +748,7 @@
                         <nexusUrl>https://oss.sonatype.org</nexusUrl>
                         <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+                        <stagingRepositoryId>${project.artifactId}-${project.version}</stagingRepositoryId>
                     </configuration>
                 </plugin>
             </plugins>
