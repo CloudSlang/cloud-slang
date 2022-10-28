@@ -342,13 +342,13 @@
             <dependency>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-core</artifactId>
-                <version>3.4.2</version>
+                <version>4.9.0</version>
             </dependency>
 
             <dependency>
                 <groupId>com.mattbertolini</groupId>
                 <artifactId>liquibase-slf4j</artifactId>
-                <version>1.2.1</version>
+                <version>4.0.0</version>
             </dependency>
 
             <dependency>
@@ -588,14 +588,14 @@
                                 <ignoredUnusedDeclaredDependencies combine.children="append">
                                     <ignoredUnusedDeclaredDependency>io.cloudslang:score-all:jar:${score.version}
                                     </ignoredUnusedDeclaredDependency>
-                                    <ignoredUnusedDeclaredDependency>com.mattbertolini:liquibase-slf4j:jar:1.2.1
+                                    <ignoredUnusedDeclaredDependency>com.mattbertolini:liquibase-slf4j:jar:4.0.0
                                     </ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>com.h2database:h2:jar:${h2.version}
                                     </ignoredUnusedDeclaredDependency>
 
                                     <ignoredUnusedDeclaredDependency>org.python:jython-standalone:jar:2.7.2
                                     </ignoredUnusedDeclaredDependency>
-                                    <ignoredUnusedDeclaredDependency>org.liquibase:liquibase-core:jar:3.4.2
+                                    <ignoredUnusedDeclaredDependency>org.liquibase:liquibase-core:jar:4.9.0
                                     </ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>log4j:log4j:jar:1.2.17
                                     </ignoredUnusedDeclaredDependency>
