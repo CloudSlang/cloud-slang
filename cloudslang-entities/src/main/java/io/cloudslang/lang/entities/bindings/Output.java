@@ -40,6 +40,15 @@ public class Output extends InOutParam {
         super(name, value, scriptFunctions, systemPropertyDependencies);
     }
 
+    public Output(
+            String name,
+            Value value,
+            Set<ScriptFunction> scriptFunctions,
+            Set<String> systemPropertyDependencies,
+            Set<String> variableSystemPropertyDependencies) {
+        super(name, value, scriptFunctions, systemPropertyDependencies, variableSystemPropertyDependencies);
+    }
+
     public boolean hasRobotProperty() {
         return robot != null;
     }

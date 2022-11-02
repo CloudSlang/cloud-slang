@@ -66,6 +66,18 @@ public class Argument extends InOutParam {
         this.prompt = prompt;
     }
 
+    public Argument(String name,
+                    Value value,
+                    Set<ScriptFunction> functionDependencies,
+                    Set<String> systemPropertyDependencies,
+                    Set<String> variableSystemPropertyDependencies,
+                    boolean privateArgument,
+                    Prompt prompt) {
+        super(name, value, functionDependencies, systemPropertyDependencies, variableSystemPropertyDependencies);
+        this.privateArgument = privateArgument;
+        this.prompt = prompt;
+    }
+
     /**
      * only here to satisfy serialization libraries
      */

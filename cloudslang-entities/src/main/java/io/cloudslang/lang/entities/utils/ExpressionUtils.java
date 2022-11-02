@@ -9,11 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.utils;
 
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -31,6 +34,7 @@ import static io.cloudslang.lang.entities.constants.Regex.CS_TO_UPPER_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.EXPRESSION_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX_WITH_DEFAULT;
+import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITHOUT_QUOTES;
@@ -38,7 +42,6 @@ import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_WITHOUT_QUOTES;
 import static java.util.regex.Pattern.compile;
-import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX;
 
 /**
  * @author Bonczidai Levente
@@ -110,6 +113,20 @@ public final class ExpressionUtils {
         if (properties.isEmpty()) {
             properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITHOUT_QUOTES, expression, 1));
             properties.addAll(matchFunction(SYSTEM_PROPERTY_PATTERN_WITH_DEFAULT_WITHOUT_QUOTES, expression, 1));
+        }
+        return properties;
+    }
+
+    public static Set<String> extractVariableSystemProperties(String expression, List<Argument> arguments) {
+        Set<String> properties = new HashSet<>();
+
+        Matcher getSpVarMatcher = GET_SP_VAR_PATTERN.matcher(expression);
+        if (getSpVarMatcher.matches()) {
+            String inputName = getSpVarMatcher.group(1);
+            arguments.stream()
+                    .filter(arg -> StringUtils.equals(arg.getName(), inputName))
+                    .findFirst()
+                    .ifPresent(argument -> properties.add(argument.getValue().toString()));
         }
         return properties;
     }

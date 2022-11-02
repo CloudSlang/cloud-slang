@@ -14,11 +14,13 @@ import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.entities.bindings.Argument;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +49,21 @@ public class TransformersHandler {
     public Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers,
                                                      List<RuntimeException> errors, String errorMessagePrefix,
                                                      SensitivityLevel sensitivityLevel) {
+        return runTransformers(rawData, scopeTransformers, errors, errorMessagePrefix, sensitivityLevel,
+                Collections.emptyList());
+    }
+
+    public Map<String, Serializable> runTransformers(Map<String, Object> rawData, List<Transformer> scopeTransformers,
+                                                     List<RuntimeException> errors, String errorMessagePrefix,
+                                                     SensitivityLevel sensitivityLevel, List<Argument> arguments) {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
             Object value = rawData.get(key);
             try {
                 @SuppressWarnings("unchecked")
-                TransformModellingResult transformModellingResult = transformer.transform(value, sensitivityLevel);
+                TransformModellingResult transformModellingResult = transformer.transform(value, sensitivityLevel,
+                        arguments);
                 Object data = transformModellingResult.getTransformedData();
                 if (data != null) {
                     transformedData.put(key, (Serializable) data);

@@ -17,6 +17,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.entities.bindings.Argument;
 
 import java.util.List;
 
@@ -25,6 +26,11 @@ public interface Transformer<F, T> {
     TransformModellingResult<T> transform(F rawData);
 
     TransformModellingResult<T> transform(F rawData, SensitivityLevel sensitivityLevel);
+
+    default TransformModellingResult<T> transform(F rawData, SensitivityLevel sensitivityLevel,
+                                                  List<Argument> arguments) {
+        return transform(rawData, sensitivityLevel);
+    }
 
     List<Scope> getScopes();
 

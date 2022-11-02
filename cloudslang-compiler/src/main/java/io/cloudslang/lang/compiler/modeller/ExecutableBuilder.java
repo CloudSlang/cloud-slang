@@ -61,23 +61,23 @@ import static ch.lambdaj.Lambda.on;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_EXTERNAL_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ROBOT_GROUP;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_SETTINGS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SEQ_STEPS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKER_GROUP;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.WORKFLOW_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
+import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationTarget;
 import static io.cloudslang.lang.entities.ScoreLangConstants.FAILURE_RESULT;
 import static io.cloudslang.lang.entities.ScoreLangConstants.LOOP_KEY;
 import static io.cloudslang.lang.entities.ScoreLangConstants.NAMESPACE_DELIMITER;
 import static io.cloudslang.lang.entities.ScoreLangConstants.SUCCESS_RESULT;
 import static io.cloudslang.lang.entities.ScoreLangConstants.WARNING_RESULT;
-import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationStepName;
-import static io.cloudslang.lang.compiler.utils.SlangSourceUtils.getNavigationTarget;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
@@ -640,9 +640,10 @@ public class ExecutableBuilder {
         preStepData.putAll(transformersHandler
                 .runTransformers(stepRawData, localPreStepTransformers, errors, errorMessagePrefix,
                         sensitivityLevel));
+        final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
         postStepData.putAll(transformersHandler
                 .runTransformers(stepRawData, localPostStepTransformers, errors, errorMessagePrefix,
-                        sensitivityLevel));
+                        sensitivityLevel, arguments));
 
         replaceOnFailureReference(postStepData, onFailureStepName);
 
@@ -650,7 +651,6 @@ public class ExecutableBuilder {
         String robotGroup = (String) stepRawData.get(SlangTextualKeys.ROBOT_GROUP);
 
         String refId = "";
-        final List<Argument> arguments = getArgumentsFromDoStep(preStepData);
         final Map<String, Object> doRawData = getRawDataFromDoStep(stepRawData);
 
         if (isNotEmpty(doRawData)) {
