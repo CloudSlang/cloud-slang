@@ -27,6 +27,7 @@ import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceIm
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.utils.PythonScriptGeneratorUtils;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -125,7 +127,7 @@ public class ScriptExecutorTest {
         scriptExecutor.executeScript(script, scriptInputValues, false);
 
         Map<String, Serializable> captured = callArgCaptor.getValue();
-        Assert.assertArrayEquals(scriptInputValues.keySet().toArray(), captured.keySet().toArray());
+        assertThat(scriptInputValues.keySet(), Matchers.containsInAnyOrder(captured.keySet().toArray()));
     }
 
     @Test
