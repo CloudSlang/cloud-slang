@@ -207,6 +207,7 @@ public class DoTransformer extends InOutTransformer implements Transformer<Map<S
                 ValueFactory.create(entryValue, sensitive, sensitivityLevel),
                 accumulator.getFunctionDependencies(),
                 accumulator.getSystemPropertyDependencies(),
+                accumulator.getVariableSystemPropertyDependencies(),
                 privateArgument,
                 prompt
         );

@@ -223,6 +223,10 @@ public class DependenciesHelper {
                 if (isNotEmpty(systemPropertyDependencies)) {
                     result.addAll(systemPropertyDependencies);
                 }
+                Set<String> variableSystemPropertyDependencies = inOutParam.getVariableSystemPropertyDependencies();
+                if (isNotEmpty(variableSystemPropertyDependencies)) {
+                    result.addAll(variableSystemPropertyDependencies);
+                }
             }
         }
         return result;
@@ -242,6 +246,7 @@ public class DependenciesHelper {
                     if (itemAsObject instanceof Output) {
                         Output itemAsOutput = (Output) itemAsObject;
                         result.addAll(itemAsOutput.getSystemPropertyDependencies());
+                        result.addAll(itemAsOutput.getVariableSystemPropertyDependencies());
                     } else {
                         throw new RuntimeException("For step: " + stepName +
                                 " - Incorrect type for post step data items.");

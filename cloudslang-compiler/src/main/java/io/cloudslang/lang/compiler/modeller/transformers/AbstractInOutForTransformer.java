@@ -9,18 +9,26 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class AbstractInOutForTransformer {
 
     protected Accumulator extractFunctionData(Serializable... values) {
+        return extractFunctionData(Collections.emptyList(), values);
+    }
+
+    protected Accumulator extractFunctionData(List<Argument> arguments, Serializable... values) {
         final Set<String> systemPropertyDependencies = new HashSet<>();
+        final Set<String> variableSystemPropertyDependencies = new HashSet<>();
         final Set<ScriptFunction> functionDependencies = new HashSet<>();
 
         for (Serializable value : values) {
@@ -40,6 +48,11 @@ public class AbstractInOutForTransformer {
                 boolean getSpVarFunctionFound = ExpressionUtils.matchGetSystemPropertyVariableFunction(expression);
                 if (getSpVarFunctionFound) {
                     functionDependencies.add(ScriptFunction.GET_SP_VAR);
+                    Set<String> variablePropertyDependencies = ExpressionUtils.extractVariableSystemProperties(
+                            expression, arguments);
+                    if (CollectionUtils.isNotEmpty(variablePropertyDependencies)) {
+                        variableSystemPropertyDependencies.addAll(variablePropertyDependencies);
+                    }
                 }
 
                 for (ScriptFunction function : ScriptFunction.values()) {
@@ -50,17 +63,26 @@ public class AbstractInOutForTransformer {
             }
         }
 
-        return new Accumulator(functionDependencies, systemPropertyDependencies);
+        return new Accumulator(functionDependencies, systemPropertyDependencies, variableSystemPropertyDependencies);
     }
 
     protected static class Accumulator {
 
         private final Set<ScriptFunction> functionDependencies;
         private final Set<String> systemPropertyDependencies;
+        private final Set<String> variableSystemPropertyDependencies;
 
         public Accumulator(Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies) {
             this.functionDependencies = functionDependencies;
             this.systemPropertyDependencies = systemPropertyDependencies;
+            this.variableSystemPropertyDependencies = Collections.emptySet();
+        }
+
+        public Accumulator(Set<ScriptFunction> functionDependencies, Set<String> systemPropertyDependencies,
+                           Set<String> variableSystemPropertyDependencies) {
+            this.functionDependencies = functionDependencies;
+            this.systemPropertyDependencies = systemPropertyDependencies;
+            this.variableSystemPropertyDependencies = variableSystemPropertyDependencies;
         }
 
         public Set<ScriptFunction> getFunctionDependencies() {
@@ -71,5 +93,8 @@ public class AbstractInOutForTransformer {
             return systemPropertyDependencies;
         }
 
+        public Set<String> getVariableSystemPropertyDependencies() {
+            return variableSystemPropertyDependencies;
+        }
     }
 }
