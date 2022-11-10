@@ -19,6 +19,7 @@ import org.apache.commons.lang.Validate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -184,8 +185,8 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
         Validate.notNull(mandatoryKeySet);
         Validate.notNull(optionalKeySet);
 
-        Set<String> missingKeys = new HashSet<>();
-        Set<String> emptyValuesKeys = new HashSet<>();
+        Set<String> missingKeys = new TreeSet<>();
+        Set<String> emptyValuesKeys = new TreeSet<>();
         for (String reqKey : mandatoryKeySet) {
             String reqValue = tMap.get(reqKey);
             if (reqValue == null) {

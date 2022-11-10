@@ -78,7 +78,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
-                "Sequential operation step has the following missing tags: [object_path, action, id]");
+                "Sequential operation step has the following missing tags: [action, id, object_path]");
         assertEquals(expectedSteps, transform.getTransformedData());
     }
 
@@ -90,7 +90,7 @@ public class SeqStepsTransformerTest extends TransformersTestParent {
 
         assertThat(transform.getErrors(), hasSize(1));
         assertEquals(transform.getErrors().get(0).getMessage(),
-                "Sequential operation step has the following empty tags: [object_path, action, id]");
+                "Sequential operation step has the following empty tags: [action, id, object_path]");
         assertEquals(expectedSteps, transform.getTransformedData());
     }
 
