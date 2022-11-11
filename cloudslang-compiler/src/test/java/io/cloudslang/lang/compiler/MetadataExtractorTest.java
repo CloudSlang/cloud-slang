@@ -30,10 +30,10 @@ public class MetadataExtractorTest {
 
     private static final String NEWLINE = System.lineSeparator();
 
-    private static final String DESCRIPTION_AND_PREREQUISITES = "description: " + NEWLINE +
+    private static final String DESCRIPTION = "description: " + NEWLINE +
             "  Parses the given JSON input to retrieve the" + NEWLINE +
-            "  corresponding value addressed by the json_path input." + NEWLINE +
-            "prerequisites: jenkinsapi Python module";
+            "  corresponding value addressed by the json_path input.";
+    private static final String PREREQUISITES = "prerequisites: jenkinsapi Python module";
     private static final String SOME_OTHER_RESULT = "SOME_OTHER_RESULT";
 
     @Autowired
@@ -70,7 +70,8 @@ public class MetadataExtractorTest {
         String metadataToPrint = metadata.prettyPrint();
         Assert.assertNotNull(metadataToPrint);
         Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));
-        Assert.assertTrue(metadataToPrint.contains(DESCRIPTION_AND_PREREQUISITES));
+        Assert.assertTrue(metadataToPrint.contains(DESCRIPTION));
+        Assert.assertTrue(metadataToPrint.contains(PREREQUISITES));
         Assert.assertTrue(metadataToPrint.contains(SOME_OTHER_RESULT));
         Assert.assertFalse(metadataToPrint.contains(SOME_OTHER_RESULT + ":"));
     }

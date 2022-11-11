@@ -40,10 +40,10 @@ import static org.mockito.Mockito.mock;
 @ContextConfiguration(classes = {MetadataHelperTest.Config.class})
 public class MetadataHelperTest {
 
-    private static final String DESCRIPTION_AND_PREREQUISITES = "description: " + System.lineSeparator() +
+    private static final String DESCRIPTION = "description: " + System.lineSeparator() +
             "  Parses the given JSON input to retrieve the" + System.lineSeparator() +
-            "  corresponding value addressed by the json_path input." + System.lineSeparator() +
-            "prerequisites: jenkinsapi Python module";
+            "  corresponding value addressed by the json_path input.";
+    private static final String PREREQUISITES = "prerequisites: jenkinsapi Python module";
     private static final String JSON_INPUT_VALUE =
             "json_input: JSON data input - Example: '{\"k1\": {\"k2\": [\"v1\", \"v2\"]}}'";
     private static final String PREREQUISITES_MISSING = "description: " + System.lineSeparator() +
@@ -74,7 +74,8 @@ public class MetadataHelperTest {
         String metadataToPrint = metadataHelper.extractMetadata(new File(flowFilePath));
         Assert.assertNotNull(metadataToPrint);
         Assert.assertFalse(metadataToPrint.contains("io.cloudslang.lang.compiler.modeller.model.Metadata"));
-        Assert.assertTrue(metadataToPrint.contains(DESCRIPTION_AND_PREREQUISITES));
+        Assert.assertTrue(metadataToPrint.contains(DESCRIPTION));
+        Assert.assertTrue(metadataToPrint.contains(PREREQUISITES));
         Assert.assertTrue(metadataToPrint.contains(SOME_OTHER_RESULT));
         Assert.assertFalse(metadataToPrint.contains(SOME_OTHER_RESULT + ":"));
     }
