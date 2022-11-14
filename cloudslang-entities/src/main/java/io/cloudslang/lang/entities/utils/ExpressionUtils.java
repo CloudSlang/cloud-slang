@@ -149,7 +149,7 @@ public final class ExpressionUtils {
             String inputName = noQuotesMatcher.group(1);
             return arguments.stream()
                     .filter(arg -> StringUtils.equals(arg.getName(), inputName) && arg.getValue() != null)
-                    .map(arg -> arg.getValue().toString())
+                    .map(arg -> arg.getValue().get().toString())
                     .findFirst()
                     .orElse(null);
         }
@@ -159,7 +159,7 @@ public final class ExpressionUtils {
     private static Optional<String> getValueForInputName(List<Argument> arguments, String inputName) {
         return arguments.stream()
                 .filter(arg -> StringUtils.equals(arg.getName(), inputName) && arg.getValue() != null)
-                .map(arg -> arg.getValue().toString())
+                .map(arg -> arg.getValue().get().toString())
                 .findFirst();
     }
 
