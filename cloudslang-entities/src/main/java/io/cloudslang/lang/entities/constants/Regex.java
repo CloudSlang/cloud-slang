@@ -102,7 +102,11 @@ public class Regex {
 
     public static final String DESCRIPTION_EMPTY_LINE = "(\\s*)(#!)(\\s*)";
 
-    // get_sp_var(flow_input)
-    public static final String GET_SP_VAR_REGEX = "get_sp_var\\(\\s*(.+)\\s*\\)";
+    // get_sp_var('flow_input')
+    public static final String GET_SP_VAR_REGEX_WITH_SINGLE_QUOTES = "get_sp_var\\(\\s*'(.+)'\\s*\\)";
+    // get_sp_var("flow_input")
+    public static final String GET_SP_VAR_REGEX_WITH_DOUBLE_QUOTES = "get_sp_var\\(\\s*\"(.+)\"\\s*\\)";
+    // get_sp_var("flow_input")
+    public static final String GET_SP_VAR_REGEX_WITHOUT_QUOTES = "get_sp_var\\(\\s*(.+)\\s*\\)";
     //////////////// description end
 }
