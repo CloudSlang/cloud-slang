@@ -42,13 +42,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.runtime.RuntimeConstants.BRANCHES_CONTEXT_KEY;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.DEFAULT_ROI_VALUE;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_TOTAL_ROI;
+import static java.lang.Integer.parseInt;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.Validate.notNull;
 
 /**
@@ -87,24 +93,28 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             int parallelismLevel = executionRuntimeServices.getLevelParallelism() != null ?
                     (int) executionRuntimeServices.getLevelParallelism() : 0;
             executionRuntimeServices.setLevelParallelism(parallelismLevel + 1);
-
-            List<Value> splitData = parallelLoopBinding
-                .bindParallelLoopList(parallelLoopStatement, flowContext, runEnv.getSystemProperties(), nodeName);
-
-            fireEvent(
-                executionRuntimeServices,
-                ScoreLangConstants.EVENT_SPLIT_BRANCHES,
-                "parallel loop expression bound",
-                runEnv.getExecutionPath().getCurrentPath(),
-                LanguageEventData.StepType.STEP,
-                nodeName,
-                flowContext.getImmutableViewOfVariables(),
-                Pair.of(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) splitData));
+            List<Value> splitData = handleFirstIteration(parallelLoopStatement, runEnv, executionRuntimeServices,
+                    nodeName, flowContext);
 
             runEnv.putNextStepPosition(nextStepId);
-            runEnv.getExecutionPath().down();
+            //todo take from contexts: executionRuntimeServices.getThrottleSize();
+            // temporary taking throttle from system properties
+            final Integer throttleSize = Integer.getInteger("cloudslang.worker.parallelThrottleSize", null);
+            final int splitSize = splitData.size();
+            final int lanesToStart = calculateNumberOfLanesToStart(splitSize, throttleSize);
 
-            for (Value splitItem : splitData) {
+            // we start in reverse order to make sure that we have all the branches before starting the first ones, so
+            // in this manner we don't miss any branch
+            final List<Value> splitDataCurrentBulk = splitData.subList(0, lanesToStart);
+            final List<Value> splitDataLeftoversSublist = splitData.subList(lanesToStart, splitSize);
+
+            if (isNotEmpty(splitDataLeftoversSublist)) {
+                executionRuntimeServices.setSplitData(new ArrayList<>(splitDataLeftoversSublist));
+            } else {
+                executionRuntimeServices.removeSplitData();
+            }
+
+            for (Value splitItem : splitDataCurrentBulk) {
                 Context branchContext = (Context) SerializationUtils.clone(flowContext);
 
                 // first fire event
@@ -168,22 +178,22 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                                  Map<String, ResultNavigation> stepNavigationValues,
                              @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
         try {
-            runEnv.getExecutionPath().up();
             notNull(executionRuntimeServices.getLevelParallelism(), "Parallelism level can not be null");
             List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
             if ((int) executionRuntimeServices.getLevelParallelism() > 0) {
                 executionRuntimeServices.setLevelParallelism((int) executionRuntimeServices.getLevelParallelism() - 1);
             }
-            Context flowContext = runEnv.getStack().popContext();
 
+            handleLastIteration(runEnv, executionRuntimeServices);
+
+            Context flowContext = runEnv.getStack().popContext();
+            Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
             collectBranchesData(executionRuntimeServices, nodeName, branchesContext);
             Map<String, Value> outputBindingContext = new HashMap<>();
             outputBindingContext.put(
                 RuntimeConstants.BRANCHES_CONTEXT_KEY,
                 ValueFactory.create((Serializable) branchesContext)
             );
-
-            Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
             Map<String, Value> publishValues =
                 bindPublishValues(
                     runEnv,
@@ -366,5 +376,52 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             result.put(entry.getKey(), entry.getValue() == null ? null : entry.getValue().get());
         }
         return result;
+    }
+
+    /**
+     * Returns the number of lanes to start executing from the system context, depending on the throttle size value.
+     */
+    private int calculateNumberOfLanesToStart(int splitSize, Integer throttleSize) {
+        return throttleSize == null ?
+                splitSize : (splitSize % throttleSize == 0) ? throttleSize : (splitSize % throttleSize);
+    }
+
+    private List<Value> handleFirstIteration(LoopStatement parallelLoopStatement,
+                                             RunEnvironment runEnv,
+                                             ExecutionRuntimeServices executionRuntimeServices,
+                                             String nodeName,
+                                             Context flowContext) {
+
+        List<Value> splitData = (ArrayList<Value>) executionRuntimeServices.getSplitData();
+
+        // split data is not set for first iteration
+        if (isEmpty(splitData)) {
+            splitData = parallelLoopBinding.bindParallelLoopList(parallelLoopStatement, flowContext,
+                    runEnv.getSystemProperties(), nodeName);
+            executionRuntimeServices.setSplitDataSize(splitData.size());
+            fireEvent(
+                    executionRuntimeServices,
+                    ScoreLangConstants.EVENT_SPLIT_BRANCHES,
+                    "parallel loop expression bound",
+                    runEnv.getExecutionPath().getCurrentPath(),
+                    LanguageEventData.StepType.STEP,
+                    nodeName,
+                    flowContext.getImmutableViewOfVariables(),
+                    Pair.of(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) splitData));
+            runEnv.getExecutionPath().down();
+        }
+
+        return splitData;
+    }
+
+    private boolean handleLastIteration(RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices) {
+        String remainingBranches = executionRuntimeServices.getRemainingBranches();
+        if (isNotBlank(remainingBranches) && parseInt(remainingBranches) == 0) {
+            executionRuntimeServices.removeRemainingBranches();
+            runEnv.getExecutionPath().up();
+
+            return true;
+        }
+        return false;
     }
 }
