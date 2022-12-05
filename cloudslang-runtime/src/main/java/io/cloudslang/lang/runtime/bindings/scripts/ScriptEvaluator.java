@@ -45,10 +45,11 @@ public class ScriptEvaluator extends ScriptProcessor {
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def accessed(key):" +
             LINE_SEPARATOR + "  pass";
-    private static final boolean EXTERNAL_PYTHON = !Boolean.valueOf(
-            System.getProperty("use.jython.expressions", "true"));
-
-
+    private static final String PYTHON_SERVER = "python-server";
+    private static final String PYTHON = "python";
+    private static final String JYTHON = "jython";
+    private static final String PYTHON_EVALUATOR = System.getProperty("python.expressionsEval",
+            PYTHON_SERVER).toLowerCase();
     public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
 
     @Resource(name = "externalPythonRuntimeService")
@@ -63,10 +64,15 @@ public class ScriptEvaluator extends ScriptProcessor {
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
         try {
-            if (EXTERNAL_PYTHON) {
-                return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
-            } else {
-                return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
+            switch (PYTHON_EVALUATOR) {
+                //TODO add method for python server once the server is implemented; also copy for the default method
+                case PYTHON_SERVER:
+                case PYTHON:
+                    return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
+                case JYTHON:
+                    return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
+                default:
+                    return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error in evaluating expression: '" +
