@@ -126,11 +126,15 @@ public class ScriptEvaluator extends ScriptProcessor {
     public Value testExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies, long timeoutPeriod) {
         try {
-            if (EXTERNAL_PYTHON) {
-                return doTestExternalPython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
-
-            } else {
-                return doTestJython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
+            switch (PYTHON_EVALUATOR) {
+                //TODO add method for python server once the server is implemented; also copy for the default method
+                case PYTHON_SERVER:
+                case PYTHON:
+                    return doTestExternalPython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
+                case JYTHON:
+                    return doTestJython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
+                default:
+                    return doTestExternalPython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error in evaluating expression: '" +
