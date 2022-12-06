@@ -17,6 +17,7 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.api.python.enums.PythonStrategy;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
@@ -33,6 +34,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.cloudslang.runtime.api.python.enums.PythonStrategy.PYTHON_SERVER;
+import static io.cloudslang.runtime.api.python.enums.PythonStrategy.getPythonStrategy;
+
 /**
  * @author stoneo
  * @version $Id$
@@ -45,11 +49,8 @@ public class ScriptEvaluator extends ScriptProcessor {
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def accessed(key):" +
             LINE_SEPARATOR + "  pass";
-    private static final String PYTHON_SERVER = "python-server";
-    private static final String PYTHON = "python";
-    private static final String JYTHON = "jython";
-    private static final String PYTHON_EVALUATOR = System.getProperty("python.expressionsEval",
-            PYTHON_SERVER).toLowerCase();
+    private static final PythonStrategy PYTHON_EVALUATOR =
+            getPythonStrategy(System.getProperty("python.expressionsEval"), PYTHON_SERVER);
     public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
 
     @Resource(name = "externalPythonRuntimeService")
