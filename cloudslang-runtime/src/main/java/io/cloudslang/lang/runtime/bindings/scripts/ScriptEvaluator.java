@@ -17,6 +17,7 @@ import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.api.python.enums.PythonStrategy;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
@@ -33,6 +34,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.cloudslang.runtime.api.python.enums.PythonStrategy.PYTHON_SERVER;
+import static io.cloudslang.runtime.api.python.enums.PythonStrategy.getPythonStrategy;
+
 /**
  * @author stoneo
  * @version $Id$
@@ -45,10 +49,8 @@ public class ScriptEvaluator extends ScriptProcessor {
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def accessed(key):" +
             LINE_SEPARATOR + "  pass";
-    private static final boolean EXTERNAL_PYTHON = !Boolean.valueOf(
-            System.getProperty("use.jython.expressions", "true"));
-
-
+    private static final PythonStrategy PYTHON_EVALUATOR =
+            getPythonStrategy(System.getProperty("python.expressionsEval"), PYTHON_SERVER);
     public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
 
     @Resource(name = "externalPythonRuntimeService")
@@ -63,10 +65,15 @@ public class ScriptEvaluator extends ScriptProcessor {
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
         try {
-            if (EXTERNAL_PYTHON) {
-                return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
-            } else {
-                return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
+            switch (PYTHON_EVALUATOR) {
+                //TODO add method for python server once the server is implemented; also copy for the default method
+                case PYTHON_SERVER:
+                case PYTHON:
+                    return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
+                case JYTHON:
+                    return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
+                default:
+                    return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error in evaluating expression: '" +
@@ -120,11 +127,15 @@ public class ScriptEvaluator extends ScriptProcessor {
     public Value testExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies, long timeoutPeriod) {
         try {
-            if (EXTERNAL_PYTHON) {
-                return doTestExternalPython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
-
-            } else {
-                return doTestJython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
+            switch (PYTHON_EVALUATOR) {
+                //TODO add method for python server once the server is implemented; also copy for the default method
+                case PYTHON_SERVER:
+                case PYTHON:
+                    return doTestExternalPython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
+                case JYTHON:
+                    return doTestJython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
+                default:
+                    return doTestExternalPython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error in evaluating expression: '" +

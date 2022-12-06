@@ -58,7 +58,7 @@ import static java.util.Collections.singletonList;
 @ContextConfiguration(classes = OutputsBindingTest.Config.class)
 public class OutputsBindingTest {
     static {
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     private static final long DEFAULT_TIMEOUT = 10000;

@@ -40,7 +40,7 @@ import static org.python.google.common.collect.Lists.newArrayList;
 @RunWith(MockitoJUnitRunner.class)
 public class ParallelLoopBindingTest {
     static {
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     @SuppressWarnings("unchecked")

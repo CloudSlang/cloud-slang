@@ -66,7 +66,7 @@ import static org.python.google.common.collect.Sets.newHashSet;
 @ContextConfiguration(classes = ScriptEvaluatorTest.Config.class)
 public class ScriptEvaluatorTest {
     static {
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     private static String LINE_SEPARATOR = "\n";
