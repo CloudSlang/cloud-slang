@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class LoopsBindingTest {
     static {
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     @SuppressWarnings("unchecked")

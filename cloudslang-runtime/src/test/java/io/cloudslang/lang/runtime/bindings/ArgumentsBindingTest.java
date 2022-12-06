@@ -88,7 +88,7 @@ public class ArgumentsBindingTest {
                 PythonExecutionNotCachedEngine.class.getSimpleName());
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
 
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     @SuppressWarnings("unchecked")

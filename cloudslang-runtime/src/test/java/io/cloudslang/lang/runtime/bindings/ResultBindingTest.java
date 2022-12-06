@@ -55,7 +55,7 @@ import static java.util.Arrays.asList;
 @ContextConfiguration(classes = ResultBindingTest.Config.class)
 public class ResultBindingTest {
     static {
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     @SuppressWarnings("unchecked")
