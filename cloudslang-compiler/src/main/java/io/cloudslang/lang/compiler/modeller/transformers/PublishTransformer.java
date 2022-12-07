@@ -18,6 +18,7 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Output;
 
 import java.io.Serializable;
@@ -53,9 +54,10 @@ public class PublishTransformer extends AbstractOutputsTransformer implements Tr
     @Override
     void handleOutputProperties(List<Output> transformedData,
                                 Map.Entry<String, ?> entry, List<RuntimeException> errors,
-                                SensitivityLevel sensitivityLevel) {
+                                SensitivityLevel sensitivityLevel,
+                                List<Argument> arguments) {
         addOutput(transformedData,
-                createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry, sensitivityLevel),
+                createPropOutput((Map.Entry<String, Map<String, Serializable>>) entry, sensitivityLevel, arguments),
                 errors);
     }
 

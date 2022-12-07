@@ -9,12 +9,16 @@
  *******************************************************************************/
 package io.cloudslang.lang.entities.utils;
 
+import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +35,9 @@ import static io.cloudslang.lang.entities.constants.Regex.CS_TO_UPPER_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.EXPRESSION_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX_WITH_DEFAULT;
+import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX_WITHOUT_QUOTES;
+import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX_WITH_DOUBLE_QUOTES;
+import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX_WITH_SINGLE_QUOTES;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_DOUBLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_SINGLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITHOUT_QUOTES;
@@ -38,7 +45,6 @@ import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_SINGLE_QUOTE;
 import static io.cloudslang.lang.entities.constants.Regex.SYSTEM_PROPERTY_REGEX_WITH_DEFAULT_WITHOUT_QUOTES;
 import static java.util.regex.Pattern.compile;
-import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX;
 
 /**
  * @author Bonczidai Levente
@@ -72,7 +78,12 @@ public final class ExpressionUtils {
 
     private static final Map<ScriptFunction, Pattern> patternsMap = new HashMap<>();
 
-    private static final Pattern GET_SP_VAR_PATTERN = compile(GET_SP_VAR_REGEX, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern GET_SP_VAR_PATTERN_WITH_SINGLE_QUOTES =
+        compile(GET_SP_VAR_REGEX_WITH_SINGLE_QUOTES, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern GET_SP_VAR_PATTERN_WITH_DOUBLE_QUOTES =
+        compile(GET_SP_VAR_REGEX_WITH_DOUBLE_QUOTES, Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern GET_SP_VAR_PATTERN_WITHOUT_QUOTES =
+            compile(GET_SP_VAR_REGEX_WITHOUT_QUOTES, Pattern.UNICODE_CHARACTER_CLASS);
 
     static {
         addPattern(ScriptFunction.CHECK_EMPTY, CHECK_EMPTY_REGEX);
@@ -114,6 +125,44 @@ public final class ExpressionUtils {
         return properties;
     }
 
+    public static Set<String> extractVariableSystemProperties(String expression, List<Argument> arguments) {
+        Set<String> properties = new HashSet<>();
+
+        String inputName = getInputNameFromExpression(expression, arguments);
+        if (inputName != null) {
+            getValueForInputName(arguments, inputName).ifPresent(properties::add);
+        }
+        return properties;
+    }
+
+    private static String getInputNameFromExpression(String expression, List<Argument> arguments) {
+        Matcher singleQuotesMatcher = GET_SP_VAR_PATTERN_WITH_SINGLE_QUOTES.matcher(expression);
+        if (singleQuotesMatcher.matches()) {
+            return singleQuotesMatcher.group(1);
+        }
+        Matcher doubleQuotesMatcher = GET_SP_VAR_PATTERN_WITH_DOUBLE_QUOTES.matcher(expression);
+        if (doubleQuotesMatcher.matches()) {
+            return doubleQuotesMatcher.group(1);
+        }
+        Matcher noQuotesMatcher = GET_SP_VAR_PATTERN_WITHOUT_QUOTES.matcher(expression);
+        if (noQuotesMatcher.matches()) {
+            String inputName = noQuotesMatcher.group(1);
+            return arguments.stream()
+                    .filter(arg -> StringUtils.equals(arg.getName(), inputName) && arg.getValue() != null)
+                    .map(arg -> arg.getValue().get().toString())
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    private static Optional<String> getValueForInputName(List<Argument> arguments, String inputName) {
+        return arguments.stream()
+                .filter(arg -> StringUtils.equals(arg.getName(), inputName) && arg.getValue() != null)
+                .map(arg -> arg.getValue().get().toString())
+                .findFirst();
+    }
+
     public static boolean matchGetFunction(String text) {
         return matchPattern(GET_PATTERN_WITH_DEFAULT, text) || matchPattern(GET_PATTERN, text);
     }
@@ -146,6 +195,8 @@ public final class ExpressionUtils {
     }
 
     public static boolean matchGetSystemPropertyVariableFunction(String text) {
-        return matchPattern(GET_SP_VAR_PATTERN, text);
+        return matchPattern(GET_SP_VAR_PATTERN_WITH_SINGLE_QUOTES, text) ||
+                matchPattern(GET_SP_VAR_PATTERN_WITH_DOUBLE_QUOTES, text) ||
+                matchPattern(GET_SP_VAR_PATTERN_WITHOUT_QUOTES, text);
     }
 }

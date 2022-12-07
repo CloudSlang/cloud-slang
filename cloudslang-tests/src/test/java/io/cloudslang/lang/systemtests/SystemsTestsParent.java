@@ -102,7 +102,7 @@ public abstract class SystemsTestsParent {
         assertNull("python.executor.engine was configured before this test!!!!!!!", provideralAlreadyConfigured);
 
         System.setProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(), EventVerbosityLevel.DEFAULT.getValue());
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     @Autowired

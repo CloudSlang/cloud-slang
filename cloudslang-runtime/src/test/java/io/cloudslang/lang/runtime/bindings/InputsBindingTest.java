@@ -56,7 +56,7 @@ import static org.junit.Assert.assertThrows;
 @ContextConfiguration(classes = InputsBindingTest.Config.class)
 public class InputsBindingTest {
     static {
-        System.setProperty("use.jython.expressions", "true");
+        System.setProperty("python.expressionsEval", "jython");
     }
 
     @Autowired

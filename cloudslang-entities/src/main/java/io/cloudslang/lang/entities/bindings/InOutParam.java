@@ -31,16 +31,27 @@ public abstract class InOutParam implements Serializable {
     private Value value;
     private Set<ScriptFunction> functionDependencies;
     private Set<String> systemPropertyDependencies;
+    private Set<String> variableSystemPropertyDependencies;
 
     public InOutParam(
             String name,
             Value value,
             Set<ScriptFunction> functionDependencies,
             Set<String> systemPropertyDependencies) {
+        this(name, value, functionDependencies, systemPropertyDependencies, new HashSet<>());
+    }
+
+    public InOutParam(
+            String name,
+            Value value,
+            Set<ScriptFunction> functionDependencies,
+            Set<String> systemPropertyDependencies,
+            Set<String> variableSystemPropertyDependencies) {
         this.name = name;
         this.value = value;
         this.functionDependencies = functionDependencies;
         this.systemPropertyDependencies = systemPropertyDependencies;
+        this.variableSystemPropertyDependencies = variableSystemPropertyDependencies;
     }
 
     public InOutParam(String name, Value value) {
@@ -74,6 +85,10 @@ public abstract class InOutParam implements Serializable {
         return systemPropertyDependencies;
     }
 
+    public Set<String> getVariableSystemPropertyDependencies() {
+        return variableSystemPropertyDependencies;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -101,6 +116,7 @@ public abstract class InOutParam implements Serializable {
                 .append(value, that.value)
                 .append(functionDependencies, that.functionDependencies)
                 .append(systemPropertyDependencies, that.systemPropertyDependencies)
+                .append(variableSystemPropertyDependencies, that.variableSystemPropertyDependencies)
                 .isEquals();
     }
 
@@ -111,6 +127,7 @@ public abstract class InOutParam implements Serializable {
                 .append(value)
                 .append(functionDependencies)
                 .append(systemPropertyDependencies)
+                .append(variableSystemPropertyDependencies)
                 .toHashCode();
     }
 
