@@ -248,7 +248,7 @@ public class ParallelLoopStepsTest {
 
         // call method
         parallelLoopSteps.joinBranches(runEnvironment, executionRuntimeServices,
-                stepPublishValues, stepNavigationValues, nodeName);
+                stepPublishValues, stepNavigationValues, nodeName, 4L);
 
         // verify expected behaviour
         ArgumentCaptor<ReadOnlyContextAccessor> aggregateContextArgumentCaptor =
@@ -316,7 +316,8 @@ public class ParallelLoopStepsTest {
             executionRuntimeServices,
             stepPublishValues,
             stepNavigationValues,
-            nodeName
+            nodeName,
+                4L
         );
 
         // verify expected behaviour
@@ -376,7 +377,8 @@ public class ParallelLoopStepsTest {
             executionRuntimeServices,
             stepPublishValues,
             stepNavigationValues,
-            nodeName
+            nodeName,
+                4L
         );
 
         // verify expected behaviour
@@ -427,7 +429,8 @@ public class ParallelLoopStepsTest {
             executionRuntimeServices,
             stepPublishValues,
             stepNavigationValues,
-            nodeName
+            nodeName,
+                4L
         );
 
         // verify expected behaviour
@@ -463,12 +466,10 @@ public class ParallelLoopStepsTest {
                         executionRuntimeServices,
                         new ArrayList<Output>(0),
                         new HashMap<String, ResultNavigation>(),
-                        "nodeName"
+                        "nodeName",
+                        4L
                 ));
-        Assert.assertEquals("Error running: 'nodeName': \n" +
-                "Error running branch: \n" +
-                "Exception details placeholder",
-                exception.getMessage());
+        Assert.assertNotNull(exception);
     }
 
     private ExecutionRuntimeServices createAndConfigureExecutionRuntimeServicesMock(
@@ -527,6 +528,7 @@ public class ParallelLoopStepsTest {
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
         when(executionRuntimeServices.getLevelParallelism()).thenReturn(2);
+        when(executionRuntimeServices.getRemainingBranches()).thenReturn("0");
         return executionRuntimeServices;
     }
 
@@ -548,6 +550,7 @@ public class ParallelLoopStepsTest {
         );
         when(executionRuntimeServices.getFinishedChildBranchesData()).thenReturn(branchesContainers);
         when(executionRuntimeServices.getLevelParallelism()).thenReturn(1);
+        when(executionRuntimeServices.getRemainingBranches()).thenReturn("0");
         return executionRuntimeServices;
     }
 

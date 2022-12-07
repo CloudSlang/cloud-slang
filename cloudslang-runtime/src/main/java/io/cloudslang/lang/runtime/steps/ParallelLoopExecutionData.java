@@ -47,13 +47,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.cloudslang.lang.entities.ScoreLangConstants.CURRENT_STEP_ID_KEY;
+import static io.cloudslang.lang.entities.ScoreLangConstants.RUN_ENV;
 import static io.cloudslang.lang.runtime.RuntimeConstants.BRANCHES_CONTEXT_KEY;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.DEFAULT_ROI_VALUE;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_RUNTIME_SERVICES;
 import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUTION_TOTAL_ROI;
 import static java.lang.Integer.parseInt;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -76,7 +78,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
     private static final Logger logger = LogManager.getLogger(ParallelLoopExecutionData.class);
 
     public void addBranches(@Param(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY) LoopStatement parallelLoopStatement,
-                            @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+                            @Param(RUN_ENV) RunEnvironment runEnv,
                             @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
 
@@ -119,15 +121,15 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
                 // first fire event
                 fireEvent(
-                    executionRuntimeServices,
-                    ScoreLangConstants.EVENT_BRANCH_START,
-                    "parallel loop branch created",
-                    runEnv.getExecutionPath().getCurrentPath(),
-                    LanguageEventData.StepType.STEP,
-                    nodeName,
-                    branchContext.getImmutableViewOfVariables(),
-                    Pair.of(ScoreLangConstants.REF_ID, refId),
-                    Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
+                        executionRuntimeServices,
+                        ScoreLangConstants.EVENT_BRANCH_START,
+                        "parallel loop branch created",
+                        runEnv.getExecutionPath().getCurrentPath(),
+                        LanguageEventData.StepType.STEP,
+                        nodeName,
+                        branchContext.getImmutableViewOfVariables(),
+                        Pair.of(ScoreLangConstants.REF_ID, refId),
+                        Pair.of(RuntimeConstants.SPLIT_ITEM_KEY, splitItem));
                 // take path down one level
                 runEnv.getExecutionPath().down();
 
@@ -150,10 +152,10 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                         branchContext, new HashMap<>(), new HashMap<>());
 
                 createBranch(
-                    branchRuntimeEnvironment,
-                    executionRuntimeServices,
-                    refId,
-                    branchBeginStep);
+                        branchRuntimeEnvironment,
+                        executionRuntimeServices,
+                        refId,
+                        branchBeginStep);
 
                 // take path up level
                 runEnv.getExecutionPath().up();
@@ -165,75 +167,134 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
             updateCallArgumentsAndPushContextToStack(runEnv, flowContext, new HashMap<>(), new HashMap<>());
         } catch (RuntimeException e) {
             logger.error("There was an error running the add branches execution step of: \'" + nodeName +
-                "\'. Error is: " + e.getMessage());
+                    "\'. Error is: " + e.getMessage());
             throw new RuntimeException("Error running: " + nodeName + ": " + e.getMessage(), e);
         }
 
     }
 
-    public void joinBranches(@Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
+    public void joinBranches(@Param(RUN_ENV) RunEnvironment runEnv,
                              @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                              @Param(ScoreLangConstants.STEP_PUBLISH_KEY) List<Output> stepPublishValues,
                              @Param(ScoreLangConstants.STEP_NAVIGATION_KEY)
-                                 Map<String, ResultNavigation> stepNavigationValues,
-                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName) {
+                             Map<String, ResultNavigation> stepNavigationValues,
+                             @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+                             @Param(CURRENT_STEP_ID_KEY) Long currentStepId) {
         try {
             notNull(executionRuntimeServices.getLevelParallelism(), "Parallelism level can not be null");
-            List<Map<String, Serializable>> branchesContext = Lists.newArrayList();
             if ((int) executionRuntimeServices.getLevelParallelism() > 0) {
                 executionRuntimeServices.setLevelParallelism((int) executionRuntimeServices.getLevelParallelism() - 1);
             }
+            ArrayList<Map<String, Serializable>> temporaryBranchesContext =
+                    executionRuntimeServices.getParallelTemporaryContext();
+            collectBranchesData(executionRuntimeServices, nodeName, temporaryBranchesContext);
 
-            handleLastIteration(runEnv, executionRuntimeServices);
+            if (isLastIteration(executionRuntimeServices.getRemainingBranches())) {
+                // bind step results, outputs and handle navigation
+                handleLastIteration(
+                        runEnv,
+                        executionRuntimeServices,
+                        stepPublishValues,
+                        stepNavigationValues,
+                        nodeName,
+                        temporaryBranchesContext);
+            } else {
+                // fail only in the last iteration
+                executionRuntimeServices.removeStepErrorKey();
+                runEnv.putNextStepPosition(currentStepId);
+            }
 
-            Context flowContext = runEnv.getStack().popContext();
-            Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
-            collectBranchesData(executionRuntimeServices, nodeName, branchesContext);
-            Map<String, Value> outputBindingContext = new HashMap<>();
-            outputBindingContext.put(
-                RuntimeConstants.BRANCHES_CONTEXT_KEY,
-                ValueFactory.create((Serializable) branchesContext)
-            );
-            Map<String, Value> publishValues =
-                bindPublishValues(
-                    runEnv,
+            runEnv.getExecutionPath().forward();
+        } catch (RuntimeException e) {
+            logger.error("There was an error running the joinBranches execution step of: \'" + nodeName +
+                    "\'. Error is: " + e.getMessage());
+            throw new RuntimeException("Error running: \'" + nodeName + "\': \n" + e.getMessage(), e);
+        }
+    }
+
+    private List<Value> handleFirstIteration(LoopStatement parallelLoopStatement,
+                                             RunEnvironment runEnv,
+                                             ExecutionRuntimeServices executionRuntimeServices,
+                                             String nodeName,
+                                             Context flowContext) {
+
+        List<Value> splitData = (ArrayList<Value>) executionRuntimeServices.getSplitData();
+
+        // split data is not set for first iteration
+        if (isEmpty(splitData)) {
+            splitData = parallelLoopBinding.bindParallelLoopList(parallelLoopStatement, flowContext,
+                    runEnv.getSystemProperties(), nodeName);
+            executionRuntimeServices.setSplitDataSize(splitData.size());
+            executionRuntimeServices.setParallelTemporaryContext(Lists.newArrayList());
+            fireEvent(
                     executionRuntimeServices,
-                    stepPublishValues,
-                    stepNavigationValues,
+                    ScoreLangConstants.EVENT_SPLIT_BRANCHES,
+                    "parallel loop expression bound",
+                    runEnv.getExecutionPath().getCurrentPath(),
+                    LanguageEventData.StepType.STEP,
                     nodeName,
-                    outputBindingContext,
-                    globalContext
-                );
+                    flowContext.getImmutableViewOfVariables(),
+                    Pair.of(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) splitData));
+            runEnv.getExecutionPath().down();
+        }
 
-            flowContext.putVariables(publishValues);
+        return splitData;
+    }
 
-            String parallelLoopResult = getParallelLoopResult(branchesContext);
+    private void handleLastIteration(RunEnvironment runEnv,
+                                     ExecutionRuntimeServices executionRuntimeServices,
+                                     List<Output> stepPublishValues,
+                                     Map<String, ResultNavigation> stepNavigationValues,
+                                     String nodeName,
+                                     ArrayList<Map<String, Serializable>> temporaryBranchesContext) {
 
-            handleNavigationAndReturnValues(
+        executionRuntimeServices.removeRemainingBranches();
+        runEnv.getExecutionPath().up();
+
+        if (temporaryBranchesContext.size() < executionRuntimeServices.getSplitDataSize()) {
+            throw new RuntimeException("Exception occurred when running lane");
+        }
+
+        Context flowContext = runEnv.getStack().popContext();
+        Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
+        Map<String, Value> outputBindingContext = new HashMap<>();
+        outputBindingContext.put(
+                BRANCHES_CONTEXT_KEY,
+                ValueFactory.create(temporaryBranchesContext)
+        );
+        Map<String, Value> publishValues = bindPublishValues(
+                runEnv,
+                executionRuntimeServices,
+                stepPublishValues,
+                stepNavigationValues,
+                nodeName,
+                outputBindingContext,
+                globalContext
+        );
+
+        flowContext.putVariables(publishValues);
+
+        String parallelLoopResult = getParallelLoopResult(temporaryBranchesContext);
+
+        handleNavigationAndReturnValues(
                 runEnv,
                 executionRuntimeServices,
                 stepNavigationValues,
                 nodeName,
                 publishValues,
                 parallelLoopResult
-            );
+        );
 
-            runEnv.getStack().pushContext(flowContext);
-            runEnv.getExecutionPath().forward();
-        } catch (RuntimeException e) {
-            logger.error("There was an error running the joinBranches execution step of: \'" + nodeName +
-                "\'. Error is: " + e.getMessage());
-            throw new RuntimeException("Error running: \'" + nodeName + "\': \n" + e.getMessage(), e);
-        }
+        runEnv.getStack().pushContext(flowContext);
     }
 
     private void handleNavigationAndReturnValues(
-        RunEnvironment runEnv,
-        ExecutionRuntimeServices executionRuntimeServices,
-        Map<String, ResultNavigation> stepNavigationValues,
-        String nodeName,
-        Map<String, Value> publishValues,
-        String parallelLoopResult) {
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices executionRuntimeServices,
+            Map<String, ResultNavigation> stepNavigationValues,
+            String nodeName,
+            Map<String, Value> publishValues,
+            String parallelLoopResult) {
         // set the position of the next step - for the use of the navigation
         // find in the navigation values the correct next step position, according to the parallel loop result,
         // and set it
@@ -241,7 +302,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         if (navigation == null) {
             // should always have the executable response mapped to a navigation by the step, if not, it is an error
             throw new RuntimeException("Step: " + nodeName +
-                " has no matching navigation for the parallel loop result: " + parallelLoopResult);
+                    " has no matching navigation for the parallel loop result: " + parallelLoopResult);
         }
         Long nextStepPosition = navigation.getNextStepId();
         String presetResult = navigation.getPresetResult();
@@ -250,15 +311,15 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         ReturnValues returnValues = new ReturnValues(outputs, presetResult != null ? presetResult : parallelLoopResult);
 
         fireEvent(
-            executionRuntimeServices,
-            runEnv,
-            ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
-            "Parallel loop output binding finished",
-            LanguageEventData.StepType.STEP, nodeName,
-            new HashMap<String, Value>(),
-            Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
-            Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
-            Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition));
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.EVENT_JOIN_BRANCHES_END,
+                "Parallel loop output binding finished",
+                LanguageEventData.StepType.STEP, nodeName,
+                new HashMap<String, Value>(),
+                Pair.of(LanguageEventData.OUTPUTS, (Serializable) publishValues),
+                Pair.of(LanguageEventData.RESULT, returnValues.getResult()),
+                Pair.of(LanguageEventData.NEXT_STEP_POSITION, nextStepPosition));
 
         runEnv.putReturnValues(returnValues);
         runEnv.putNextStepPosition(nextStepPosition);
@@ -278,75 +339,77 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
     }
 
     private Map<String, Value> bindPublishValues(
-        RunEnvironment runEnv,
-        ExecutionRuntimeServices executionRuntimeServices,
-        List<Output> stepPublishValues,
-        Map<String, ResultNavigation> stepNavigationValues,
-        String nodeName,
-        Map<String, Value> publishContext,
-        Map<String, Value> globalContext) {
+            RunEnvironment runEnv,
+            ExecutionRuntimeServices executionRuntimeServices,
+            List<Output> stepPublishValues,
+            Map<String, ResultNavigation> stepNavigationValues,
+            String nodeName,
+            Map<String, Value> publishContext,
+            Map<String, Value> globalContext) {
 
         fireEvent(
-            executionRuntimeServices,
-            runEnv,
-            ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
-            "Parallel loop output binding started",
-            LanguageEventData.StepType.STEP,
-            nodeName,
-            new HashMap<String, Value>(),
-            Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
-            Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
+                executionRuntimeServices,
+                runEnv,
+                ScoreLangConstants.EVENT_JOIN_BRANCHES_START,
+                "Parallel loop output binding started",
+                LanguageEventData.StepType.STEP,
+                nodeName,
+                new HashMap<String, Value>(),
+                Pair.of(ScoreLangConstants.STEP_PUBLISH_KEY, (Serializable) stepPublishValues),
+                Pair.of(ScoreLangConstants.STEP_NAVIGATION_KEY, (Serializable) stepNavigationValues));
 
         ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(publishContext, globalContext);
         return outputsBinding.bindOutputs(
-            outputsBindingAccessor,
-            runEnv.getSystemProperties(),
-            stepPublishValues
+                outputsBindingAccessor,
+                runEnv.getSystemProperties(),
+                stepPublishValues
         );
     }
 
     private void collectBranchesData(
-        ExecutionRuntimeServices executionRuntimeServices,
-        String nodeName,
-        List<Map<String, Serializable>> branchesContext) {
+            ExecutionRuntimeServices executionRuntimeServices,
+            String nodeName,
+            List<Map<String, Serializable>> branchesContext) {
 
         List<EndBranchDataContainer> branches = executionRuntimeServices.getFinishedChildBranchesData();
         Double roiBeforeParallelLoop = executionRuntimeServices.getRoiValue();
         for (EndBranchDataContainer branch : branches) {
-            checkExceptionInBranch(branch);
+            boolean isBranchException = checkExceptionInBranch(branch);
 
-            Map<String, Serializable> branchContext = branch.getContexts();
-            RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(ScoreLangConstants.RUN_ENV);
-            Map<String, Value> initialBranchContext =
-                branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables();
-            Map<String, Serializable> branchContextMap = convert(initialBranchContext);
-            ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
-            String branchResult = executableReturnValues.getResult();
-            branchContextMap.put(ScoreLangConstants.BRANCH_RESULT_KEY, branchResult);
-            branchesContext.add(branchContextMap);
+            if (!isBranchException) {
+                Map<String, Serializable> branchContext = branch.getContexts();
+                RunEnvironment branchRuntimeEnvironment = (RunEnvironment) branchContext.get(RUN_ENV);
+                Map<String, Value> initialBranchContext =
+                        branchRuntimeEnvironment.getStack().popContext().getImmutableViewOfVariables();
+                Map<String, Serializable> branchContextMap = convert(initialBranchContext);
+                ReturnValues executableReturnValues = branchRuntimeEnvironment.removeReturnValues();
+                String branchResult = executableReturnValues.getResult();
+                branchContextMap.put(ScoreLangConstants.BRANCH_RESULT_KEY, branchResult);
+                branchesContext.add(branchContextMap);
 
-            // up branch path
-            branchRuntimeEnvironment.getExecutionPath().up();
+                // up branch path
+                branchRuntimeEnvironment.getExecutionPath().up();
 
-            // The ROI value for each branch does already contain any previous ROI value, so we need to subtract it
-            Double branchRoi = (Double) branch.getSystemContext()
-                    .getOrDefault(EXECUTION_TOTAL_ROI, DEFAULT_ROI_VALUE) - roiBeforeParallelLoop;
-            executionRuntimeServices.addRoiValue(branchRoi);
+                // The ROI value for each branch does already contain any previous ROI value, so we need to subtract it
+                Double branchRoi = (Double) branch.getSystemContext()
+                        .getOrDefault(EXECUTION_TOTAL_ROI, DEFAULT_ROI_VALUE) - roiBeforeParallelLoop;
+                executionRuntimeServices.addRoiValue(branchRoi);
 
-            fireEvent(
-                executionRuntimeServices,
-                branchRuntimeEnvironment,
-                ScoreLangConstants.EVENT_BRANCH_END,
-                "Parallel loop branch ended",
-                LanguageEventData.StepType.STEP,
-                nodeName,
-                initialBranchContext,
-                Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
-            );
+                fireEvent(
+                        executionRuntimeServices,
+                        branchRuntimeEnvironment,
+                        ScoreLangConstants.EVENT_BRANCH_END,
+                        "Parallel loop branch ended",
+                        LanguageEventData.StepType.STEP,
+                        nodeName,
+                        initialBranchContext,
+                        Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
+                );
+            }
         }
     }
 
-    private void checkExceptionInBranch(EndBranchDataContainer branch) {
+    private boolean checkExceptionInBranch(EndBranchDataContainer branch) {
         //first we check that no exception was thrown during the execution of the branch
         String branchException = branch.getException();
         if (StringUtils.isNotEmpty(branchException)) {
@@ -357,8 +420,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 branchId = branchExecutionRuntimeServices.getBranchId();
             }
             logger.error("There was an error running branch: " + branchId + " Error is: " + branchException);
-            throw new RuntimeException(BRANCH_EXCEPTION_PREFIX + ": \n" + branchException);
+            return true;
         }
+        return false;
     }
 
     private void createBranch(RunEnvironment runEnv,
@@ -366,7 +430,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                               String refId,
                               Long branchBeginStep) {
         Map<String, Serializable> branchContext = new HashMap<>();
-        branchContext.put(ScoreLangConstants.RUN_ENV, runEnv);
+        branchContext.put(RUN_ENV, runEnv);
         executionRuntimeServices.addBranchForParallelLoop(branchBeginStep, refId, branchContext);
     }
 
@@ -386,42 +450,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 splitSize : (splitSize % throttleSize == 0) ? throttleSize : (splitSize % throttleSize);
     }
 
-    private List<Value> handleFirstIteration(LoopStatement parallelLoopStatement,
-                                             RunEnvironment runEnv,
-                                             ExecutionRuntimeServices executionRuntimeServices,
-                                             String nodeName,
-                                             Context flowContext) {
-
-        List<Value> splitData = (ArrayList<Value>) executionRuntimeServices.getSplitData();
-
-        // split data is not set for first iteration
-        if (isEmpty(splitData)) {
-            splitData = parallelLoopBinding.bindParallelLoopList(parallelLoopStatement, flowContext,
-                    runEnv.getSystemProperties(), nodeName);
-            executionRuntimeServices.setSplitDataSize(splitData.size());
-            fireEvent(
-                    executionRuntimeServices,
-                    ScoreLangConstants.EVENT_SPLIT_BRANCHES,
-                    "parallel loop expression bound",
-                    runEnv.getExecutionPath().getCurrentPath(),
-                    LanguageEventData.StepType.STEP,
-                    nodeName,
-                    flowContext.getImmutableViewOfVariables(),
-                    Pair.of(LanguageEventData.BOUND_PARALLEL_LOOP_EXPRESSION, (Serializable) splitData));
-            runEnv.getExecutionPath().down();
-        }
-
-        return splitData;
-    }
-
-    private boolean handleLastIteration(RunEnvironment runEnv, ExecutionRuntimeServices executionRuntimeServices) {
-        String remainingBranches = executionRuntimeServices.getRemainingBranches();
-        if (isNotBlank(remainingBranches) && parseInt(remainingBranches) == 0) {
-            executionRuntimeServices.removeRemainingBranches();
-            runEnv.getExecutionPath().up();
-
-            return true;
-        }
-        return false;
+    private boolean isLastIteration(String remainingBranches) {
+        return isNotBlank(remainingBranches) && parseInt(remainingBranches) == 0;
     }
 }
