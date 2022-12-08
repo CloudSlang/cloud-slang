@@ -99,14 +99,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     nodeName, flowContext);
 
             runEnv.putNextStepPosition(nextStepId);
-            //todo take from contexts: executionRuntimeServices.getThrottleSize();
+            // todo take from contexts: executionRuntimeServices.getThrottleSize();
             // temporary taking throttle from system properties
             final Integer throttleSize = Integer.getInteger("cloudslang.worker.parallelThrottleSize", null);
             final int splitSize = splitData.size();
             final int lanesToStart = calculateNumberOfLanesToStart(splitSize, throttleSize);
-
-            // we start in reverse order to make sure that we have all the branches before starting the first ones, so
-            // in this manner we don't miss any branch
             final List<Value> splitDataCurrentBulk = splitData.subList(0, lanesToStart);
             final List<Value> splitDataLeftoversSublist = splitData.subList(lanesToStart, splitSize);
 
