@@ -248,10 +248,10 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                                      String nodeName,
                                      ArrayList<Map<String, Serializable>> temporaryBranchesContext) {
 
-        executionRuntimeServices.removeRemainingBranches();
+        clearExecutionRuntimeForNextStep(executionRuntimeServices);
         runEnv.getExecutionPath().up();
 
-        if (temporaryBranchesContext.size() < executionRuntimeServices.getSplitDataSize()) {
+        if (temporaryBranchesContext.size() < executionRuntimeServices.removeSplitDataSize()) {
             throw new RuntimeException("Exception occurred when running lane");
         }
 
@@ -275,7 +275,6 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         flowContext.putVariables(publishValues);
 
         String parallelLoopResult = getParallelLoopResult(temporaryBranchesContext);
-
         handleNavigationAndReturnValues(
                 runEnv,
                 executionRuntimeServices,
@@ -452,5 +451,12 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
     private boolean isLastIteration(String remainingBranches) {
         return isNotBlank(remainingBranches) && parseInt(remainingBranches) == 0;
+    }
+
+    private void clearExecutionRuntimeForNextStep(ExecutionRuntimeServices executionRuntimeServices) {
+        executionRuntimeServices.removeRemainingBranches();
+        executionRuntimeServices.removeParallelTemporaryContext();
+        executionRuntimeServices.removeSplitData();
+        executionRuntimeServices.removeThrottleSize();
     }
 }
