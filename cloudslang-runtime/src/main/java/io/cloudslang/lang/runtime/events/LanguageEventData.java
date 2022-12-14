@@ -55,6 +55,7 @@ public class LanguageEventData extends HashMap<String, Serializable> {
     public static final String PRODUCER_WORKER_UUID = "PRODUCER_WORKER_UUID";
     public static final String ROBOT_UUID = "ROBOT_UUID";
     public static final String ROBOT_GROUP_NAME = "ROBOT_GROUP_NAME";
+    public static final String BRANCH_ID = "BRANCH_ID";
 
     public enum StepType {
         FLOW("flow"),
@@ -154,6 +155,14 @@ public class LanguageEventData extends HashMap<String, Serializable> {
 
     public void setPath(String path) {
         put(PATH, path);
+    }
+
+    public String getBranchId() {
+        return (String) get(BRANCH_ID);
+    }
+
+    public void setBranchId(String branchId) {
+        put(BRANCH_ID, branchId);
     }
 
     public String getResult() {
