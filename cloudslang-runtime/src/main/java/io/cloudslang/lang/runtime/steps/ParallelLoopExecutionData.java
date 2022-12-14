@@ -56,6 +56,7 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.EXECUT
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -248,8 +249,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         clearExecutionRuntimeForNextStep(executionRuntimeServices);
         runEnv.getExecutionPath().up();
 
-        if (temporaryBranchesContext.size() < executionRuntimeServices.removeSplitDataSize()) {
-            throw new RuntimeException("Exception occurred when running lane");
+        if (isTrue(executionRuntimeServices.removeBranchErrorKey())) {
+            throw new RuntimeException("Exception occurred during lane execution");
         }
 
         Context flowContext = runEnv.getStack().popContext();
@@ -401,6 +402,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                         initialBranchContext,
                         Pair.of(RuntimeConstants.BRANCH_RETURN_VALUES_KEY, executableReturnValues)
                 );
+            } else {
+                executionRuntimeServices.setBranchErrorKey();
             }
         }
     }
@@ -454,6 +457,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         executionRuntimeServices.removeRemainingBranches();
         executionRuntimeServices.removeParallelTemporaryContext();
         executionRuntimeServices.removeSplitData();
+        executionRuntimeServices.removeSplitDataSize();
         executionRuntimeServices.removeThrottleSize();
     }
 }

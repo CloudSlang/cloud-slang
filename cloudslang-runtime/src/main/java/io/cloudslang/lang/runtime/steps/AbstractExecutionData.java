@@ -115,6 +115,7 @@ public abstract class AbstractExecutionData {
         eventData.setTimeStamp(new Date());
         eventData.setExecutionId(runtimeServices.getExecutionId());
         eventData.setPath(path);
+        eventData.setBranchId(runtimeServices.getBranchId());
         return eventData;
     }
 
