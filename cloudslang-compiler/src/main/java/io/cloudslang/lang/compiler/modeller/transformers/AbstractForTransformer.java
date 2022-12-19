@@ -9,188 +9,20 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler.modeller.transformers;
 
-import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
-import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
-import io.cloudslang.lang.entities.ListLoopStatement;
-import io.cloudslang.lang.entities.ListParallelLoopStatement;
-import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapLoopStatement;
-import io.cloudslang.lang.entities.MapParallelLoopStatement;
-import io.cloudslang.lang.entities.ParallelLoopStatement;
-import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class AbstractForTransformer extends AbstractInOutForTransformer {
 
     private ExecutableValidator executableValidator;
 
     // case: value in variable_name
-    private static final String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
+    protected static final String FOR_REGEX = "^(\\s+)?(\\w+)\\s+(in)\\s+(\\w+)(\\s+)?$";
     // case: key, value
-    private static final String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\w+)(\\s+)?(,)(\\s+)?(\\w+)(\\s+)?$";
-    private static final String FOR_IN_KEYWORD = " in ";
+    protected static final String KEY_VALUE_PAIR_REGEX = "^(\\s+)?(\\w+)(\\s+)?(,)(\\s+)?(\\w+)(\\s+)?$";
+    protected static final String FOR_IN_KEYWORD = " in ";
 
-    public TransformModellingResult<LoopStatement> transformToLoopStatement(String rawData) {
-        List<RuntimeException> errors = new ArrayList<>();
-        Accumulator dependencyAccumulator = extractFunctionData("${" + rawData + "}");
-        if (StringUtils.isEmpty(rawData)) {
-            errors.add(new RuntimeException("For statement is empty."));
-            return new BasicTransformModellingResult<>(null, errors);
-        }
-
-        LoopStatement loopStatement = null;
-        String varName;
-        String collectionExpression;
-
-        Pattern regexSimpleFor = Pattern.compile(FOR_REGEX);
-        Matcher matcherSimpleFor = regexSimpleFor.matcher(rawData);
-
-        try {
-            if (matcherSimpleFor.find()) {
-                // case: value in variable_name
-                varName = matcherSimpleFor.group(2);
-                collectionExpression = matcherSimpleFor.group(4);
-                loopStatement = createLoopStatement(varName, collectionExpression, dependencyAccumulator);
-            } else {
-                String beforeInKeyword = StringUtils.substringBefore(rawData, FOR_IN_KEYWORD);
-                collectionExpression = StringUtils.substringAfter(rawData, FOR_IN_KEYWORD).trim();
-
-                Pattern regexKeyValueFor = Pattern.compile(KEY_VALUE_PAIR_REGEX);
-                Matcher matcherKeyValueFor = regexKeyValueFor.matcher(beforeInKeyword);
-
-                if (matcherKeyValueFor.find()) {
-                    // case: key, value
-                    String keyName = matcherKeyValueFor.group(2);
-                    String valueName = matcherKeyValueFor.group(6);
-                    loopStatement = createMapForLoopStatement(keyName, valueName,
-                            collectionExpression, dependencyAccumulator);
-                } else {
-                    // case: value in expression_other_than_variable_name
-                    varName = beforeInKeyword.trim();
-                    loopStatement = createLoopStatement(varName, collectionExpression, dependencyAccumulator);
-                }
-            }
-        } catch (RuntimeException rex) {
-            errors.add(rex);
-        }
-
-        return new BasicTransformModellingResult<>(loopStatement, errors);
-    }
-
-    public TransformModellingResult<ParallelLoopStatement> transformToParallelLoopStatement(String value,
-                                                                                            String throttle) {
-
-        List<RuntimeException> errors = new ArrayList<>();
-
-        if (StringUtils.isEmpty(value)) {
-            errors.add(new RuntimeException("For statement is empty."));
-            return new BasicTransformModellingResult<>(null, errors);
-        }
-
-        ParallelLoopStatement parallelLoopStatement = null;
-        String varName;
-        String collectionExpression;
-        Pattern regexSimpleFor = Pattern.compile(FOR_REGEX);
-        Matcher matcherSimpleFor = regexSimpleFor.matcher(value);
-        Accumulator dependencyAccumulator;
-
-        if (throttle == null) {
-            dependencyAccumulator = extractFunctionData("${" + value + "}");
-        } else {
-            dependencyAccumulator = extractFunctionData("${" + value + "}", throttle);
-            String throttleExpression = ExpressionUtils.extractExpression(throttle);
-            throttle = throttleExpression != null ? throttleExpression : throttle;
-        }
-
-        try {
-            if (matcherSimpleFor.find()) {
-                // case: value in variable_name
-                varName = matcherSimpleFor.group(2);
-                collectionExpression = matcherSimpleFor.group(4);
-                parallelLoopStatement = createListParallelLoopStatement(varName, collectionExpression, throttle,
-                        dependencyAccumulator);
-            } else {
-                String beforeInKeyword = StringUtils.substringBefore(value, FOR_IN_KEYWORD);
-                collectionExpression = StringUtils.substringAfter(value, FOR_IN_KEYWORD).trim();
-
-                Pattern regexKeyValueFor = Pattern.compile(KEY_VALUE_PAIR_REGEX);
-                Matcher matcherKeyValueFor = regexKeyValueFor.matcher(beforeInKeyword);
-
-                if (matcherKeyValueFor.find()) {
-                    // case: key, value
-                    String keyName = matcherKeyValueFor.group(2);
-                    String valueName = matcherKeyValueFor.group(6);
-                    parallelLoopStatement = createMapParallelLoopStatement(keyName, valueName, throttle,
-                            collectionExpression, dependencyAccumulator);
-                } else {
-                    // case: value in expression_other_than_variable_name
-                    varName = beforeInKeyword.trim();
-                    parallelLoopStatement = createListParallelLoopStatement(varName, collectionExpression, throttle,
-                            dependencyAccumulator);
-                }
-            }
-        } catch (RuntimeException rex) {
-            errors.add(rex);
-        }
-
-        return new BasicTransformModellingResult<>(parallelLoopStatement, errors);
-    }
-
-    private ParallelLoopStatement createMapParallelLoopStatement(String keyName,
-                                                                 String valueName,
-                                                                 String throttleExpression,
-                                                                 String collectionExpression,
-                                                                 Accumulator dependencyAccumulator) {
-        executableValidator.validateLoopStatementVariable(keyName);
-        executableValidator.validateLoopStatementVariable(valueName);
-        return new MapParallelLoopStatement(
-                keyName,
-                valueName,
-                collectionExpression,
-                throttleExpression,
-                dependencyAccumulator.getFunctionDependencies(),
-                dependencyAccumulator.getSystemPropertyDependencies());
-    }
-
-    private ParallelLoopStatement createListParallelLoopStatement(String varName,
-                                                                  String collectionExpression,
-                                                                  String throttleExpression,
-                                                                  Accumulator dependencyAccumulator) {
-        executableValidator.validateLoopStatementVariable(varName);
-        return new ListParallelLoopStatement(
-                varName,
-                collectionExpression,
-                throttleExpression,
-                dependencyAccumulator.getFunctionDependencies(),
-                dependencyAccumulator.getSystemPropertyDependencies());
-    }
-
-    private LoopStatement createMapForLoopStatement(String keyName, String valueName,
-                                                    String collectionExpression, Accumulator dependencyAccumulator) {
-        executableValidator.validateLoopStatementVariable(keyName);
-        executableValidator.validateLoopStatementVariable(valueName);
-        return new MapLoopStatement(
-                keyName,
-                valueName,
-                collectionExpression,
-                dependencyAccumulator.getFunctionDependencies(),
-                dependencyAccumulator.getSystemPropertyDependencies());
-    }
-
-    private LoopStatement createLoopStatement(String varName, String collectionExpression,
-                                              Accumulator dependencyAccumulator) {
-        executableValidator.validateLoopStatementVariable(varName);
-        return new ListLoopStatement(
-                varName,
-                collectionExpression,
-                dependencyAccumulator.getFunctionDependencies(),
-                dependencyAccumulator.getSystemPropertyDependencies());
+    protected void validateLoopStatementVariable(String name) {
+        executableValidator.validateLoopStatementVariable(name);
     }
 
     public void setExecutableValidator(ExecutableValidator executableValidator) {
