@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
+import static io.cloudslang.lang.entities.bindings.values.Value.toStringSafe;
 import static java.lang.Integer.getInteger;
 import static java.lang.Integer.min;
 import static java.lang.Integer.parseInt;
@@ -101,10 +102,10 @@ public class ParallelLoopBinding extends AbstractBinding {
                     flowContext.getImmutableViewOfVariables(),
                     systemProperties,
                     parallelLoopStatement.getFunctionDependencies());
-            int throttleSize = parseInt(evalResult.toString());
+            int throttleSize = parseInt(toStringSafe(evalResult));
 
             if (throttleSize <= 0) {
-                throw new RuntimeException("max_throttle input is not valid");
+                throw new RuntimeException("'max_throttle' input is not valid");
             }
 
             return min(throttleSize, systemMaxThrottle);

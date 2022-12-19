@@ -32,6 +32,10 @@ public interface Value extends Serializable {
     String toString();
 
     static String toStringSafe(Value value) {
+        if (value != null && value.isSensitive()) {
+            return value.get() != null ? value.get().toString() : null;
+        }
+
         return value != null && value.get() != null ? value.toString() : null;
     }
 
