@@ -13,7 +13,7 @@ import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
 import io.cloudslang.dependency.impl.services.MavenConfigImpl;
-import io.cloudslang.lang.entities.ListLoopStatement;
+import io.cloudslang.lang.entities.ListParallelLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -69,11 +69,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.python.google.common.collect.Lists.newArrayList;
 
-/**
- * Date: 4/7/2015
- *
- * @author Bonczidai Levente
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ParallelLoopStepsTest.Config.class)
 public class ParallelLoopStepsTest {
@@ -103,8 +98,8 @@ public class ParallelLoopStepsTest {
     @Test
     public void testBranchesAreCreated() throws Exception {
         // prepare arguments
-        ListLoopStatement parallelLoopStatement = new ListLoopStatement("varName", "expression",
-                new HashSet<ScriptFunction>(), new HashSet<String>(), true);
+        ListParallelLoopStatement parallelLoopStatement = new ListParallelLoopStatement("varName", "expression", null,
+                new HashSet<ScriptFunction>(), new HashSet<String>());
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();
@@ -121,6 +116,7 @@ public class ParallelLoopStepsTest {
         when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement),
                 eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName)))
                 .thenReturn(expectedSplitData);
+        when(executionRuntimeServices.getThrottleSize()).thenReturn(3);
         Long branchBeginStepId = 3L;
 
         // call method
@@ -159,8 +155,8 @@ public class ParallelLoopStepsTest {
     @Test
     public void testAddBranchesEventsAreFired() throws Exception {
         // prepare arguments
-        ListLoopStatement parallelLoopStatement = new ListLoopStatement("varName", "expression",
-                new HashSet<ScriptFunction>(), new HashSet<String>(), true);
+        ListParallelLoopStatement parallelLoopStatement = new ListParallelLoopStatement("varName", "expression", null,
+                new HashSet<ScriptFunction>(), new HashSet<String>());
 
         RunEnvironment runEnvironment = new RunEnvironment();
         Map<String, Value> variables = new HashMap<>();
@@ -177,6 +173,7 @@ public class ParallelLoopStepsTest {
         when(parallelLoopBinding.bindParallelLoopList(eq(parallelLoopStatement),
                 eq(context), eq(runEnvironment.getSystemProperties()), eq(nodeName)))
                 .thenReturn(expectedSplitData);
+        when(executionRuntimeServices.getThrottleSize()).thenReturn(3);
         Long branchBeginStepId = 0L;
 
         // call method

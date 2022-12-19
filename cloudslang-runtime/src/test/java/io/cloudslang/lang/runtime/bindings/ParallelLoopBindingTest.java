@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.runtime.bindings;
 
-import io.cloudslang.lang.entities.ListLoopStatement;
+import io.cloudslang.lang.entities.ListParallelLoopStatement;
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.Value;
@@ -61,8 +61,8 @@ public class ParallelLoopBindingTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 parallelLoopBinding
                         .bindParallelLoopList(null, new Context(
-                        new HashMap<String, Value>(),
-                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName"));
+                                new HashMap<String, Value>(),
+                                Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName"));
         Assert.assertEquals("parallel loop statement cannot be null", exception.getMessage());
 
     }
@@ -79,9 +79,9 @@ public class ParallelLoopBindingTest {
     public void passingNullNodeNameThrowsException() throws Exception {
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 parallelLoopBinding.bindParallelLoopList(
-                    createBasicSyncLoopStatement(), new Context(
-                            new HashMap<String, Value>(),
-                            Collections.<String, Value>emptyMap()), EMPTY_SET, null));
+                        createBasicSyncLoopStatement(), new Context(
+                                new HashMap<String, Value>(),
+                                Collections.<String, Value>emptyMap()), EMPTY_SET, null));
         Assert.assertEquals("node name cannot be null", exception.getMessage());
     }
 
@@ -90,7 +90,7 @@ public class ParallelLoopBindingTest {
         Map<String, Value> variables = new HashMap<>();
         variables.put("key1", ValueFactory.create("value1"));
         variables.put("key2", ValueFactory.create("value2"));
-        final Context context = new Context(variables,Collections.<String, Value>emptyMap());
+        final Context context = new Context(variables, Collections.<String, Value>emptyMap());
         List<Value> expectedList = newArrayList(ValueFactory.create(1), ValueFactory.create(2), ValueFactory.create(3));
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
@@ -108,7 +108,7 @@ public class ParallelLoopBindingTest {
         Map<String, Value> variables = new HashMap<>();
         variables.put("key1", ValueFactory.create("value1"));
         variables.put("key2", ValueFactory.create("value2"));
-        final Context context = new Context(variables,Collections.<String, Value>emptyMap());
+        final Context context = new Context(variables, Collections.<String, Value>emptyMap());
 
         when(scriptEvaluator.evalExpr(eq("expression"), eq(variables), eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
                 .thenReturn(ValueFactory.create(newArrayList()));
@@ -129,14 +129,14 @@ public class ParallelLoopBindingTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 parallelLoopBinding
-                .bindParallelLoopList(createBasicSyncLoopStatement(), new Context(
-                        variables,
-                        Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName"));
+                        .bindParallelLoopList(createBasicSyncLoopStatement(), new Context(
+                                variables,
+                                Collections.<String, Value>emptyMap()), EMPTY_SET, "nodeName"));
         Assert.assertEquals("Error evaluating parallel loop expression in step 'nodeName', error is: \n" +
                 "evaluation exception", exception.getMessage());
     }
 
-    private ListLoopStatement createBasicSyncLoopStatement() {
-        return new ListLoopStatement("varName", "expression", EMPTY_FUNCTION_SET, EMPTY_PROPERTY_SET, true);
+    private ListParallelLoopStatement createBasicSyncLoopStatement() {
+        return new ListParallelLoopStatement("varName", "expression", null, EMPTY_FUNCTION_SET, EMPTY_PROPERTY_SET);
     }
 }

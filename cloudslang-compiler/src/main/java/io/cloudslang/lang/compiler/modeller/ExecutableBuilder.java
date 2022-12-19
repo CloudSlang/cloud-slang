@@ -58,10 +58,12 @@ import java.util.stream.Collectors;
 import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
+import static com.google.common.collect.Maps.newHashMapWithExpectedSize;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_EXTERNAL_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.DO_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.MAX_THROTTLE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.NAVIGATION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.ON_FAILURE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PARALLEL_LOOP_KEY;
@@ -122,7 +124,9 @@ public class ExecutableBuilder {
 
     private List<String> stepAdditionalKeyWords = asList(LOOP_KEY, DO_KEY, DO_EXTERNAL_KEY, NAVIGATION_KEY,
             WORKER_GROUP, ROBOT_GROUP);
-    private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY, WORKER_GROUP);
+    private List<String> parallelLoopValidKeywords = asList(DO_KEY, DO_EXTERNAL_KEY, FOR_KEY,
+            WORKER_GROUP, MAX_THROTTLE_KEY);
+    private List<String> parallelLoopConstructKeywords = asList(FOR_KEY, MAX_THROTTLE_KEY);
 
     private List<String> seqSupportedResults = asList(SUCCESS_RESULT, WARNING_RESULT, FAILURE_RESULT);
 
@@ -184,15 +188,15 @@ public class ExecutableBuilder {
                                                            SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
         String execName = preCompileValidator.validateExecutableRawData(parsedSlang, executableRawData, errors);
-        String workerGroup = (String)executableRawData.get(SlangTextualKeys.WORKER_GROUP);
+        String workerGroup = (String) executableRawData.get(SlangTextualKeys.WORKER_GROUP);
         errors.addAll(preCompileValidator.checkKeyWords(
-                execName,
-                "",
-                executableRawData,
-                ListUtils.union(preExecTransformers, postExecTransformers),
-                ParsedSlang.Type.DECISION.equals(parsedSlang.getType()) ?
-                        executableAdditionalKeywords : allExecutableAdditionalKeywords,
-                executableConstraintGroups
+                        execName,
+                        "",
+                        executableRawData,
+                        ListUtils.union(preExecTransformers, postExecTransformers),
+                        ParsedSlang.Type.DECISION.equals(parsedSlang.getType()) ?
+                                executableAdditionalKeywords : allExecutableAdditionalKeywords,
+                        executableConstraintGroups
                 )
         );
 
@@ -292,8 +296,8 @@ public class ExecutableBuilder {
                 } else {
                     preCompileValidator.validateResultsHaveNoExpression(results, execName, errors);
                     preCompileValidator.validateResultsWithWhitelist(results, seqSupportedResults, execName, errors);
-                    seqSteps = (List)((Map) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
-                                    .get(SEQ_STEPS_KEY);
+                    seqSteps = (List) ((Map) actionRawData.get(SlangTextualKeys.SEQ_ACTION_KEY))
+                            .get(SEQ_STEPS_KEY);
                     @SuppressWarnings("unchecked")
                     Map<String, Object> settings = (Map<String, Object>) ((Map) actionRawData
                             .get(SlangTextualKeys.SEQ_ACTION_KEY))
@@ -550,7 +554,13 @@ public class ExecutableBuilder {
                                 )
                         );
 
-                        parallelLoopRawData.put(PARALLEL_LOOP_KEY, parallelLoopRawData.remove(FOR_KEY));
+                        Map<String, Object> filteredParallelLoopData =
+                                newHashMapWithExpectedSize(parallelLoopConstructKeywords.size());
+                        for (String keyword : parallelLoopConstructKeywords) {
+                            filteredParallelLoopData.put(keyword, parallelLoopRawData.remove(keyword));
+                        }
+
+                        parallelLoopRawData.put(PARALLEL_LOOP_KEY, filteredParallelLoopData);
                         stepRawDataValue.putAll(parallelLoopRawData);
                     }
                 }
@@ -676,7 +686,7 @@ public class ExecutableBuilder {
             workerGroup = (String) stepRawData.get(SlangTextualKeys.WORKER_GROUP);
         } else if (stepRawData.get(SlangTextualKeys.WORKER_GROUP) instanceof Map) {
             workerGroup = String.valueOf(
-                    ((Map<String, Object>)stepRawData.get(SlangTextualKeys.WORKER_GROUP)).get(SlangTextualKeys.VALUE));
+                    ((Map<String, Object>) stepRawData.get(SlangTextualKeys.WORKER_GROUP)).get(SlangTextualKeys.VALUE));
         }
         return workerGroup;
     }

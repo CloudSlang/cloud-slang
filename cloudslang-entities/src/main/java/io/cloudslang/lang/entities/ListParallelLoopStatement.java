@@ -10,30 +10,28 @@
 package io.cloudslang.lang.entities;
 
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
-import java.io.Serializable;
-import java.util.Set;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-/**
- * Date: 2/3/2015
- *
- * @author Bonczidai Levente
- */
-public class ListLoopStatement extends LoopStatement implements Serializable {
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.Set;
 
-    private static final long serialVersionUID = -540865117927676643L;
-    private static final String FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "for loop var name cannot be empty";
+public class ListParallelLoopStatement extends ParallelLoopStatement implements Serializable {
+
+    private static final long serialVersionUID = -8939322708339882016L;
+    private static final String PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "parallel loop var name cannot be empty";
 
     private final String varName;
 
-    public ListLoopStatement(String varName, String collectionExpression, Set<ScriptFunction> functionDependencies,
-                             Set<String> systemPropertyDependencies) {
-        super(collectionExpression, functionDependencies, systemPropertyDependencies);
+    public ListParallelLoopStatement(String varName,
+                                     String collectionExpression,
+                                     String throttleExpression,
+                                     Set<ScriptFunction> functionDependencies,
+                                     Set<String> systemPropertyDependencies) {
+        super(collectionExpression, throttleExpression, functionDependencies, systemPropertyDependencies);
 
-        Validate.notBlank(varName, FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY);
+        Validate.notBlank(varName, PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY);
         this.varName = varName;
     }
 
@@ -41,7 +39,7 @@ public class ListLoopStatement extends LoopStatement implements Serializable {
      * only here to satisfy serialization libraries
      */
     @SuppressWarnings("unused")
-    private ListLoopStatement() {
+    private ListParallelLoopStatement() {
         varName = null;
     }
 
@@ -62,25 +60,18 @@ public class ListLoopStatement extends LoopStatement implements Serializable {
         if (this == o) {
             return true;
         }
-
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        ListLoopStatement that = (ListLoopStatement) o;
-
-        return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(varName, that.varName)
-                .isEquals();
+        if (!super.equals(o)) {
+            return false;
+        }
+        ListParallelLoopStatement that = (ListParallelLoopStatement) o;
+        return Objects.equals(varName, that.varName);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode())
-                .append(varName)
-                .toHashCode();
+        return Objects.hash(super.hashCode(), varName);
     }
-
 }

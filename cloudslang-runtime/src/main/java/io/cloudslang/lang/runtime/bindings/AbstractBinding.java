@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.LoopStatement;
 import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.MapParallelLoopStatement;
 import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
@@ -47,7 +48,7 @@ public class AbstractBinding {
     }
 
     protected Value getEvalResultForMap(Value evalResult, LoopStatement loopStatement, String collectionExpression) {
-        if (loopStatement instanceof MapLoopStatement) {
+        if (loopStatement instanceof MapLoopStatement || loopStatement instanceof MapParallelLoopStatement) {
             if (evalResult != null && evalResult.get() instanceof Map) {
                 //noinspection unchecked
                 Set<Map.Entry<Serializable, Serializable>> entrySet =
