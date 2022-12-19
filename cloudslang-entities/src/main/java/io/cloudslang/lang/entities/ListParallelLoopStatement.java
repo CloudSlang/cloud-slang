@@ -20,7 +20,7 @@ import java.util.Set;
 public class ListParallelLoopStatement extends ParallelLoopStatement implements Serializable {
 
     private static final long serialVersionUID = -8939322708339882016L;
-    public static final String PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "parallel loop var name cannot be empty";
+    private static final String PARALLEL_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "parallel loop var name cannot be empty";
 
     private final String varName;
 

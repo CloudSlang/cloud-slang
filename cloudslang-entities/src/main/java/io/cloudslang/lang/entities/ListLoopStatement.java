@@ -25,7 +25,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class ListLoopStatement extends LoopStatement implements Serializable {
 
     private static final long serialVersionUID = -540865117927676643L;
-    public static final String FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "for loop var name cannot be empty";
+    private static final String FOR_LOOP_VAR_NAME_CANNOT_BE_EMPTY = "for loop var name cannot be empty";
 
     private final String varName;
 

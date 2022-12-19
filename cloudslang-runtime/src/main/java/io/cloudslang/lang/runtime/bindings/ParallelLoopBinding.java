@@ -40,7 +40,7 @@ public class ParallelLoopBinding extends AbstractBinding {
 
     public ParallelLoopBinding() {
         int parallelThrottle = getInteger("worker.parallelMaxThrottle", DEFAULT_THROTTLE);
-        systemMaxThrottle = (parallelThrottle > 1 && parallelThrottle <= 100) ? parallelThrottle : DEFAULT_THROTTLE;
+        systemMaxThrottle = (parallelThrottle > 1 && parallelThrottle <= 1000) ? parallelThrottle : DEFAULT_THROTTLE;
 
         logger.info("Worker parallel max throttle: " + systemMaxThrottle);
     }
