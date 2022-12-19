@@ -70,6 +70,7 @@ public interface SlangTextualKeys {
     String PARALLEL_LOOP_KEY = "parallel_loop";
     String WORKER_GROUP = "worker_group"; //&& flow
     String ROBOT_GROUP = "robot_group";
+    String MAX_THROTTLE_KEY = "max_throttle";
 
     //seq step
     String SEQ_STEP_ID_KEY = "id";

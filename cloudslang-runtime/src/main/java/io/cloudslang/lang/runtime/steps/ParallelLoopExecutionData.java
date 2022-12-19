@@ -10,9 +10,9 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.hp.oo.sdk.content.annotations.Param;
-import io.cloudslang.lang.entities.ListLoopStatement;
-import io.cloudslang.lang.entities.LoopStatement;
-import io.cloudslang.lang.entities.MapLoopStatement;
+import io.cloudslang.lang.entities.ListParallelLoopStatement;
+import io.cloudslang.lang.entities.MapParallelLoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
 import io.cloudslang.lang.entities.bindings.Output;
@@ -68,8 +68,6 @@ import static org.apache.commons.lang3.Validate.notNull;
 @Component
 public class ParallelLoopExecutionData extends AbstractExecutionData {
 
-    public static final String BRANCH_EXCEPTION_PREFIX = "Error running branch";
-
     @Autowired
     private ParallelLoopBinding parallelLoopBinding;
 
@@ -78,18 +76,19 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
 
     private static final Logger logger = LogManager.getLogger(ParallelLoopExecutionData.class);
 
-    public void addBranches(@Param(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY) LoopStatement parallelLoopStatement,
-                            @Param(RUN_ENV) RunEnvironment runEnv,
-                            @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
-                            @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
+    public void addBranches(
+            @Param(ScoreLangConstants.PARALLEL_LOOP_STATEMENT_KEY) ParallelLoopStatement parallelLoopStatement,
+            @Param(RUN_ENV) RunEnvironment runEnv,
+            @Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
+            @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
 
-                            //CHECKSTYLE:OFF: checkstyle:parametername
-                            @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
-                            //CHECKSTYLE:ON
+            //CHECKSTYLE:OFF: checkstyle:parametername
+            @Param(ExecutionParametersConsts.RUNNING_EXECUTION_PLAN_ID) Long RUNNING_EXECUTION_PLAN_ID,
+            //CHECKSTYLE:ON
 
-                            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
-                            @Param(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY) Long branchBeginStep,
-                            @Param(ScoreLangConstants.REF_ID) String refId) {
+            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
+            @Param(ScoreLangConstants.BRANCH_BEGIN_STEP_ID_KEY) Long branchBeginStep,
+            @Param(ScoreLangConstants.REF_ID) String refId) {
 
         try {
             Context flowContext = runEnv.getStack().popContext();
@@ -100,9 +99,8 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     nodeName, flowContext);
 
             runEnv.putNextStepPosition(nextStepId);
-            // todo take from contexts: executionRuntimeServices.getThrottleSize();
-            // temporary taking throttle from system properties
-            final Integer throttleSize = Integer.getInteger("cloudslang.worker.parallelThrottleSize", null);
+
+            final Integer throttleSize = executionRuntimeServices.getThrottleSize();
             final int splitSize = splitData.size();
             final int lanesToStart = calculateNumberOfLanesToStart(splitSize, throttleSize);
             final List<Value> splitDataCurrentBulk = splitData.subList(0, lanesToStart);
@@ -137,10 +135,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                 StatefulSessionStack branchStack = branchRuntimeEnvironment.getStatefulSessionsStack();
                 branchStack.pushSessionsMap(new HashMap<>());
 
-                if (parallelLoopStatement instanceof ListLoopStatement) {
-                    branchContext.putVariable(((ListLoopStatement) parallelLoopStatement).getVarName(), splitItem);
-                } else if (parallelLoopStatement instanceof MapLoopStatement) {
-                    MapLoopStatement mapLoopStatement = (MapLoopStatement) parallelLoopStatement;
+                if (parallelLoopStatement instanceof ListParallelLoopStatement) {
+                    branchContext.putVariable(
+                            ((ListParallelLoopStatement) parallelLoopStatement).getVarName(), splitItem);
+                } else if (parallelLoopStatement instanceof MapParallelLoopStatement) {
+                    MapParallelLoopStatement mapLoopStatement = (MapParallelLoopStatement) parallelLoopStatement;
                     //noinspection unchecked
                     ImmutablePair<Value, Value> pair = (ImmutablePair<Value, Value>) splitItem.get();
                     branchContext.putVariable(mapLoopStatement.getKeyName(), pair.getLeft());
@@ -210,7 +209,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         }
     }
 
-    private List<Value> handleFirstIteration(LoopStatement parallelLoopStatement,
+    private List<Value> handleFirstIteration(ParallelLoopStatement parallelLoopStatement,
                                              RunEnvironment runEnv,
                                              ExecutionRuntimeServices executionRuntimeServices,
                                              String nodeName,
@@ -224,6 +223,11 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
                     runEnv.getSystemProperties(), nodeName);
             executionRuntimeServices.setSplitDataSize(splitData.size());
             executionRuntimeServices.setParallelTemporaryContext(Lists.newArrayList());
+
+            int throttleSize = parallelLoopBinding.bindParallelLoopThrottle(parallelLoopStatement, flowContext,
+                    runEnv.getSystemProperties(), nodeName);
+            executionRuntimeServices.setThrottleSize(throttleSize);
+
             fireEvent(
                     executionRuntimeServices,
                     ScoreLangConstants.EVENT_SPLIT_BRANCHES,

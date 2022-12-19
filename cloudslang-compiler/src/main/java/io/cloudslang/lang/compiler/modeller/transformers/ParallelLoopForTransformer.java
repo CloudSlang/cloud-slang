@@ -12,27 +12,39 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.CompilerConstants;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
-import io.cloudslang.lang.entities.LoopStatement;
+import io.cloudslang.lang.entities.ParallelLoopStatement;
 import io.cloudslang.lang.entities.SensitivityLevel;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-/**
- * Date: 3/25/2015
- *
- * @author Bonczidai Levente
- */
-public class ParallelLoopForTransformer extends AbstractForTransformer implements Transformer<String, LoopStatement> {
+import static io.cloudslang.lang.compiler.SlangTextualKeys.FOR_KEY;
+import static io.cloudslang.lang.compiler.SlangTextualKeys.MAX_THROTTLE_KEY;
+
+public class ParallelLoopForTransformer extends AbstractForTransformer
+        implements Transformer<Object, ParallelLoopStatement> {
 
     @Override
-    public TransformModellingResult<LoopStatement> transform(String rawData) {
+    public TransformModellingResult<ParallelLoopStatement> transform(Object rawData) {
         return transform(rawData, CompilerConstants.DEFAULT_SENSITIVITY_LEVEL);
     }
 
     @Override
-    public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        return transformToLoopStatement(rawData, true);
+    public TransformModellingResult<ParallelLoopStatement> transform(Object rawData,
+                                                                     SensitivityLevel sensitivityLevel) {
+        String value = null;
+        String throttle = null;
+
+        if (rawData instanceof Map) {
+            Map<String, Object> parallelLoopRawData = (Map<String, Object>) rawData;
+            value = Objects.toString(parallelLoopRawData.get(FOR_KEY), null);
+            throttle = Objects.toString(parallelLoopRawData.get(MAX_THROTTLE_KEY), null);
+        }
+
+        // throttle can be null
+        return transformToParallelLoopStatement(value, throttle);
     }
 
     @Override

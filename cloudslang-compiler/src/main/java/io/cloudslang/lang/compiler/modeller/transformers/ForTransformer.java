@@ -27,7 +27,7 @@ public class ForTransformer extends AbstractForTransformer implements Transforme
 
     @Override
     public TransformModellingResult<LoopStatement> transform(String rawData, SensitivityLevel sensitivityLevel) {
-        return transformToLoopStatement(rawData, false);
+        return transformToLoopStatement(rawData);
     }
 
     @Override
