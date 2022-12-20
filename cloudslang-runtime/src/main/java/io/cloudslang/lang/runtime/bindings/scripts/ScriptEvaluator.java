@@ -125,10 +125,6 @@ public class ScriptEvaluator extends ScriptProcessor {
                           Set<ScriptFunction> functionDependencies, long timeoutPeriod) {
         try {
             switch (PYTHON_EVALUATOR) {
-                //TODO add method for python server once the server is implemented; also copy for the default method
-                case PYTHON_SERVER:
-                case PYTHON:
-                    return doTestExternalPython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
                 case JYTHON:
                     return doTestJython(expr, context, systemProperties, functionDependencies, timeoutPeriod);
                 default:
