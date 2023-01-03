@@ -128,12 +128,13 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         Value inputValue = userInputs.get(inputName);
                         Input inputToUpdate = executableInputsMap.get(inputName);
                         if (inputToUpdate != null) {
-                            Input updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
-                                    .build();
-                            mutableInputList.set(mutableInputList.indexOf(inputToUpdate), updatedInput);
                             // In case values are the same, do not compute the value again to avoid seeing it as a new const
                             if (inputToUpdate.getValue() != null && inputToUpdate.getValue().equals(inputValue)) {
                                 callArguments.remove(inputName);
+                            } else {
+                                Input updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
+                                        .build();
+                                mutableInputList.set(mutableInputList.indexOf(inputToUpdate), updatedInput);
                             }
                         } else {
                             Input toAddInput = new Input.InputBuilder(inputName, inputValue).build();
