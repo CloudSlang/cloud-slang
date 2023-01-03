@@ -128,7 +128,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                         Value inputValue = userInputs.get(inputName);
                         Input inputToUpdate = executableInputsMap.get(inputName);
                         if (inputToUpdate != null) {
-                            // In case values are the same, do not compute the value again to avoid seeing it as a new const
+                            // In case values are the same, do not compute the value again to avoid seeing it as new
                             if (inputToUpdate.getValue() != null && inputToUpdate.getValue().equals(inputValue)) {
                                 callArguments.remove(inputName);
                             } else {
