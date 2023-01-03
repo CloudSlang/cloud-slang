@@ -36,6 +36,9 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonServerService;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonServerServiceImpl;
+import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -1202,6 +1205,11 @@ public class ActionStepsTest {
         @Bean(name = "jythonExecutionEngine")
         public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
+        }
+
+        @Bean(name = "externalPythonServerService")
+        public ExternalPythonServerService externalPythonServerService() {
+            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class));
         }
 
         @Bean(name = "externalPythonRuntimeService")
