@@ -131,6 +131,10 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                             Input updatedInput = new Input.InputBuilder(inputToUpdate, inputValue)
                                     .build();
                             mutableInputList.set(mutableInputList.indexOf(inputToUpdate), updatedInput);
+                            // In case values are the same, do not compute the value again to avoid seeing it as a new const
+                            if (inputToUpdate.getValue() != null && inputToUpdate.getValue().equals(inputValue)) {
+                                callArguments.remove(inputName);
+                            }
                         } else {
                             Input toAddInput = new Input.InputBuilder(inputName, inputValue).build();
                             mutableInputList.add(toAddInput);
@@ -153,7 +157,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                 Map<String, Value> debuggerInputs =
                         (Map<String, Value>) systemContext.remove(DEBUGGER_EXECUTABLE_INPUTS);
                 List<Input> newInputs = debuggerInputs.entrySet().stream().map(entry ->
-                        new Input.InputBuilder(entry.getKey(), entry.getValue()).withRequired(false).build())
+                                new Input.InputBuilder(entry.getKey(), entry.getValue()).withRequired(false).build())
                         .collect(toList());
                 List<Input> updatedExecutableInputs = new ArrayList<>(newExecutableInputs.size() +
                         newInputs.size());
