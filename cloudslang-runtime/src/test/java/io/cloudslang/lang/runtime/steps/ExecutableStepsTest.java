@@ -46,6 +46,9 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonServerService;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonServerServiceImpl;
+import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -91,6 +94,10 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ExecutableStepsTest.Config.class)
 public class ExecutableStepsTest {
+
+    static {
+        System.setProperty("python.expressionsEval", "jython");
+    }
 
     @Autowired
     private ExecutableExecutionData executableSteps;
@@ -502,6 +509,11 @@ public class ExecutableStepsTest {
         @Bean(name = "jythonExecutionEngine")
         public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
+        }
+
+        @Bean(name = "externalPythonServerService")
+        public ExternalPythonServerService externalPythonServerService() {
+            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class));
         }
 
         @Bean(name = "externalPythonRuntimeService")
