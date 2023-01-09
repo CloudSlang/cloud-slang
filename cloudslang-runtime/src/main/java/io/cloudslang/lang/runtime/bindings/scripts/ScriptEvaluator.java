@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.cloudslang.runtime.api.python.enums.PythonStrategy.PYTHON_SERVER;
+import static io.cloudslang.runtime.api.python.enums.PythonStrategy.PYTHON_EXECUTOR;
 import static io.cloudslang.runtime.api.python.enums.PythonStrategy.getPythonStrategy;
 
 /**
@@ -50,7 +50,7 @@ public class ScriptEvaluator extends ScriptProcessor {
     private static final String BACKWARD_COMPATIBLE_ACCESS_METHOD = "def accessed(key):" +
             LINE_SEPARATOR + "  pass";
     private static final PythonStrategy PYTHON_EVALUATOR =
-            getPythonStrategy(System.getProperty("python.expressionsEval"), PYTHON_SERVER);
+            getPythonStrategy(System.getProperty("python.expressionsEval"), PYTHON_EXECUTOR);
     public static final int MAX_LENGTH = Integer.getInteger("input.error.max.length", 1000);
 
     @Resource(name = "externalPythonRuntimeService")
@@ -68,7 +68,7 @@ public class ScriptEvaluator extends ScriptProcessor {
             switch (PYTHON_EVALUATOR) {
                 case JYTHON:
                     return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
-                //case PYTHON_SERVER or PYTHON
+                //case PYTHON_EXECUTOR or PYTHON
                 default:
                     return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
             }
