@@ -29,7 +29,6 @@ import io.cloudslang.runtime.impl.python.PythonExecutionNotCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonServerService;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonServerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.events.EventBus;
@@ -461,8 +460,9 @@ public class ArgumentsBindingTest {
         }
 
         @Bean(name = "externalPythonServerService")
-        public ExternalPythonServerService externalPythonServerService() {
-            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class));
+        public PythonRuntimeService externalPythonServerService() {
+            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class),
+                    new Semaphore(100), new Semaphore(50));
         }
 
         @Bean(name = "externalPythonRuntimeService")

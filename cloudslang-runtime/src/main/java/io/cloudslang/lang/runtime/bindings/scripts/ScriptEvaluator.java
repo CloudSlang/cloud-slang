@@ -59,6 +59,9 @@ public class ScriptEvaluator extends ScriptProcessor {
     @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService legacyJythonRuntimeService;
 
+    @Resource(name = "externalPythonServerService")
+    private PythonRuntimeService pythonServerService;
+
     @Autowired
     private ScriptsService scriptsService;
 
@@ -66,11 +69,14 @@ public class ScriptEvaluator extends ScriptProcessor {
                           Set<ScriptFunction> functionDependencies) {
         try {
             switch (PYTHON_EVALUATOR) {
+                case PYTHON_EXECUTOR:
+                    return doEvaluateExpressionServerPython(expr, context, systemProperties, functionDependencies);
+                case PYTHON:
+                    return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
                 case JYTHON:
                     return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
-                //case PYTHON_EXECUTOR or PYTHON
                 default:
-                    return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
+                    return doEvaluateExpressionServerPython(expr, context, systemProperties, functionDependencies);
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error in evaluating expression: '" +
@@ -114,6 +120,29 @@ public class ScriptEvaluator extends ScriptProcessor {
         }
 
         PythonEvaluationResult result = pythonRuntimeService.eval(
+                buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
+
+        //noinspection unchecked
+        Set<String> accessedResources = (Set<String>) result.getResultContext().get(ACCESSED_RESOURCES_SET);
+        return ValueFactory.create(result.getEvalResult(), getSensitive(pythonContext, accessedResources));
+    }
+
+    private Value doEvaluateExpressionServerPython(String expr,
+                                                   Map<String, Value> context,
+                                                   Set<SystemProperty> systemProperties,
+                                                   Set<ScriptFunction> functionDependencies) {
+        Map<String, Serializable> pythonContext = createExternalPythonContext(context);
+        boolean systemPropertiesDefined = false;
+        if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY) ||
+                functionDependencies.contains(ScriptFunction.GET_SP_VAR)) {
+            systemPropertiesDefined = true;
+        }
+        if (systemPropertiesDefined) {
+            pythonContext.put(SYSTEM_PROPERTIES_MAP,
+                    (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
+        }
+
+        PythonEvaluationResult result = pythonServerService.eval(
                 buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
 
         //noinspection unchecked

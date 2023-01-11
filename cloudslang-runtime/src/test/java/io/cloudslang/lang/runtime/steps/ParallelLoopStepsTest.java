@@ -35,6 +35,9 @@ import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonServerServiceImpl;
+import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -57,6 +60,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -607,9 +611,16 @@ public class ParallelLoopStepsTest {
             return new PythonRuntimeServiceImpl();
         }
 
+        @Bean(name = "externalPythonServerService")
+        public PythonRuntimeService externalPythonServerService() {
+            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class),
+                    new Semaphore(100), new Semaphore(50));
+        }
+
+
         @Bean(name = "externalPythonExecutionEngine")
         public PythonExecutionEngine externalPythonExecutionEngine() {
-            return new PythonExecutionCachedEngine();
+            return new ExternalPythonExecutionEngine();
         }
 
         @Bean
