@@ -70,13 +70,13 @@ public class ScriptEvaluator extends ScriptProcessor {
         try {
             switch (PYTHON_EVALUATOR) {
                 case PYTHON_EXECUTOR:
-                    return doEvaluateExpressionServerPython(expr, context, systemProperties, functionDependencies);
+                    return doEvaluateExpressionPythonExecutor(expr, context, systemProperties, functionDependencies);
                 case PYTHON:
                     return doEvaluateExpressionExternalPython(expr, context, systemProperties, functionDependencies);
                 case JYTHON:
                     return doEvaluateExpressionJython(expr, context, systemProperties, functionDependencies);
                 default:
-                    return doEvaluateExpressionServerPython(expr, context, systemProperties, functionDependencies);
+                    return doEvaluateExpressionPythonExecutor(expr, context, systemProperties, functionDependencies);
             }
         } catch (Exception exception) {
             throw new RuntimeException("Error in evaluating expression: '" +
@@ -127,7 +127,7 @@ public class ScriptEvaluator extends ScriptProcessor {
         return ValueFactory.create(result.getEvalResult(), getSensitive(pythonContext, accessedResources));
     }
 
-    private Value doEvaluateExpressionServerPython(String expr,
+    private Value doEvaluateExpressionPythonExecutor(String expr,
                                                    Map<String, Value> context,
                                                    Set<SystemProperty> systemProperties,
                                                    Set<ScriptFunction> functionDependencies) {
