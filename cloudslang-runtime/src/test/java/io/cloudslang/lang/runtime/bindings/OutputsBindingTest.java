@@ -25,9 +25,8 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonServerService;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonServerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -143,7 +142,7 @@ public class OutputsBindingTest {
         Map<String, Value> operationContext = prepareOperationContext();
         Map<String, Value> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = singletonList(
-            createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
+                createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
 
         Map<String, Value> result = outputsBinding
                 .bindOutputs(new ReadOnlyContextAccessor(operationContext, actionReturnValues), EMPTY_SET, outputs);
@@ -159,9 +158,9 @@ public class OutputsBindingTest {
         Map<String, Value> operationContext = prepareOperationContext();
         Map<String, Value> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Lists.newArrayList(
-            createExpressionOutput("output1", "1"),
-            createExpressionOutput("output2", "2"),
-            createExpressionOutput("output3", "3")
+                createExpressionOutput("output1", "1"),
+                createExpressionOutput("output2", "2"),
+                createExpressionOutput("output3", "3")
         );
 
         Map<String, Value> result = outputsBinding
@@ -190,8 +189,8 @@ public class OutputsBindingTest {
         Map<String, Value> operationContext = prepareOperationContext();
         Map<String, Value> actionReturnValues = prepareActionReturnValues();
         List<Output> outputs = Arrays.asList(
-            createNoExpressionOutput("host1"),
-            createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
+                createNoExpressionOutput("host1"),
+                createExpressionOutput("hostFromExpression", "${ 'http://' + hostExpr + ':' + str(port) }"));
 
         Map<String, Value> result = outputsBinding
                 .bindOutputs(new ReadOnlyContextAccessor(operationContext, actionReturnValues), EMPTY_SET, outputs);
@@ -267,9 +266,10 @@ public class OutputsBindingTest {
             return new PythonExecutionCachedEngine();
         }
 
-        @Bean(name = "externalPythonServerService")
-        public ExternalPythonServerService externalPythonServerService() {
-            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class));
+        @Bean(name = "externalPythonExecutorService")
+        public PythonRuntimeService externalPythonExecutorService() {
+            return new ExternalPythonExecutorServiceImpl(mock(StatefulRestEasyClientsHolder.class),
+                    new Semaphore(100), new Semaphore(50));
         }
 
         @Bean(name = "externalPythonRuntimeService")

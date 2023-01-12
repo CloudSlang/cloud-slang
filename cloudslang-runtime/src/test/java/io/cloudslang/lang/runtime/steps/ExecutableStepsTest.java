@@ -45,9 +45,8 @@ import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonServerService;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonServerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
 import io.cloudslang.score.events.EventBus;
@@ -272,7 +271,7 @@ public class ExecutableStepsTest {
     public void testStartExecutableRebindWithNoArguments() {
         List<Argument> modifiedArguments = new ArrayList<>();
         final RunEnvironment runEnv = new RunEnvironment();
-        runEnv.getStack().pushContext(new Context(new HashMap<>(),new HashMap<>()));
+        runEnv.getStack().pushContext(new Context(new HashMap<>(), new HashMap<>()));
         runEnv.setContextModified(true);
         runEnv.setModifiedArguments(modifiedArguments);
         ExecutionRuntimeServices runtimeServices = new ExecutionRuntimeServices();
@@ -511,9 +510,10 @@ public class ExecutableStepsTest {
             return new PythonExecutionCachedEngine();
         }
 
-        @Bean(name = "externalPythonServerService")
-        public ExternalPythonServerService externalPythonServerService() {
-            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class));
+        @Bean(name = "externalPythonExecutorService")
+        public PythonRuntimeService externalPythonExecutorService() {
+            return new ExternalPythonExecutorServiceImpl(mock(StatefulRestEasyClientsHolder.class),
+                    new Semaphore(100), new Semaphore(50));
         }
 
         @Bean(name = "externalPythonRuntimeService")
