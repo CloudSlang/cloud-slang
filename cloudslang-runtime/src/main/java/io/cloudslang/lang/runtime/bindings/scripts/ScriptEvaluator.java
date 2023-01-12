@@ -59,8 +59,8 @@ public class ScriptEvaluator extends ScriptProcessor {
     @Resource(name = "jythonRuntimeService")
     private PythonRuntimeService legacyJythonRuntimeService;
 
-    @Resource(name = "externalPythonServerService")
-    private PythonRuntimeService pythonServerService;
+    @Resource(name = "externalPythonExecutorService")
+    private PythonRuntimeService pythonExecutorService;
 
     @Autowired
     private ScriptsService scriptsService;
@@ -142,7 +142,7 @@ public class ScriptEvaluator extends ScriptProcessor {
                     (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
         }
 
-        PythonEvaluationResult result = pythonServerService.eval(
+        PythonEvaluationResult result = pythonExecutorService.eval(
                 buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
 
         //noinspection unchecked

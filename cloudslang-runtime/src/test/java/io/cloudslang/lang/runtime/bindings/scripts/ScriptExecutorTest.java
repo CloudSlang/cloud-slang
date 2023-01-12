@@ -23,8 +23,8 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonServerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -199,9 +199,9 @@ public class ScriptExecutorTest {
             };
         }
 
-        @Bean(name = "externalPythonServerService")
-        public PythonRuntimeService externalPythonServerService() {
-            return new ExternalPythonServerServiceImpl(mock(StatefulRestEasyClientsHolder.class),
+        @Bean(name = "externalPythonExecutorService")
+        public PythonRuntimeService externalPythonExecutorService() {
+            return new ExternalPythonExecutorServiceImpl(mock(StatefulRestEasyClientsHolder.class),
                     new Semaphore(100), new Semaphore(50));
         }
 
