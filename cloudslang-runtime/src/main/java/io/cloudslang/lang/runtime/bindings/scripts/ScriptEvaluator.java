@@ -21,6 +21,8 @@ import io.cloudslang.runtime.api.python.enums.PythonStrategy;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonScriptException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,8 @@ import static io.cloudslang.runtime.api.python.enums.PythonStrategy.getPythonStr
  */
 @Component
 public class ScriptEvaluator extends ScriptProcessor {
+
+    private static final Logger logger = LogManager.getLogger(ScriptEvaluator.class);
     private static String LINE_SEPARATOR = "\n";
     private static final String SYSTEM_PROPERTIES_MAP = "sys_prop";
     private static final String ACCESSED_RESOURCES_SET = "accessed_resources_set";
@@ -148,6 +152,7 @@ public class ScriptEvaluator extends ScriptProcessor {
             result = pythonExecutorService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
         } catch (ExternalPythonScriptException exception) {
+            logger.error("Could not evaluate expressions on python executor, retrying with python");
             result = pythonRuntimeService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
         }
