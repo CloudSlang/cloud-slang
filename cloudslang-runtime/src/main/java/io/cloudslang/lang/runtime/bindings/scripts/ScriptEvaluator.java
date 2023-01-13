@@ -18,6 +18,7 @@ import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.api.python.enums.PythonStrategy;
+import io.cloudslang.runtime.impl.python.external.ExternalPythonScriptException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.python.core.Py;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.ws.rs.ProcessingException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -147,7 +147,7 @@ public class ScriptEvaluator extends ScriptProcessor {
         try {
             result = pythonExecutorService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
-        } catch (ProcessingException exception) {
+        } catch (ExternalPythonScriptException exception) {
             result = pythonRuntimeService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
         }
