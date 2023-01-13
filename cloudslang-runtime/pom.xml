@@ -125,7 +125,6 @@
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
 
-
         <!-- For tests -->
         <dependency>
             <groupId>junit</groupId>
