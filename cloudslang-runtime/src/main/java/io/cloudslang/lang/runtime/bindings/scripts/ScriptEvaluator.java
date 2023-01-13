@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.ws.rs.ProcessingException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -128,9 +129,9 @@ public class ScriptEvaluator extends ScriptProcessor {
     }
 
     private Value doEvaluateExpressionPythonExecutor(String expr,
-                                                   Map<String, Value> context,
-                                                   Set<SystemProperty> systemProperties,
-                                                   Set<ScriptFunction> functionDependencies) {
+                                                     Map<String, Value> context,
+                                                     Set<SystemProperty> systemProperties,
+                                                     Set<ScriptFunction> functionDependencies) {
         Map<String, Serializable> pythonContext = createExternalPythonContext(context);
         boolean systemPropertiesDefined = false;
         if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_PROPERTY) ||
@@ -142,8 +143,14 @@ public class ScriptEvaluator extends ScriptProcessor {
                     (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
         }
 
-        PythonEvaluationResult result = pythonExecutorService.eval(
-                buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
+        PythonEvaluationResult result = null;
+        try {
+            result = pythonExecutorService.eval(
+                    buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
+        } catch (ProcessingException exception) {
+            result = pythonRuntimeService.eval(
+                    buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
+        }
 
         //noinspection unchecked
         Set<String> accessedResources = (Set<String>) result.getResultContext().get(ACCESSED_RESOURCES_SET);
