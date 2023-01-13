@@ -143,7 +143,7 @@ public class ScriptEvaluator extends ScriptProcessor {
                     (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
         }
 
-        PythonEvaluationResult result = null;
+        PythonEvaluationResult result;
         try {
             result = pythonExecutorService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
