@@ -27,7 +27,9 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.lang.runtime.steps.ContentTestActions.NonSerializableObject;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
+import io.cloudslang.runtime.api.python.PythonExecutorConfigurationDataService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.api.python.entities.PythonExecutorDetails;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.runtime.impl.java.JavaExecutionCachedEngine;
 import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
@@ -1204,6 +1206,11 @@ public class ActionStepsTest {
         @Bean(name = "jythonExecutionEngine")
         public PythonExecutionEngine pythonExecutionEngine() {
             return new PythonExecutionCachedEngine();
+        }
+
+        @Bean(name = "pythonExecutorConfigurationDataService")
+        public PythonExecutorConfigurationDataService pythonExecutorConfigurationDataService() {
+            return PythonExecutorDetails::new;
         }
 
         @Bean(name = "externalPythonExecutorService")

@@ -17,7 +17,9 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonExecutionResult;
+import io.cloudslang.runtime.api.python.PythonExecutorConfigurationDataService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
+import io.cloudslang.runtime.api.python.entities.PythonExecutorDetails;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutor;
@@ -197,6 +199,11 @@ public class ScriptExecutorTest {
                     };
                 }
             };
+        }
+
+        @Bean(name = "pythonExecutorConfigurationDataService")
+        public PythonExecutorConfigurationDataService pythonExecutorConfigurationDataService() {
+            return PythonExecutorDetails::new;
         }
 
         @Bean(name = "externalPythonExecutorService")
