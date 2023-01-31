@@ -152,7 +152,9 @@ public class ScriptEvaluator extends ScriptProcessor {
             result = pythonExecutorService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
         } catch (ExternalPythonScriptException exception) {
-            logger.error("Could not evaluate expressions on python executor, retrying with python");
+            if (logger.isDebugEnabled()) {
+                logger.warn("Could not evaluate expressions on python executor, retrying with python");
+            }
             result = pythonRuntimeService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
         }
