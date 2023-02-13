@@ -37,8 +37,9 @@ import io.cloudslang.runtime.api.python.entities.PythonExecutorDetails;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
+import io.cloudslang.runtime.impl.python.executor.ExternalPythonExecutorServiceImpl;
+import io.cloudslang.runtime.impl.python.executor.PythonExecutorCommunicationServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
-import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.events.EventBus;
@@ -613,6 +614,12 @@ public class ParallelLoopStepsTest {
             return PythonExecutorDetails::new;
         }
 
+        @Bean(name = "pythonExecutorCommunicationService")
+        public PythonExecutorCommunicationServiceImpl pythonExecutorCommunicationService() {
+            return new PythonExecutorCommunicationServiceImpl(
+                    mock(StatefulRestEasyClientsHolder.class), mock(PythonExecutorConfigurationDataService.class));
+        }
+
         @Bean(name = "externalPythonRuntimeService")
         public PythonRuntimeService externalPythonRuntimeService() {
             return new PythonRuntimeServiceImpl();
@@ -620,8 +627,7 @@ public class ParallelLoopStepsTest {
 
         @Bean(name = "externalPythonExecutorService")
         public PythonRuntimeService externalPythonexecutorService() {
-            return new ExternalPythonExecutorServiceImpl(mock(StatefulRestEasyClientsHolder.class),
-                    new Semaphore(100), new Semaphore(50));
+            return new ExternalPythonExecutorServiceImpl(new Semaphore(100), new Semaphore(50));
         }
 
 
