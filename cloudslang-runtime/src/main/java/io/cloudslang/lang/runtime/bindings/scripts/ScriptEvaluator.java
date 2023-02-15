@@ -72,7 +72,7 @@ public class ScriptEvaluator extends ScriptProcessor {
     private ScriptsService scriptsService;
 
     @Autowired
-    PythonExecutorLifecycleManagerService pythonExecutorLifecycleManagerService;
+    private PythonExecutorLifecycleManagerService pythonExecutorLifecycleManagerService;
 
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
