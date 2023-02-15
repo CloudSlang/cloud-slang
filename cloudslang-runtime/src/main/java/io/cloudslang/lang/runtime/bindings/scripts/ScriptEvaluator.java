@@ -16,6 +16,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
+import io.cloudslang.runtime.api.python.PythonExecutorLifecycleManagerService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.api.python.enums.PythonStrategy;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonScriptException;
@@ -69,6 +70,9 @@ public class ScriptEvaluator extends ScriptProcessor {
 
     @Autowired
     private ScriptsService scriptsService;
+
+    @Autowired
+    PythonExecutorLifecycleManagerService pythonExecutorLifecycleManagerService;
 
     public Value evalExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
                           Set<ScriptFunction> functionDependencies) {
@@ -148,13 +152,18 @@ public class ScriptEvaluator extends ScriptProcessor {
         }
 
         PythonEvaluationResult result;
-        try {
-            result = pythonExecutorService.eval(
-                    buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
-        } catch (ExternalPythonScriptException exception) {
-            if (logger.isDebugEnabled()) {
-                logger.warn("Could not evaluate expressions on python executor, retrying with python");
+        if (pythonExecutorLifecycleManagerService.isAlive()) {
+            try {
+                result = pythonExecutorService.eval(
+                        buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
+            } catch (ExternalPythonScriptException exception) {
+                if (logger.isDebugEnabled()) {
+                    logger.warn("Could not evaluate expressions on python executor, retrying with python");
+                }
+                result = pythonRuntimeService.eval(
+                        buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
             }
+        } else {
             result = pythonRuntimeService.eval(
                     buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
         }
