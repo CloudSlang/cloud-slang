@@ -32,6 +32,7 @@ import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonExecutorConfigurationDataService;
+import io.cloudslang.runtime.api.python.PythonExecutorLifecycleManagerService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.api.python.entities.PythonExecutorDetails;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
@@ -39,6 +40,7 @@ import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.executor.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.executor.PythonExecutorCommunicationServiceImpl;
+import io.cloudslang.runtime.impl.python.executor.PythonExecutorLifecycleManagerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.EndBranchDataContainer;
@@ -618,6 +620,12 @@ public class ParallelLoopStepsTest {
         public PythonExecutorCommunicationServiceImpl pythonExecutorCommunicationService() {
             return new PythonExecutorCommunicationServiceImpl(
                     mock(StatefulRestEasyClientsHolder.class), mock(PythonExecutorConfigurationDataService.class));
+        }
+
+        @Bean(name = "pythonExecutorLifecycleManagerService")
+        public PythonExecutorLifecycleManagerService pythonExecutorLifecycleManagerService() {
+            return new PythonExecutorLifecycleManagerServiceImpl(pythonExecutorCommunicationService(),
+                    pythonExecutorConfigurationDataService());
         }
 
         @Bean(name = "externalPythonRuntimeService")
