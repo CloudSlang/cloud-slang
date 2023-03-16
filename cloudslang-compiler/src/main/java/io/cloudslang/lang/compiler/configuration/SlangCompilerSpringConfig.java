@@ -80,8 +80,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.inspector.TrustedTagInspector;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
@@ -458,7 +460,7 @@ public class SlangCompilerSpringConfig {
     }
 
     private Constructor getConstructor() {
-        Constructor constructor = new Constructor(ParsedSlang.class);
+        Constructor constructor = new Constructor(ParsedSlang.class, new LoaderOptions());
         constructor.setPropertyUtils(new PropertyUtils() {
             @Override
             public Property getProperty(Class<? extends Object> type, String name) {
