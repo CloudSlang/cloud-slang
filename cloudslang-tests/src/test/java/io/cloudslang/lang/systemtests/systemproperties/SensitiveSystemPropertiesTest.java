@@ -113,8 +113,7 @@ public class SensitiveSystemPropertiesTest extends ValueSyntaxParent {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 slang.loadSystemProperties(SlangSource.fromFile(propertiesFileUri)));
-        assertTrue(exception.getMessage().contains("Artifact {flow.var3_sensitive} has invalid value"));
-        assertTrue(exception.getMessage().contains("Value cannot be cast to Serializable"));
+        assertTrue(exception.getMessage().contains("Global tag is not allowed"));
     }
 
     private void testExecutable(
