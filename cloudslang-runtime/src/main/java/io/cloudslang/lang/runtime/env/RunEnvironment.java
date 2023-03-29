@@ -215,8 +215,8 @@ public class RunEnvironment implements Serializable {
         for (Value value : prepareValuesForEncryptDecrypt()) {
             if (value.get() instanceof HashMap) {
                 HashMap<String, Value> map = (HashMap<String, Value>) value.get();
-                for (Value valueInMap : map.values()) {
-                    if (valueInMap.isSensitive()) {
+                for (Serializable valueInMap : map.values()) {
+                    if (valueInMap instanceof Value && ((Value) valueInMap).isSensitive()) {
                         ((SensitiveValue) valueInMap).decrypt();
                     }
                 }
@@ -230,8 +230,8 @@ public class RunEnvironment implements Serializable {
         for (Value value : prepareValuesForEncryptDecrypt()) {
             if (value.get() instanceof HashMap) {
                 HashMap<String, Value> map = (HashMap<String, Value>) value.get();
-                for (Value valueInMap : map.values()) {
-                    if (valueInMap.isSensitive()) {
+                for (Serializable valueInMap : map.values()) {
+                    if (valueInMap instanceof Value && ((Value) valueInMap).isSensitive()) {
                         ((SensitiveValue) valueInMap).encrypt();
                     }
                 }
