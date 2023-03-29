@@ -20,6 +20,8 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.score.api.StatefulSessionStack;
 import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -77,6 +79,8 @@ public class RunEnvironment implements Serializable {
 
     //list of the arguments that need to be rebound if context is modified
     private List<Argument> modifiedArguments;
+
+    private static final Logger logger = LogManager.getLogger(RunEnvironment.class);
 
     public RunEnvironment(Set<SystemProperty> systemProperties) {
         Validate.notNull(systemProperties, "system properties cannot be null");
@@ -213,7 +217,14 @@ public class RunEnvironment implements Serializable {
 
     public void decryptSensitiveData() {
         for (Value value : prepareValuesForEncryptDecrypt()) {
-            if (value.isSensitive()) {
+            if (value.get() instanceof HashMap) {
+                HashMap<String, Value> map = (HashMap<String, Value>) value.get();
+                for (Serializable valueInMap : map.values()) {
+                    if (valueInMap instanceof Value && ((Value) valueInMap).isSensitive()) {
+                        ((SensitiveValue) valueInMap).decrypt();
+                    }
+                }
+            } else if (value.isSensitive()) {
                 ((SensitiveValue) value).decrypt();
             }
         }
@@ -221,7 +232,14 @@ public class RunEnvironment implements Serializable {
 
     public void encryptSensitiveData() {
         for (Value value : prepareValuesForEncryptDecrypt()) {
-            if (value.isSensitive()) {
+            if (value.get() instanceof HashMap) {
+                HashMap<String, Value> map = (HashMap<String, Value>) value.get();
+                for (Serializable valueInMap : map.values()) {
+                    if (valueInMap instanceof Value && ((Value) valueInMap).isSensitive()) {
+                        ((SensitiveValue) valueInMap).encrypt();
+                    }
+                }
+            } else if (value.isSensitive()) {
                 ((SensitiveValue) value).encrypt();
             }
         }
