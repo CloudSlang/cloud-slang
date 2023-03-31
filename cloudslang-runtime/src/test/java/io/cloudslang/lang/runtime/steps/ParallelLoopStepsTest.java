@@ -31,18 +31,17 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.services.ScriptsService;
-import io.cloudslang.runtime.api.python.PythonExecutorConfigurationDataService;
-import io.cloudslang.runtime.api.python.PythonExecutorLifecycleManagerService;
+import io.cloudslang.runtime.api.python.executor.services.PythonExecutorCommunicationService;
+import io.cloudslang.runtime.api.python.executor.services.PythonExecutorConfigurationDataService;
+import io.cloudslang.runtime.api.python.executor.services.PythonExecutorLifecycleManagerService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.api.python.entities.PythonExecutorDetails;
+import io.cloudslang.runtime.api.python.executor.entities.PythonExecutorDetails;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.executor.ExternalPythonExecutorServiceImpl;
-import io.cloudslang.runtime.impl.python.executor.PythonExecutorCommunicationServiceImpl;
-import io.cloudslang.runtime.impl.python.executor.PythonExecutorLifecycleManagerServiceImpl;
+import io.cloudslang.runtime.impl.python.executor.services.ExternalPythonExecutorServiceImpl;
+import io.cloudslang.runtime.impl.python.executor.services.PythonExecutorLifecycleManagerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
-import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.EndBranchDataContainer;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -617,9 +616,8 @@ public class ParallelLoopStepsTest {
         }
 
         @Bean(name = "pythonExecutorCommunicationService")
-        public PythonExecutorCommunicationServiceImpl pythonExecutorCommunicationService() {
-            return new PythonExecutorCommunicationServiceImpl(
-                    mock(StatefulRestEasyClientsHolder.class), mock(PythonExecutorConfigurationDataService.class));
+        public PythonExecutorCommunicationService pythonExecutorCommunicationService() {
+            return mock(PythonExecutorCommunicationService.class);
         }
 
         @Bean(name = "pythonExecutorLifecycleManagerService")
