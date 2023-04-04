@@ -22,8 +22,9 @@
     <score:worker uuid="-1"/>
 
     <bean class="io.cloudslang.lang.systemtests.TriggerFlows"/>
-    <bean id="pythonExecutorDetails" class="io.cloudslang.runtime.api.python.entities.PythonExecutorDetails"/>
-    <bean name="pythonExecutorConfigurationDataService" class="io.cloudslang.runtime.impl.python.external.StubPythonExecutorConfigurationDataServiceImpl">
+    <bean id="pythonExecutorDetails" class="io.cloudslang.runtime.api.python.executor.entities.PythonExecutorDetails"/>
+    <bean name="pythonExecutorConfigurationDataService" class="io.cloudslang.runtime.impl.python.executor.services.stubs.StubPythonExecutorConfigurationDataServiceImpl">
         <lookup-method name="getPythonExecutorConfiguration" bean="pythonExecutorDetails"/>
     </bean>
+    <bean id="pythonExecutorCommunicationService" class="io.cloudslang.runtime.impl.python.executor.services.stubs.StubPythonExecutorCommunicationServiceImpl"/>
 </beans>

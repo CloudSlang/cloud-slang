@@ -16,7 +16,7 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
-import io.cloudslang.runtime.api.python.PythonExecutorLifecycleManagerService;
+import io.cloudslang.runtime.api.python.executor.services.PythonExecutorLifecycleManagerService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.api.python.enums.PythonStrategy;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonScriptException;

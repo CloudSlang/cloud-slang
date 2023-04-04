@@ -27,20 +27,19 @@ import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.lang.runtime.steps.ContentTestActions.NonSerializableObject;
 import io.cloudslang.runtime.api.java.JavaRuntimeService;
-import io.cloudslang.runtime.api.python.PythonExecutorConfigurationDataService;
+import io.cloudslang.runtime.api.python.executor.services.PythonExecutorCommunicationService;
+import io.cloudslang.runtime.api.python.executor.services.PythonExecutorConfigurationDataService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
-import io.cloudslang.runtime.api.python.entities.PythonExecutorDetails;
+import io.cloudslang.runtime.api.python.executor.entities.PythonExecutorDetails;
 import io.cloudslang.runtime.api.sequential.SequentialExecutionService;
 import io.cloudslang.runtime.impl.java.JavaExecutionCachedEngine;
 import io.cloudslang.runtime.impl.java.JavaRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.executor.ExternalPythonExecutorServiceImpl;
-import io.cloudslang.runtime.impl.python.executor.PythonExecutorCommunicationServiceImpl;
+import io.cloudslang.runtime.impl.python.executor.services.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
-import io.cloudslang.runtime.impl.python.external.StatefulRestEasyClientsHolder;
 import io.cloudslang.score.api.execution.ExecutionParametersConsts;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
@@ -1215,9 +1214,8 @@ public class ActionStepsTest {
         }
 
         @Bean(name = "pythonExecutorCommunicationService")
-        public PythonExecutorCommunicationServiceImpl pythonExecutorCommunicationService() {
-            return new PythonExecutorCommunicationServiceImpl(
-                    mock(StatefulRestEasyClientsHolder.class), mock(PythonExecutorConfigurationDataService.class));
+        public PythonExecutorCommunicationService pythonExecutorCommunicationService() {
+            return mock(PythonExecutorCommunicationService.class);
         }
 
         @Bean(name = "externalPythonExecutorService")
