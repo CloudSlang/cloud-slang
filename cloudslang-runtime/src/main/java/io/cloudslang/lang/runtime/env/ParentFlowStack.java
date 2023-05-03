@@ -24,10 +24,16 @@ import java.util.Iterator;
  */
 public class ParentFlowStack implements Serializable {
 
+    private static final long serialVersionUID = -3596242783100345155L;
+
     private Deque<ParentFlowData> stack;
 
     public ParentFlowStack() {
         this.stack = new ArrayDeque<>();
+    }
+
+    public ParentFlowData peekFirstParentFlowData() {
+        return stack.peekFirst();
     }
 
     public void pushParentFlowData(ParentFlowData newContext) {
