@@ -54,7 +54,7 @@
         <!--Project dependencies-->
         <spring.version>5.3.27</spring.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <score.version>0.3.328</score.version>
+        <score.version>0.3.329</score.version>
         <h2.version>2.1.214</h2.version>
         <!--Project properties-->
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
