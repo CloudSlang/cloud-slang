@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {RunEnvironmentSensitiveTest.RunEnvironmentSensitiveValueTestConfig.class,
-        SlangEntitiesSpringConfig.class})
+                                 SlangEntitiesSpringConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RunEnvironmentSensitiveTest {
     private static final String ENCYPTED = "{Encrypted}";

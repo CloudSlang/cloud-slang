@@ -117,7 +117,9 @@ public class TestCasesYamlParserTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 parser.parseTestCases(SlangSource.fromFile(fileUri)));
         Assert.assertEquals("There was a problem parsing the YAML source: properties.prop.sl.\n" +
-                "java.lang.String cannot be cast to java.util.Map", exception.getMessage());
+                        "class java.lang.String cannot be cast to class java.util.Map " +
+                        "(java.lang.String and java.util.Map are in module java.base of loader 'bootstrap')",
+                exception.getMessage());
     }
 
     @Test

@@ -13,7 +13,7 @@ import io.cloudslang.lang.tools.build.tester.ISlangTestCaseEventListener;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import org.apache.commons.lang3.event.EventListenerSupport;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 public class TestCaseEventDispatchService {
 
