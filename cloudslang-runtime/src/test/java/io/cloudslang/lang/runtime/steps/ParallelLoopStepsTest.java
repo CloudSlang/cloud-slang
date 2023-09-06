@@ -630,7 +630,7 @@ public class ParallelLoopStepsTest {
 
         @Bean(name = "pythonExecutorProcessManagerService")
         public PythonExecutorProcessManagerService pythonExecutorProcessManagerService() {
-            return mock(PythonExecutorProcessManagerServiceImpl.class);
+            return mock(PythonExecutorProcessManagerService.class);
         }
 
         @Bean(name = "externalPythonRuntimeService")

@@ -290,7 +290,7 @@ public class OutputsBindingTest {
 
         @Bean(name = "pythonExecutorProcessManagerService")
         public PythonExecutorProcessManagerService pythonExecutorProcessManagerService() {
-            return mock(PythonExecutorProcessManagerServiceImpl.class);
+            return mock(PythonExecutorProcessManagerService.class);
         }
 
         @Bean(name = "externalPythonExecutorService")
