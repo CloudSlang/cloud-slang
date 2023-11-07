@@ -22,5 +22,7 @@ public interface RuntimeConstants {
     String BRANCH_RETURN_VALUES_KEY = "branchReturnValues";
 
     String EXECUTION_ID = "run_id";
+    String USER_ID = "get_user_id()";
+    String WORKER_GROUP = "get_worker_group()";
 
 }

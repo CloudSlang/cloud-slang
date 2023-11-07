@@ -46,7 +46,9 @@ public class ScriptsService {
                 ScriptFunction.CS_SUBSTRING,
                 ScriptFunction.CS_TO_UPPER,
                 ScriptFunction.CS_TO_LOWER,
-                ScriptFunction.GET_SP_VAR
+                ScriptFunction.GET_SP_VAR,
+                ScriptFunction.GET_USER_ID,
+                ScriptFunction.GET_WORKER_GROUP
         );
 
         for (ScriptFunction function: list) {
