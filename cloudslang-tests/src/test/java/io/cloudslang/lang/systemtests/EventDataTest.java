@@ -24,6 +24,7 @@ import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.util.CollectionUtils;
 
