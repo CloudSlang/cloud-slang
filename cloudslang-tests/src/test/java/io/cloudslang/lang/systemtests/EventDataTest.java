@@ -24,7 +24,6 @@ import io.cloudslang.score.events.ScoreEvent;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.util.CollectionUtils;
 
@@ -141,7 +140,6 @@ public class EventDataTest extends SystemsTestsParent {
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
-    @Ignore("Will be fixed very soon")
     public void testEventDataWithContext() throws Exception {
         // store context in events
         System.setProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(), EventVerbosityLevel.ALL.getValue());
@@ -152,7 +150,7 @@ public class EventDataTest extends SystemsTestsParent {
 
         List<ScoreEvent> events = compileAndRunExecutable(inputs, EMPTY_SP_SET);
         Map<String, List<LanguageEventData>> eventDataByPath = groupByPath(events);
-        populateRunId(eventDataByPath.get("0").get(0).get("EXECUTION_ID").toString());
+        populateMagicVariables(eventDataByPath.get("0").get(0).get("EXECUTION_ID").toString());
 
         validateEventData(eventDataByPath,"0", ScoreLangConstants.EVENT_INPUT_START, CONTEXT_USER_INPUTS);
         validateEventData(eventDataByPath,"0", ScoreLangConstants.EVENT_INPUT_END, CONTEXT_USER_INPUTS);
@@ -214,9 +212,10 @@ public class EventDataTest extends SystemsTestsParent {
         validateSensitiveDataNotReveiledInContext(events);
     }
 
-    private void populateRunId(String runId) {
+    private void populateMagicVariables(String runId) {
         CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runId);
-        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runId);
+        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.USER_ID, "");
+        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.WORKER_GROUP, "RAS_Operator_Path");
     }
 
     private void validateSensitiveDataNotReveiledInContext(List<ScoreEvent> events) {
