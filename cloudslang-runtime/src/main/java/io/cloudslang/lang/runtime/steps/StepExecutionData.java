@@ -82,6 +82,8 @@ public class StepExecutionData extends AbstractExecutionData {
     private LoopsBinding loopsBinding;
     @Autowired
     private ScriptEvaluator scriptEvaluator;
+    @Autowired
+    private CsMagicVariableHelper magicVariableHelper;
 
     @SuppressWarnings("unused")
     public void beginStep(@Param(ScoreLangConstants.STEP_INPUTS_KEY) List<Argument> stepInputs,
@@ -133,7 +135,7 @@ public class StepExecutionData extends AbstractExecutionData {
             );
             ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
                     flowVariables,
-                    flowContext.getImmutableViewOfMagicVariables());
+                    magicVariableHelper.getGlobalContext(executionRuntimeServices));
             Map<String, Value> boundInputs = argumentsBinding
                     .bindArguments(stepInputs, contextAccessor,
                             runEnv.getSystemProperties());
@@ -202,7 +204,7 @@ public class StepExecutionData extends AbstractExecutionData {
             ReturnValues executableReturnValues = runEnv.removeReturnValues();
             Map<String, Value> argumentsResultContext = removeStepInputsResultContext(flowContext);
             Map<String, Value> executableOutputs = executableReturnValues.getOutputs();
-            Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
+            Map<String, Value> globalContext = magicVariableHelper.getGlobalContext(executionRuntimeServices);
             ReadOnlyContextAccessor outputsBindingAccessor = new ReadOnlyContextAccessor(
                     argumentsResultContext,
                     executableOutputs,

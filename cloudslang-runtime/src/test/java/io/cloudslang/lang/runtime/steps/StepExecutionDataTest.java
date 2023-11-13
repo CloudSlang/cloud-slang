@@ -624,6 +624,11 @@ public class StepExecutionDataTest {
         }
 
         @Bean
+        public CsMagicVariableHelper magicVariableHelper() {
+            return mock(CsMagicVariableHelper.class);
+        }
+
+        @Bean
         public ScriptsService scriptsService() {
             return new ScriptsService();
         }

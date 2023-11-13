@@ -74,6 +74,9 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
     @Autowired
     private OutputsBinding outputsBinding;
 
+    @Autowired
+    private CsMagicVariableHelper magicVariableHelper;
+
     private static final Logger logger = LogManager.getLogger(ParallelLoopExecutionData.class);
 
     public void addBranches(
@@ -258,7 +261,7 @@ public class ParallelLoopExecutionData extends AbstractExecutionData {
         }
 
         Context flowContext = runEnv.getStack().popContext();
-        Map<String, Value> globalContext = flowContext.getImmutableViewOfMagicVariables();
+        Map<String, Value> globalContext = magicVariableHelper.getGlobalContext(executionRuntimeServices);
         Map<String, Value> outputBindingContext = new HashMap<>();
         outputBindingContext.put(
                 BRANCHES_CONTEXT_KEY,

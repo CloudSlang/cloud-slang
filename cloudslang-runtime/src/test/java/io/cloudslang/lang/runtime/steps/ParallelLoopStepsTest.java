@@ -573,6 +573,11 @@ public class ParallelLoopStepsTest {
         }
 
         @Bean
+        public CsMagicVariableHelper magicVariableHelper() {
+            return mock(CsMagicVariableHelper.class);
+        }
+
+        @Bean
         public LoopsBinding loopsBinding() {
             return mock(LoopsBinding.class);
         }
