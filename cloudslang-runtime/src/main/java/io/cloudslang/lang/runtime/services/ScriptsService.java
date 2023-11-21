@@ -48,7 +48,8 @@ public class ScriptsService {
                 ScriptFunction.CS_TO_LOWER,
                 ScriptFunction.GET_SP_VAR,
                 ScriptFunction.GET_USER_ID,
-                ScriptFunction.GET_WORKER_GROUP
+                ScriptFunction.GET_WORKER_GROUP,
+                ScriptFunction.GET_RUN_ID
         );
 
         for (ScriptFunction function: list) {
