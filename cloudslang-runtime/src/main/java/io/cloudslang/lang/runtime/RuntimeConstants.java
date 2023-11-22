@@ -24,5 +24,6 @@ public interface RuntimeConstants {
     String EXECUTION_ID = "run_id";
     String USER_ID = "get_user_id()";
     String WORKER_GROUP = "get_worker_group()";
+    String RUN_ID = "get_run_id()";
 
 }

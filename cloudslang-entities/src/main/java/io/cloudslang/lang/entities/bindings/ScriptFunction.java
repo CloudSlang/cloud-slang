@@ -47,7 +47,9 @@ public enum ScriptFunction {
 
     GET_USER_ID("get_user_id"),
 
-    GET_WORKER_GROUP("get_worker_group");
+    GET_WORKER_GROUP("get_worker_group"),
+
+    GET_RUN_ID("get_run_id");
 
     private final String value;
 

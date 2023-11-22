@@ -33,6 +33,7 @@ public class CsMagicVariableHelper {
         globalContext.put(RuntimeConstants.USER_ID, ValueFactory.create(userId));
         globalContext.put(RuntimeConstants.WORKER_GROUP, ValueFactory.create(workerGroup == null ?
                                                                              RAS_OPERATOR_PATH : workerGroup));
+        globalContext.put(RuntimeConstants.RUN_ID, ValueFactory.create(executionId));
         return Collections.unmodifiableMap(globalContext);
     }
 }

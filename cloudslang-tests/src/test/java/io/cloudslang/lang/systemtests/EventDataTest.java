@@ -216,6 +216,7 @@ public class EventDataTest extends SystemsTestsParent {
         CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.EXECUTION_ID, runId);
         CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.USER_ID, "");
         CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.WORKER_GROUP, "RAS_Operator_Path");
+        CONTEXT_STEP_PUBLISH_01.put(RuntimeConstants.RUN_ID, runId);
     }
 
     private void validateSensitiveDataNotReveiledInContext(List<ScoreEvent> events) {
