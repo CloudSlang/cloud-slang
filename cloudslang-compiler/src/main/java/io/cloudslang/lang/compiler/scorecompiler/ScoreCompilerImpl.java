@@ -166,7 +166,7 @@ public class ScoreCompilerImpl implements ScoreCompiler {
      *
      * @param executable the executable to create an {@link io.cloudslang.score.api.ExecutionPlan} for
      * @return {@link io.cloudslang.score.api.ExecutionPlan} of the given
-     * {@link io.cloudslang.lang.compiler.modeller.model.Executable}
+     *{@link io.cloudslang.lang.compiler.modeller.model.Executable}
      */
     private ExecutionPlan compileToExecutionPlan(Executable executable) {
 

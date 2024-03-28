@@ -16,7 +16,7 @@ import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 public class CachedPrecompileServiceImpl implements CachedPrecompileService {
 

@@ -316,7 +316,7 @@ public class SlangTestRunner {
         if (bulkRunMode == BulkRunMode.POSSIBLY_MIXED) {
             TestCaseRunMode runModeForTestCase = testRunInfoService
                     .getRunModeForTestCase(testCase, new RunMultipleTestSuiteConflictResolutionStrategy(),
-                    new SequentialRunTestSuiteResolutionStrategy());
+                        new SequentialRunTestSuiteResolutionStrategy());
             if (runModeForTestCase == TestCaseRunMode.SEQUENTIAL) {
                 resultMap.get(TestCaseRunState.SEQUENTIAL).put(testCaseEntry.getKey(), testCase);
             } else if (runModeForTestCase == TestCaseRunMode.PARALLEL) {

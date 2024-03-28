@@ -17,7 +17,7 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
