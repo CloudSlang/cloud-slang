@@ -22,10 +22,18 @@ import java.util.Map;
 @Component("csMagicVariableHelper")
 public class CsMagicVariableHelper {
 
+    private static final String RAS_OPERATOR_PATH = "RAS_Operator_Path";
+
     public Map<String, Value> getGlobalContext(ExecutionRuntimeServices executionRuntimeServices) {
         Map<String, Value> globalContext = new HashMap<>();
         String executionId = String.valueOf(executionRuntimeServices.getExecutionId());
+        String userId = executionRuntimeServices.getEffectiveRunningUser();
+        String workerGroup = executionRuntimeServices.getWorkerGroupName();
         globalContext.put(RuntimeConstants.EXECUTION_ID, ValueFactory.create(executionId));
+        globalContext.put(RuntimeConstants.USER_ID, ValueFactory.create(userId));
+        globalContext.put(RuntimeConstants.WORKER_GROUP, ValueFactory.create(workerGroup == null ?
+                                                                             RAS_OPERATOR_PATH : workerGroup));
+        globalContext.put(RuntimeConstants.RUN_ID, ValueFactory.create(executionId));
         return Collections.unmodifiableMap(globalContext);
     }
 }

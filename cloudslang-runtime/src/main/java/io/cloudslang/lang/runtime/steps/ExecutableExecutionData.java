@@ -484,7 +484,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
 
         ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
                 flowVariables,
-                flowContext.getImmutableViewOfMagicVariables());
+                magicVariableHelper.getGlobalContext(executionRuntimeServices));
 
         Map<String, Value> boundInputs = argumentsBinding
                 .bindArguments(runEnvironment.getModifiedArguments(), contextAccessor,

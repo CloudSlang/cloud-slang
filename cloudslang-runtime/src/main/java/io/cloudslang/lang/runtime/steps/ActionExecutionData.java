@@ -211,7 +211,12 @@ public class ActionExecutionData extends AbstractExecutionData {
 
         final Serializable exception = returnMap.get(EXCEPTION);
         if (exception != null) {
-            logException(exception.toString());
+            // some java actions contain the exception key without having an actual exception
+            // this is because some actions have the output field named as "errorMessage", others "exception"
+            String exceptionMessage = exception.toString();
+            if (!exceptionMessage.isEmpty()) {
+                logException(exceptionMessage);
+            }
         }
 
         return handleSensitiveValues(returnMap, currentContext);

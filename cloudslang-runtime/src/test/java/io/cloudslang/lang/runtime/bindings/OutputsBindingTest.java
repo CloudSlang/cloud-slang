@@ -25,11 +25,13 @@ import io.cloudslang.runtime.api.python.executor.services.PythonExecutorConfigur
 import io.cloudslang.runtime.api.python.executor.services.PythonExecutorLifecycleManagerService;
 import io.cloudslang.runtime.api.python.PythonRuntimeService;
 import io.cloudslang.runtime.api.python.executor.entities.PythonExecutorDetails;
+import io.cloudslang.runtime.api.python.executor.services.PythonExecutorProcessManagerService;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.runtime.impl.python.PythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.executor.services.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.executor.services.PythonExecutorLifecycleManagerServiceImpl;
+import io.cloudslang.runtime.impl.python.executor.services.PythonExecutorProcessManagerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
@@ -283,7 +285,12 @@ public class OutputsBindingTest {
         @Bean(name = "pythonExecutorLifecycleManagerService")
         public PythonExecutorLifecycleManagerService pythonExecutorLifecycleManagerService() {
             return new PythonExecutorLifecycleManagerServiceImpl(pythonExecutorCommunicationService(),
-                    pythonExecutorConfigurationDataService());
+                    pythonExecutorConfigurationDataService(), pythonExecutorProcessManagerService());
+        }
+
+        @Bean(name = "pythonExecutorProcessManagerService")
+        public PythonExecutorProcessManagerService pythonExecutorProcessManagerService() {
+            return mock(PythonExecutorProcessManagerService.class);
         }
 
         @Bean(name = "externalPythonExecutorService")

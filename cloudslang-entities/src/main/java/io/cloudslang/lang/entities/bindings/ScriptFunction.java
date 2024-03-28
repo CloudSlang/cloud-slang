@@ -43,7 +43,13 @@ public enum ScriptFunction {
 
     CS_JSON_QUERY("cs_json_query"),
 
-    GET_SP_VAR("get_sp_var");
+    GET_SP_VAR("get_sp_var"),
+
+    GET_USER_ID("get_user_id"),
+
+    GET_WORKER_GROUP("get_worker_group"),
+
+    GET_RUN_ID("get_run_id");
 
     private final String value;
 

@@ -54,6 +54,9 @@ public class Regex {
     public static final String CS_SUBSTRING_REGEX = "cs_substring\\((.+?),(.+?)(,(.+?))?\\)";
     public static final String CS_TO_UPPER_REGEX = "cs_to_upper\\((.+?)\\)";
     public static final String CS_TO_LOWER_REGEX = "cs_to_lower\\((.+?)\\)";
+    public static final String GET_USER_ID_REGEX = "get_user_id()";
+    public static final String GET_WORKER_GROUP_REGEX = "get_worker_group()";
+    public static final String GET_RUN_ID_REGEX = "get_run_id()";
 
     //////////////// description
     public static final String DESCRIPTION_START_LINE = "(\\s*)(#!!)(([^#])(.*))*";
