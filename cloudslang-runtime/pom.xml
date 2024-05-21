@@ -154,6 +154,10 @@
             <version>${parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>${score.group}</groupId>
+            <artifactId>score-worker-manager-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

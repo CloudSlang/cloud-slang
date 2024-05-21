@@ -60,6 +60,7 @@ import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
+import io.cloudslang.worker.management.WorkerConfigurationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -479,6 +480,11 @@ public class ExecutableStepsTest {
         @Bean
         public ArgumentsBinding argumentsBinding() {
             return new ArgumentsBinding();
+        }
+
+        @Bean
+        public WorkerConfigurationService getWorkerConfigurationService() {
+            return mock(WorkerConfigurationService.class);
         }
 
         @Bean
