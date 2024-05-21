@@ -172,6 +172,12 @@
                 <artifactId>score-api</artifactId>
                 <version>${score.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>${score.group}</groupId>
+                <artifactId>score-worker-manager-api</artifactId>
+                <version>${score.version}</version>
+            </dependency>
             <!-- Exclude the slf4j-log4j12 coming from score to avoid conflicts with log4j-slf4j-impl-->
             <dependency>
                 <groupId>${score.group}</groupId>

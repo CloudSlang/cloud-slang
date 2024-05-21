@@ -30,14 +30,17 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.score.api.execution.precondition.ExecutionPreconditionService;
+import io.cloudslang.score.facade.execution.ExecutionStatus;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
+import io.cloudslang.worker.management.WorkerConfigurationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -84,6 +87,9 @@ public class ExecutableExecutionData extends AbstractExecutionData {
     private final CsMagicVariableHelper magicVariableHelper;
     private final DebuggerBreakpointsHandler debuggerBreakpointsHandler;
     private final ArgumentsBinding argumentsBinding;
+
+    @Autowired(required = false)
+    private WorkerConfigurationService workerConfigurationService;
 
     public ExecutableExecutionData(ResultsBinding resultsBinding, InputsBinding inputsBinding,
                                    OutputsBinding outputsBinding, ExecutionPreconditionService preconditionService,
@@ -387,6 +393,16 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                            @Param(ScoreLangConstants.NODE_NAME_KEY) String nodeName,
                            @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId) {
         try {
+            // check canceled, if it is then set next position to null and flow termination type
+            if (workerConfigurationService != null &&
+                    (workerConfigurationService.isExecutionCancelled(executionRuntimeServices.getExecutionId()) ||
+                            (executionRuntimeServices.getFlowTerminationType() == ExecutionStatus.CANCELED))) {
+                // NOTE: an execution can be cancelled directly from CancelExecutionService, if it's currently paused.
+                // Thus, if you change the code here, please check CancelExecutionService as well.
+                executionRuntimeServices.setFlowTerminationType(ExecutionStatus.CANCELED);
+                runEnv.putNextStepPosition(null);
+                return;
+            }
             if (!isEmpty(runEnv.getExecutionPath().getParentPath())) {
                 // If it is start of a sub flow then the check should not happen
                 runEnv.putNextStepPosition(nextStepId);
