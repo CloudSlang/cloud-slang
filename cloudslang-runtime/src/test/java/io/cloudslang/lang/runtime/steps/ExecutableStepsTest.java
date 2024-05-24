@@ -138,9 +138,11 @@ public class ExecutableStepsTest {
         Map<String, Value> resultMap = new HashMap<>();
         resultMap.put("input1", ValueFactory.create(5));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap()))
+        when(inputsBinding
+                .bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap(), true))
                 .thenReturn(resultMap);
-        executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
+        executableSteps
+                .startExecutable(inputs, runEnv, new HashMap<String, Value>(),
                 new ExecutionRuntimeServices(), "", 2L, ExecutableType.FLOW, new SystemContext(), false);
 
         Map<String, Value> opVars = runEnv.getStack().popContext().getImmutableViewOfVariables();
@@ -168,7 +170,8 @@ public class ExecutableStepsTest {
         resultMap.put("input1", ValueFactory.create(inputs.get(0).getValue()));
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
 
-        when(inputsBinding.bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap()))
+        when(inputsBinding
+                .bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap(), true))
                 .thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
                 runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
