@@ -139,7 +139,7 @@ public class ExecutableStepsTest {
         resultMap.put("input1", ValueFactory.create(5));
 
         when(inputsBinding
-                .bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap(), true))
+                .bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap(), anyBoolean()))
                 .thenReturn(resultMap);
         executableSteps
                 .startExecutable(inputs, runEnv, new HashMap<String, Value>(),
@@ -171,7 +171,7 @@ public class ExecutableStepsTest {
         resultMap.put("input2", ValueFactory.create(inputs.get(1).getValue()));
 
         when(inputsBinding
-                .bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap(), true))
+                .bindInputs(eq(inputs), anyMap(), anyMap(), anySet(), anyList(), anyBoolean(), anyMap(), anyBoolean()))
                 .thenReturn(resultMap);
         executableSteps.startExecutable(inputs, runEnv, new HashMap<String, Value>(),
                 runtimeServices, "dockerizeStep", 2L, ExecutableType.FLOW, new SystemContext(), false);
