@@ -58,7 +58,7 @@ public class InputsBinding extends AbstractBinding {
                                          List<Input> missingInputs,
                                          boolean useEmptyValuesForPrompts,
                                          Map<String, Prompt> prompts,
-                                         Boolean isCslangPromptEnabled) {
+                                         boolean isCslangPromptEnabled) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
 
         // we do not want to change original context map
@@ -80,7 +80,7 @@ public class InputsBinding extends AbstractBinding {
     private void bindInput(Input input, Map<String, ? extends Value> context,
                            Map<String, Value> promptContext, Map<String, Value> targetContext,
                            Set<SystemProperty> systemProperties, List<Input> missingInputs,
-                           boolean useEmptyValuesForPrompts, Boolean isCslangPromptEnabled) {
+                           boolean useEmptyValuesForPrompts, boolean isCslangPromptEnabled) {
         Value value;
 
         String inputName = input.getName();
