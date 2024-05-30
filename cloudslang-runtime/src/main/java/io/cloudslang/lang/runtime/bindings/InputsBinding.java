@@ -106,22 +106,16 @@ public class InputsBinding extends AbstractBinding {
 
             if (input.hasPrompt()) {
                 if (!isCslangPromptEnabled) {
-                    if (isNull(value)) {
+                    if (isNull(value) || isEmpty(value)) {
                         if (useEmptyValuesForPrompts) {
                             value = createEmptyValue(input);
-                        }
-                        else {
+                        } else {
                             resolvePromptExpressions(input, context, targetContext, systemProperties);
                             missingInputs.add(createMissingInput(input, value));
                             return;
                         }
                     }
-                    else if (isEmpty(value)) {
-                        missingInputs.add(input);
-                        return;
-                    }
-                }
-                else {
+                } else {
                     if (useEmptyValuesForPrompts) {
                         if (isNull(value)) {
                             value = createEmptyValue(input);
