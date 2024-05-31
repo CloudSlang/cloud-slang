@@ -185,7 +185,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
             List<Input> missingInputs = new ArrayList<>();
             ReadOnlyContextAccessor context = new ReadOnlyContextAccessor(callArguments, magicVariables);
-            Boolean  isCslangPromptEnabled = executionRuntimeServices.getCslangPromptsEnabledFlag();
+            boolean isCslangPromptEnabled = executionRuntimeServices.getCslangPromptsEnabledFlag();
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
                     newExecutableInputs,
                     context.getMergedContexts(),
