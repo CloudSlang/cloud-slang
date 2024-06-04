@@ -109,7 +109,7 @@ public class InputsBinding extends AbstractBinding {
                     if (isNull(value) || isEmpty(value)) {
                         if (useEmptyValuesForPrompts) {
                             value = createEmptyValue(input);
-                        } else {
+                        } else if (isNull(promptValue)) {
                             resolvePromptExpressions(input, context, targetContext, systemProperties);
                             missingInputs.add(createMissingInput(input, value));
                             return;
