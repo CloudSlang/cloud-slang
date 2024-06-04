@@ -185,6 +185,7 @@ public class ExecutableExecutionData extends AbstractExecutionData {
             Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
             List<Input> missingInputs = new ArrayList<>();
             ReadOnlyContextAccessor context = new ReadOnlyContextAccessor(callArguments, magicVariables);
+            boolean isCslangPromptEnabled = executionRuntimeServices.getCslangPromptsEnabledFlag();
             Map<String, Value> boundInputValues = inputsBinding.bindInputs(
                     newExecutableInputs,
                     context.getMergedContexts(),
@@ -192,7 +193,8 @@ public class ExecutableExecutionData extends AbstractExecutionData {
                     runEnv.getSystemProperties(),
                     missingInputs,
                     isTrue(useEmptyValuesForPrompts),
-                    promptArguments);
+                    promptArguments,
+                    isCslangPromptEnabled);
 
             boolean continueToNext = true;
             if (systemContext.containsKey(ScoreLangConstants.USER_INTERRUPT)) {
