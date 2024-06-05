@@ -35,6 +35,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>cloudslang-spi</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -63,6 +64,11 @@
         </dependency>
 
         <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.python</groupId>
             <artifactId>jython-standalone</artifactId>
         </dependency>
@@ -85,11 +91,13 @@
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>dependency-management-api</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>${score.group}</groupId>
             <artifactId>dependency-management-impl</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

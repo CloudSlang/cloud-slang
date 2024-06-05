@@ -96,6 +96,10 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = StepExecutionDataTest.Config.class)
 public class StepExecutionDataTest {
 
+    static {
+        System.setProperty("python.expressionsEval", "jython");
+    }
+
     @Autowired
     private StepExecutionData stepExecutionData;
 

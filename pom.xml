@@ -492,7 +492,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.6</version>
+                    <version>0.8.12</version>
                     <executions>
                         <execution>
                             <id>prepare-agent</id>
@@ -593,19 +593,8 @@
                             </goals>
                             <configuration>
                                 <failOnWarning>true</failOnWarning>
-                                <ignoredNonTestScopedDependencies combine.children="append">
-                                    <ignoredNonTestScopedDependency>org.springframework:spring-beans:jar:${spring.version}</ignoredNonTestScopedDependency>
-                                    <ignoredNonTestScopedDependency>io.cloudslang:dependency-management-api:jar:${score.version}</ignoredNonTestScopedDependency>
-                                    <ignoredNonTestScopedDependency>io.cloudslang:dependency-management-impl:jar:${score.version}</ignoredNonTestScopedDependency>
-                                    <ignoredNonTestScopedDependency>io.cloudslang.lang:cloudslang-spi:jar:${version}</ignoredNonTestScopedDependency>
-                                    <ignoredNonTestScopedDependency>org.hamcrest:hamcrest-all:jar:*</ignoredNonTestScopedDependency>
-                                    <ignoredNonTestScopedDependency>commons-collections:commons-collections:jar:*</ignoredNonTestScopedDependency>
-                                    <ignoredNonTestScopedDependency>org.powermock:powermock-core:jar:*</ignoredNonTestScopedDependency>
-                                    <ignoredNonTestScopedDependency>org.python:jython-standalone:jar:*</ignoredNonTestScopedDependency>
-                                </ignoredNonTestScopedDependencies>
                                 <!--For detection of used undeclared dependencies currently everything here is ignore because of existing issue to not fail the build now.-->
                                 <ignoredUsedUndeclaredDependencies combine.children="append">
-                                    <ignoredUsedUndeclaredDependency>jakarta.annotation:jakarta.annotation-api:jar:*</ignoredUsedUndeclaredDependency>
                                 </ignoredUsedUndeclaredDependencies>
 
                                 <ignoredUnusedDeclaredDependencies combine.children="append">
@@ -720,6 +709,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <compilerArgs>
+                            <!-- Added to avoid warnings in logs -->
+                            <arg>-parameters</arg>
+                        </compilerArgs>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
