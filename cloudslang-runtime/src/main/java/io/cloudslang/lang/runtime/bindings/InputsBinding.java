@@ -57,7 +57,8 @@ public class InputsBinding extends AbstractBinding {
                                          Set<SystemProperty> systemProperties,
                                          List<Input> missingInputs,
                                          boolean useEmptyValuesForPrompts,
-                                         Map<String, Prompt> prompts) {
+                                         Map<String, Prompt> prompts,
+                                         boolean isCslangPromptEnabled) {
         Map<String, Value> resultContext = new LinkedHashMap<>();
 
         // we do not want to change original context map
@@ -70,7 +71,7 @@ public class InputsBinding extends AbstractBinding {
             input = overridePromptSettingIfExists(prompts, input);
 
             bindInput(input, srcContext, actualPromptContext, resultContext,
-                    systemProperties, missingInputs, useEmptyValuesForPrompts);
+                    systemProperties, missingInputs, useEmptyValuesForPrompts, isCslangPromptEnabled);
         }
 
         return resultContext;
@@ -79,7 +80,7 @@ public class InputsBinding extends AbstractBinding {
     private void bindInput(Input input, Map<String, ? extends Value> context,
                            Map<String, Value> promptContext, Map<String, Value> targetContext,
                            Set<SystemProperty> systemProperties, List<Input> missingInputs,
-                           boolean useEmptyValuesForPrompts) {
+                           boolean useEmptyValuesForPrompts, boolean isCslangPromptEnabled) {
         Value value;
 
         String inputName = input.getName();
@@ -104,15 +105,26 @@ public class InputsBinding extends AbstractBinding {
             }
 
             if (input.hasPrompt()) {
-                if (useEmptyValuesForPrompts) {
-                    if (isNull(value)) {
-                        value = createEmptyValue(input);
+                if (!isCslangPromptEnabled) {
+                    if (isNull(value) || isEmpty(value)) {
+                        if (useEmptyValuesForPrompts) {
+                            value = createEmptyValue(input);
+                        } else if (isNull(promptValue)) {
+                            resolvePromptExpressions(input, context, targetContext, systemProperties);
+                            missingInputs.add(createMissingInput(input, value));
+                            return;
+                        }
                     }
-                } else if (isNull(promptValue)) {
-                    resolvePromptExpressions(input, context, targetContext, systemProperties);
-
-                    missingInputs.add(createMissingInput(input, value));
-                    return;
+                } else {
+                    if (useEmptyValuesForPrompts) {
+                        if (isNull(value)) {
+                            value = createEmptyValue(input);
+                        }
+                    } else if (isNull(promptValue)) {
+                        resolvePromptExpressions(input, context, targetContext, systemProperties);
+                        missingInputs.add(createMissingInput(input, value));
+                        return;
+                    }
                 }
             } else if (input.isRequired() && isEmpty(value)) {
                 missingInputs.add(input);
