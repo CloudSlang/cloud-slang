@@ -39,10 +39,10 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {RunEnvironmentSensitiveTest.RunEnvironmentSensitiveValueTestConfig.class,
-        SlangEntitiesSpringConfig.class})
+                                 SlangEntitiesSpringConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RunEnvironmentSensitiveTest {
-    private static final String ENCYPTED = "{Encrypted}";
+    private static final String ENCRYPTED = "{Encrypted}";
     private static final String OBFUSCATED = "{Obfuscated}";
 
     @Test
@@ -233,7 +233,7 @@ public class RunEnvironmentSensitiveTest {
 
                 @Override
                 public String encrypt(char[] clearText) {
-                    return ENCYPTED + new String(clearText);
+                    return ENCRYPTED + new String(clearText);
                 }
 
                 @Override
@@ -248,12 +248,12 @@ public class RunEnvironmentSensitiveTest {
 
                 @Override
                 public char[] decrypt(String cypherText) {
-                    return cypherText.substring(ENCYPTED.length()).toCharArray();
+                    return cypherText.substring(ENCRYPTED.length()).toCharArray();
                 }
 
                 @Override
                 public boolean isTextEncrypted(String text) {
-                    return text.startsWith(ENCYPTED);
+                    return text.startsWith(ENCRYPTED);
                 }
             };
         }

@@ -86,6 +86,10 @@ public class ParallelLoopStepsTest {
     private static final String BRANCH_EXCEPTION_MESSAGE = "Exception details placeholder";
     private static final String SUCCESS_RESULT = "SUCCESS";
 
+    static {
+        System.setProperty("python.expressionsEval", "jython");
+    }
+
     @Autowired
     private ParallelLoopExecutionData parallelLoopSteps;
 
