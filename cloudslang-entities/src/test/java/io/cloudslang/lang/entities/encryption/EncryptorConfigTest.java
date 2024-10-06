@@ -47,6 +47,11 @@ public class EncryptorConfigTest {
         field.set(null, new AtomicReference<>());
     }
 
+    @After
+    public void afterTest() throws Exception {
+        cleanup();
+    }
+
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     public void testEncryptionWithEncryptorImplementation() {
