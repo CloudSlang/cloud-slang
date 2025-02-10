@@ -17,9 +17,7 @@ import io.cloudslang.lang.compiler.modeller.model.Operation;
 import io.cloudslang.lang.compiler.modeller.model.Step;
 import io.cloudslang.lang.compiler.modeller.model.Workflow;
 import io.cloudslang.lang.entities.ExecutableType;
-import io.cloudslang.lang.entities.ResultNavigation;
 import io.cloudslang.lang.entities.ScoreLangConstants;
-import io.cloudslang.lang.entities.bindings.Argument;
 import io.cloudslang.lang.entities.bindings.Input;
 import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
@@ -29,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,10 +41,10 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -153,7 +151,7 @@ public class ExecutionPlanBuilderTest {
         String group = step.getWorkerGroup();
         when(stepFactory
                 .createFinishStepStep(eq(stepId), eq(postStepActionData),
-                        anyMapOf(String.class, ResultNavigation.class), eq(stepName), eq(group),
+                        anyMap(), eq(stepName), eq(group),
                         eq(isParallelLoop))).thenReturn(new ExecutionStep(stepId));
     }
 
@@ -167,7 +165,7 @@ public class ExecutionPlanBuilderTest {
         String name = step.getName();
         String group = step.getWorkerGroup();
         when(stepFactory
-                .createBeginStepStep(eq(stepId), anyListOf(Argument.class),
+                .createBeginStepStep(eq(stepId), any(),
                         eq(preStepActionData), eq(refId), eq(name), eq(group))).thenReturn(new ExecutionStep(stepId));
     }
 
@@ -195,7 +193,7 @@ public class ExecutionPlanBuilderTest {
         Map<String, Serializable> postStepActionData = step.getPostStepActionData();
         String stepName = step.getName();
         when(stepFactory.createJoinBranchesStep(eq(stepId), eq(postStepActionData),
-                anyMapOf(String.class, ResultNavigation.class), eq(stepName)))
+                anyMap(), eq(stepName)))
                 .thenReturn(new ExecutionStep(stepId));
     }
 
@@ -295,15 +293,15 @@ public class ExecutionPlanBuilderTest {
                 eq(compiledFlow.getId()),
                 eq(step.getName()));
         verify(stepFactory)
-                .createBeginStepStep(eq(5L), anyListOf(Argument.class), eq(step.getPreStepActionData()),
+                .createBeginStepStep(eq(5L), any(), eq(step.getPreStepActionData()),
                         eq(step.getRefId()), eq(step.getName()), eq(step.getWorkerGroup()));
         verify(stepFactory)
                 .createFinishStepStep(eq(6L), eq(step.getPostStepActionData()),
-                        anyMapOf(String.class, ResultNavigation.class), eq(step.getName()),
+                        anyMap(), eq(step.getName()),
                         eq(step.getWorkerGroup()), eq(step.isParallelLoop()));
         verify(stepFactory)
                 .createJoinBranchesStep(eq(7L), eq(step.getPostStepActionData()),
-                        anyMapOf(String.class, ResultNavigation.class), eq(step.getName()));
+                        anyMap(), eq(step.getName()));
 
         assertEquals("different number of execution steps than expected", 8, executionPlan.getSteps().size());
         assertEquals("flow name is different than expected", flowName, executionPlan.getName());

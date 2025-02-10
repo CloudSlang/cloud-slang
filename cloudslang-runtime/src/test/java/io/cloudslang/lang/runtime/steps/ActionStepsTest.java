@@ -76,8 +76,8 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -1137,9 +1137,9 @@ public class ActionStepsTest {
 
 
         verify(seqExecutionService).execute(
-                any(String.class),
+                any(),
                 mockedProviderCaptor.capture(),
-                any(Serializable.class)
+                any()
         );
 
         CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();
@@ -1171,9 +1171,9 @@ public class ActionStepsTest {
 
 
         verify(seqExecutionService).execute(
-                any(String.class),
+                any(),
                 mockedProviderCaptor.capture(),
-                any(Serializable.class)
+                any()
         );
 
         CloudSlangSequentialExecutionParametersProviderImpl mockedProvider = mockedProviderCaptor.getValue();

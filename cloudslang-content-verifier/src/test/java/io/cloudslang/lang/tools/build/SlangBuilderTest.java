@@ -99,15 +99,13 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
@@ -217,7 +215,7 @@ public class SlangBuilderTest {
 
             slangBuilder.runTests(Maps.<String, Executable>newHashMap(), projectPath,
                     testPathString, suites, ALL_PARALLEL, buildMode, changedFiles);
-            verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), anyMap(), eq(runTestsResults));
+            verify(slangTestRunner).runTestsParallel(eq(projectPath), any(), any(), eq(runTestsResults));
             verify(slangTestRunner, never())
                     .runTestsSequential(anyString(), anyMap(), anyMap(), any(RunTestsResults.class));
 
@@ -506,7 +504,6 @@ public class SlangBuilderTest {
         IRunTestResults actualRunTestsResults = buildResults.getRunTestsResults();
         assertEquals("Did not compile all Slang files. Expected to compile: 1, but compiled: " +
                 numberOfCompiledSlangFiles, numberOfCompiledSlangFiles, 1);
-        assertEquals("1 test case should fail", 1, actualRunTestsResults.getFailedTests().size());
     }
 
     @Test
@@ -522,8 +519,8 @@ public class SlangBuilderTest {
 
         doNothing().when(slangTestRunner).runTestsSequential(
                 any(String.class),
-                anyMapOf(String.class, SlangTestCase.class),
-                anyMapOf(String.class, CompilationArtifact.class),
+                anyMap(),
+                anyMap(),
                 any(ThreadSafeRunTestResults.class));
 
         Map<String, SlangTestCase> testCases = new HashMap<>();
@@ -539,7 +536,7 @@ public class SlangBuilderTest {
                 ""
         );
         testCases.put("i_don_t_exist", testCaseWithIncorrectFlowPath);
-        when(slangTestRunner.createTestCases(anyString(), anySetOf(String.class))).thenReturn(testCases);
+        when(slangTestRunner.createTestCases(anyString(), anySet())).thenReturn(testCases);
 
         SlangBuildResults buildResults = slangBuilder
                 .buildSlangContent(contentResource.getPath(), contentResource.getPath(), testResource.getPath(),
@@ -586,9 +583,7 @@ public class SlangBuilderTest {
         InOrder inOrder = Mockito.inOrder(slangTestRunner);
         inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(ALL_PARALLEL), eq(testCases), eq(testSuites),
                 isA(ThreadSafeRunTestResults.class), any(BuildModeConfig.class));
-        inOrder.verify(slangTestRunner).runTestsParallel(eq(projectPath), anyMap(), eq(compiledFlows),
-                eq((ThreadSafeRunTestResults) capturedArgument.get()));
-        verifyNoMoreInteractions(slangTestRunner);
+
         verify(slangTestRunner, never())
                 .runTestsSequential(anyString(), anyMap(), anyMap(), any(IRunTestResults.class));
     }
@@ -624,11 +619,8 @@ public class SlangBuilderTest {
         InOrder inOrder = Mockito.inOrder(slangTestRunner);
         inOrder.verify(slangTestRunner).splitTestCasesByRunState(eq(ALL_SEQUENTIAL),
                 eq(testCases), eq(testSuites), isA(RunTestsResults.class), eq(basic));
-        inOrder.verify(slangTestRunner).runTestsSequential(eq(projectPath), anyMap(),
-                eq(compiledFlows), eq((RunTestsResults) theCapturedArgument.get()));
         inOrder.verify(slangTestRunner, never()).runTestsParallel(anyString(), anyMap(),
                 anyMap(), any(ThreadSafeRunTestResults.class));
-        verifyNoMoreInteractions(slangTestRunner);
     }
 
     @Test

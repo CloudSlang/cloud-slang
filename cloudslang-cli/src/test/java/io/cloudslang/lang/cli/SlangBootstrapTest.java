@@ -13,19 +13,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.shell.Bootstrap;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.powermock.api.mockito.PowerMockito.doNothing;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore("jdk.internal.reflect.*")
-@PrepareForTest({SlangBootstrap.class, Bootstrap.class})
+@RunWith(SpringJUnit4ClassRunner.class)
 public class SlangBootstrapTest {
-
 
     @Before
     public void before() throws Exception {

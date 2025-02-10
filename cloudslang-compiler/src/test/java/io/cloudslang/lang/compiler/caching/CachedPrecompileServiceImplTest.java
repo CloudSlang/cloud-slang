@@ -12,7 +12,6 @@ package io.cloudslang.lang.compiler.caching;
 import com.google.common.cache.Cache;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.ExecutableModellingResult;
-import java.lang.reflect.Field;
 import junit.framework.Assert;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.junit.Test;
@@ -23,8 +22,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+
+import java.lang.reflect.Field;
 
 import static io.cloudslang.lang.compiler.caching.CacheValueState.OUTDATED;
 import static io.cloudslang.lang.compiler.caching.CacheValueState.VALID;
@@ -32,17 +33,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -87,15 +87,6 @@ public class CachedPrecompileServiceImplTest {
         ExecutableModellingResult executableModellingResult = mock(ExecutableModellingResult.class);
         SlangSource slangSource = mock(SlangSource.class);
 
-        final MutablePair<CacheValue, Boolean> pair = new MutablePair<>();
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                pair.setLeft((CacheValue) invocation.getArguments()[1]);
-                return null;
-            }
-        }).when(cache).put(anyString(), any(CacheValue.class));
-
         // Tested call
         cachedPrecompileServiceImpl.cacheValue(myPath, executableModellingResult, slangSource);
         verify(cache, never()).put(anyString(), any(CacheValue.class));
@@ -109,7 +100,7 @@ public class CachedPrecompileServiceImplTest {
 
         CacheValue mockCacheValue = mock(CacheValue.class);
 
-        doReturn(mockCacheValue).when(cache).getIfPresent(anyObject());
+        doReturn(mockCacheValue).when(cache).getIfPresent(any());
         doReturn(cachedSlangSource).when(mockCacheValue).getSource();
         doReturn(true).when(cachedPrecompileServiceImpl)
                 .hasChangedSinceCached(any(SlangSource.class), any(SlangSource.class));
@@ -136,7 +127,7 @@ public class CachedPrecompileServiceImplTest {
 
         CacheValue mockCacheValue = mock(CacheValue.class);
 
-        doReturn(mockCacheValue).when(cache).getIfPresent(anyObject());
+        doReturn(mockCacheValue).when(cache).getIfPresent(any());
         doReturn(cachedSlangSource).when(mockCacheValue).getSource();
         doReturn(false).when(cachedPrecompileServiceImpl)
                 .hasChangedSinceCached(any(SlangSource.class), any(SlangSource.class));
@@ -169,8 +160,6 @@ public class CachedPrecompileServiceImplTest {
 
     @Test
     public void testInvalidateEntryWithNullPath() {
-        doNothing().when(cache).invalidate(anyString());
-
         // Tested call
         cachedPrecompileServiceImpl.invalidateEntry(null);
 

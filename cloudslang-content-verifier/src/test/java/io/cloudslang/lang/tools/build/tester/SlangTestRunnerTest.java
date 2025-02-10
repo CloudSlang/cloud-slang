@@ -91,12 +91,12 @@ import static io.cloudslang.lang.tools.build.tester.runconfiguration.BuildModeCo
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -319,7 +319,7 @@ public class SlangTestRunnerTest {
                 subscribeArgumentsHolder.setEventTypes(argument);
                 return null;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySet());
 
         final Future futureTestCase1 = mock(Future.class);
         final Future futureTestCase2 = mock(Future.class);
@@ -700,7 +700,7 @@ public class SlangTestRunnerTest {
         allTestedFlowModels.put("testFlowPath1", executable);
         allTestedFlowModels.put("testFlowPath2", executable);
         BuildModeConfig buildModeConfig = createChangedBuildModeConfig(changedFiles, allTestedFlowModels);
-        when(dependenciesHelper.fetchDependencies(any(Executable.class), anyMapOf(String.class, Executable.class)))
+        when(dependenciesHelper.fetchDependencies(any(Executable.class), anyMap()))
                 .thenReturn(new HashSet<String>());
 
         // Tested call
@@ -769,7 +769,7 @@ public class SlangTestRunnerTest {
                 listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, data));
                 return listener;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySet());
     }
 
     private void prepareMockForEventListenerWithSuccessResultAndOutputs(final Map<String, Serializable> outputs) {
@@ -786,7 +786,7 @@ public class SlangTestRunnerTest {
                 listener.onEvent(new ScoreEvent(ScoreLangConstants.EVENT_EXECUTION_FINISHED, data));
                 return listener;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySet());
     }
 
     private void prepareMockForEventListenerWithSlangExceptionEvent() {
@@ -799,7 +799,7 @@ public class SlangTestRunnerTest {
                 listener.onEvent(new ScoreEvent(EventConstants.SCORE_ERROR_EVENT, data));
                 return listener;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySet());
     }
 
 
