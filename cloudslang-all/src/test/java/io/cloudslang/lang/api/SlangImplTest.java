@@ -47,9 +47,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 
 /**
@@ -105,7 +105,7 @@ public class SlangImplTest {
         SlangSource tempFile = createTempFile();
         Mockito.when(
                 compiler.compile(any(SlangSource.class),
-                        anySetOf(SlangSource.class),
+                        any(),
                         any(PrecompileStrategy.class))
         ).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, new HashSet<SlangSource>());
@@ -129,7 +129,7 @@ public class SlangImplTest {
         SlangSource tempFile = createTempFile();
         Mockito.when(
                 compiler.compile(any(SlangSource.class),
-                        anySetOf(SlangSource.class),
+                        any(),
                         any(PrecompileStrategy.class))
         ).thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, null);
@@ -146,7 +146,7 @@ public class SlangImplTest {
         Set<SlangSource> dependencies = new HashSet<>();
         dependencies.add(SlangSource.fromFile(tempDependencyFile));
         Mockito.when(
-                compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class), any(PrecompileStrategy.class)))
+                compiler.compile(any(SlangSource.class), any(), any(PrecompileStrategy.class)))
                 .thenReturn(emptyCompilationArtifact);
         CompilationArtifact compilationArtifact = slang.compile(tempFile, dependencies);
         Assert.assertNotNull(compilationArtifact);
@@ -159,7 +159,7 @@ public class SlangImplTest {
     public void testCompileOperationWithException() throws IOException {
         Mockito.when(
                 compiler.compile(any(SlangSource.class),
-                        anySetOf(SlangSource.class),
+                        any(),
                         any(PrecompileStrategy.class))
         ).thenThrow(Exception.class);
         SlangSource tempFile = createTempFile();
@@ -207,7 +207,7 @@ public class SlangImplTest {
         SlangSource tempFile = createTempFile();
         Mockito.when(mockSlang.compile(tempFile, new HashSet<SlangSource>())).thenReturn(emptyCompilationArtifact);
         Mockito.when(mockSlang.compileAndRun(any(SlangSource.class),
-                anySetOf(SlangSource.class), anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class)))
+                anySet(), anyMap(), anySet()))
                 .thenCallRealMethod();
         Long id = mockSlang
                 .compileAndRun(tempFile, new HashSet<SlangSource>(),
@@ -222,8 +222,8 @@ public class SlangImplTest {
         Slang mockSlang = Mockito.mock(SlangImpl.class);
         SlangSource tempFile = createTempFile();
 
-        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySetOf(SlangSource.class),
-                anyMapOf(String.class, Value.class), anySetOf(SystemProperty.class))).thenCallRealMethod();
+        Mockito.when(mockSlang.compileAndRun(any(SlangSource.class), anySet(),
+                anyMap(), anySet())).thenCallRealMethod();
         Long id = mockSlang
                 .compileAndRun(tempFile, new HashSet<SlangSource>(),
                         new HashMap<String, Value>(), new HashSet<SystemProperty>());
@@ -298,7 +298,7 @@ public class SlangImplTest {
         @Bean
         public SlangCompiler compiler() {
             SlangCompiler compiler = Mockito.mock(SlangCompiler.class);
-            Mockito.when(compiler.compile(any(SlangSource.class), anySetOf(SlangSource.class)))
+            Mockito.when(compiler.compile(any(SlangSource.class), anySet()))
                     .thenReturn(emptyCompilationArtifact);
             return compiler;
         }

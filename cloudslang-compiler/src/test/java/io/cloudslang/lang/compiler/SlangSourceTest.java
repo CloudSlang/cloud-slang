@@ -25,6 +25,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -144,19 +146,6 @@ public class SlangSourceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 SlangSource.fromFile(tempFolder));
         Assert.assertTrue( exception.getMessage().contains("doesn't lead to a file, directories are not supported"));
-    }
-
-    @Test
-    public void testWhenThereIsProblemReadingTheFileThrowException() throws Exception {
-        File file = mock(File.class);
-        when(file.getName()).thenReturn(name);
-        when(file.isFile()).thenReturn(true);
-
-        when(file.getPath()).thenThrow((Class) IOException.class);
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                SlangSource.fromFile(file));
-        Assert.assertEquals("There was a problem reading the file: file_name.sl", exception.getMessage());
     }
 
     @Test

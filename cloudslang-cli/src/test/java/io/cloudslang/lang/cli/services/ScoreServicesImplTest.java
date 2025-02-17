@@ -40,9 +40,9 @@ import java.util.Set;
 import static com.google.common.collect.Sets.newHashSet;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyMapOf;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -74,8 +74,8 @@ public class ScoreServicesImplTest {
         when(
                 slang.run(
                         any(CompilationArtifact.class),
-                        anyMapOf(String.class, Value.class),
-                        anySetOf(SystemProperty.class)))
+                        anyMap(),
+                        anySet()))
                 .thenReturn(DEFAULT_EXECUTION_ID);
     }
 
@@ -136,7 +136,7 @@ public class ScoreServicesImplTest {
                 eventDispatcherThread.start();
                 return null;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySet());
 
         // invoke method
         final long executionId = scoreServicesImpl
@@ -144,7 +144,7 @@ public class ScoreServicesImplTest {
 
         // verify constraints
         ArgumentCaptor<ScoreEventListener> scoreEventListenerArg = ArgumentCaptor.forClass(ScoreEventListener.class);
-        verify(slang).subscribeOnEvents(scoreEventListenerArg.capture(), anySetOf(String.class));
+        verify(slang).subscribeOnEvents(scoreEventListenerArg.capture(), anySet());
         verify(slang).run(compilationArtifact, inputs, systemProperties);
         verify(slang).unSubscribeOnEvents(scoreEventListenerArg.getValue());
         assertEquals("execution ID not as expected", DEFAULT_EXECUTION_ID, executionId);
@@ -188,7 +188,7 @@ public class ScoreServicesImplTest {
                 eventDispatcherThread.start();
                 return null;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySet());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false));
@@ -230,7 +230,7 @@ public class ScoreServicesImplTest {
                 eventDispatcherThread.start();
                 return null;
             }
-        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySetOf(String.class));
+        }).when(slang).subscribeOnEvents(any(ScoreEventListener.class), anySet());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 scoreServicesImpl.triggerSync(compilationArtifact, inputs, systemProperties, false, false));

@@ -86,14 +86,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -322,7 +321,7 @@ public class ExecutableStepsTest {
 
         when(resultsBinding.resolveResult(
                 isNull(Map.class),
-                anyMapOf(String.class, Value.class),
+                anyMap(),
                 eq(runEnv.getSystemProperties()),
                 eq(results),
                 isNull(String.class)
@@ -405,7 +404,7 @@ public class ExecutableStepsTest {
         )).thenReturn(boundOutputs);
         when(resultsBinding.resolveResult(
                 isNull(Map.class),
-                anyMapOf(String.class, Value.class),
+                anyMap(),
                 eq(runEnv.getSystemProperties()),
                 eq(possibleResults),
                 isNull(String.class)

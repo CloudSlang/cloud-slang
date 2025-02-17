@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.python.google.common.collect.Lists;
 
 import java.io.Serializable;
@@ -37,9 +37,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.anySetOf;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -70,12 +70,6 @@ public class LoopsBindingTest {
     public void whenValueIsNotThereItWillBeCreated() throws Exception {
         Context context = mock(Context.class);
         ArrayList<Value> result = Lists.newArrayList(ValueFactory.create(1));
-        when(scriptEvaluator.evalExpr(
-                anyString(),
-                anyMapOf(String.class, Value.class),
-                anySetOf(SystemProperty.class),
-                anySetOf(ScriptFunction.class))
-        ).thenReturn(ValueFactory.create(result));
         Value loopCondition = ValueFactory.create(new ForLoopCondition(result));
         when(context.getLanguageVariable(LoopCondition.LOOP_CONDITION_KEY)).thenReturn(null);
         context.putLanguageVariable(LoopCondition.LOOP_CONDITION_KEY, loopCondition);
@@ -87,11 +81,10 @@ public class LoopsBindingTest {
     @Test
     public void whenExpressionIsEmptyThrowsException() throws Exception {
         Context context = mock(Context.class);
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class),
+        when(scriptEvaluator.evalExpr(anyString(), anyMap(),
                 eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
                 .thenReturn(ValueFactory.create(Lists.newArrayList()));
         Map<String, Value> langVars = Collections.emptyMap();
-        when(context.getImmutableViewOfLanguageVariables()).thenReturn(langVars);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 loopsBinding.getOrCreateLoopCondition(createBasicForStatement(), context, EMPTY_SET, "node"));
@@ -118,9 +111,6 @@ public class LoopsBindingTest {
     public void whenValueIsThereItWillBeReturned() throws Exception {
         Context context = mock(Context.class);
         ArrayList<Value> result = Lists.newArrayList(ValueFactory.create(1));
-        when(scriptEvaluator.evalExpr(anyString(), anyMapOf(String.class, Value.class),
-                eq(EMPTY_SET), eq(EMPTY_FUNCTION_SET)))
-                .thenReturn(ValueFactory.create(result));
         Map<String, Value> langVars = new HashMap<>();
         ForLoopCondition forLoopCondition = new ForLoopCondition(result);
         langVars.put(LoopCondition.LOOP_CONDITION_KEY, ValueFactory.create(forLoopCondition));

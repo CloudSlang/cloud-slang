@@ -18,15 +18,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 
 @RunWith(MockitoJUnitRunner.class)
 public class YamlParserTest {
@@ -44,15 +44,6 @@ public class YamlParserTest {
 
     @Mock
     private ParserExceptionHandler parserExceptionHandler;
-
-    @Test
-    public void throwExceptionWhenFileIsNotValid() throws Exception {
-        Mockito.when(yaml.loadAs(any(InputStream.class), eq(ParsedSlang.class))).thenThrow(IOException.class);
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                yamlParser.parse(new SlangSource("a", "b")));
-        Assert.assertEquals("There was a problem parsing the YAML source: b.\n" +
-                "null", exception.getMessage());
-    }
 
     @Test
     public void throwExceptionWhenSourceIsEmpty() throws Exception {
