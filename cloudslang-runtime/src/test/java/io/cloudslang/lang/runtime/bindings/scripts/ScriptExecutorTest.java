@@ -29,12 +29,12 @@ import io.cloudslang.runtime.impl.python.PythonExecutor;
 import io.cloudslang.runtime.impl.python.PythonRuntimeServiceImpl;
 import io.cloudslang.runtime.impl.python.executor.services.ExternalPythonExecutorServiceImpl;
 import io.cloudslang.runtime.impl.python.executor.services.PythonExecutorLifecycleManagerServiceImpl;
-import io.cloudslang.runtime.impl.python.executor.services.PythonExecutorProcessManagerServiceImpl;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonExecutionEngine;
 import io.cloudslang.runtime.impl.python.external.ExternalPythonRuntimeServiceImpl;
 import io.cloudslang.score.events.EventBus;
 import io.cloudslang.score.events.EventBusImpl;
 import io.cloudslang.utils.PythonScriptGeneratorUtils;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
@@ -134,7 +135,7 @@ public class ScriptExecutorTest {
         scriptExecutor.executeScript(script, scriptInputValues, false);
 
         Map<String, Serializable> captured = callArgCaptor.getValue();
-        Assert.assertArrayEquals(scriptInputValues.keySet().toArray(), captured.keySet().toArray());
+        assertThat(scriptInputValues.keySet(), Matchers.containsInAnyOrder(captured.keySet().toArray()));
     }
 
     @Test

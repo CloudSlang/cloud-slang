@@ -12,6 +12,7 @@ package io.cloudslang.lang.entities.encryption;
 import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.spi.encryption.Encryption;
 import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ public class EncryptorConfigTest {
         Field field = EncryptionProvider.class.getDeclaredField("encryptor");
         field.setAccessible(true);
         field.set(null, new AtomicReference<>());
+    }
+
+    @After
+    public void afterTest() throws Exception {
+        cleanup();
     }
 
     @Test
