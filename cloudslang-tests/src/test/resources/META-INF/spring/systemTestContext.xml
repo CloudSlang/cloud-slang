@@ -27,4 +27,6 @@
         <lookup-method name="getPythonExecutorConfiguration" bean="pythonExecutorDetails"/>
     </bean>
     <bean id="pythonExecutorCommunicationService" class="io.cloudslang.runtime.impl.python.executor.services.stubs.StubPythonExecutorCommunicationServiceImpl"/>
+
+    <bean name="executionSummaryDelegatorService" class="io.cloudslang.orchestrator.services.StubExecutionSummaryDelegatorService"/>
 </beans>
