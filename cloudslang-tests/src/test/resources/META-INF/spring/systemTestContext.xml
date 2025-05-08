@@ -27,4 +27,52 @@
         <lookup-method name="getPythonExecutorConfiguration" bean="pythonExecutorDetails"/>
     </bean>
     <bean id="pythonExecutorCommunicationService" class="io.cloudslang.runtime.impl.python.executor.services.stubs.StubPythonExecutorCommunicationServiceImpl"/>
+    <bean id="executionSummaryDelegatorService" class="io.cloudslang.orchestrator.services.StubExecutionSummaryDelegatorService"/>
+    <bean id="systemPropertyValidator" class="io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl"/>
+    <!-- Yaml bean with prototype scope -->
+    <bean id="yaml" class="org.yaml.snakeyaml.Yaml" scope="prototype">
+        <property name="beanAccess" value="FIELD"/>
+    </bean>
+
+    <!-- YamlFactoryService and implementation -->
+    <bean id="yamlFactoryService" class="io.cloudslang.lang.compiler.newyaml.impl.YamlFactoryServiceImpl"/>
+
+    <!-- YamlPoolService using constructor injection -->
+    <bean id="yamlPoolService" class="io.cloudslang.lang.compiler.newyaml.impl.YamlPoolServiceImpl">
+        <constructor-arg ref="yamlFactoryService"/>
+    </bean>
+
+    <!-- YamlParser with an anonymous override of getYaml() is tricky in XML; simplified -->
+    <bean id="yamlParser" class="io.cloudslang.lang.systemtests.YamlParserTest"> <!-- Use a concrete class if possible -->
+        <property name="yamlPoolService" ref="yamlPoolService"/>
+        <property name="executableValidator" ref="executableValidator"/>
+        <property name="parserExceptionHandler" ref="parserExceptionHandler"/>
+        <property name="yaml" ref="yaml"/>
+    </bean>
+
+    <!-- ParserExceptionHandler -->
+    <bean id="parserExceptionHandler" class="io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler"/>
+
+    <!-- DependencyFormatValidator -->
+    <bean id="dependencyFormatValidator" class="io.cloudslang.lang.compiler.modeller.transformers.DependencyFormatValidator"/>
+
+    <!-- ExecutableValidator -->
+    <bean id="executableValidator" class="io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl">
+        <property name="systemPropertyValidator" ref="systemPropertyValidator"/>
+    </bean>
+
+    <!-- PreCompileValidatorImpl with setter injection -->
+    <bean id="preCompileValidatorImpl" class="io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl">
+        <property name="executableValidator" ref="executableValidator"/>
+    </bean>
+
+    <!-- SeqStepsTransformer as a mock (replace with real implementation or factory) -->
+    <bean id="seqStepsTransformer" class="io.cloudslang.lang.compiler.modeller.transformers.SeqStepsTransformer"/>
+
+    <!-- SeqActionTransformer with constructor injection -->
+    <bean id="seqActionTransformer" class="io.cloudslang.lang.compiler.modeller.transformers.SeqActionTransformer">
+        <constructor-arg ref="dependencyFormatValidator"/>
+        <constructor-arg ref="preCompileValidatorImpl"/>
+        <constructor-arg ref="seqStepsTransformer"/>
+    </bean>
 </beans>

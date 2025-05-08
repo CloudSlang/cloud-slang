@@ -120,6 +120,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.vibur</groupId>
+            <artifactId>vibur-object-pool</artifactId>
+            <version>25.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
             <scope>test</scope>

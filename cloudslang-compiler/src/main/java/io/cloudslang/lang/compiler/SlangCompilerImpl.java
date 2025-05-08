@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.cloudslang.lang.compiler.CompilerConstants.DEFAULT_SENSITIVITY_LEVEL;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.SENSITIVE_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.VALUE_KEY;
 
@@ -169,6 +170,11 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     @Override
+    public ExecutableModellingResult preCompileByteSource(SlangByteSource source) {
+        return preCompileModelFromByteSource(source, DEFAULT_SENSITIVITY_LEVEL);
+    }
+
+    @Override
     public ExecutableModellingResult preCompileSource(SlangSource source) {
         return preCompileSource(source, PrecompileStrategy.WITHOUT_CACHE);
     }
@@ -270,6 +276,16 @@ public class SlangCompilerImpl implements SlangCompiler {
     }
 
     private ExecutableModellingResult preCompileModel(SlangSource source, SensitivityLevel sensitivityLevel) {
+        //first thing we parse the yaml file into java maps
+        ParsedSlang parsedSlang = yamlParser.parse(source);
+        ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
+
+        // Then we transform the parsed Slang source to a Slang model
+        return slangModeller.createModel(parseModellingResult, sensitivityLevel);
+    }
+
+    private ExecutableModellingResult preCompileModelFromByteSource(SlangByteSource source,
+                                                                    SensitivityLevel sensitivityLevel) {
         //first thing we parse the yaml file into java maps
         ParsedSlang parsedSlang = yamlParser.parse(source);
         ParseModellingResult parseModellingResult = yamlParser.validate(parsedSlang);
