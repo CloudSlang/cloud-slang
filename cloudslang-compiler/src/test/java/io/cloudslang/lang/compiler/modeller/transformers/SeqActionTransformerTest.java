@@ -14,6 +14,10 @@ import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
+import io.cloudslang.lang.compiler.newyaml.YamlFactoryService;
+import io.cloudslang.lang.compiler.newyaml.YamlPoolService;
+import io.cloudslang.lang.compiler.newyaml.impl.YamlFactoryServiceImpl;
+import io.cloudslang.lang.compiler.newyaml.impl.YamlPoolServiceImpl;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -22,9 +26,7 @@ import io.cloudslang.lang.compiler.validator.ExecutableValidatorImpl;
 import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -257,12 +259,25 @@ public class SeqActionTransformerTest extends TransformersTestParent {
 
         @Bean
         public YamlParser yamlParser() {
-            return new YamlParser() {
+            YamlParser yamlParser = new YamlParser() {
                 @Override
                 public Yaml getYaml() {
                     return yaml();
                 }
             };
+            yamlParser.setYamlPoolService(yamlPoolService());
+
+            return yamlParser;
+        }
+
+        @Bean
+        public YamlFactoryService yamlFactoryService() {
+            return new YamlFactoryServiceImpl();
+        }
+
+        @Bean
+        public YamlPoolService yamlPoolService() {
+            return new YamlPoolServiceImpl(yamlFactoryService());
         }
 
         @Bean

@@ -12,6 +12,10 @@ package io.cloudslang.lang.compiler.modeller.transformers;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
+import io.cloudslang.lang.compiler.newyaml.YamlFactoryService;
+import io.cloudslang.lang.compiler.newyaml.YamlPoolService;
+import io.cloudslang.lang.compiler.newyaml.impl.YamlFactoryServiceImpl;
+import io.cloudslang.lang.compiler.newyaml.impl.YamlPoolServiceImpl;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
@@ -107,12 +111,25 @@ public class OutputsTransformerTest {
 
         @Bean
         public YamlParser yamlParser() {
-            return new YamlParser() {
+            YamlParser yamlParser = new YamlParser() {
                 @Override
                 public Yaml getYaml() {
                     return yaml();
                 }
             };
+            yamlParser.setYamlPoolService(yamlPoolService());
+
+            return yamlParser;
+        }
+
+        @Bean
+        public YamlFactoryService yamlFactoryService() {
+            return new YamlFactoryServiceImpl();
+        }
+
+        @Bean
+        public YamlPoolService yamlPoolService() {
+            return new YamlPoolServiceImpl(yamlFactoryService());
         }
 
         @Bean

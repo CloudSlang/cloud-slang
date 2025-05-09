@@ -10,22 +10,31 @@
 package io.cloudslang.lang.compiler.parser;
 
 
-
+import io.cloudslang.lang.compiler.SlangByteSource;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.result.ParseModellingResult;
+import io.cloudslang.lang.compiler.newyaml.YamlPoolService;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.validator.ExecutableValidator;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.yaml.snakeyaml.Yaml;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class YamlParser {
 
     private ParserExceptionHandler parserExceptionHandler;
 
     private ExecutableValidator executableValidator;
+
+    private YamlPoolService yamlPoolService;
 
     protected abstract Yaml getYaml();
 
@@ -54,11 +63,11 @@ public abstract class YamlParser {
     }
 
     public ParsedSlang parse(SlangSource source) {
-
         Validate.notEmpty(source.getContent(), "Source " + source.getName() + " cannot be empty");
 
-        try {
-            ParsedSlang parsedSlang = getYaml().loadAs(source.getContent(), ParsedSlang.class);
+        Yaml yamlInstance = yamlPoolService.tryTakeYamlWithDefaultTimeout();
+        try (Reader reader = new BufferedReader(new StringReader(source.getContent()))) {
+            ParsedSlang parsedSlang = yamlInstance.loadAs(reader, ParsedSlang.class);
             if (parsedSlang == null) {
                 throw new RuntimeException("Source " + source.getName() + " does not contain YAML content");
             }
@@ -69,6 +78,34 @@ public abstract class YamlParser {
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the YAML source: " +
                     source.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+        } finally {
+            yamlPoolService.restoreYaml(yamlInstance);
+        }
+    }
+
+    public ParsedSlang parse(SlangByteSource byteSource) {
+        final byte[] sourceBytes = byteSource.getSource();
+        if ((sourceBytes == null) || (sourceBytes.length == 0)) {
+            throw new IllegalArgumentException("Source " + byteSource.getName() + " cannot be empty");
+        }
+
+        Yaml yamlInstance = yamlPoolService.tryTakeYamlWithDefaultTimeout();
+        try (Reader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(sourceBytes),
+                SlangSource.getCloudSlangCharset()))) {
+            ParsedSlang parsedSlang = yamlInstance.loadAs(reader, ParsedSlang.class);
+
+            if (parsedSlang == null) {
+                throw new RuntimeException("Source " + byteSource.getName() + " does not contain YAML content");
+            }
+            parsedSlang.setName(byteSource.getName());
+            parsedSlang.setFileExtension(byteSource.getFileExtension());
+
+            return parsedSlang;
+        } catch (Throwable e) {
+            throw new RuntimeException("There was a problem parsing the YAML source: " +
+                    byteSource.getName() + ".\n" + parserExceptionHandler.getErrorMessage(e), e);
+        } finally {
+            yamlPoolService.restoreYaml(yamlInstance);
         }
     }
 
@@ -79,4 +116,9 @@ public abstract class YamlParser {
     public void setExecutableValidator(ExecutableValidator executableValidator) {
         this.executableValidator = executableValidator;
     }
+
+    public void setYamlPoolService(YamlPoolService yamlPoolService) {
+        this.yamlPoolService = yamlPoolService;
+    }
+
 }
