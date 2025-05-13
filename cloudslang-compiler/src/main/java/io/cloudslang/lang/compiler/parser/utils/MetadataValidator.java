@@ -13,5 +13,9 @@ import io.cloudslang.lang.compiler.SlangSource;
 import java.util.List;
 
 public interface MetadataValidator {
-    List<RuntimeException> validateCheckstyle(SlangSource source);
+    default List<RuntimeException> validateCheckstyle(SlangSource source) {
+        return validateCheckstyle(source, false);
+    }
+
+    List<RuntimeException> validateCheckstyle(SlangSource source, boolean includeStepDescription);
 }

@@ -43,7 +43,7 @@ public class MetadataParserTest {
         flowDescription.put("@result SUCCESS", "Flow completed successfully.");
         flowDescription.put("@result FAILURE", "Failure occurred during execution.");
 
-        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
+        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable), true);
         Assert.assertTrue(parseResult.getTopLevelDescriptions().size() == 1);
         Assert.assertEquals(flowDescription, parseResult.getTopLevelDescriptions().get(0).getData());
 
@@ -69,7 +69,7 @@ public class MetadataParserTest {
     @Test
     public void testParseNoDescription() throws Exception {
         URI executable = getClass().getResource("/metadata/step/step_description_03.sl").toURI();
-        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
+        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable), true);
 
         Assert.assertTrue(parseResult.getTopLevelDescriptions().size() == 0);
         Assert.assertTrue(parseResult.getStepDescriptions().size() == 0);
@@ -79,7 +79,7 @@ public class MetadataParserTest {
     @Test
     public void testParseEmptySource() throws Exception {
         URI executable = getClass().getResource("/metadata/step/step_description_04.sl").toURI();
-        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable));
+        ParsedDescriptionData parseResult = metadataParser.parse(SlangSource.fromFile(executable), true);
 
         Assert.assertTrue(parseResult.getTopLevelDescriptions().size() == 0);
         Assert.assertTrue(parseResult.getStepDescriptions().size() == 0);

@@ -79,7 +79,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription01() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_01.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 0);
 
@@ -107,7 +107,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription02() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_05.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 0);
 
@@ -127,7 +127,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription03() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_06.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 1);
         assertErrorMessages(metadata.getErrors(), "Multiple top level descriptions found at line numbers: [9, 53]");
@@ -142,7 +142,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription04() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_07.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 1);
         assertErrorMessages(metadata.getErrors(),
@@ -160,7 +160,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription08() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_08.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 0);
 
@@ -176,7 +176,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription09() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_09.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 1);
         assertErrorMessages(metadata.getErrors(),
@@ -198,7 +198,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription10() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_10.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 1);
         assertErrorMessages(metadata.getErrors(),
@@ -228,7 +228,7 @@ public class MetadataExtractorTest {
     public void testExtractDescription11() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_12.sl").toURI();
         MetadataModellingResult metadata =
-                metadataExtractor.extractMetadataModellingResult(SlangSource.fromFile(operation));
+                metadataExtractor.extractMetadataModellingResult(true, SlangSource.fromFile(operation));
 
         Assert.assertTrue(metadata.getErrors().size() == 10);
         assertErrorMessages(
@@ -258,7 +258,7 @@ public class MetadataExtractorTest {
     public void testCheckstyle01() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_02.sl").toURI();
         List<RuntimeException> checkstyleViolations =
-                metadataExtractor.validateCheckstyle(SlangSource.fromFile(operation));
+                metadataExtractor.validateCheckstyle(SlangSource.fromFile(operation), true);
         assertErrorMessages(
                 checkstyleViolations,
                 "Error at line [1] - Previous line should be delimiter line (120 characters of `#`)",
@@ -275,7 +275,7 @@ public class MetadataExtractorTest {
     public void testCheckstyle02() throws Exception {
         URI operation = getClass().getResource("/metadata/step/step_description_11.sl").toURI();
         List<RuntimeException> checkstyleViolations =
-                metadataExtractor.validateCheckstyle(SlangSource.fromFile(operation));
+                metadataExtractor.validateCheckstyle(SlangSource.fromFile(operation), true);
         assertErrorMessages(
                 checkstyleViolations,
                 "Error at line [4] - There should be an empty line between two " +

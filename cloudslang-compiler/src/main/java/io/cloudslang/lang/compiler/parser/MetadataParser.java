@@ -34,18 +34,22 @@ public class MetadataParser {
     }
 
     public ParsedDescriptionData parse(SlangSource source) {
+        return parse(source, false);
+    }
+
+    public ParsedDescriptionData parse(SlangSource source, boolean includeStepDescription) {
         Validate.notNull(source.getContent(), "Source " + source.getName() + " cannot be null");
         try {
-            return extractDescriptionData(source);
+            return extractDescriptionData(source, includeStepDescription);
         } catch (Throwable e) {
             throw new RuntimeException("There was a problem parsing the description: " +
                     source.getName() + "." + System.lineSeparator() + parserExceptionHandler.getErrorMessage(e), e);
         }
     }
 
-    private ParsedDescriptionData extractDescriptionData(SlangSource source) {
+    private ParsedDescriptionData extractDescriptionData(SlangSource source, boolean includeStepDescription) {
         List<String> lines = SlangSourceUtils.readLines(source);
-        return processRawLines(lines);
+        return includeStepDescription ? processAllRawLines(lines) : processRawLines(lines);
     }
 
     private ParsedDescriptionData processRawLines(List<String> lines) {
@@ -61,18 +65,19 @@ public class MetadataParser {
         while (lineIterator.hasNext()) {
             counter++;
             String currentLine = lineIterator.next();
+            String leadingStrippedLine = currentLine.stripLeading();
             if (currentLine.startsWith(namespace)) {
                 break;
             }
             if (descriptionStarted) {
                 descriptionRawLines.add(currentLine);
             }
-            if (descriptionPatternMatcher.matchesDescriptionStart(currentLine)) {
+            if (descriptionPatternMatcher.matchesDescriptionStart(leadingStrippedLine, currentLine)) {
                 descriptionStarted = true;
                 descriptionStartLine = counter;
                 handleBlockStart(descriptionBuilder, counter);
             }
-            if (descriptionPatternMatcher.matchesDescriptionEnd(currentLine)) {
+            if (descriptionPatternMatcher.matchesDescriptionEnd(leadingStrippedLine, currentLine)) {
                 if (descriptionStarted) {
                     descriptionEndLine = counter;
                     break;
@@ -92,19 +97,21 @@ public class MetadataParser {
             // no start or end lines now only the description content
             for (String currentLine : descriptionRawLines) {
                 lineNrZeroBased++;
+                String leadingStrippedLine = currentLine.stripLeading();
                 // #! @tag var: content <=> @tag var
                 if (descriptionPatternMatcher.matchesDescriptionVariableLine(currentLine)) {
                     handleDescriptionLineVariableSyntax(descriptionBuilder, currentLine);
                 } else {
                     // #! @tag: content
-                    if (descriptionPatternMatcher.matchesDescriptionGeneralLine(currentLine)) {
+                    if (descriptionPatternMatcher.matchesDescriptionGeneralLine(leadingStrippedLine, currentLine)) {
                         handleDescriptionLineGeneralSyntax(descriptionBuilder, currentLine);
                     } else {
-                        if (descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(currentLine)) {
+                        if (descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(leadingStrippedLine,
+                                currentLine)) {
                             handleDescriptionLineVariableDeclarationOnlySyntax(descriptionBuilder, currentLine);
                         } else {
                             // #! continued from previous line
-                            if (descriptionPatternMatcher.matchesDescriptionComplementaryLine(currentLine)) {
+                            if (descriptionPatternMatcher.matchesDescriptionComplementaryLine(leadingStrippedLine)) {
                                 handleDescriptionLineComplementarySyntax(descriptionBuilder, currentLine);
                             } else {
                                 // check if line is allowed inside description
@@ -119,6 +126,50 @@ public class MetadataParser {
                 }
             }
             handleDescriptionEnd(descriptionBuilder, lines, descriptionEndLine);
+        }
+        return descriptionBuilder.build();
+    }
+
+    private ParsedDescriptionData processAllRawLines(List<String> lines) {
+        DescriptionBuilder descriptionBuilder = new DescriptionBuilder();
+        for (int lineNrZeroBased = 0; lineNrZeroBased < lines.size(); lineNrZeroBased++) {
+            String currentLine = lines.get(lineNrZeroBased);
+
+            // block start -  #!!
+            if (descriptionPatternMatcher.matchesDescriptionStart(currentLine)) {
+                handleBlockStart(descriptionBuilder, lineNrZeroBased);
+            } else
+                // #!!#
+                if (descriptionPatternMatcher.matchesDescriptionEnd(currentLine)) {
+                    handleDescriptionEnd(descriptionBuilder, lines, lineNrZeroBased);
+                } else {
+                    // #! @tag var: content <=> @tag var
+                    if (descriptionPatternMatcher.matchesDescriptionVariableLine(currentLine)) {
+                        handleDescriptionLineVariableSyntax(descriptionBuilder, currentLine);
+                    } else
+                        // #! @tag: content
+                        if (descriptionPatternMatcher.matchesDescriptionGeneralLine(currentLine)) {
+                            handleDescriptionLineGeneralSyntax(descriptionBuilder, currentLine);
+                        } else {
+                            if (descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(currentLine)) {
+                                handleDescriptionLineVariableDeclarationOnlySyntax(descriptionBuilder, currentLine);
+                            } else {
+                                // #! continued from previous line
+                                if (descriptionPatternMatcher.matchesDescriptionComplementaryLine(currentLine)) {
+                                    handleDescriptionLineComplementarySyntax(descriptionBuilder, currentLine);
+                                } else {
+                                    // check if line is allowed inside description
+                                    if (descriptionBuilder.descriptionOpened()) {
+                                        handleNonDescriptionLineInsideDescription(
+                                                descriptionBuilder,
+                                                currentLine,
+                                                lineNrZeroBased
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                }
         }
         return descriptionBuilder.build();
     }

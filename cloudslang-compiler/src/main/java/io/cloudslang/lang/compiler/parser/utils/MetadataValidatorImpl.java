@@ -33,10 +33,10 @@ public class MetadataValidatorImpl implements MetadataValidator {
     }
 
     @Override
-    public List<RuntimeException> validateCheckstyle(SlangSource source) {
+    public List<RuntimeException> validateCheckstyle(SlangSource source, boolean includeStepDescription) {
         Validate.notNull(source.getContent(), "Source " + source.getName() + " cannot be null");
         try {
-            return extractCheckstyleData(source);
+            return extractCheckstyleData(source, includeStepDescription);
         } catch (Throwable e) {
             throw new RuntimeException(
                     "There was a problem extracting checkstyle data for source [" +
@@ -45,9 +45,9 @@ public class MetadataValidatorImpl implements MetadataValidator {
         }
     }
 
-    private List<RuntimeException> extractCheckstyleData(SlangSource source) {
+    private List<RuntimeException> extractCheckstyleData(SlangSource source, boolean includeStepDescription) {
         List<String> lines = SlangSourceUtils.readLines(source);
-        ParsedDescriptionData parsedDescriptionData = metadataParser.parse(source);
+        ParsedDescriptionData parsedDescriptionData = metadataParser.parse(source, includeStepDescription);
         List<RuntimeException> errors = new ArrayList<>();
 
         // process flow descriptions
@@ -82,12 +82,13 @@ public class MetadataValidatorImpl implements MetadataValidator {
              !finished && lineNrZeroBased < lines.size();
              lineNrZeroBased++) {
             String currentLine = lines.get(lineNrZeroBased);
+            String leadingStrippedInput = currentLine.stripLeading();
 
             // #! @tag var: content
             // #! @tag: content
             boolean variableLine = isVariableLine(currentLine);
-            boolean isGeneralLine = isGeneralLine(currentLine);
-            if (variableLine || isGeneralLine || isVariableLineDeclarationOnly(currentLine)) {
+            boolean isGeneralLine = isGeneralLine(leadingStrippedInput, currentLine);
+            if (variableLine || isGeneralLine || isVariableLineDeclarationOnly(leadingStrippedInput, currentLine)) {
                 // extract tag
                 String currentTag;
                 if (variableLine) {
@@ -118,7 +119,7 @@ public class MetadataValidatorImpl implements MetadataValidator {
                     previousItemEndLineNumber = lineNrZeroBased;
                 } else {
                     // #!!#
-                    if (descriptionPatternMatcher.matchesDescriptionEnd(currentLine)) {
+                    if (descriptionPatternMatcher.matchesDescriptionEnd(leadingStrippedInput, currentLine)) {
                         // validate ending wrapper line
                         validateEndingWrapperLine(lines, isStep, errors, lineNrZeroBased);
 
@@ -224,16 +225,16 @@ public class MetadataValidatorImpl implements MetadataValidator {
                         !currentLine.trim().equals(Regex.DESCRIPTION_TOKEN);
     }
 
-    private boolean isGeneralLine(String currentLine) {
-        return descriptionPatternMatcher.matchesDescriptionGeneralLine(currentLine);
+    private boolean isGeneralLine(String leadingStrippedInput, String currentLine) {
+        return descriptionPatternMatcher.matchesDescriptionGeneralLine(leadingStrippedInput, currentLine);
     }
 
     private boolean isVariableLine(String currentLine) {
         return descriptionPatternMatcher.matchesDescriptionVariableLine(currentLine);
     }
 
-    private boolean isVariableLineDeclarationOnly(String currentLine) {
-        return descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(currentLine);
+    private boolean isVariableLineDeclarationOnly(String leadingStrippedInput, String currentLine) {
+        return descriptionPatternMatcher.matchesVariableLineDeclarationOnlyLine(leadingStrippedInput, currentLine);
     }
 
     private String tryExtractLine(List<String> lines, int lineNr) {

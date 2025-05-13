@@ -59,11 +59,20 @@ public class DescriptionPatternMatcher {
     }
 
     public boolean matchesDescriptionStart(String input) {
-        return input.startsWith(descriptionStartString) && descriptionStartPattern.matcher(input).matches();
+        return descriptionStartPattern.matcher(input).matches();
+    }
+
+    public boolean matchesDescriptionStart(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionStartString) &&
+                descriptionStartPattern.matcher(input).matches();
     }
 
     public boolean matchesDescriptionEnd(String input) {
-        return input.startsWith(descriptionEndString) && descriptionEndPattern.matcher(input).matches();
+        return descriptionEndPattern.matcher(input).matches();
+    }
+
+    public boolean matchesDescriptionEnd(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionEndString) && descriptionEndPattern.matcher(input).matches();
     }
 
     public boolean matchesDescriptionVariableLine(String input) {
@@ -71,7 +80,12 @@ public class DescriptionPatternMatcher {
     }
 
     public boolean matchesDescriptionGeneralLine(String input) {
-        return input.startsWith(descriptionWithTagString) && descriptionGeneralLinePattern.matcher(input).matches();
+        return descriptionGeneralLinePattern.matcher(input).matches();
+    }
+
+    public boolean matchesDescriptionGeneralLine(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionWithTagString) &&
+                descriptionGeneralLinePattern.matcher(input).matches();
     }
 
     public boolean matchesDescriptionComplementaryLine(String input) {
@@ -99,7 +113,11 @@ public class DescriptionPatternMatcher {
     }
 
     public boolean matchesVariableLineDeclarationOnlyLine(String input) {
-        return input.startsWith(descriptionWithTagString) &&
+        return descriptionVariableLineDeclarationOnlyPattern.matcher(input).matches();
+    }
+
+    public boolean matchesVariableLineDeclarationOnlyLine(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionWithTagString) &&
                 descriptionVariableLineDeclarationOnlyPattern.matcher(input).matches();
     }
 

@@ -15,14 +15,33 @@ import java.util.List;
 
 public interface MetadataExtractor {
 
-    Metadata extractMetadata(SlangSource source);
+    default Metadata extractMetadata(SlangSource source) {
+        return extractMetadata(false, source);
+    }
+
+    Metadata extractMetadata(boolean includeStepDescription, SlangSource source);
 
     Metadata extractMetadata(SlangSource source, boolean shouldValidateDescription);
 
-    MetadataModellingResult extractMetadataModellingResult(SlangSource source);
+    default MetadataModellingResult extractMetadataModellingResult(SlangSource source) {
+        return extractMetadataModellingResult(false, source);
+    }
 
-    MetadataModellingResult extractMetadataModellingResult(SlangSource source, boolean shouldValidateCheckstyle);
+    MetadataModellingResult extractMetadataModellingResult(boolean includeStepDescription, SlangSource source);
 
-    List<RuntimeException> validateCheckstyle(SlangSource source);
+    default MetadataModellingResult extractMetadataModellingResult(SlangSource source,
+                                                                   boolean shouldValidateCheckstyle) {
+        return extractMetadataModellingResult(false, source, shouldValidateCheckstyle);
+    }
+
+    MetadataModellingResult extractMetadataModellingResult(boolean includeStepDescription,
+                                                           SlangSource source,
+                                                           boolean shouldValidateCheckstyle);
+
+    default List<RuntimeException> validateCheckstyle(SlangSource source) {
+        return validateCheckstyle(source, false);
+    }
+
+    List<RuntimeException> validateCheckstyle(SlangSource source, boolean includeStepDescription);
 
 }
