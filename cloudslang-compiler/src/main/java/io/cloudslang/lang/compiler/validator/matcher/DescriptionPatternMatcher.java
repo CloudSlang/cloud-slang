@@ -37,6 +37,10 @@ public class DescriptionPatternMatcher {
     private final Pattern emptyLinePattern;
     private final Pattern descriptionVariableLineDeclarationOnlyPattern;
 
+    private final String descriptionStartString = "#!!";
+    private final String descriptionEndString = "#!!#";
+    private final String descriptionWithTagString = "#! @";
+
     public DescriptionPatternMatcher() {
         descriptionStartPattern = Pattern.compile(Regex.DESCRIPTION_START_LINE, UNICODE_CHARACTER_CLASS);
         descriptionVariableLinePattern = Pattern.compile(Regex.DESCRIPTION_VARIABLE_LINE, UNICODE_CHARACTER_CLASS);
@@ -58,8 +62,17 @@ public class DescriptionPatternMatcher {
         return descriptionStartPattern.matcher(input).matches();
     }
 
+    public boolean matchesDescriptionStart(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionStartString) &&
+                descriptionStartPattern.matcher(input).matches();
+    }
+
     public boolean matchesDescriptionEnd(String input) {
         return descriptionEndPattern.matcher(input).matches();
+    }
+
+    public boolean matchesDescriptionEnd(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionEndString) && descriptionEndPattern.matcher(input).matches();
     }
 
     public boolean matchesDescriptionVariableLine(String input) {
@@ -68,6 +81,11 @@ public class DescriptionPatternMatcher {
 
     public boolean matchesDescriptionGeneralLine(String input) {
         return descriptionGeneralLinePattern.matcher(input).matches();
+    }
+
+    public boolean matchesDescriptionGeneralLine(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionWithTagString) &&
+                descriptionGeneralLinePattern.matcher(input).matches();
     }
 
     public boolean matchesDescriptionComplementaryLine(String input) {
@@ -96,6 +114,11 @@ public class DescriptionPatternMatcher {
 
     public boolean matchesVariableLineDeclarationOnlyLine(String input) {
         return descriptionVariableLineDeclarationOnlyPattern.matcher(input).matches();
+    }
+
+    public boolean matchesVariableLineDeclarationOnlyLine(String leadingStrippedInput, String input) {
+        return leadingStrippedInput.startsWith(descriptionWithTagString) &&
+                descriptionVariableLineDeclarationOnlyPattern.matcher(input).matches();
     }
 
     public String getStepName(String input) {

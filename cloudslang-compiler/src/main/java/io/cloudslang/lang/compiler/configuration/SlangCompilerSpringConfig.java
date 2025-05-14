@@ -50,6 +50,10 @@ import io.cloudslang.lang.compiler.modeller.transformers.SeqStepsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.compiler.modeller.transformers.WorkFlowTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.WorkerGroupTransformer;
+import io.cloudslang.lang.compiler.newyaml.YamlFactoryService;
+import io.cloudslang.lang.compiler.newyaml.YamlPoolService;
+import io.cloudslang.lang.compiler.newyaml.impl.YamlFactoryServiceImpl;
+import io.cloudslang.lang.compiler.newyaml.impl.YamlPoolServiceImpl;
 import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.YamlParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
@@ -121,6 +125,7 @@ public class SlangCompilerSpringConfig {
         };
         yamlParser.setExecutableValidator(executableValidator());
         yamlParser.setParserExceptionHandler(parserExceptionHandler());
+        yamlParser.setYamlPoolService(yamlPoolService());
         return yamlParser;
     }
 
@@ -256,6 +261,16 @@ public class SlangCompilerSpringConfig {
         slangCompiler.setMetadataExtractor(metadataExtractor());
 
         return slangCompiler;
+    }
+
+    @Bean
+    public YamlFactoryService yamlFactoryService() {
+        return new YamlFactoryServiceImpl();
+    }
+
+    @Bean
+    public YamlPoolService yamlPoolService() {
+        return new YamlPoolServiceImpl(yamlFactoryService());
     }
 
     @Bean

@@ -25,9 +25,9 @@ public class MetadataExtractorImpl implements MetadataExtractor {
     private MetadataValidator metadataValidator;
 
     @Override
-    public Metadata extractMetadata(SlangSource source) {
+    public Metadata extractMetadata(boolean includeStepDescription, SlangSource source) {
         validateSlangSource(source);
-        return getExecutableMetadata(source);
+        return getExecutableMetadata(source, includeStepDescription);
     }
 
     @Deprecated
@@ -37,28 +37,30 @@ public class MetadataExtractorImpl implements MetadataExtractor {
     }
 
     @Override
-    public MetadataModellingResult extractMetadataModellingResult(SlangSource source) {
+    public MetadataModellingResult extractMetadataModellingResult(boolean includeStepDescription, SlangSource source) {
         validateSlangSource(source);
-        ParsedDescriptionData parsedDescriptionData = metadataParser.parse(source);
+        ParsedDescriptionData parsedDescriptionData = metadataParser.parse(source, includeStepDescription);
         return metadataModeller.createModel(parsedDescriptionData);
     }
 
     @Deprecated
     @Override
     public MetadataModellingResult extractMetadataModellingResult(
+            boolean includeStepDescription,
             SlangSource source,
             boolean shouldValidateCheckstyle) {
-        MetadataModellingResult metadataModellingResult = extractMetadataModellingResult(source);
+        MetadataModellingResult metadataModellingResult =
+                extractMetadataModellingResult(includeStepDescription, source);
         if (shouldValidateCheckstyle) {
-            metadataModellingResult.getErrors().addAll(validateCheckstyle(source));
+            metadataModellingResult.getErrors().addAll(validateCheckstyle(source, includeStepDescription));
         }
         return metadataModellingResult;
     }
 
     @Override
-    public List<RuntimeException> validateCheckstyle(SlangSource source) {
+    public List<RuntimeException> validateCheckstyle(SlangSource source, boolean includeStepDescription) {
         validateSlangSource(source);
-        return metadataValidator.validateCheckstyle(source);
+        return metadataValidator.validateCheckstyle(source, includeStepDescription);
     }
 
     private Metadata getMetadata(SlangSource source, boolean shouldValidateDescription) {
@@ -79,13 +81,14 @@ public class MetadataExtractorImpl implements MetadataExtractor {
         Validate.notNull(source, "You must supply a source to extract the metadata from");
     }
 
-    private Metadata getExecutableMetadata(SlangSource source) {
-        MetadataModellingResult result = getMetadataModellingResultThrowFirstError(source);
+    private Metadata getExecutableMetadata(SlangSource source, boolean includeStepDescription) {
+        MetadataModellingResult result = getMetadataModellingResultThrowFirstError(source, includeStepDescription);
         return result.getMetadata();
     }
 
-    private MetadataModellingResult getMetadataModellingResultThrowFirstError(SlangSource source) {
-        MetadataModellingResult result = extractMetadataModellingResult(source);
+    private MetadataModellingResult getMetadataModellingResultThrowFirstError(SlangSource source,
+                                                                              boolean includeStepDescription) {
+        MetadataModellingResult result = extractMetadataModellingResult(includeStepDescription, source);
         if (result.getErrors().size() > 0) {
             throw result.getErrors().get(0);
         }

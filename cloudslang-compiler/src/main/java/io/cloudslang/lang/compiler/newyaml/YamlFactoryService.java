@@ -7,15 +7,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  *******************************************************************************/
-package io.cloudslang.lang.compiler.parser.utils;
+package io.cloudslang.lang.compiler.newyaml;
 
-import io.cloudslang.lang.compiler.SlangSource;
-import java.util.List;
+import org.yaml.snakeyaml.Yaml;
 
-public interface MetadataValidator {
-    default List<RuntimeException> validateCheckstyle(SlangSource source) {
-        return validateCheckstyle(source, false);
-    }
+public interface YamlFactoryService {
 
-    List<RuntimeException> validateCheckstyle(SlangSource source, boolean includeStepDescription);
+    Yaml createYamlForParsing();
+
 }
