@@ -183,12 +183,12 @@ public class ScriptEvaluator extends ScriptProcessor {
     private static void injectTruststorePropertiesIfNeeded(Set<ScriptFunction> functionDependencies,
                                                            Map<String, Serializable> pythonContext) {
         if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_TRUSTSTORE_PATH)) {
-            pythonContext.put(Regex.GET_SYSTEM_TRUSTSTORE_PATH_REGEX,
+            pythonContext.put("get_system_truststore_path()",
                     System.getProperty("javax.net.ssl.trustStore"));
 
         }
         if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_TRUSTSTORE_PASSWORD)) {
-            pythonContext.put(Regex.GET_SYSTEM_TRUSTSTORE_PASSWORD_REGEX,
+            pythonContext.put("get_system_truststore_password()",
                     System.getProperty("javax.net.ssl.trustStorePassword"));
         }
     }
