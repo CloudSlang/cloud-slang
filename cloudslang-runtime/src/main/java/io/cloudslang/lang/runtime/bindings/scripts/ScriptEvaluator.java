@@ -14,6 +14,7 @@ import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.PyObjectValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.constants.Regex;
 import io.cloudslang.lang.runtime.services.ScriptsService;
 import io.cloudslang.runtime.api.python.PythonEvaluationResult;
 import io.cloudslang.runtime.api.python.executor.services.PythonExecutorLifecycleManagerService;
@@ -110,6 +111,9 @@ public class ScriptEvaluator extends ScriptProcessor {
             jythonContext.put(SYSTEM_PROPERTIES_MAP,
                     (Serializable) prepareSystemPropertiesForJython(systemProperties));
         }
+
+        injectTruststorePropertiesIfNeeded(functionDependencies, jythonContext);
+
         return processJythonEvaluation(expr, jythonContext, systemPropertiesDefined, functionDependencies);
     }
 
@@ -127,6 +131,8 @@ public class ScriptEvaluator extends ScriptProcessor {
             pythonContext.put(SYSTEM_PROPERTIES_MAP,
                     (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
         }
+
+        injectTruststorePropertiesIfNeeded(functionDependencies, pythonContext);
 
         PythonEvaluationResult result = pythonRuntimeService.eval(
                 buildAddFunctionsScriptForExternalPython(functionDependencies), expr, pythonContext);
@@ -151,6 +157,8 @@ public class ScriptEvaluator extends ScriptProcessor {
                     (Serializable) prepareSystemPropertiesForExternalPython(systemProperties));
         }
 
+        injectTruststorePropertiesIfNeeded(functionDependencies, pythonContext);
+
         PythonEvaluationResult result;
         if (pythonExecutorLifecycleManagerService.isAlive()) {
             try {
@@ -170,6 +178,19 @@ public class ScriptEvaluator extends ScriptProcessor {
         //noinspection unchecked
         Set<String> accessedResources = (Set<String>) result.getResultContext().get(ACCESSED_RESOURCES_SET);
         return ValueFactory.create(result.getEvalResult(), getSensitive(pythonContext, accessedResources));
+    }
+
+    private static void injectTruststorePropertiesIfNeeded(Set<ScriptFunction> functionDependencies,
+                                                           Map<String, Serializable> pythonContext) {
+        if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_TRUSTSTORE_PATH)) {
+            pythonContext.put(Regex.GET_SYSTEM_TRUSTSTORE_PATH_REGEX,
+                    System.getProperty("javax.net.ssl.trustStore"));
+
+        }
+        if (functionDependencies.contains(ScriptFunction.GET_SYSTEM_TRUSTSTORE_PASSWORD)) {
+            pythonContext.put(Regex.GET_SYSTEM_TRUSTSTORE_PASSWORD_REGEX,
+                    System.getProperty("javax.net.ssl.trustStorePassword"));
+        }
     }
 
     public Value testExpr(String expr, Map<String, Value> context, Set<SystemProperty> systemProperties,
