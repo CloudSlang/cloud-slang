@@ -39,6 +39,7 @@ import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_USE_JYT
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_VERSION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 
 public class PythonActionTransformer extends AbstractTransformer
@@ -63,7 +64,7 @@ public class PythonActionTransformer extends AbstractTransformer
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
                                                                          SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
-        Map<String, Serializable> transformedData = null;
+        Map<String, Serializable> transformedData = emptyMap();
 
         try {
             if (rawData != null) {
