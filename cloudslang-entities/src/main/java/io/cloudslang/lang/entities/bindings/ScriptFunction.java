@@ -49,7 +49,11 @@ public enum ScriptFunction {
 
     GET_WORKER_GROUP("get_worker_group"),
 
-    GET_RUN_ID("get_run_id");
+    GET_RUN_ID("get_run_id"),
+
+    GET_SYSTEM_TRUSTSTORE_PATH("get_system_truststore_path"),
+
+    GET_SYSTEM_TRUSTSTORE_PASSWORD("get_system_truststore_password");
 
     private final String value;
 

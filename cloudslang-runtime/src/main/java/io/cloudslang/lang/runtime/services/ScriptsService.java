@@ -49,7 +49,9 @@ public class ScriptsService {
                 ScriptFunction.GET_SP_VAR,
                 ScriptFunction.GET_USER_ID,
                 ScriptFunction.GET_WORKER_GROUP,
-                ScriptFunction.GET_RUN_ID
+                ScriptFunction.GET_RUN_ID,
+                ScriptFunction.GET_SYSTEM_TRUSTSTORE_PATH,
+                ScriptFunction.GET_SYSTEM_TRUSTSTORE_PASSWORD
         );
 
         for (ScriptFunction function: list) {

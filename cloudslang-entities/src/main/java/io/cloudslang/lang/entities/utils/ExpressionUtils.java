@@ -38,6 +38,8 @@ import static io.cloudslang.lang.entities.constants.Regex.GET_REGEX_WITH_DEFAULT
 import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX_WITHOUT_QUOTES;
 import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX_WITH_DOUBLE_QUOTES;
 import static io.cloudslang.lang.entities.constants.Regex.GET_SP_VAR_REGEX_WITH_SINGLE_QUOTES;
+import static io.cloudslang.lang.entities.constants.Regex.GET_SYSTEM_TRUSTSTORE_PASSWORD_REGEX;
+import static io.cloudslang.lang.entities.constants.Regex.GET_SYSTEM_TRUSTSTORE_PATH_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_USER_ID_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_WORKER_GROUP_REGEX;
 import static io.cloudslang.lang.entities.constants.Regex.GET_RUN_ID_REGEX;
@@ -101,6 +103,8 @@ public final class ExpressionUtils {
         addPattern(ScriptFunction.GET_USER_ID, GET_USER_ID_REGEX);
         addPattern(ScriptFunction.GET_WORKER_GROUP, GET_WORKER_GROUP_REGEX);
         addPattern(ScriptFunction.GET_RUN_ID, GET_RUN_ID_REGEX);
+        addPattern(ScriptFunction.GET_SYSTEM_TRUSTSTORE_PATH, GET_SYSTEM_TRUSTSTORE_PATH_REGEX);
+        addPattern(ScriptFunction.GET_SYSTEM_TRUSTSTORE_PASSWORD, GET_SYSTEM_TRUSTSTORE_PASSWORD_REGEX);
     }
 
     private static void addPattern(ScriptFunction function, String regex) {
