@@ -12,21 +12,15 @@ package io.cloudslang.lang.api.configuration;
 import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.api.SlangImpl;
 import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import io.cloudslang.lang.runtime.configuration.SlangRuntimeSpringConfig;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * User: stoneo
- * Date: 03/12/2014
- * Time: 10:39
+ * Not a @Configuration on purpose to enable only compiler capabilities
+ * when declared as a bean
  */
-@Configuration
-@Conditional(SlangSpringConfigurationCondition.class)
-@Import({SlangRuntimeSpringConfig.class, SlangCompilerSpringConfig.class})
-public class SlangSpringConfiguration {
+@Import({SlangCompilerSpringConfig.class})
+public class SlangCompilerSpringConfiguration {
 
     @Bean
     public Slang slang() {
