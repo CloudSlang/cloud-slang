@@ -9,13 +9,14 @@
  *******************************************************************************/
 package io.cloudslang.lang.api.configuration;
 
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import io.cloudslang.lang.api.Slang;
+import io.cloudslang.lang.api.SlangImpl;
+import org.springframework.context.annotation.Bean;
 
-@Configuration
-@Conditional(SlangCompilerSpringConfigurationCondition.class)
-@Import({SlangCompilerSpringConfig.class})
-public class SlangCompilerSpringConfiguration extends AbstractSlangConfiguration {
+public abstract class AbstractSlangConfiguration {
+
+    @Bean
+    public Slang slang() {
+        return new SlangImpl();
+    }
 }

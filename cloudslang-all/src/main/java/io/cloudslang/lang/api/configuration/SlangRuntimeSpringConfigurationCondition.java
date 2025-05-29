@@ -9,20 +9,15 @@
  *******************************************************************************/
 package io.cloudslang.lang.api.configuration;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-public class SlangSpringConfigurationCondition implements Condition {
+public class SlangRuntimeSpringConfigurationCondition implements Condition {
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        String enabled = context.getEnvironment().getProperty("slang.runtime.enabled");
-
-        if (StringUtils.isEmpty(enabled)) {
-            return true;
-        }
+        String enabled = context.getEnvironment().getProperty("slang.runtime.enabled", "true");
 
         return Boolean.parseBoolean(enabled);
     }

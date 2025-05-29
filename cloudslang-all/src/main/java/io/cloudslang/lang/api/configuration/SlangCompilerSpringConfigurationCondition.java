@@ -9,13 +9,16 @@
  *******************************************************************************/
 package io.cloudslang.lang.api.configuration;
 
-import io.cloudslang.lang.compiler.configuration.SlangCompilerSpringConfig;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
-@Configuration
-@Conditional(SlangCompilerSpringConfigurationCondition.class)
-@Import({SlangCompilerSpringConfig.class})
-public class SlangCompilerSpringConfiguration extends AbstractSlangConfiguration {
+/**
+ * This class is a negation of the SlangRuntimeSpringConfigurationCondition
+ */
+public class SlangCompilerSpringConfigurationCondition extends SlangRuntimeSpringConfigurationCondition {
+
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        return !super.matches(context, metadata);
+    }
 }
