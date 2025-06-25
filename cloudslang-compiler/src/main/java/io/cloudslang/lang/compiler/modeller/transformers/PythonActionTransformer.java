@@ -32,14 +32,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_DEPENDENCIES_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_SCRIPT_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_USE_JYTHON_KEY;
 import static io.cloudslang.lang.compiler.SlangTextualKeys.PYTHON_ACTION_VERSION_KEY;
-import static io.cloudslang.lang.compiler.SlangTextualKeys.INPUTS_KEY;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 
 public class PythonActionTransformer extends AbstractTransformer
