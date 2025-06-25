@@ -64,7 +64,7 @@ public class PythonActionTransformer extends AbstractTransformer
     public TransformModellingResult<Map<String, Serializable>> transform(Map<String, Serializable> rawData,
                                                                          SensitivityLevel sensitivityLevel) {
         List<RuntimeException> errors = new ArrayList<>();
-        Map<String, Serializable> transformedData = emptyMap();
+        Map<String, Serializable> transformedData = null;
 
         try {
             if (rawData != null) {

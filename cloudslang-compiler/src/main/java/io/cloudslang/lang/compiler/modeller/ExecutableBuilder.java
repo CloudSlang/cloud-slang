@@ -388,24 +388,24 @@ public class ExecutableBuilder {
                                                  List<RuntimeException> errors,
                                                  ParsedSlang parsedSlang, String execName) {
         Map<String, Object> actionRawData = new HashMap<>();
-        Object javaActionRawData = executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY);
-        Object pythonActionRawData = executableRawData.get(SlangTextualKeys.PYTHON_ACTION_KEY);
-        Object seqActionRawData = executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY);
-        if (javaActionRawData != null) {
-            actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY,
-                    executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
-        }
-        if (pythonActionRawData != null) {
+
+        boolean isJavaAction = executableRawData.containsKey(SlangTextualKeys.JAVA_ACTION_KEY);
+        boolean isPythonAction = executableRawData.containsKey(SlangTextualKeys.PYTHON_ACTION_KEY);
+        boolean isSeqAction = executableRawData.containsKey(SlangTextualKeys.SEQ_ACTION_KEY);
+
+        if (isPythonAction) {
             Object pythonActionObject = executableRawData.get(PYTHON_ACTION_KEY);
             if (pythonActionObject instanceof Map) {
                 Map<String, Object> pythonAction = (Map<String, Object>) executableRawData.get(PYTHON_ACTION_KEY);
                 pythonAction.put(SlangTextualKeys.INPUTS_KEY, executableRawData.get(INPUTS_KEY));
             }
             actionRawData.put(PYTHON_ACTION_KEY, pythonActionObject);
-        }
-        if (seqActionRawData != null) {
+        } else if (isSeqAction) {
             actionRawData.put(SlangTextualKeys.SEQ_ACTION_KEY,
                     executableRawData.get(SlangTextualKeys.SEQ_ACTION_KEY));
+        } else if (isJavaAction) {
+            actionRawData.put(SlangTextualKeys.JAVA_ACTION_KEY,
+                    executableRawData.get(SlangTextualKeys.JAVA_ACTION_KEY));
         }
         if (MapUtils.isEmpty(actionRawData)) {
             errors.add(new RuntimeException("Error compiling " + parsedSlang.getName() +
@@ -823,7 +823,7 @@ public class ExecutableBuilder {
      *
      * @param workflow the workflow of the flow
      * @return a Pair with two sets of dependencies. One set is for CloudSlang dependencies
-     *         and the other one is for external dependencies.
+     * and the other one is for external dependencies.
      */
     private Pair<Set<String>, Set<String>> fetchDirectStepsDependencies(Workflow workflow) {
         Set<String> dependencies = new HashSet<>();
