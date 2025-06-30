@@ -30,7 +30,6 @@ public class TransformersHandler {
 
     public static final String CLASS = "class ";
 
-
     public static String keyToTransform(Transformer transformer) {
         String key;
         if (transformer.keyToTransform() != null) {
