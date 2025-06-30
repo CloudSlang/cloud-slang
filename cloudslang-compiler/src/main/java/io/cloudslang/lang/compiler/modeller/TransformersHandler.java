@@ -101,6 +101,60 @@ public class TransformersHandler {
         return transformedData;
     }
 
+    public Map<String, Serializable> runActionTransformers(Map<String, Object> rawData,
+                                                           List<Transformer> scopeTransformers,
+                                                           List<RuntimeException> errors,
+                                                           String errorMessagePrefix,
+                                                           SensitivityLevel sensitivityLevel,
+                                                           List<Argument> arguments) {
+        Map<String, Serializable> transformedData = new HashMap<>();
+        for (Transformer transformer : scopeTransformers) {
+            String key = keyToTransform(transformer);
+            Object value = rawData.get(key);
+            if (value == null) {
+                continue;
+            }
+            try {
+                @SuppressWarnings("unchecked")
+                TransformModellingResult transformModellingResult = transformer.transform(value, sensitivityLevel,
+                        arguments);
+                Object data = transformModellingResult.getTransformedData();
+                if (data != null) {
+                    transformedData.put(key, (Serializable) data);
+                }
+                if (rawData.containsKey(key)) {
+                    for (RuntimeException rex : transformModellingResult.getErrors()) {
+                        errors.add(wrapErrorMessage(rex, errorMessagePrefix));
+                    }
+                }
+            } catch (ClassCastException e) {
+                Class transformerType = getTransformerFromType(transformer);
+                if (value instanceof Map && transformerType.equals(List.class)) {
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a list of values, but instead there is a map.\n" +
+                            "By the Yaml spec lists properties are marked with a '- ' (dash followed by a space)"));
+                } else if (value instanceof List && transformerType.equals(Map.class)) {
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a map of values, but instead there is a list.\n" +
+                            "By the Yaml spec maps properties are NOT marked with a '- ' (dash followed by a space)"));
+                } else if (value instanceof String && transformerType.equals(Map.class)) {
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a map of values, but instead there is a string."));
+                } else if (value instanceof String && transformerType.equals(List.class)) {
+                    errors.add(new RuntimeException(errorMessagePrefix + "Under property: '" + key +
+                            "' there should be a list of values, but instead there is a string."));
+                } else {
+                    String message = "Data for property: " + key + " -> " + rawData.get(key).toString() +
+                            " is illegal." + "\n Transformer is: " + transformer.getClass().getSimpleName();
+                    errors.add(new RuntimeException(errorMessagePrefix + message, e));
+                }
+            } catch (RuntimeException e) {
+                errors.add(wrapErrorMessage(e, errorMessagePrefix));
+            }
+        }
+        return transformedData;
+    }
+
     private Class getTransformerFromType(Transformer transformer) {
         // Always take the first interface Transformer<F, T> in case of many interfaces
         // Always take the first parameter F of the Transformer interface
