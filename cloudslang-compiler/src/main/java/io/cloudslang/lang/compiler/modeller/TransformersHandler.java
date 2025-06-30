@@ -15,6 +15,7 @@ import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Argument;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -65,7 +66,7 @@ public class TransformersHandler {
                 TransformModellingResult transformModellingResult = transformer.transform(value, sensitivityLevel,
                         arguments);
                 Object data = transformModellingResult.getTransformedData();
-                if (data != null) {
+                if (isNonEmptyData(data)) {
                     transformedData.put(key, (Serializable) data);
                 }
                 if (rawData.containsKey(key)) {
@@ -99,6 +100,16 @@ public class TransformersHandler {
             }
         }
         return transformedData;
+    }
+
+    private boolean isNonEmptyData(Object data) {
+        if (data == null) {
+            return false;
+        }
+        if (data instanceof Map) {
+            return MapUtils.isNotEmpty((Map<?, ?>) data);
+        }
+        return true;
     }
 
     private Class getTransformerFromType(Transformer transformer) {
