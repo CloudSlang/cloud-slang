@@ -110,10 +110,11 @@ public class TransformersHandler {
         Map<String, Serializable> transformedData = new HashMap<>();
         for (Transformer transformer : scopeTransformers) {
             String key = keyToTransform(transformer);
-            Object value = rawData.get(key);
-            if (value == null) {
+            boolean containsKey = rawData.containsKey(key);
+            if (!containsKey) {
                 continue;
             }
+            Object value = rawData.get(key);
             try {
                 @SuppressWarnings("unchecked")
                 TransformModellingResult transformModellingResult = transformer.transform(value, sensitivityLevel,
