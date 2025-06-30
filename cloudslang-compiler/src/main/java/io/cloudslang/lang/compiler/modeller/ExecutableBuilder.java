@@ -481,8 +481,8 @@ public class ExecutableBuilder {
 
         String errorMessagePrefix = "Action syntax is illegal.\n";
         actionData.putAll(
-                transformersHandler.runTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix,
-                        sensitivityLevel));
+                transformersHandler.runActionTransformers(actionRawData, actionTransformers, errors, errorMessagePrefix,
+                        sensitivityLevel, Collections.emptyList()));
 
         Action action = new Action(actionData);
         return new ActionModellingResult(action, errors);
