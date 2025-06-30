@@ -11,17 +11,16 @@ package io.cloudslang.lang.compiler.modeller;
 
 
 import io.cloudslang.lang.compiler.CompilerConstants;
-import io.cloudslang.lang.compiler.SlangTextualKeys;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.transformers.Transformer;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.bindings.Argument;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +29,6 @@ import java.util.Map;
 public class TransformersHandler {
 
     public static final String CLASS = "class ";
-    private static final List<String> VALID_OPERATION_TYPE_KEYS = Arrays.asList(SlangTextualKeys.JAVA_ACTION_KEY,
-            SlangTextualKeys.PYTHON_ACTION_KEY, SlangTextualKeys.SEQ_ACTION_KEY);
 
 
     public static String keyToTransform(Transformer transformer) {
@@ -70,10 +67,8 @@ public class TransformersHandler {
                 TransformModellingResult transformModellingResult = transformer.transform(value, sensitivityLevel,
                         arguments);
                 Object data = transformModellingResult.getTransformedData();
-                if (data != null) {
-                    if (!isOperationTypeKey(key) || rawData.containsKey(key)) {
-                        transformedData.put(key, (Serializable) data);
-                    }
+                if (isNonEmptyData(data)) {
+                    transformedData.put(key, (Serializable) data);
                 }
                 if (rawData.containsKey(key)) {
                     for (RuntimeException rex : transformModellingResult.getErrors()) {
@@ -108,8 +103,14 @@ public class TransformersHandler {
         return transformedData;
     }
 
-    private boolean isOperationTypeKey(String key) {
-        return VALID_OPERATION_TYPE_KEYS.contains(key);
+    private boolean isNonEmptyData(Object data) {
+        if (data == null) {
+            return false;
+        }
+        if (data instanceof Map) {
+            return MapUtils.isNotEmpty((Map<?, ?>) data);
+        }
+        return true;
     }
 
     private Class getTransformerFromType(Transformer transformer) {
