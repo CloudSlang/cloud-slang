@@ -41,7 +41,7 @@ public class SlangEntitiesSpringConfig implements ApplicationContextAware {
         applicationContext = localApplicationContext;
     }
 
-    @Bean("dummyEncryptor1")
+    @Bean("dummyEncryptor")
     public DummyEncryptor dummyEncryptor() {
         return new DummyEncryptor();
     }
