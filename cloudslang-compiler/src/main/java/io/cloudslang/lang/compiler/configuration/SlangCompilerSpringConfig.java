@@ -10,8 +10,6 @@
 package io.cloudslang.lang.compiler.configuration;
 
 
-import static io.cloudslang.lang.compiler.SlangTextualKeys.OBJECT_REPOSITORY_KEY;
-
 import com.google.common.collect.Lists;
 import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.compiler.MetadataExtractor;
@@ -26,6 +24,7 @@ import io.cloudslang.lang.compiler.modeller.MetadataModeller;
 import io.cloudslang.lang.compiler.modeller.MetadataModellerImpl;
 import io.cloudslang.lang.compiler.modeller.SlangModeller;
 import io.cloudslang.lang.compiler.modeller.SlangModellerImpl;
+import io.cloudslang.lang.compiler.modeller.SystemPropertiesHelper;
 import io.cloudslang.lang.compiler.modeller.TransformersHandler;
 import io.cloudslang.lang.compiler.modeller.transformers.AbstractForTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.AbstractInputsTransformer;
@@ -38,7 +37,6 @@ import io.cloudslang.lang.compiler.modeller.transformers.ForTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.InputsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.JavaActionTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.NavigateTransformer;
-import io.cloudslang.lang.compiler.modeller.SystemPropertiesHelper;
 import io.cloudslang.lang.compiler.modeller.transformers.OutputsTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.ParallelLoopForTransformer;
 import io.cloudslang.lang.compiler.modeller.transformers.PublishTransformer;
@@ -77,8 +75,6 @@ import io.cloudslang.lang.compiler.validator.PreCompileValidator;
 import io.cloudslang.lang.compiler.validator.PreCompileValidatorImpl;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidator;
 import io.cloudslang.lang.compiler.validator.SystemPropertyValidatorImpl;
-import io.cloudslang.lang.entities.encryption.DummyEncryptor;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -87,13 +83,13 @@ import org.springframework.context.annotation.Scope;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.inspector.TrustedTagInspector;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 
-
 import java.util.List;
+
+import static io.cloudslang.lang.compiler.SlangTextualKeys.OBJECT_REPOSITORY_KEY;
 
 @Configuration
 @ComponentScan("io.cloudslang.lang.compiler")
@@ -108,11 +104,6 @@ public class SlangCompilerSpringConfig {
         Yaml yaml = new Yaml(getConstructor());
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml;
-    }
-
-    @Bean
-    public DummyEncryptor dummyEncryptor() {
-        return new DummyEncryptor();
     }
 
     @Bean
