@@ -69,12 +69,12 @@
         <repository>
             <id>ossrh</id>
             <name>Maven Central staging repository</name>
-            <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/</url>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>ossrh</id>
             <name>Maven Central snapshots repository</name>
-            <url>https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/</url>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
