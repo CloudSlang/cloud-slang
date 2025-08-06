@@ -69,12 +69,12 @@
         <repository>
             <id>ossrh</id>
             <name>Maven Central staging repository</name>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>${nexus.url}</url>
         </repository>
         <snapshotRepository>
             <id>ossrh</id>
             <name>Maven Central snapshots repository</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+            <url>${nexus.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -793,25 +793,25 @@
         <profile>
             <id>deploy-internal</id>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <version>${maven-deploy-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>custom-deployment-to-nexus</id>
-                                <goals>
-                                    <goal>deploy</goal>
-                                </goals>
-                                <phase>deploy</phase>
-                                <configuration>
-                                    <altDeploymentRepository>${custom.nexus}</altDeploymentRepository>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
+<!--                <plugins>-->
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-deploy-plugin</artifactId>-->
+<!--                        <version>${maven-deploy-plugin.version}</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>custom-deployment-to-nexus</id>-->
+<!--                                <goals>-->
+<!--                                    <goal>deploy</goal>-->
+<!--                                </goals>-->
+<!--                                <phase>deploy</phase>-->
+<!--                                <configuration>-->
+<!--                                    <altDeploymentRepository>${custom.nexus}</altDeploymentRepository>-->
+<!--                                </configuration>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
+<!--                </plugins>-->
             </build>
         </profile>
     </profiles>
