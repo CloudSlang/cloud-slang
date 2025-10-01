@@ -302,9 +302,9 @@ public class ActionExecutionData extends AbstractExecutionData {
             final Map<String, Value> returnedMap = scriptExecutor.executeScript(
                     normalizePythonDependencies(dependencies), pythonScript, callArguments, useJython);
 
-            final Value ex = returnedMap.get(EXCEPTION);
-            if (ex != null) {
-                logger.error("Python operation encountered an exception: " + ex.toString());
+            final String ex = Value.toStringSafe(returnedMap.get(EXCEPTION));
+            if (StringUtils.isNotEmpty(ex)) {
+                logger.error("Python operation encountered an exception: " + ex);
             }
 
             return returnedMap;
