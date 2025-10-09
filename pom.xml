@@ -245,7 +245,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.12.0</version>
+                <version>3.18.0</version>
             </dependency>
 
             <dependency>
@@ -354,7 +354,7 @@
             <dependency>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-core</artifactId>
-                <version>4.9.0</version>
+                <version>4.33.0</version>
             </dependency>
 
             <dependency>
@@ -581,7 +581,7 @@
 
                                     <ignoredUnusedDeclaredDependency>org.python:jython-standalone:jar:*
                                     </ignoredUnusedDeclaredDependency>
-                                    <ignoredUnusedDeclaredDependency>org.liquibase:liquibase-core:jar:4.9.0
+                                    <ignoredUnusedDeclaredDependency>org.liquibase:liquibase-core:jar:4.33.0
                                     </ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>log4j:log4j:jar:1.2.17
                                     </ignoredUnusedDeclaredDependency>
