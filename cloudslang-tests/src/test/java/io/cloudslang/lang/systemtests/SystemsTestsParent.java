@@ -21,6 +21,12 @@ import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.properties.EventVerbosityLevel;
 import io.cloudslang.runtime.impl.python.PythonExecutionCachedEngine;
 import io.cloudslang.score.events.ScoreEvent;
+import org.apache.commons.lang.StringUtils;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,11 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang.StringUtils;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static ch.lambdaj.Lambda.select;
 import static io.cloudslang.lang.entities.properties.SlangSystemPropertyConstant.CSLANG_RUNTIME_EVENTS_VERBOSITY;
@@ -61,9 +62,10 @@ public abstract class SystemsTestsParent {
     static {
         ClassLoader classLoader = SystemsTestsParent.class.getClassLoader();
 
-        String settingsXmlPath = classLoader.getResource("settings.xml").getPath();
+        File settingsXmlFile = new File(classLoader.getResource("settings.xml").getFile());
+        String settingsXmlPath = settingsXmlFile.getPath();
         System.out.println("setting.xml path is [" + settingsXmlPath + "]");
-        File rootHome = new File(settingsXmlPath).getParentFile();
+        File rootHome = settingsXmlFile.getParentFile();
 
         System.setProperty("app.home", rootHome.getAbsolutePath());
 
@@ -90,7 +92,8 @@ public abstract class SystemsTestsParent {
         }
 
         System.setProperty(MavenConfigImpl.MAVEN_SETTINGS_PATH, settingsXmlPath);
-        String m2ConfPath = classLoader.getResource("m2.conf").getPath();
+        File m2ConfFile = new File(classLoader.getResource("m2.conf").getFile());
+        String m2ConfPath = m2ConfFile.getPath();
         System.out.println("m2.conf path [" + m2ConfPath + "]");
         System.setProperty(MavenConfigImpl.MAVEN_M2_CONF_PATH, m2ConfPath);
 
@@ -100,6 +103,7 @@ public abstract class SystemsTestsParent {
 
         System.setProperty(CSLANG_RUNTIME_EVENTS_VERBOSITY.getValue(), EventVerbosityLevel.DEFAULT.getValue());
         System.setProperty("python.expressionsEval", "jython");
+        System.setProperty("maven.multiModuleProjectDirectory", rootHome.getAbsolutePath());
     }
 
     @Autowired
@@ -111,10 +115,10 @@ public abstract class SystemsTestsParent {
     @Autowired
     protected TriggerFlows triggerFlows;
 
-    public List<ScoreEvent>  runAndCollectAllEvents(
-        CompilationArtifact compilationArtifact,
-        Map<String, Value> userInputs,
-        Set<SystemProperty> systemProperties) {
+    public List<ScoreEvent> runAndCollectAllEvents(
+            CompilationArtifact compilationArtifact,
+            Map<String, Value> userInputs,
+            Set<SystemProperty> systemProperties) {
         return triggerFlows.runAndCollectAllEvents(compilationArtifact, userInputs, systemProperties);
     }
 
