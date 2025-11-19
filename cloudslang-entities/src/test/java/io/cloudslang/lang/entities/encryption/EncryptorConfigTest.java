@@ -10,6 +10,7 @@
 package io.cloudslang.lang.entities.encryption;
 
 import configuration.SlangEntitiesSpringConfig;
+import io.cloudslang.lang.entities.encryption.EncryptionProvider;
 import io.cloudslang.lang.spi.encryption.Encryption;
 import org.junit.Before;
 import org.junit.After;
@@ -24,9 +25,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -42,14 +41,12 @@ public class EncryptorConfigTest {
 
     @Before
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    public void cleanup() throws Exception {
-        Field field = EncryptionProvider.class.getDeclaredField("encryptor");
-        field.setAccessible(true);
-        field.set(null, new AtomicReference<>());
+    public void cleanup() {
+        EncryptionProvider.reset();
     }
 
     @After
-    public void afterTest() throws Exception {
+    public void afterTest() {
         cleanup();
     }
 
