@@ -17,6 +17,8 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.SpringEncryptionTestBase;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -24,6 +26,7 @@ import java.util.HashSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
@@ -35,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DeserializeTest.Config.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class DeserializeTest {
+public class DeserializeTest extends SpringEncryptionTestBase {
 
     private ObjectMapper mapper;
 
@@ -125,5 +128,10 @@ public class DeserializeTest {
     @Configuration
     @ComponentScan("io.cloudslang.lang.entities")
     static class Config {
+
+        @Bean("dummyEncryptor")
+        public DummyEncryptor dummyEncryptor() {
+            return new DummyEncryptor();
+        }
     }
 }

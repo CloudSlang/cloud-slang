@@ -10,6 +10,7 @@
 package io.cloudslang.lang.entities.bindings.values;
 
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
+import io.cloudslang.lang.entities.SpringEncryptionTestBase;
 import io.cloudslang.lang.spi.encryption.Encryption;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -20,7 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ValueFactoryTest.Config.class)
-public class ValueFactoryTest {
+public class ValueFactoryTest extends SpringEncryptionTestBase {
 
     @Test
     public void testCreatePyObjectValue() {
