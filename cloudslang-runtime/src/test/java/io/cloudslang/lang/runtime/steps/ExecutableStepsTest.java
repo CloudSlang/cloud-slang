@@ -10,6 +10,7 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.google.common.collect.Lists;
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
@@ -24,6 +25,7 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.encryption.EncryptionProvider;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
@@ -40,6 +42,7 @@ import io.cloudslang.lang.runtime.env.ReturnValues;
 import io.cloudslang.lang.runtime.env.RunEnvironment;
 import io.cloudslang.lang.runtime.events.LanguageEventData;
 import io.cloudslang.lang.runtime.services.ScriptsService;
+import io.cloudslang.lang.spi.encryption.Encryption;
 import io.cloudslang.runtime.api.python.executor.services.PythonExecutorCommunicationService;
 import io.cloudslang.runtime.api.python.executor.services.PythonExecutorConfigurationDataService;
 import io.cloudslang.runtime.api.python.executor.services.PythonExecutorLifecycleManagerService;
@@ -61,6 +64,8 @@ import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 import io.cloudslang.worker.management.WorkerConfigurationService;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +75,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,6 +86,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
@@ -97,7 +104,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ExecutableStepsTest.Config.class)
+@ContextConfiguration(classes = {ExecutableStepsTest.Config.class, SlangEntitiesSpringConfig.class})
 public class ExecutableStepsTest {
 
     static {
@@ -121,6 +128,23 @@ public class ExecutableStepsTest {
 
     @Autowired
     private ExecutionPreconditionService executionPreconditionService;
+
+    @Before
+    public void setUp() throws Exception {
+        clearEncryptionProviderCache();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        clearEncryptionProviderCache();
+    }
+
+    private void clearEncryptionProviderCache() throws Exception {
+        Field field = EncryptionProvider.class.getDeclaredField("encryptor");
+        field.setAccessible(true);
+        AtomicReference<Encryption> encryptorRef = (AtomicReference<Encryption>) field.get(null);
+        encryptorRef.set(null); // Clear the cached encryption instance
+    }
 
     @Test
     public void testStart() {
