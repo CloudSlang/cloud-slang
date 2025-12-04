@@ -1268,5 +1268,9 @@ public class ActionStepsTest {
             return mock(SequentialExecutionService.class);
         }
 
+        @Bean
+        public CsMagicVariableHelper magicVariableHelper() {
+            return mock(CsMagicVariableHelper.class);
+        }
     }
 }

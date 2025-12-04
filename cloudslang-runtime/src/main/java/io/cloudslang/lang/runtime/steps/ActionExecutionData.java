@@ -68,7 +68,7 @@ public class ActionExecutionData extends AbstractExecutionData {
 
     private static final boolean REMOVE_MESSAGE_FROM_LOGGED_EX =
             Boolean.parseBoolean(
-                    System.getProperty("worker.execution.sanitizeOperationStacktrace","false"));
+                    System.getProperty("worker.execution.sanitizeOperationStacktrace", "false"));
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -79,13 +79,16 @@ public class ActionExecutionData extends AbstractExecutionData {
     @Autowired
     private SequentialExecutionService seqExecutionService;
 
+    @Autowired
+    private CsMagicVariableHelper magicVariableHelper;
+
     @Autowired(required = false)
     private SlangStepDataConsumer stepDataConsumer;
 
     public void doAction(@Param(EXECUTION_RUNTIME_SERVICES) ExecutionRuntimeServices executionRuntimeServices,
                          @Param(ScoreLangConstants.RUN_ENV) RunEnvironment runEnv,
                          @Param(ExecutionParametersConsts.NON_SERIALIZABLE_EXECUTION_DATA)
-                                 Map<String, Map<String, Object>> nonSerializableExecutionData,
+                         Map<String, Map<String, Object>> nonSerializableExecutionData,
                          @Param(ScoreLangConstants.NEXT_STEP_ID_KEY) Long nextStepId,
                          @Param(ScoreLangConstants.ACTION_TYPE) ActionType actionType,
                          @Param(ScoreLangConstants.JAVA_ACTION_CLASS_KEY) String className,
@@ -127,8 +130,11 @@ public class ActionExecutionData extends AbstractExecutionData {
                     returnValue = prepareAndRunPythonAction(dependencies, script, callArguments, useJython);
                     break;
                 case SEQUENTIAL:
-                    returnValue = runSequentialAction(callArguments, gav, steps, Boolean.TRUE.equals(external),
-                            execution, runEnv, nextStepId);
+                    Map<String, Value> magicVariables = magicVariableHelper.getGlobalContext(executionRuntimeServices);
+                    ReadOnlyContextAccessor context = new ReadOnlyContextAccessor(callArguments, magicVariables);
+
+                    returnValue = runSequentialAction(context.getMergedContexts(), gav, steps,
+                            Boolean.TRUE.equals(external), execution, runEnv, nextStepId);
                     break;
                 default:
                     break;
