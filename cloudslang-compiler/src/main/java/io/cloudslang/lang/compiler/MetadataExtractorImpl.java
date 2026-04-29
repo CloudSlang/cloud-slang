@@ -16,7 +16,6 @@ import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionData;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import java.util.List;
-import io.cloudslang.score.util.Validate;
 
 public class MetadataExtractorImpl implements MetadataExtractor {
 
@@ -78,7 +77,7 @@ public class MetadataExtractorImpl implements MetadataExtractor {
     }
 
     private void validateSlangSource(SlangSource source) {
-        Validate.notNull(source, "You must supply a source to extract the metadata from");
+        if (source == null) throw new IllegalArgumentException("You must supply a source to extract the metadata from");
     }
 
     private Metadata getExecutableMetadata(SlangSource source, boolean includeStepDescription) {

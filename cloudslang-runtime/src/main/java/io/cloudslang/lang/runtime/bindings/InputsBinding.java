@@ -25,7 +25,7 @@ import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import io.cloudslang.score.util.Validate;
+
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class InputsBinding extends AbstractBinding {
         Value value;
 
         String inputName = input.getName();
-        Validate.notEmpty(inputName);
+        if (inputName == null || inputName.isEmpty()) throw new IllegalArgumentException("The validated string is empty");
         String errorMessagePrefix = "Error binding input: '" + inputName;
 
         try {

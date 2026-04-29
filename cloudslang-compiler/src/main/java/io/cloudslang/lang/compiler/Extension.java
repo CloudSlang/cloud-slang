@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import io.cloudslang.score.util.Validate;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -88,7 +87,7 @@ public enum Extension {
             }
         }
         String extensionsAsString = Arrays.toString(extensionValues);
-        Validate.isTrue(validFileExtension,
+        if (!validFileExtension) throw new IllegalArgumentException(
                 "File: " + fileName + " must have one of the following extensions: " +
                         extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
         );

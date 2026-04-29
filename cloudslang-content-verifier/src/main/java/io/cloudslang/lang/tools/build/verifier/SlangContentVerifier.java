@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import io.cloudslang.score.util.Validate;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -63,8 +62,8 @@ public class SlangContentVerifier {
 
     public PreCompileResult createModelsAndValidate(String directoryPath, boolean shouldValidateDescription,
                                                     boolean shouldValidateCheckstyle) {
-        Validate.notEmpty(directoryPath, "You must specify a path");
-        Validate.isTrue(new File(directoryPath).isDirectory(), "Directory path argument \'" +
+        if (directoryPath == null || directoryPath.isEmpty()) throw new IllegalArgumentException("You must specify a path");
+        if (!new File(directoryPath).isDirectory()) throw new IllegalArgumentException("Directory path argument \'" +
                 directoryPath + "\' does not lead to a directory");
         Map<String, Executable> slangModels = new HashMap<>();
         Collection<File> slangFiles = slangCompilationService.listSlangFiles(new File(directoryPath), true);
@@ -81,7 +80,7 @@ public class SlangContentVerifier {
                 String errorMessagePrefixCompilation = "Failed to compile file: \'" +
                     slangFile.getAbsoluteFile() + "\'.\n";
 
-                Validate.isTrue(slangFile.isFile(), "file path \'" + slangFile.getAbsolutePath() +
+                if (!slangFile.isFile()) throw new IllegalArgumentException("file path \'" + slangFile.getAbsolutePath() +
                         "\' must lead to a file");
                 SlangSource slangSource = SlangSource.fromFile(slangFile);
 

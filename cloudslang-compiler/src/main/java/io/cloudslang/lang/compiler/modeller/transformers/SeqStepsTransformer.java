@@ -14,7 +14,6 @@ import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
 import org.apache.commons.lang3.StringUtils;
-import io.cloudslang.score.util.Validate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -180,9 +179,9 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
 
     private void validateNotEmptyValues(Map<String, String> tMap, Set<String> mandatoryKeySet,
                                         Set<String> optionalKeySet) {
-        Validate.notNull(tMap);
-        Validate.notNull(mandatoryKeySet);
-        Validate.notNull(optionalKeySet);
+        if (tMap == null) throw new IllegalArgumentException("Validated object is null");
+        if (mandatoryKeySet == null) throw new IllegalArgumentException("Validated object is null");
+        if (optionalKeySet == null) throw new IllegalArgumentException("Validated object is null");
 
         Set<String> missingKeys = new HashSet<>();
         Set<String> emptyValuesKeys = new HashSet<>();
