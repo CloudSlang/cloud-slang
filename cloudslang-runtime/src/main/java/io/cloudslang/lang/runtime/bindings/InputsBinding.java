@@ -25,7 +25,7 @@ import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

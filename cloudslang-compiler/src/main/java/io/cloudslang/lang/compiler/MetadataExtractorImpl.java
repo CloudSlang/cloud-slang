@@ -16,7 +16,7 @@ import io.cloudslang.lang.compiler.parser.MetadataParser;
 import io.cloudslang.lang.compiler.parser.model.ParsedDescriptionData;
 import io.cloudslang.lang.compiler.parser.utils.MetadataValidator;
 import java.util.List;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 
 public class MetadataExtractorImpl implements MetadataExtractor {
 

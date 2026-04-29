@@ -13,7 +13,7 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveStringValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

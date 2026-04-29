@@ -10,7 +10,7 @@
 package io.cloudslang.lang.compiler.modeller.transformers;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 
 import java.util.HashSet;
 import java.util.Set;

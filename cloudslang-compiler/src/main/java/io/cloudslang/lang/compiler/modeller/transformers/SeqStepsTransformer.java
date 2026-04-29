@@ -13,8 +13,8 @@ import io.cloudslang.lang.compiler.modeller.model.SeqStep;
 import io.cloudslang.lang.compiler.modeller.result.BasicTransformModellingResult;
 import io.cloudslang.lang.compiler.modeller.result.TransformModellingResult;
 import io.cloudslang.lang.entities.SensitivityLevel;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import io.cloudslang.score.util.Validate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +39,7 @@ import static io.cloudslang.lang.compiler.modeller.transformers.AbstractTransfor
 import static io.cloudslang.lang.entities.ScoreLangConstants.SEQ_ASSIGNMENT_ACTION;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class SeqStepsTransformer extends AbstractInOutForTransformer
         implements Transformer<List<Map<String, Map<String, String>>>, ArrayList<SeqStep>> {

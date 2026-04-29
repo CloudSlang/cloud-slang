@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 
 import static ch.lambdaj.Lambda.convertMap;
 

@@ -9,7 +9,7 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;

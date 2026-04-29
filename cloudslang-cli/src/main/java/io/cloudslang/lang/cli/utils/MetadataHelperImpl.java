@@ -13,7 +13,7 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import java.io.File;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

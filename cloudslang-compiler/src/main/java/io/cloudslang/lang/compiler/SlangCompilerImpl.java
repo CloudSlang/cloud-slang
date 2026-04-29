@@ -29,7 +29,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.Serializable;

@@ -20,7 +20,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
-import org.apache.commons.lang.Validate;
+import io.cloudslang.score.util.Validate;
 
 import java.io.Serializable;
 import java.util.HashMap;
