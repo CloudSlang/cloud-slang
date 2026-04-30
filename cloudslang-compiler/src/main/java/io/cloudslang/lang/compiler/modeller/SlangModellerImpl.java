@@ -17,9 +17,6 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
-
-
 public class SlangModellerImpl implements SlangModeller {
 
     private ExecutableBuilder executableBuilder;
@@ -28,7 +25,9 @@ public class SlangModellerImpl implements SlangModeller {
     public ExecutableModellingResult createModel(ParseModellingResult parseModellingResult,
                                                  SensitivityLevel sensitivityLevel) {
         ParsedSlang parsedSlang = parseModellingResult.getParsedSlang();
-        Validate.notNull(parsedSlang, "You must supply a parsed Slang source to compile");
+        if (parsedSlang == null) {
+            throw new IllegalArgumentException("You must supply a parsed Slang source to compile");
+        }
 
         try {
             switch (parsedSlang.getType()) {

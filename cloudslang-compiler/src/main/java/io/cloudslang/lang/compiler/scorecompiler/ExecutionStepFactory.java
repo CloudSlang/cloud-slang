@@ -20,7 +20,6 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.score.api.ControlActionMetadata;
 import io.cloudslang.score.api.ExecutionStep;
-import org.apache.commons.lang.Validate;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -43,7 +42,10 @@ public class ExecutionStepFactory {
     public ExecutionStep createBeginStepStep(Long index, List<Argument> stepInputs,
                                              Map<String, Serializable> preStepData, String refId, String stepName,
                                              String workerGroup) {
-        Validate.notNull(preStepData, "preStepData is null");
+        if (preStepData == null) {
+            throw new IllegalArgumentException("preStepData is null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.STEP_INPUTS_KEY, (Serializable) stepInputs);
         actionData.put(ScoreLangConstants.LOOP_KEY, preStepData.get(SlangTextualKeys.FOR_KEY));
@@ -60,7 +62,10 @@ public class ExecutionStepFactory {
 
     public ExecutionStep createWorkerGroupStep(Long index, Map<String, Serializable> preStepData, String stepName,
                                                   String workerGroup, String robotGroup) {
-        Validate.notNull(preStepData, "preStepData is null");
+        if (preStepData == null) {
+            throw new IllegalArgumentException("preStepData is null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.HOOKS, "TBD");
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
@@ -78,7 +83,10 @@ public class ExecutionStepFactory {
     public ExecutionStep createFinishStepStep(Long index, Map<String, Serializable> postStepData,
                                               Map<String, ResultNavigation> navigationValues,
                                               String stepName, String workerGroup, boolean parallelLoop) {
-        Validate.notNull(postStepData, "postStepData is null");
+        if (postStepData == null) {
+            throw new IllegalArgumentException("postStepData is null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
 
         actionData.put(ScoreLangConstants.PREVIOUS_STEP_ID_KEY, index - 1);
@@ -109,8 +117,14 @@ public class ExecutionStepFactory {
 
     public ExecutionStep createStartStep(Long index, Map<String, Serializable> preExecutableData, List<Input>
             execInputs, String executableName, ExecutableType executableType) {
-        Validate.notNull(preExecutableData, "preExecutableData is null");
-        Validate.notNull(execInputs, "Executable inputs are null");
+        if (preExecutableData == null) {
+            throw new IllegalArgumentException("preExecutableData is null");
+        }
+
+        if (execInputs == null) {
+            throw new IllegalArgumentException("Executable inputs are null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.EXECUTABLE_INPUTS_KEY, (Serializable) execInputs);
         actionData.put(ScoreLangConstants.HOOKS, (Serializable) preExecutableData);
@@ -121,7 +135,10 @@ public class ExecutionStepFactory {
     }
 
     public ExecutionStep createActionStep(Long index, Map<String, Serializable> actionRawData) {
-        Validate.notNull(actionRawData, "actionData is null");
+        if (actionRawData == null) {
+            throw new IllegalArgumentException("actionData is null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
         ActionType actionType;
 
@@ -161,9 +178,18 @@ public class ExecutionStepFactory {
     public ExecutionStep createEndStep(Long index, Map<String, Serializable> postExecutableData,
                                        List<Output> outputs, List<Result> results,
                                        String executableName, ExecutableType executableType) {
-        Validate.notNull(postExecutableData, "postExecutableData is null");
-        Validate.notNull(outputs, "Executable outputs are null");
-        Validate.notNull(results, "Executable results are null");
+        if (postExecutableData == null) {
+            throw new IllegalArgumentException("postExecutableData is null");
+        }
+
+        if (outputs == null) {
+            throw new IllegalArgumentException("Executable outputs are null");
+        }
+
+        if (results == null) {
+            throw new IllegalArgumentException("Executable results are null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.EXECUTABLE_OUTPUTS_KEY, (Serializable) outputs);
         actionData.put(ScoreLangConstants.EXECUTABLE_RESULTS_KEY, (Serializable) results);
@@ -176,7 +202,10 @@ public class ExecutionStepFactory {
     public ExecutionStep createAddBranchesStep(Long currentStepId, Long nextStepId,
                                                Long branchBeginStepId, Map<String, Serializable> preStepData,
                                                String refId, String stepName) {
-        Validate.notNull(preStepData, "preStepData is null");
+        if (preStepData == null) {
+            throw new IllegalArgumentException("preStepData is null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.NODE_NAME_KEY, stepName);
         actionData.put(ScoreLangConstants.REF_ID, refId);
@@ -192,8 +221,14 @@ public class ExecutionStepFactory {
 
     public ExecutionStep createJoinBranchesStep(Long index, Map<String, Serializable> postStepData,
                                                 Map<String, ResultNavigation> navigationValues, String stepName) {
-        Validate.notNull(postStepData, "postStepData is null");
-        Validate.notNull(navigationValues, "navigationValues is null");
+        if (postStepData == null) {
+            throw new IllegalArgumentException("postStepData is null");
+        }
+
+        if (navigationValues == null) {
+            throw new IllegalArgumentException("navigationValues is null");
+        }
+
         Map<String, Serializable> actionData = new HashMap<>();
         actionData.put(ScoreLangConstants.STEP_PUBLISH_KEY, postStepData.get(SlangTextualKeys.PUBLISH_KEY));
         actionData.put(ScoreLangConstants.STEP_NAVIGATION_KEY, new HashMap<>(navigationValues));

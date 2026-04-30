@@ -13,7 +13,6 @@ import io.cloudslang.lang.api.Slang;
 import io.cloudslang.lang.compiler.SlangSource;
 import io.cloudslang.lang.compiler.modeller.model.Metadata;
 import java.io.File;
-import org.apache.commons.lang.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +26,17 @@ public class MetadataHelperImpl implements MetadataHelper {
 
     @Override
     public String extractMetadata(File file) {
-        Validate.notNull(file, "File can not be null");
-        Validate.notNull(file.getAbsolutePath(), "File path can not be null");
-        Validate.isTrue(file.isFile(), "File: " + file.getName() + " was not found");
+        if (file == null) {
+            throw new IllegalArgumentException("File can not be null");
+        }
+
+        if (file.getAbsolutePath() == null) {
+            throw new IllegalArgumentException("File path can not be null");
+        }
+
+        if (!file.isFile()) {
+            throw new IllegalArgumentException("File: " + file.getName() + " was not found");
+        }
 
         Metadata metadata = slang.extractMetadata(SlangSource.fromFile(file));
 

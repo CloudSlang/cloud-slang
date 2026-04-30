@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.cloudslang.lang.compiler;
 
-import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -88,10 +87,12 @@ public enum Extension {
             }
         }
         String extensionsAsString = Arrays.toString(extensionValues);
-        Validate.isTrue(validFileExtension,
-                "File: " + fileName + " must have one of the following extensions: " +
-                        extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
-        );
+        if (!validFileExtension) {
+            throw new IllegalArgumentException(
+                    "File: " + fileName + " must have one of the following extensions: " +
+                            extensionsAsString.substring(1, extensionsAsString.length() - 1) + "."
+            );
+        }
     }
 
     public static String removeExtension(String fileName) {
