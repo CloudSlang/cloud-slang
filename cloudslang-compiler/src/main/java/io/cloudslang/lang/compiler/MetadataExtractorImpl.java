@@ -77,7 +77,9 @@ public class MetadataExtractorImpl implements MetadataExtractor {
     }
 
     private void validateSlangSource(SlangSource source) {
-        if (source == null) throw new IllegalArgumentException("You must supply a source to extract the metadata from");
+        if (source == null) {
+            throw new IllegalArgumentException("You must supply a source to extract the metadata from");
+        }
     }
 
     private Metadata getExecutableMetadata(SlangSource source, boolean includeStepDescription) {

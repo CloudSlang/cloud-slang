@@ -26,9 +26,17 @@ public class MetadataHelperImpl implements MetadataHelper {
 
     @Override
     public String extractMetadata(File file) {
-        if (file == null) throw new IllegalArgumentException("File can not be null");
-        if (file.getAbsolutePath() == null) throw new IllegalArgumentException("File path can not be null");
-        if (!file.isFile()) throw new IllegalArgumentException("File: " + file.getName() + " was not found");
+        if (file == null) {
+            throw new IllegalArgumentException("File can not be null");
+        }
+
+        if (file.getAbsolutePath() == null) {
+            throw new IllegalArgumentException("File path can not be null");
+        }
+
+        if (!file.isFile()) {
+            throw new IllegalArgumentException("File: " + file.getName() + " was not found");
+        }
 
         Metadata metadata = slang.extractMetadata(SlangSource.fromFile(file));
 

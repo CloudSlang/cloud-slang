@@ -684,8 +684,9 @@ public class SlangBuildMain {
 
         repositoryPath = FilenameUtils.separatorsToSystem(repositoryPath);
 
-        if (!new File(repositoryPath).isDirectory())
+        if (!new File(repositoryPath).isDirectory()) {
             throw new IllegalArgumentException("Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
+        }
 
         return repositoryPath;
     }

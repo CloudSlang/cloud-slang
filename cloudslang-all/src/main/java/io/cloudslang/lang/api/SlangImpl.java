@@ -66,8 +66,14 @@ public class SlangImpl implements Slang {
             SlangSource source,
             Set<SlangSource> dependencies,
             PrecompileStrategy precompileStrategy) {
-        if (source == null) throw new IllegalArgumentException("Source can not be null");
-        if (precompileStrategy == null) throw new IllegalArgumentException("Pre-compile strategy can not be null");
+        if (source == null) {
+            throw new IllegalArgumentException("Source can not be null");
+        }
+
+        if (precompileStrategy == null) {
+            throw new IllegalArgumentException("Pre-compile strategy can not be null");
+        }
+
         Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
@@ -84,9 +90,18 @@ public class SlangImpl implements Slang {
             Set<SlangSource> dependencies,
             PrecompileStrategy precompileStrategy,
             SensitivityLevel sensitivityLevel) {
-        if (source == null) throw new IllegalArgumentException("Source can not be null");
-        if (precompileStrategy == null) throw new IllegalArgumentException("Pre-compile strategy can not be null");
-        if (sensitivityLevel == null) throw new IllegalArgumentException("Sensitivity level can not be null");
+        if (source == null) {
+            throw new IllegalArgumentException("Source can not be null");
+        }
+
+        if (precompileStrategy == null) {
+            throw new IllegalArgumentException("Pre-compile strategy can not be null");
+        }
+
+        if (sensitivityLevel == null) {
+            throw new IllegalArgumentException("Sensitivity level can not be null");
+        }
+
         Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
@@ -112,8 +127,14 @@ public class SlangImpl implements Slang {
             SlangSource source,
             Set<SlangSource> dependencies,
             PrecompileStrategy precompileStrategy) {
-        if (source == null) throw new IllegalArgumentException("Source can not be null");
-        if (precompileStrategy == null) throw new IllegalArgumentException("Pre-compile strategy can not be null");
+        if (source == null) {
+            throw new IllegalArgumentException("Source can not be null");
+        }
+
+        if (precompileStrategy == null) {
+            throw new IllegalArgumentException("Pre-compile strategy can not be null");
+        }
+
         Set<SlangSource> dependencySources = filterOutNullSources(dependencies);
 
         try {
@@ -139,7 +160,10 @@ public class SlangImpl implements Slang {
 
     @Override
     public Metadata extractMetadata(SlangSource source) {
-        if (source == null) throw new IllegalArgumentException("Source can not be null");
+        if (source == null) {
+            throw new IllegalArgumentException("Source can not be null");
+        }
+
         try {
             return metadataExtractor.extractMetadata(source);
         } catch (Exception e) {
@@ -152,7 +176,10 @@ public class SlangImpl implements Slang {
     @Override
     public Long run(CompilationArtifact compilationArtifact, Map<String, Value> runInputs,
                     Set<SystemProperty> systemProperties) {
-        if (compilationArtifact == null) throw new IllegalArgumentException("Compilation artifact can not be null");
+        if (compilationArtifact == null) {
+            throw new IllegalArgumentException("Compilation artifact can not be null");
+        }
+
         if (runInputs == null) {
             runInputs = new HashMap<>();
         }
@@ -197,7 +224,9 @@ public class SlangImpl implements Slang {
 
     @Override
     public Set<SystemProperty> loadSystemProperties(SlangSource source) {
-        if (source == null) throw new IllegalArgumentException("Source can not be null");
+        if (source == null) {
+            throw new IllegalArgumentException("Source can not be null");
+        }
         return compiler.loadSystemProperties(source);
     }
 

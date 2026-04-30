@@ -65,10 +65,15 @@ public class ScoreCompilerImpl implements ScoreCompiler {
                 executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             try {
-                if (path == null || path.isEmpty()) throw new IllegalArgumentException("Source " + executable.getName() +
-                        " has dependencies but no path was given to the compiler");
+                if (path == null || path.isEmpty()) {
+                    throw new IllegalArgumentException("Source " + executable.getName() +
+                            " has dependencies but no path was given to the compiler");
+                }
+
                 for (Object element : path) {
-                    if (element == null) throw new IllegalArgumentException("Source " + executable.getName() + " has empty dependencies");
+                    if (element == null) {
+                        throw new IllegalArgumentException("Source " + executable.getName() + " has empty dependencies");
+                    }
                 }
             } catch (RuntimeException ex) {
                 exceptions.add(ex);

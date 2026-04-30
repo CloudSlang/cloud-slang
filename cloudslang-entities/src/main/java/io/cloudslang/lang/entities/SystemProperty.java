@@ -31,8 +31,13 @@ public class SystemProperty implements Serializable {
     private final String description;
 
     private SystemProperty(String namespace, String key, Value value, String description) {
-        if (namespace == null) throw new IllegalArgumentException("System property namespace cannot be null");
-        if (key == null || key.isEmpty()) throw new IllegalArgumentException("System property key cannot be empty");
+        if (namespace == null) {
+            throw new IllegalArgumentException("System property namespace cannot be null");
+        }
+
+        if (key == null || key.isEmpty()) {
+            throw new IllegalArgumentException("System property key cannot be empty");
+        }
 
         String fullyQualifiedName;
         if (StringUtils.isNotEmpty(namespace)) {

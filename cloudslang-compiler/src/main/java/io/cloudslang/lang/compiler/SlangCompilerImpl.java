@@ -192,8 +192,13 @@ public class SlangCompilerImpl implements SlangCompiler {
     private ExecutableModellingResult getExecutableModellingResult(SlangSource source,
                                                                    PrecompileStrategy precompileStrategy,
                                                                    SensitivityLevel sensitivityLevel) {
-        if (source == null) throw new IllegalArgumentException("You must supply a source to compile");
-        if (precompileStrategy == null) throw new IllegalArgumentException("Pre-compile strategy can not be null");
+        if (source == null) {
+            throw new IllegalArgumentException("You must supply a source to compile");
+        }
+
+        if (precompileStrategy == null) {
+            throw new IllegalArgumentException("Pre-compile strategy can not be null");
+        }
 
         final String filePath = source.getFilePath();
 

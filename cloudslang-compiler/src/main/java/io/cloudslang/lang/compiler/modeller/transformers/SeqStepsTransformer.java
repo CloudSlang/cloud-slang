@@ -179,9 +179,17 @@ public class SeqStepsTransformer extends AbstractInOutForTransformer
 
     private void validateNotEmptyValues(Map<String, String> tMap, Set<String> mandatoryKeySet,
                                         Set<String> optionalKeySet) {
-        if (tMap == null) throw new IllegalArgumentException("Validated object is null");
-        if (mandatoryKeySet == null) throw new IllegalArgumentException("Validated object is null");
-        if (optionalKeySet == null) throw new IllegalArgumentException("Validated object is null");
+        if (tMap == null) {
+            throw new IllegalArgumentException("Validated object is null");
+        }
+
+        if (mandatoryKeySet == null) {
+            throw new IllegalArgumentException("Validated object is null");
+        }
+
+        if (optionalKeySet == null) {
+            throw new IllegalArgumentException("Validated object is null");
+        }
 
         Set<String> missingKeys = new HashSet<>();
         Set<String> emptyValuesKeys = new HashSet<>();

@@ -84,7 +84,10 @@ public class InputsBinding extends AbstractBinding {
         Value value;
 
         String inputName = input.getName();
-        if (inputName == null || inputName.isEmpty()) throw new IllegalArgumentException("The validated string is empty");
+        if (inputName == null || inputName.isEmpty()) {
+            throw new IllegalArgumentException("The validated string is empty");
+        }
+
         String errorMessagePrefix = "Error binding input: '" + inputName;
 
         try {
