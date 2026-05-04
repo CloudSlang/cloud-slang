@@ -72,7 +72,8 @@ public class ScoreCompilerImpl implements ScoreCompiler {
 
                 for (Object element : path) {
                     if (element == null) {
-                        throw new IllegalArgumentException("Source " + executable.getName() + " has empty dependencies");
+                        throw new IllegalArgumentException("Source " + executable.getName() +
+                                " has empty dependencies");
                     }
                 }
             } catch (RuntimeException ex) {

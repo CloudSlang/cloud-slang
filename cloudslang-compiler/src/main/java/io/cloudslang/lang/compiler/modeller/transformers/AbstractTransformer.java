@@ -30,15 +30,15 @@ public abstract class AbstractTransformer {
             Set<String> mandatoryKeys,
             Set<String> optionalKeys) {
         if (keySet == null) {
-            throw new IllegalArgumentException("Validated object is null");
+            throw new IllegalArgumentException("The validated object is null");
         }
 
         if (mandatoryKeys == null) {
-            throw new IllegalArgumentException("Validated object is null");
+            throw new IllegalArgumentException("The validated object is null");
         }
 
         if (optionalKeys == null) {
-            throw new IllegalArgumentException("Validated object is null");
+            throw new IllegalArgumentException("The validated object is null");
         }
 
         Set<String> missingKeys = new HashSet<>(mandatoryKeys);
