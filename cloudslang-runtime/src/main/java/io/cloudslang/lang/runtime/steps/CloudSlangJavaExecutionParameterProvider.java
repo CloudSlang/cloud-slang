@@ -15,7 +15,7 @@ import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionObject;
 import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.runtime.api.java.JavaExecutionParametersProvider;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
