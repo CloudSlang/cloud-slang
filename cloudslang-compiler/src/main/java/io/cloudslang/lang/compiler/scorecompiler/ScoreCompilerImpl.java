@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
 
 import static ch.lambdaj.Lambda.convertMap;
 
@@ -65,17 +66,9 @@ public class ScoreCompilerImpl implements ScoreCompiler {
                 executable.getType().equals(SlangTextualKeys.FLOW_TYPE);
         if (hasDependencies) {
             try {
-                if (path == null || path.isEmpty()) {
-                    throw new IllegalArgumentException("Source " + executable.getName() +
-                            " has dependencies but no path was given to the compiler");
-                }
-
-                for (Object element : path) {
-                    if (element == null) {
-                        throw new IllegalArgumentException("Source " + executable.getName() +
-                                " has empty dependencies");
-                    }
-                }
+                Validate.notEmpty(path, "Source " + executable.getName() +
+                        " has dependencies but no path was given to the compiler");
+                Validate.noNullElements(path, "Source " + executable.getName() + " has empty dependencies");
             } catch (RuntimeException ex) {
                 exceptions.add(ex);
             }

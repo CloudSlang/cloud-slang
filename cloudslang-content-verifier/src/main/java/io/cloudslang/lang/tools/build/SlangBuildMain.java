@@ -26,6 +26,7 @@ import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.events.ScoreEventListener;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -684,10 +685,8 @@ public class SlangBuildMain {
 
         repositoryPath = FilenameUtils.separatorsToSystem(repositoryPath);
 
-        if (!new File(repositoryPath).isDirectory()) {
-            throw new IllegalArgumentException("Directory path argument \'" + repositoryPath +
-                    "\' does not lead to a directory");
-        }
+        Validate.isTrue(new File(repositoryPath).isDirectory(),
+                "Directory path argument \'" + repositoryPath + "\' does not lead to a directory");
 
         return repositoryPath;
     }

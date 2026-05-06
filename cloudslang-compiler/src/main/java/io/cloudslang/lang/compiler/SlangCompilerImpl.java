@@ -29,6 +29,7 @@ import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.entities.utils.SetUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.Serializable;
@@ -192,13 +193,8 @@ public class SlangCompilerImpl implements SlangCompiler {
     private ExecutableModellingResult getExecutableModellingResult(SlangSource source,
                                                                    PrecompileStrategy precompileStrategy,
                                                                    SensitivityLevel sensitivityLevel) {
-        if (source == null) {
-            throw new IllegalArgumentException("You must supply a source to compile");
-        }
-
-        if (precompileStrategy == null) {
-            throw new IllegalArgumentException("Pre-compile strategy can not be null");
-        }
+        Validate.notNull(source, "You must supply a source to compile");
+        Validate.notNull(precompileStrategy, "Pre-compile strategy can not be null");
 
         final String filePath = source.getFilePath();
 
