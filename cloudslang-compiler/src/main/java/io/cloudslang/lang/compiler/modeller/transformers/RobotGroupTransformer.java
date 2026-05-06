@@ -18,7 +18,7 @@ import io.cloudslang.lang.entities.SensitivityLevel;
 import io.cloudslang.lang.entities.utils.ExpressionUtils;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class RobotGroupTransformer extends AbstractInOutForTransformer
         implements Transformer<String, RobotGroupStatement> {
