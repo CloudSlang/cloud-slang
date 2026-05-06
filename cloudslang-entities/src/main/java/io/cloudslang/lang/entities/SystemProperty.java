@@ -13,6 +13,7 @@ import io.cloudslang.lang.entities.bindings.values.SensitiveStringValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import java.io.Serializable;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -31,13 +32,8 @@ public class SystemProperty implements Serializable {
     private final String description;
 
     private SystemProperty(String namespace, String key, Value value, String description) {
-        if (namespace == null) {
-            throw new IllegalArgumentException("System property namespace cannot be null");
-        }
-
-        if (key == null || key.isEmpty()) {
-            throw new IllegalArgumentException("System property key cannot be empty");
-        }
+        Validate.notNull(namespace, "System property namespace cannot be null");
+        Validate.notEmpty(key, "System property key cannot be empty");
 
         String fullyQualifiedName;
         if (StringUtils.isNotEmpty(namespace)) {
