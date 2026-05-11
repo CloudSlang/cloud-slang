@@ -67,8 +67,8 @@ public class SlangContentVerifier {
         }
 
         if (!new File(directoryPath).isDirectory()) {
-            throw new IllegalArgumentException("Directory path argument \'" +
-                    directoryPath + "\' does not lead to a directory");
+            throw new IllegalArgumentException("Directory path argument \'" + directoryPath +
+                    "\' does not lead to a directory");
         }
 
         Map<String, Executable> slangModels = new HashMap<>();
