@@ -51,7 +51,7 @@ public class DescriptionBuilder {
         String tagContent = currentDescription.get(tag);
         tagContent = tagContent == null ? "" : tagContent;
         if (StringUtils.isNotBlank(content)) {
-            if (org.apache.commons.lang.StringUtils.isNotEmpty(tagContent)) {
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(tagContent)) {
                 tagContent += System.lineSeparator();
             }
             tagContent += content;

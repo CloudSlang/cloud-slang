@@ -19,8 +19,8 @@ import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.PassedSlang
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SkippedSlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parallel.testcaseevents.SlangTestCaseEvent;
 import io.cloudslang.lang.tools.build.tester.parse.SlangTestCase;
-import org.apache.commons.lang.mutable.MutableBoolean;
-import org.apache.commons.lang.mutable.MutableInt;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.event.EventListenerSupport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -106,7 +106,7 @@ public class TestCaseEventDispatchServiceTest {
             Thread.sleep(50);
         }
         // Checks that all listeners are called, order is not important
-        assertEquals(3, mutableInt.getValue());
+        assertEquals(Integer.valueOf(3), mutableInt.getValue());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class TestCaseEventDispatchServiceTest {
             Thread.sleep(50);
         }
         // Checks that all listeners are called, order is not important
-        assertEquals(5, mutableInt.getValue());
+        assertEquals(Integer.valueOf(5), mutableInt.getValue());
     }
 
 }
