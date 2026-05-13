@@ -57,10 +57,6 @@ http://www.apache.org/licenses/LICENSE-2.0
             <artifactId>spring-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>${score.group}</groupId>

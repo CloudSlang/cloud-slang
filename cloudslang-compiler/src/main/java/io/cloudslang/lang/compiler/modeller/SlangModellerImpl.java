@@ -17,7 +17,7 @@ import io.cloudslang.lang.compiler.parser.model.ParsedSlang;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 
 public class SlangModellerImpl implements SlangModeller {
