@@ -101,11 +101,6 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>io.cloudslang.lang</groupId>
             <artifactId>cloudslang-commons</artifactId>
             <version>${project.parent.version}</version>
