@@ -12,6 +12,7 @@ package io.cloudslang.fortest;
 import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.SpringEncryptionTestBase;
 import io.cloudslang.lang.spi.encryption.Encryption;
 
 import java.io.Serializable;
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SensitiveValueTest.SensitiveValueTestConfig.class, SlangEntitiesSpringConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class SensitiveValueTest {
+public class SensitiveValueTest extends SpringEncryptionTestBase {
     private static final String ENCRYPTED = "{Encrypted}";
     private static final String OBFUSCATED = "{Obfuscated}";
 
