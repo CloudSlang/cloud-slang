@@ -15,7 +15,7 @@ import io.cloudslang.lang.compiler.parser.utils.ParserExceptionHandler;
 import io.cloudslang.lang.compiler.utils.MetadataUtils;
 import io.cloudslang.lang.compiler.utils.SlangSourceUtils;
 import io.cloudslang.lang.compiler.validator.matcher.DescriptionPatternMatcher;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
