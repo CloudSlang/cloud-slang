@@ -277,16 +277,16 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             }
             //noinspection unchecked
             sessionData.put(parameter, sessionContextObject);
-        }
-
-        try {
-            Class<?> expectedClass = Class.forName(objectClassName, true, classLoader);
-            if (!expectedClass.isInstance(sessionContextObject)) {
-                sessionContextObject = migrateSessionContextObject(sessionData, parameter,
-                        sessionContextObject, expectedClass);
+        } else {
+            try {
+                Class<?> expectedClass = Class.forName(objectClassName, true, classLoader);
+                if (!expectedClass.isInstance(sessionContextObject)) {
+                    sessionContextObject = migrateSessionContextObject(sessionData, parameter,
+                            sessionContextObject, expectedClass);
+                }
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("Failed to load class [" + objectClassName + "]", e);
             }
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load class [" + objectClassName + "]", e);
         }
 
         args.add(sessionContextObject);
