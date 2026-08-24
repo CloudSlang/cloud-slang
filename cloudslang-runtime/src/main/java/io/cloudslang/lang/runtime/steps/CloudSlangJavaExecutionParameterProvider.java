@@ -15,10 +15,14 @@ import com.hp.oo.sdk.content.plugin.SerializableSessionObject;
 import com.hp.oo.sdk.content.plugin.SessionObject;
 import com.hp.oo.sdk.content.plugin.StepSerializableSessionObject;
 import io.cloudslang.runtime.api.java.JavaExecutionParametersProvider;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +36,8 @@ import static io.cloudslang.score.api.execution.ExecutionParametersConsts.SESSIO
  * Created by Genadi Rabinovich, genadi@hpe.com on 17/05/2016.
  */
 public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionParametersProvider {
+    private static final Logger logger = LogManager.getLogger(CloudSlangJavaExecutionParameterProvider.class);
+
     private static final String PARAM_CLASS_NAME = Param.class.getCanonicalName();
     private static final String GLOBAL_SESSION_OBJECT_CLASS_NAME = GlobalSessionObject.class.getCanonicalName();
     private static final String SESSION_OBJECT_CLASS_NAME = SessionObject.class.getCanonicalName();
@@ -73,21 +79,22 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                 if (parameterName != null) {
                     final String methodName = executionMethod.getDeclaringClass().getName();
                     String paramClassName = parameterTypes[index].getCanonicalName();
+                    ClassLoader parameterClassLoader = parameterTypes[index].getClassLoader();
                     if (paramClassName.equals(GLOBAL_SESSION_OBJECT_CLASS_NAME)) {
                         handleSessionContextArgument(globalSessionObjectData, GLOBAL_SESSION_OBJECT_CLASS_NAME,
                                 args, parameterName, methodName,
-                                annotation.getClass().getClassLoader());
+                                parameterClassLoader);
                     } else if (paramClassName.equals(SESSION_OBJECT_CLASS_NAME)) {
                         handleSessionContextArgument(sessionObjectData, SESSION_OBJECT_CLASS_NAME,
                                 args, parameterName + "_" + (depth - 1), methodName,
-                                annotation.getClass().getClassLoader());
+                                parameterClassLoader);
                     } else if (paramClassName.equals(SERIALIZABLE_SESSION_OBJECT)) {
                         handleSessionContextArgument(serializableSessionData, SERIALIZABLE_SESSION_OBJECT,
                                 args, parameterName, methodName,
-                                annotation.getClass().getClassLoader());
+                                parameterClassLoader);
                     } else if (paramClassName.equals(STEP_SERIALIZABLE_SESSION_OBJECT)) {
                         handleStepSessionContextArgument(serializableSessionData, args, parameterName,
-                                annotation.getClass().getClassLoader());
+                                parameterClassLoader, parameterTypes[index]);
                     } else {
                         Serializable value = currentContext.get(parameterName);
                         Class<?> parameterClass = parameterTypes[index];
@@ -130,7 +137,8 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
     }
 
     private void handleStepSessionContextArgument(Map sessionData, List<Object> args,
-                                                  String parameterName, ClassLoader classLoader) {
+                                                  String parameterName, ClassLoader classLoader,
+                                                  Class<?> expectedClass) {
         final String stepSessionKey = parameterName + "_" + nodeNameWithDepth;
         Object sessionContextObject = sessionData.get(stepSessionKey);
         if (sessionContextObject == null) {
@@ -145,7 +153,112 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             //noinspection unchecked
             sessionData.put(stepSessionKey, sessionContextObject);
         }
+
+        if (sessionContextObject != null && expectedClass != null &&
+                !expectedClass.isInstance(sessionContextObject)) {
+            sessionContextObject = migrateSessionContextObject(sessionData, stepSessionKey,
+                    sessionContextObject, expectedClass);
+        }
         args.add(sessionContextObject);
+    }
+
+    private Object migrateSessionContextObject(Map sessionData, String sessionKey,
+                                               Object sessionContextObject, Class<?> expectedClass) {
+        try {
+            Object migratedObject = instantiateMigratedObject(expectedClass, sessionContextObject, sessionKey);
+            copyCompatibleFields(sessionContextObject, migratedObject);
+            //noinspection unchecked
+            sessionData.put(sessionKey, migratedObject);
+            return migratedObject;
+        } catch (Exception e) {
+            logger.warn("Failed to migrate session context object. key: {}, expectedClass: {}, " +
+                            "actualClass: {}, node: {}. Keeping original object for this invocation.",
+                    sessionKey,
+                    expectedClass.getName(),
+                    sessionContextObject.getClass().getName(),
+                    nodeNameWithDepth,
+                    e);
+            return sessionContextObject;
+        }
+    }
+
+    private Object instantiateMigratedObject(Class<?> expectedClass, Object sessionContextObject,
+                                             String fallbackSessionName)
+            throws ReflectiveOperationException {
+        try {
+            return expectedClass.getConstructor(String.class)
+                    .newInstance(resolveStepSessionName(sessionContextObject, fallbackSessionName));
+        } catch (NoSuchMethodException ignored) {
+            return expectedClass.newInstance();
+        }
+    }
+
+    private String resolveStepSessionName(Object sessionContextObject, String fallbackName) {
+        Object nameValue = invokeNoArgMethodIfExists(sessionContextObject, "getName");
+        if (nameValue != null) {
+            return String.valueOf(nameValue);
+        }
+
+        Class<?> currentClass = sessionContextObject.getClass();
+        while (currentClass != null) {
+            try {
+                Field nameField = currentClass.getDeclaredField("name");
+                nameField.setAccessible(true);
+                Object fieldValue = nameField.get(sessionContextObject);
+                return fieldValue == null ? fallbackName : String.valueOf(fieldValue);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                // Keep searching up the hierarchy and use fallback when unavailable.
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+
+        return fallbackName;
+    }
+
+    private Object invokeNoArgMethodIfExists(Object target, String methodName) {
+        try {
+            Method method = target.getClass().getMethod(methodName);
+            return method.invoke(target);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private void copyCompatibleFields(Object source, Object target) throws IllegalAccessException {
+        Class<?> sourceClass = source.getClass();
+        while (sourceClass != null) {
+            Field[] sourceFields = sourceClass.getDeclaredFields();
+            for (Field sourceField : sourceFields) {
+                int modifiers = sourceField.getModifiers();
+                if (Modifier.isStatic(modifiers)) {
+                    continue;
+                }
+                sourceField.setAccessible(true);
+                Object sourceValue = sourceField.get(source);
+                setFieldOnTargetHierarchy(target, sourceField.getName(), sourceValue);
+            }
+            sourceClass = sourceClass.getSuperclass();
+        }
+    }
+
+    private void setFieldOnTargetHierarchy(Object target, String fieldName, Object fieldValue)
+            throws IllegalAccessException {
+        Class<?> targetClass = target.getClass();
+        while (targetClass != null) {
+            try {
+                Field targetField = targetClass.getDeclaredField(fieldName);
+                int modifiers = targetField.getModifiers();
+                if (Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers)) {
+                    return;
+                }
+                targetField.setAccessible(true);
+                targetField.set(target, fieldValue);
+                return;
+            } catch (NoSuchFieldException | IllegalArgumentException ignore) {
+                // Continue searching in parent types or skip incompatible values.
+            }
+            targetClass = targetClass.getSuperclass();
+        }
     }
 
     private void handleSessionContextArgument(Map sessionData, String objectClassName, List<Object> args,
@@ -155,6 +268,7 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
                 this.nodeNameWithDepth : parameterName;
 
         Object sessionContextObject = sessionData.get(parameter);
+
         if (sessionContextObject == null) {
             try {
                 sessionContextObject = Class.forName(objectClassName, true, classLoader).newInstance();
@@ -163,7 +277,18 @@ public class CloudSlangJavaExecutionParameterProvider implements JavaExecutionPa
             }
             //noinspection unchecked
             sessionData.put(parameter, sessionContextObject);
+        } else {
+            try {
+                Class<?> expectedClass = Class.forName(objectClassName, true, classLoader);
+                if (!expectedClass.isInstance(sessionContextObject)) {
+                    sessionContextObject = migrateSessionContextObject(sessionData, parameter,
+                            sessionContextObject, expectedClass);
+                }
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("Failed to load class [" + objectClassName + "]", e);
+            }
         }
+
         args.add(sessionContextObject);
     }
 }
