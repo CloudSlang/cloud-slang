@@ -203,7 +203,9 @@ public abstract class AbstractExecutionData {
                                                     Map<String, Value> langVariables) {
         if (langVariables.containsKey(LoopCondition.LOOP_CONDITION_KEY)) {
             LoopCondition loopCondition = (LoopCondition) langVariables.get(LoopCondition.LOOP_CONDITION_KEY).get();
-            if (!shouldBreakLoop(breakOn, executableReturnValues) && loopCondition.hasMore()) {
+            boolean shouldBreak = shouldBreakLoop(breakOn, executableReturnValues);
+            boolean hasMore = loopCondition.hasMore();
+            if (!shouldBreak && hasMore) {
                 // setWorkerGroupStep will always precede beginStep in execution plan
                 final Long workerGroupStepPosition = previousStepId != null ? previousStepId - 1 : null;
                 runEnv.putNextStepPosition(workerGroupStepPosition);
