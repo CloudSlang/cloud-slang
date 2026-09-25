@@ -511,6 +511,33 @@ public class InputsBindingTest {
 
     }
 
+    @Test
+    public void testPromptExpressionIsResolvedPerContext() {
+        Prompt prompt = new Prompt.PromptBuilder()
+            .setPromptType(PromptType.TEXT)
+            .setPromptMessage("${server}")
+            .build();
+        Input input = new Input.InputBuilder("reason", ValueFactory.create(""), false)
+            .withPrompt(prompt)
+            .build();
+
+        List<Input> firstMissingInput = new ArrayList<>();
+        Map<String, Value> firstContext = new HashMap<>();
+        firstContext.put("server", ValueFactory.create("test1234"));
+        bindInputs(Collections.singletonList(input), firstContext, new HashMap<>(), new HashSet<>(),
+            firstMissingInput);
+
+        List<Input> secondMissingInput = new ArrayList<>();
+        Map<String, Value> secondContext = new HashMap<>();
+        secondContext.put("server", ValueFactory.create("paia1234"));
+        bindInputs(Collections.singletonList(input), secondContext, new HashMap<>(), new HashSet<>(),
+            secondMissingInput);
+
+        assertEquals("test1234", firstMissingInput.get(0).getPrompt().getPromptMessage());
+        assertEquals("paia1234", secondMissingInput.get(0).getPrompt().getPromptMessage());
+        assertEquals("${server}", input.getPrompt().getPromptMessage());
+    }
+
     private Map<String, Value> bindInputs(List<Input> inputs, Map<String, Value> context,
                                           Map<String, Value> promptArgs,
                                           Set<SystemProperty> systemProperties, List<Input> missingInputs) {

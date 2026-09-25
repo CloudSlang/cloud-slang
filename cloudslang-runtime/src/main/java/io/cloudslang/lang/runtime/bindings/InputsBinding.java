@@ -110,8 +110,9 @@ public class InputsBinding extends AbstractBinding {
                         if (useEmptyValuesForPrompts) {
                             value = createEmptyValue(input);
                         } else if (isNull(promptValue)) {
-                            resolvePromptExpressions(input, context, targetContext, systemProperties);
-                            missingInputs.add(createMissingInput(input, value));
+                            Prompt resolvedPrompt = resolvePromptExpressions(input, context, targetContext,
+                                systemProperties);
+                            missingInputs.add(createMissingInput(input, value, resolvedPrompt));
                             return;
                         }
                     }
@@ -121,8 +122,9 @@ public class InputsBinding extends AbstractBinding {
                             value = createEmptyValue(input);
                         }
                     } else if (isNull(promptValue)) {
-                        resolvePromptExpressions(input, context, targetContext, systemProperties);
-                        missingInputs.add(createMissingInput(input, value));
+                        Prompt resolvedPrompt = resolvePromptExpressions(input, context, targetContext,
+                            systemProperties);
+                        missingInputs.add(createMissingInput(input, value, resolvedPrompt));
                         return;
                     }
                 }
@@ -139,10 +141,10 @@ public class InputsBinding extends AbstractBinding {
         targetContext.put(inputName, value);
     }
 
-    private void resolvePromptExpressions(Input input,
-                                          Map<String, ? extends Value> context,
-                                          Map<String, Value> targetContext,
-                                          Set<SystemProperty> systemProperties) {
+    private Prompt resolvePromptExpressions(Input input,
+                                            Map<String, ? extends Value> context,
+                                            Map<String, Value> targetContext,
+                                            Set<SystemProperty> systemProperties) {
         if (input.hasPrompt()) {
             EvaluationContextHolder evaluationContextHolder =
                     new EvaluationContextHolder(context,
@@ -152,9 +154,9 @@ public class InputsBinding extends AbstractBinding {
                             input.getName(),
                             input.getFunctionDependencies());
 
-            resolvePromptExpressions(input.getPrompt(), evaluationContextHolder);
+            return resolvePromptExpressions(input.getPrompt(), evaluationContextHolder);
         }
-
+        return null;
     }
 
     private Value resolveValue(Input input, Map<String, ? extends Value> context,
@@ -204,8 +206,10 @@ public class InputsBinding extends AbstractBinding {
         return value == null || value.get() == null || value.get().equals("");
     }
 
-    private Input createMissingInput(Input input, Value value) {
-        return new Input.InputBuilder(input, value).build();
+    private Input createMissingInput(Input input, Value value, Prompt prompt) {
+        return new Input.InputBuilder(input, value)
+                .withPrompt(prompt)
+                .build();
     }
 
     private Value createEmptyValue(Input input) {
@@ -216,7 +220,7 @@ public class InputsBinding extends AbstractBinding {
         if (prompts.containsKey(input.getName())) {
             return new Input
                     .InputBuilder(input, input.getValue())
-                    .withPrompt(prompts.get(input.getName()))
+                    .withPrompt(copyPrompt(prompts.get(input.getName())))
                     .build();
         } else {
             return input;

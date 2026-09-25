@@ -136,9 +136,10 @@ public class StepExecutionData extends AbstractExecutionData {
             ReadOnlyContextAccessor contextAccessor = new ReadOnlyContextAccessor(
                     flowVariables,
                     magicVariableHelper.getGlobalContext(executionRuntimeServices));
+            Map<String, Prompt> resolvedPrompts = new LinkedHashMap<>();
             Map<String, Value> boundInputs = argumentsBinding
-                    .bindArguments(stepInputs, contextAccessor,
-                            runEnv.getSystemProperties());
+                .bindArguments(stepInputs, contextAccessor,
+                    runEnv.getSystemProperties(), resolvedPrompts);
 
             sendEndBindingArgumentsEvent(
                     stepInputs,
@@ -155,7 +156,7 @@ public class StepExecutionData extends AbstractExecutionData {
                     runEnv,
                     flowContext,
                     boundInputs,
-                    createPrompts(stepInputs));
+                    resolvedPrompts);
 
             Value workerGroupValue = flowContext.removeLanguageVariable(WORKER_GROUP_VALUE);
             Value workerGroupOverride = flowContext.removeLanguageVariable(WORKER_GROUP_OVERRIDE);
@@ -415,13 +416,5 @@ public class StepExecutionData extends AbstractExecutionData {
         }
         return ExecutionParametersConsts.DEFAULT_ROI_VALUE;
     }
-
-    private Map<String, Prompt> createPrompts(List<Argument> stepInputs) {
-        return stepInputs
-                .stream()
-                .filter(Argument::hasPrompt)
-                .collect(toMap(InOutParam::getName, Argument::getPrompt, (x, y) -> y, LinkedHashMap::new));
-    }
-
 
 }
