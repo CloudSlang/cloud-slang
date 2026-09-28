@@ -207,9 +207,11 @@ public class InputsBinding extends AbstractBinding {
     }
 
     private Input createMissingInput(Input input, Value value, Prompt prompt) {
-        return new Input.InputBuilder(input, value)
-                .withPrompt(prompt)
-                .build();
+        Input.InputBuilder builder = new Input.InputBuilder(input, value);
+        if (prompt != null) {
+            builder.withPrompt(prompt);
+        }
+        return builder.build();
     }
 
     private Value createEmptyValue(Input input) {
