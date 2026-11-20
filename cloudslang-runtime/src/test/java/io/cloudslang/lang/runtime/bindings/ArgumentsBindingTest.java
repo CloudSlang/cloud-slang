@@ -400,21 +400,25 @@ public class ArgumentsBindingTest {
                 multiChoicePrompt);
 
 
-        Map<String, Value> result = bindArguments(Arrays.asList(argument1, argument2, argument3), context);
+        Map<String, Prompt> resolvedPrompts = new HashMap<>();
+        Map<String, Value> result = argumentsBinding.bindArguments(Arrays.asList(argument1, argument2, argument3),
+            context, EMPTY_SET, resolvedPrompts);
         assertFalse(result.isEmpty());
         assertTrue(result.containsKey("argument1"));
         assertTrue(result.containsKey("argument2"));
         assertTrue(result.containsKey("argument3"));
 
-        assertEquals("(What's the story?) Morning glory", argument1.getPrompt().getPromptMessage());
+        assertEquals("(What's the story?) Morning glory", resolvedPrompts.get("argument1").getPromptMessage());
 
-        assertEquals("Hey hey! My my!", argument2.getPrompt().getPromptMessage());
-        assertEquals("|", argument2.getPrompt().getPromptDelimiter());
-        assertEquals("1|2|3", argument2.getPrompt().getPromptOptions());
+        assertEquals("Hey hey! My my!", resolvedPrompts.get("argument2").getPromptMessage());
+        assertEquals("|", resolvedPrompts.get("argument2").getPromptDelimiter());
+        assertEquals("1|2|3", resolvedPrompts.get("argument2").getPromptOptions());
 
-        assertEquals("Rock 'n' Roll will never die", argument3.getPrompt().getPromptMessage());
-        assertEquals("!", argument3.getPrompt().getPromptDelimiter());
-        assertEquals("x!y!z", argument3.getPrompt().getPromptOptions());
+        assertEquals("Rock 'n' Roll will never die", resolvedPrompts.get("argument3").getPromptMessage());
+        assertEquals("!", resolvedPrompts.get("argument3").getPromptDelimiter());
+        assertEquals("x!y!z", resolvedPrompts.get("argument3").getPromptOptions());
+
+        assertEquals("${messageContainer1 + ' Morning glory'}", argument1.getPrompt().getPromptMessage());
     }
 
     private Map<String, Value> bindArguments(

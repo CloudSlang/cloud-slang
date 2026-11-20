@@ -11,6 +11,7 @@ package io.cloudslang.lang.runtime.bindings;
 
 import io.cloudslang.lang.entities.SystemProperty;
 import io.cloudslang.lang.entities.bindings.Argument;
+import io.cloudslang.lang.entities.bindings.prompt.Prompt;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
 import io.cloudslang.lang.runtime.steps.ReadOnlyContextAccessor;
@@ -34,13 +35,21 @@ public class ArgumentsBinding extends AbstractBinding {
             List<Argument> arguments,
             Map<String, ? extends Value> context,
             Set<SystemProperty> systemProperties) {
+        return bindArguments(arguments, context, systemProperties, new HashMap<>());
+    }
+
+    public Map<String, Value> bindArguments(
+            List<Argument> arguments,
+            Map<String, ? extends Value> context,
+            Set<SystemProperty> systemProperties,
+            Map<String, Prompt> resolvedPrompts) {
         Map<String, Value> resultContext = new HashMap<>();
 
         //we do not want to change original context map
         Map<String, Value> srcContext = new HashMap<>(context);
 
         for (Argument argument : arguments) {
-            bindArgument(argument, srcContext, systemProperties, resultContext);
+            bindArgument(argument, srcContext, systemProperties, resultContext, resolvedPrompts);
         }
 
         return resultContext;
@@ -50,13 +59,21 @@ public class ArgumentsBinding extends AbstractBinding {
             List<Argument> arguments,
             ReadOnlyContextAccessor contextAccessor,
             Set<SystemProperty> systemProperties) {
+        return bindArguments(arguments, contextAccessor, systemProperties, new HashMap<>());
+    }
+
+    public Map<String, Value> bindArguments(
+            List<Argument> arguments,
+            ReadOnlyContextAccessor contextAccessor,
+            Set<SystemProperty> systemProperties,
+            Map<String, Prompt> resolvedPrompts) {
         Map<String, Value> resultContext = new HashMap<>();
 
         //we do not want to change original context map
         Map<String, Value> srcContext = contextAccessor.getMergedContexts();
 
         for (Argument argument : arguments) {
-            bindArgument(argument, srcContext, systemProperties, resultContext);
+            bindArgument(argument, srcContext, systemProperties, resultContext, resolvedPrompts);
         }
 
         return resultContext;
@@ -66,7 +83,8 @@ public class ArgumentsBinding extends AbstractBinding {
             Argument argument,
             Map<String, ? extends Value> srcContext,
             Set<SystemProperty> systemProperties,
-            Map<String, Value> targetContext) {
+            Map<String, Value> targetContext,
+            Map<String, Prompt> resolvedPrompts) {
         Value inputValue;
         String inputName = argument.getName();
         String errorMessagePrefix = "Error binding step input: '" + inputName;
@@ -97,7 +115,9 @@ public class ArgumentsBinding extends AbstractBinding {
             }
 
             if (argument.hasPrompt()) {
-                resolvePromptExpressions(argument.getPrompt(), evaluationContextHolder.overrideInputValue(inputValue));
+                Prompt resolvedPrompt = resolvePromptExpressions(argument.getPrompt(),
+                        evaluationContextHolder.overrideInputValue(inputValue));
+                resolvedPrompts.put(inputName, resolvedPrompt);
             }
 
             inputValue = handleSensitiveModifier(inputValue, argument.isSensitive());

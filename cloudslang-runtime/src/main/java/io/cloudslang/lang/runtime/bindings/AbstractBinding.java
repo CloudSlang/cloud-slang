@@ -122,28 +122,51 @@ public class AbstractBinding {
         }
     }
 
-    protected void resolvePromptExpressions(Prompt prompt, EvaluationContextHolder evaluationContextHolder) {
-        // prompt message
+    protected Prompt resolvePromptExpressions(Prompt prompt, EvaluationContextHolder evaluationContextHolder) {
+        Prompt.PromptBuilder promptBuilder = new Prompt.PromptBuilder()
+                .setPromptType(prompt.getPromptType())
+                .setPromptMessage(prompt.getPromptMessage());
+
         tryEvaluateExpression(prompt.getPromptMessage(), evaluationContextHolder)
                 .map(Value::toStringSafeEmpty)
-                .ifPresent(prompt::setPromptMessage);
+                .ifPresent(promptBuilder::setPromptMessage);
 
         // in case of single/multi-choice
         if (prompt.getPromptType().isChoiceLike()) {
+            promptBuilder
+                    .setPromptOptions(prompt.getPromptOptions())
+                    .setPromptDelimiter(prompt.getPromptDelimiter());
+
             // prompt options
             tryEvaluateExpression(prompt.getPromptOptions(), evaluationContextHolder)
                     .ifPresent(value -> {
                         if (value.isSensitive()) {
                             throw new RuntimeException(SENSITIVE_VALUE_IN_PROMPT_OPTION_ERROR);
                         }
-                        prompt.setPromptOptions(Value.toStringSafeEmpty(value));
+                        promptBuilder.setPromptOptions(Value.toStringSafeEmpty(value));
                     });
 
             // prompt delimiter
             tryEvaluateExpression(prompt.getPromptDelimiter(), evaluationContextHolder)
                     .map(Value::toStringSafeEmpty)
-                    .ifPresent(prompt::setPromptDelimiter);
+                    .ifPresent(promptBuilder::setPromptDelimiter);
         }
+
+        return promptBuilder.build();
+    }
+
+    protected Prompt copyPrompt(Prompt prompt) {
+        Prompt.PromptBuilder promptBuilder = new Prompt.PromptBuilder()
+                .setPromptType(prompt.getPromptType())
+                .setPromptMessage(prompt.getPromptMessage());
+
+        if (prompt.getPromptType().isChoiceLike()) {
+            promptBuilder
+                    .setPromptOptions(prompt.getPromptOptions())
+                    .setPromptDelimiter(prompt.getPromptDelimiter());
+        }
+
+        return promptBuilder.build();
     }
 
 }
