@@ -17,6 +17,7 @@ import io.cloudslang.lang.entities.bindings.Output;
 import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.ScriptFunction;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.SpringEncryptionTestBase;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DeserializeTest.Config.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class DeserializeTest {
+public class DeserializeTest extends SpringEncryptionTestBase {
 
     private ObjectMapper mapper;
 
