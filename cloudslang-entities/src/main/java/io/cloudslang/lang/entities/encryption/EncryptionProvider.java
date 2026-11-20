@@ -35,6 +35,10 @@ public class EncryptionProvider {
         return encryption;
     }
 
+    public static void reset() {
+        encryptor.set(null);
+    }
+
     private static Encryption create() {
         Encryption[] encryptors;
         try {

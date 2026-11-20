@@ -10,6 +10,7 @@
 package io.cloudslang.lang.runtime.steps;
 
 import com.google.common.collect.Lists;
+import configuration.SlangEntitiesSpringConfig;
 import io.cloudslang.dependency.api.services.DependencyService;
 import io.cloudslang.dependency.api.services.MavenConfig;
 import io.cloudslang.dependency.impl.services.DependencyServiceImpl;
@@ -24,6 +25,7 @@ import io.cloudslang.lang.entities.bindings.Result;
 import io.cloudslang.lang.entities.bindings.values.SensitiveValue;
 import io.cloudslang.lang.entities.bindings.values.Value;
 import io.cloudslang.lang.entities.bindings.values.ValueFactory;
+import io.cloudslang.lang.entities.encryption.EncryptionProvider;
 import io.cloudslang.lang.entities.encryption.DummyEncryptor;
 import io.cloudslang.lang.runtime.bindings.ArgumentsBinding;
 import io.cloudslang.lang.runtime.bindings.InputsBinding;
@@ -61,6 +63,8 @@ import io.cloudslang.score.events.ScoreEvent;
 import io.cloudslang.score.lang.ExecutionRuntimeServices;
 import io.cloudslang.score.lang.SystemContext;
 import io.cloudslang.worker.management.WorkerConfigurationService;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +101,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ExecutableStepsTest.Config.class)
+@ContextConfiguration(classes = {ExecutableStepsTest.Config.class, SlangEntitiesSpringConfig.class})
 public class ExecutableStepsTest {
 
     static {
@@ -121,6 +125,16 @@ public class ExecutableStepsTest {
 
     @Autowired
     private ExecutionPreconditionService executionPreconditionService;
+
+    @Before
+    public void setUp() {
+        EncryptionProvider.reset();
+    }
+
+    @After
+    public void tearDown() {
+        setUp();
+    }
 
     @Test
     public void testStart() {
