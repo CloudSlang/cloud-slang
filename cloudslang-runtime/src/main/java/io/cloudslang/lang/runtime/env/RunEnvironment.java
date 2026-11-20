@@ -213,11 +213,18 @@ public class RunEnvironment implements Serializable {
 
     public void decryptSensitiveData() {
         for (Value value : prepareValuesForEncryptDecrypt()) {
-            if (value.get() instanceof HashMap) {
-                HashMap<String, Value> map = (HashMap<String, Value>) value.get();
+            if (value.get() instanceof Map) {
+                Map<String, Serializable> map = (Map<String, Serializable>) value.get();
                 for (Serializable valueInMap : map.values()) {
                     if (valueInMap instanceof Value && ((Value) valueInMap).isSensitive()) {
                         ((SensitiveValue) valueInMap).decrypt();
+                    }
+                }
+            } else if (value.get() instanceof List) {
+                List<Serializable> list = (List<Serializable>) value.get();
+                for (Serializable valueInList : list) {
+                    if (valueInList instanceof Value && ((Value) valueInList).isSensitive()) {
+                        ((SensitiveValue) valueInList).decrypt();
                     }
                 }
             } else if (value.isSensitive()) {
@@ -228,11 +235,18 @@ public class RunEnvironment implements Serializable {
 
     public void encryptSensitiveData() {
         for (Value value : prepareValuesForEncryptDecrypt()) {
-            if (value.get() instanceof HashMap) {
-                HashMap<String, Value> map = (HashMap<String, Value>) value.get();
+            if (value.get() instanceof Map) {
+                Map<String, Serializable> map = (Map<String, Serializable>) value.get();
                 for (Serializable valueInMap : map.values()) {
                     if (valueInMap instanceof Value && ((Value) valueInMap).isSensitive()) {
                         ((SensitiveValue) valueInMap).encrypt();
+                    }
+                }
+            } else if (value.get() instanceof List) {
+                List<Serializable> list = (List<Serializable>) value.get();
+                for (Serializable valueInList : list) {
+                    if (valueInList instanceof Value && ((Value) valueInList).isSensitive()) {
+                        ((SensitiveValue) valueInList).encrypt();
                     }
                 }
             } else if (value.isSensitive()) {
