@@ -427,6 +427,8 @@ public class SlangBuilderTest {
                 null, null, null, new HashSet<String>(), SYSTEM_PROPERTY_DEPENDENCIES);
         when(slangCompiler.preCompileSource(any(SlangSource.class)))
                 .thenReturn(new ExecutableModellingResult(executable, new ArrayList<RuntimeException>()));
+        when(metadataExtractor.extractMetadataModellingResult(any(SlangSource.class), eq(false)))
+                .thenReturn(new MetadataModellingResult(EMPTY_METADATA, new ArrayList<RuntimeException>()));
         when(scoreCompiler.compile(executable, new HashSet<Executable>()))
                 .thenReturn(EMPTY_COMPILATION_ARTIFACT);
         SlangBuildResults buildResults = slangBuilder.buildSlangContent(resource.getPath(), resource.getPath(),
